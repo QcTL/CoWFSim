@@ -1,0 +1,5 @@
+hasGaussian:false
+hasNoise:false
+hasNucleus:false
+nStarts:1
+typeEnvironment:Desert
