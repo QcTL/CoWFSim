@@ -1,9 +1,8 @@
 
 
-#include "src/tests/tst_gBasicGrid.h"
+#include "src/tests/tst_gBtoGM.h"
 
-int main()
-{
-    tst_gBasicGrid();
+int main() {
+    tst_gBtoGM();
     return 0;
 }
