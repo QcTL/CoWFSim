@@ -1,9 +1,9 @@
 
 
-#include "src/tests/tst_TransRNodeRRNode.h"
+#include "src/tests/tst_gBasicGrid.h"
 
 int main()
 {
-    tst_tRNodeRRNode();
+    tst_gBasicGrid();
     return 0;
 }
