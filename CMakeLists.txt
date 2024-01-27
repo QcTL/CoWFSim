@@ -19,6 +19,9 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/roads/rTransRNodeToRRNode.h
         src/sim/roads/node/rNode.h
         src/sim/roads/node/rRNode.h
-        src/tests/tst_TransRNodeRRNode.h)
+        src/tests/tst_TransRNodeRRNode.h
+        src/sim/structure/grids/gIGrid.h
+        src/sim/structure/grids/gBasicGrid.h
+        src/tests/tst_gBasicGrid.h)
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)
