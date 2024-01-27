@@ -15,6 +15,10 @@ endif()
 
 add_executable(CityOfWeirdFishes main.cpp
         src/IO/ReaderParameters.h
-        src/tests/tst_Reader.h)
+        src/tests/tst_Reader.h
+        src/sim/roads/rTransRNodeToRRNode.h
+        src/sim/roads/node/rNode.h
+        src/sim/roads/node/rRNode.h
+        src/tests/tst_TransRNodeRRNode.h)
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

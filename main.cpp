@@ -1,9 +1,9 @@
 
 
-#include "src/tests/tst_Reader.h"
+#include "src/tests/tst_TransRNodeRRNode.h"
 
 int main()
 {
-    tst_ReaderV1();
+    tst_tRNodeRRNode();
     return 0;
 }
