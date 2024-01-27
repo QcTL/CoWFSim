@@ -13,6 +13,8 @@ include_directories("path/to/linux/SFML/include")
 link_directories("path/to/linux/SFML/lib")
 endif()
 
-add_executable(CityOfWeirdFishes main.cpp)
+add_executable(CityOfWeirdFishes main.cpp
+        src/IO/ReaderParameters.h
+        src/tests/tst_Reader.h)
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

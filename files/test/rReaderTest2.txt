@@ -1,0 +1,12 @@
+hasNucleusDecoration:on
+hasOffsetNucleus:false
+rangeOffsetX:2
+rangeOffsetY:1
+hasGaussian:on
+sizeKernelGaussian:3
+nStarts:1
+nIndustry:1
+typeEnvironment:City
+nMainRoads:5
+wideMainRoads:1
+hasLowLevelMainRoadsDivergent:false
