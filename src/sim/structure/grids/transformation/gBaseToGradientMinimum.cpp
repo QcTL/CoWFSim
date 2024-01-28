@@ -12,7 +12,7 @@
 
 gBaseToGradientMinimum::gBaseToGradientMinimum(const std::vector<gtmElement> &lElements,
                                                std::pair<int, int> strBiggestPos,
-                                               std::unique_ptr<gIGrid<float>> gResult) : gtmGResult(std::move(gResult)),
+                                               std::shared_ptr<gIGrid<float>> gResult) : gtmGResult(std::move(gResult)),
                                                                                          gtmLElements(lElements) {
     gtmToExtend.emplace_back(strBiggestPos, 0);
     gtmGResult->set(strBiggestPos.first, strBiggestPos.second, float(lElements.size() - 1));
@@ -24,7 +24,7 @@ gBaseToGradientMinimum::gBaseToGradientMinimum(const std::vector<gtmElement> &lE
 
 gBaseToGradientMinimum::gBaseToGradientMinimum(const std::vector<gtmElement> &lElements,
                                                std::pair<int, int> strBiggestPos,
-                                               std::unique_ptr<gIGrid<float>> gResult,
+                                               std::shared_ptr<gIGrid<float>> gResult,
                                                int rSeed) : gtmGResult(std::move(gResult)),
                                                             gtmLElements(lElements) {
     gtmToExtend.emplace_back(strBiggestPos, 0);
@@ -67,7 +67,4 @@ void gBaseToGradientMinimum::generate() {
         extendValueGrid(newPos, gtmGResult->get(newPos.first, newPos.second), gtmToExtend.front().second);
         gtmToExtend.pop_front();
     }
-
-    std::cout << *dynamic_cast<gBasicGrid<float> *>(gtmGResult.get()) << std::endl;
-    std::cout << "------------" << std::endl;
 }

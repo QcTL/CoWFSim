@@ -1,8 +1,8 @@
 
 
-#include "src/tests/tst_gBtoGM.h"
+#include "src/tests/tst_gGaussian.h"
 
 int main() {
-    tst_gBtoGM();
+    tst_gGaussian();
     return 0;
 }

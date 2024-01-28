@@ -27,15 +27,15 @@ public:
     };
 
     gBaseToGradientMinimum(const std::vector<gtmElement> &lElements, std::pair<int, int> strBiggestPos,
-                           std::unique_ptr<gIGrid<float>> gResult);
+                           std::shared_ptr<gIGrid<float>> gResult);
 
     gBaseToGradientMinimum(const std::vector<gtmElement> &lElements, std::pair<int, int> strBiggestPos,
-                           std::unique_ptr<gIGrid<float>> gResult, int rSeed);
+                           std::shared_ptr<gIGrid<float>> gResult, int rSeed);
 
     void generate();
 
 private:
-    std::unique_ptr<gIGrid<float>> gtmGResult;
+    std::shared_ptr<gIGrid<float>> gtmGResult;
     std::vector<gtmElement> gtmLElements;
 
     std::list<std::pair<std::pair<int, int>, int>> gtmToExtend;

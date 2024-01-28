@@ -14,7 +14,7 @@ public:
 
     virtual void set(int row, int col, const T& value) = 0;
 
-    virtual T get(int row, int col) const = 0;
+    virtual T get(int row, int col) = 0;
 
     [[nodiscard]] virtual std::pair<std::pair<int,int>, std::pair<int,int>> rangeUse() const = 0;
 
