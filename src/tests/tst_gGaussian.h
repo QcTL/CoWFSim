@@ -11,21 +11,21 @@
 
 int tst_gGaussian() {
 
-    std::shared_ptr<gIGrid<float>> ptr = std::make_shared<gBasicGrid<float>>(gBasicGrid<float>(10, 8,-1));
-    std::vector<gBaseToGradientMinimum::gtmElement> vElem = {
-            gBaseToGradientMinimum::gtmElement(0.0,0,0.0,0),
-            gBaseToGradientMinimum::gtmElement(0.05,0,0.1,0),
-            gBaseToGradientMinimum::gtmElement(0.25,0,0.1,0),};
+    std::shared_ptr<gIGrid<double>> ptr = std::make_shared<gBasicGrid<double>>(gBasicGrid<double>(10, 8, -1));
+    std::vector<gtmElement> vElem = {
+            gtmElement(0.0, 0, 0.0, 0),
+            gtmElement(0.05, 0, 0.1, 0),
+            gtmElement(0.25, 0, 0.1, 0),};
 
-    gBaseToGradientMinimum gBGM(vElem, {5,5}, ptr ,35); // Pass ptr by reference
+    gBaseToGradientMinimum<double> gBGM(vElem, {5, 5}, ptr, 35); // Pass ptr by reference
     gBGM.generate();
 
-    std::cout << *dynamic_cast<gBasicGrid<float> *>(ptr.get()) << std::endl;
+    std::cout << *dynamic_cast<gBasicGrid<double> *>(ptr.get()) << std::endl;
     std::cout << "------------" << std::endl;
 
-    BasicTransformations::GaussianFilter<float>(ptr);
+    BasicTransformations::GaussianFilter<double>(ptr);
 
-    std::cout << *dynamic_cast<gBasicGrid<float> *>(ptr.get()) << std::endl;
+    std::cout << *dynamic_cast<gBasicGrid<double> *>(ptr.get()) << std::endl;
     std::cout << "------------" << std::endl;
     return 0;
 }

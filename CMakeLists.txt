@@ -19,7 +19,6 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/roads/rTransRNodeToRRNode.h
         src/sim/roads/node/rNode.h
         src/sim/roads/node/rRNode.h
-        src/sim/structure/grids/transformation/gBaseToGradientMinimum.cpp
         src/sim/structure/grids/transformation/gBaseToGradientMinimum.h
         src/tests/tst_TransRNodeRRNode.h
         src/sim/structure/grids/gIGrid.h
