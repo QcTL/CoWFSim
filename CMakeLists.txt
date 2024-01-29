@@ -26,6 +26,8 @@ add_executable(CityOfWeirdFishes main.cpp
         src/tests/tst_gBasicGrid.h
         src/tests/tst_gBtoGM.h
         src/sim/structure/grids/transformation/gBasicTransformations.h
-        src/tests/tst_gGaussian.h)
+        src/tests/tst_gGaussian.h
+        src/sim/structure/grids/transformation/gBaseToPattern.h
+        src/sim/structure/grids/transformation/gBaseToBorderDetection.h)
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)
