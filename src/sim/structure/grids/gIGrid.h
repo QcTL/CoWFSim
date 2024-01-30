@@ -13,8 +13,10 @@ public:
     virtual ~gIGrid() = default;
 
     virtual void set(int row, int col, const T& value) = 0;
+    void set(const std::pair<int,int> p, const T& value) {set(p.first, p.second);}
 
     virtual T get(int row, int col) = 0;
+    T get(const std::pair<int,int> p){get(p.first, p.second);}
 
     [[nodiscard]] virtual std::pair<std::pair<int,int>, std::pair<int,int>> rangeUse() const = 0;
 

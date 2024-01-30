@@ -1,0 +1,12 @@
+//
+// Created by Laminar on 29/01/2024.
+//
+
+#ifndef CITYOFWEIRDFISHES_RPILEMENUS_H
+#define CITYOFWEIRDFISHES_RPILEMENUS_H
+
+class rPileMenus {
+
+};
+
+#endif //CITYOFWEIRDFISHES_RPILEMENUS_H

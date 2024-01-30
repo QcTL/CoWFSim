@@ -27,6 +27,14 @@ add_executable(CityOfWeirdFishes main.cpp
         src/tests/tst_gBtoGM.h
         src/sim/structure/grids/transformation/gBasicTransformations.h
         src/tests/tst_gGaussian.h
+        src/display/rGlobal.cpp
+        src/display/rGlobal.h
+        src/display/rPileMenus.h
+        src/display/layers/gSimLayers.h
+        src/display/layers/gILayer.h
+        src/display/layers/tileset/gTileset.h
+        src/display/layers/implementation/gLayerAirPollution.h
+        src/tests/tst_gBasicDisplay.h,
         src/sim/structure/grids/transformation/gBaseToPattern.h
         src/sim/structure/grids/transformation/gBaseToBorderDetection.h)
 
