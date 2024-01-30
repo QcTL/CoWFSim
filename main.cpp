@@ -1,8 +1,8 @@
 
 
-#include "src/tests/tst_gBasicDisplay.h"
+#include "src/tests/tst_gBasicPattern.h"
 
 int main() {
-    tst_gBasicDisplay();
+    tst_gBasicPattern();
     return 0;
 }

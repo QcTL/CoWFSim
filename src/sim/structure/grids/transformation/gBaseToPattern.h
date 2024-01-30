@@ -21,15 +21,45 @@ public:
     gBaseToPattern(std::shared_ptr<gIGrid<T>> gR, gPatternType type, int seed) : gtmGResult(gR) {
         switch (type) {
             case gBPSquares:
+                genBasicSquaresToGrid(7,7,7,7);
+                genDiagonalToGrid(35);
                 break;
             case gBPBlobSquares:
+                gen.seed(seed);
                 break;
         }
-
-        gen.seed(seed);
     }
 
 private:
+
+    void genBasicSquaresToGrid(int bWidth, int bHeight, int nHeight, int nWidth) {
+        std::pair<std::pair<int, int>, std::pair<int, int>> ranges = gtmGResult->rangeUse();
+        for (int x = 0; x < nWidth; x++) {
+            for (int y = 0; y < nHeight; y++) {
+                std::pair<int, int> pTL = {x * (bWidth - 1), y * (bHeight - 1)};
+                std::cout << pTL.first << " - " << pTL.second << std::endl;
+
+                for (int i = 0; i < bHeight; i++) {
+                    gtmGResult->set(pTL.first, pTL.second + i, 1);
+                    gtmGResult->set(pTL.first + bWidth - 1, pTL.second + i, 1);
+                }
+
+                for (int i = 0; i < bWidth; i++) {
+                    gtmGResult->set(pTL.first + i, pTL.second, 1);
+                    gtmGResult->set(pTL.first + i, pTL.second + bHeight - 1, 1);
+                }
+
+                //gtmGResult->set(pTL.first, pTL.second, 2);
+            }
+        }
+    }
+
+    void genDiagonalToGrid(int lenghtDiag) {
+        for (int i = 0; i < lenghtDiag; i++) {
+            gtmGResult->set(i, i, 1);
+            gtmGResult->set(i, i - 1, 1);
+        }
+    }
 
     std::vector<std::vector<int>> genGridSquares(int height, int width) {
         dis_row = std::uniform_int_distribution<>(0, height);
@@ -65,10 +95,11 @@ private:
                  {i,     j - 1}};
 
         //IF IS INSIDE
-        if(0 <= dOffsets[dir].first && dOffsets[dir].first < gSquares.size() && 0 <= dOffsets[dir].second && dOffsets[dir].second < gSquares[0].size()){
-            if(gSquares[dOffsets[dir].first][dOffsets[dir].second] > gSquares[i][j]){
+        if (0 <= dOffsets[dir].first && dOffsets[dir].first < gSquares.size() && 0 <= dOffsets[dir].second &&
+            dOffsets[dir].second < gSquares[0].size()) {
+            if (gSquares[dOffsets[dir].first][dOffsets[dir].second] > gSquares[i][j]) {
                 gSquares[dOffsets[dir].first][dOffsets[dir].second] = gSquares[i][j];
-            }else{
+            } else {
                 gSquares[i][j] = gSquares[dOffsets[dir].first][dOffsets[dir].second];
             }
         }
