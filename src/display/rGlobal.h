@@ -15,7 +15,7 @@
 
 class rGlobal {
 public:
-        rGlobal(std::shared_ptr<gSimLayers> gInfoL);
+        explicit rGlobal(std::shared_ptr<gSimLayers> gInfoL);
 
         void setUp();
         void loop();

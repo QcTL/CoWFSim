@@ -7,6 +7,8 @@
 
 rGlobal::rGlobal(std::shared_ptr<gSimLayers> gInfoL)
     : gSimL(std::move(gInfoL)), rWindow(sf::RenderWindow(sf::VideoMode(800,600), "CoWF")) {
+
+    rPMenu = std::make_unique<rPileMenus>();
 }
 
 void rGlobal::setUp() {
@@ -52,6 +54,7 @@ void rGlobal::loop() {
     }
 
     rWindow.clear();
+    rPMenu->display(rWindow);
     rWindow.draw(vertices, gSimL->gSLActual->getTexture());
     rWindow.display();
 }
