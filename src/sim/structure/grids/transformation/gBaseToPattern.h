@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 #include <random>
+#include <list>
 #include "../gIGrid.h"
 
 
@@ -21,7 +22,7 @@ public:
     gBaseToPattern(std::shared_ptr<gIGrid<T>> gR, gPatternType type, int seed) : gtmGResult(gR) {
         switch (type) {
             case gBPSquares:
-                genBasicSquaresToGrid(7,7,7,7);
+                genBasicSquaresToGrid(7, 7, 7, 7);
                 genDiagonalToGrid(35);
                 break;
             case gBPBlobSquares:
@@ -82,8 +83,8 @@ private:
     std::uniform_int_distribution<> dis_col;
     std::uniform_int_distribution<> dis_dir;
 
-    std::vector<std::vector<int>> blobTwoSquares(std::vector<std::vector<int>> gSquares) {
 
+    std::vector<std::vector<int>> blobTwoSquares(std::vector<std::vector<int>> gSquares) {
         int i = dis_row(gen);
         int j = dis_col(gen);
         int dir = dis_dir(gen);
@@ -103,6 +104,41 @@ private:
                 gSquares[i][j] = gSquares[dOffsets[dir].first][dOffsets[dir].second];
             }
         }
+
+        return gSquares;
+    }
+
+
+    std::vector<std::vector<std::shared_ptr<std::list<std::pair<int, int>>>>>
+    prepBlobSquares(std::vector<std::vector<int>> gSquares) {
+        std::vector<std::vector<std::shared_ptr<std::list<std::pair<int, int>>>>> ret(gSquares.size(),
+                                                                                      std::vector<std::shared_ptr<std::list<std::pair<int, int>>>>(
+                                                                                              gSquares[0].size()));
+        for (int i = 0; i < gSquares.size(); i++) {
+            for (int j = 0; j < gSquares.size(); j++) {
+                ret[i][j]->emplace_back(i, j);
+            }
+        }
+        return ret;
+    }
+
+
+    std::vector<std::vector<std::shared_ptr<std::list<std::pair<int, int>>>>>
+    blobTwoSquaresV2(std::vector<std::vector<std::shared_ptr<std::list<std::pair<int, int>>>>> gSquares) {
+        int i = dis_row(gen);
+        int j = dis_col(gen);
+        int dir = dis_dir(gen);
+
+        std::vector<std::pair<int, int>> dOffsets =
+                {{i + 1, j},
+                 {i - 1, j},
+                 {i,     j + 1},
+                 {i,     j - 1}};
+
+        gSquares[i][j]->insert(gSquares[i][j]->end(),
+                               gSquares[dOffsets[dir].first][dOffsets[dir].second]->begin(),
+                               gSquares[dOffsets[dir].first][dOffsets[dir].second]->end());
+        gSquares[dOffsets[dir].first][dOffsets[dir].second] = gSquares[i][j];
 
         return gSquares;
     }
