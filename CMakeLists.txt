@@ -37,6 +37,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/tests/tst_gBasicDisplay.h
         src/sim/structure/grids/transformation/gBaseToPattern.h
         src/sim/structure/grids/transformation/gBaseToBorderDetection.h
-        src/tests/tst_gBasicPattern.h)
+        src/tests/tst_gBasicPattern.h
+        src/tests/tst_gGenericKernel.h)
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)
