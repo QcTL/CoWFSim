@@ -10,6 +10,7 @@
 #include <random>
 #include <list>
 #include "../gIGrid.h"
+#include "gBaseToBorderDetection.h"
 
 
 template<typename T>
@@ -27,6 +28,18 @@ public:
                 break;
             case gBPBlobSquares:
                 gen.seed(seed);
+
+                std::vector<std::vector<std::shared_ptr<std::list<std::pair<int, int>>>>>
+                        g = prepBlobSquares(genGridSquares(7, 7));
+                for (int i = 0; i < 30; i++) {
+                    g = blobTwoSquaresV2(g);
+                }
+                std::shared_ptr<gIGrid<int>> gGrid = blobToGrid(g);
+                std::cout << *dynamic_cast<gBasicGrid<int> *>(gGrid.get()) << std::endl;
+                gBaseToBorderDetection gbDet(gGrid, gBorderType::gBNonConnex);
+                std::map<T, std::vector<std::pair<std::pair<int, int>, uint8_t>>> p = gbDet.generate(
+                        [](int i) { return true; });
+                blobRoadsToGrid(p, gR);
                 break;
         }
     }
@@ -62,9 +75,10 @@ private:
         }
     }
 
+    //BLOBY GRID V1
     std::vector<std::vector<int>> genGridSquares(int height, int width) {
-        dis_row = std::uniform_int_distribution<>(0, height);
-        dis_col = std::uniform_int_distribution<>(0, width);
+        dis_row = std::uniform_int_distribution<>(0, height - 1);
+        dis_col = std::uniform_int_distribution<>(0, width - 1);
         dis_dir = std::uniform_int_distribution<>(0, 3);
 
         std::vector<std::vector<int>> grid(height, std::vector<int>(width));
@@ -77,12 +91,6 @@ private:
 
         return grid;
     }
-
-    std::mt19937 gen;
-    std::uniform_int_distribution<> dis_row;
-    std::uniform_int_distribution<> dis_col;
-    std::uniform_int_distribution<> dis_dir;
-
 
     std::vector<std::vector<int>> blobTwoSquares(std::vector<std::vector<int>> gSquares) {
         int i = dis_row(gen);
@@ -108,7 +116,13 @@ private:
         return gSquares;
     }
 
+    std::mt19937 gen;
+    std::uniform_int_distribution<> dis_row;
+    std::uniform_int_distribution<> dis_col;
+    std::uniform_int_distribution<> dis_dir;
 
+
+    //BLOBY GRID V2
     std::vector<std::vector<std::shared_ptr<std::list<std::pair<int, int>>>>>
     prepBlobSquares(std::vector<std::vector<int>> gSquares) {
         std::vector<std::vector<std::shared_ptr<std::list<std::pair<int, int>>>>> ret(gSquares.size(),
@@ -116,12 +130,12 @@ private:
                                                                                               gSquares[0].size()));
         for (int i = 0; i < gSquares.size(); i++) {
             for (int j = 0; j < gSquares.size(); j++) {
-                ret[i][j]->emplace_back(i, j);
+                ret[i][j] = std::make_shared<std::list<std::pair<int, int>>>(
+                        std::initializer_list<std::pair<int, int>>{{i, j}});
             }
         }
         return ret;
     }
-
 
     std::vector<std::vector<std::shared_ptr<std::list<std::pair<int, int>>>>>
     blobTwoSquaresV2(std::vector<std::vector<std::shared_ptr<std::list<std::pair<int, int>>>>> gSquares) {
@@ -134,14 +148,59 @@ private:
                  {i - 1, j},
                  {i,     j + 1},
                  {i,     j - 1}};
-
-        gSquares[i][j]->insert(gSquares[i][j]->end(),
-                               gSquares[dOffsets[dir].first][dOffsets[dir].second]->begin(),
-                               gSquares[dOffsets[dir].first][dOffsets[dir].second]->end());
-        gSquares[dOffsets[dir].first][dOffsets[dir].second] = gSquares[i][j];
-
+        if (0 <= dOffsets[dir].first && dOffsets[dir].first < gSquares.size() && 0 <= dOffsets[dir].second &&
+            dOffsets[dir].second < gSquares[0].size()) {
+            gSquares[i][j]->insert(gSquares[i][j]->end(),
+                                   gSquares[dOffsets[dir].first][dOffsets[dir].second]->begin(),
+                                   gSquares[dOffsets[dir].first][dOffsets[dir].second]->end());
+            gSquares[dOffsets[dir].first][dOffsets[dir].second] = gSquares[i][j];
+        }
         return gSquares;
     }
+
+    std::shared_ptr<gIGrid<int>>
+    blobToGrid(std::vector<std::vector<std::shared_ptr<std::list<std::pair<int, int>>>>> gInput) {
+        std::shared_ptr<gIGrid<int>> gB = std::make_shared<gBasicGrid<int>>(
+                gBasicGrid<int>(gInput.size(), gInput[0].size(), -1));
+
+        for (int i = 0; i < gInput.size(); i++) {
+            for (int j = 0; j < gInput[i].size(); j++) {
+                for (auto &it: *gInput[i][j]) {
+                    //TODO THIS OVERRIDES FOR EACH POSITION, WE HAVE TO KNOW IF WE ALLREADY DONE THAT LIST
+                    //Maybe put the pointer to null if its has been done so when we find a null we dont have to check it more.
+                    gB->set(it.first, it.second, i * gInput.size() + j);
+                }
+            }
+        }
+
+        return gB;
+    }
+
+    void blobRoadsToGrid(std::map<T, std::vector<std::pair<std::pair<int, int>, uint8_t>>> edges,
+                         std::shared_ptr<gIGrid<T>> gFinal) {
+        int sSquareHeight = 5, sSquareWidth = 5;
+        for (const auto &mapElem: edges) {
+            for (const auto &vecElem: mapElem.second) {
+                std::pair<int, int> pair = vecElem.first;
+                pair = {pair.first * (sSquareWidth - 1), pair.second * (sSquareHeight - 1)};
+
+                bool HasBttm = ((vecElem.second & (1 << 1)) == 0);
+                bool HasTop = ((vecElem.second & (1 << 6)) == 0);
+                bool HasLeft = ((vecElem.second & (1 << 3)) == 0);
+                bool HasRight = ((vecElem.second & (1 << 4)) == 0);
+
+                for (int i = 0; i < sSquareWidth; i++) {
+                    if (HasBttm) gtmGResult->set(pair.first + i, pair.second + sSquareHeight - 1, 1);
+                    if (HasTop) gtmGResult->set(pair.first + i, pair.second, 1);
+                }
+                for (int i = 0; i < sSquareHeight; i++) {
+                    if (HasLeft) gtmGResult->set(pair.first, pair.second + i, 1);
+                    if (HasRight) gtmGResult->set(pair.first + sSquareWidth - 1, pair.second + i, 1);
+                }
+            }
+        }
+    }
+
 
     std::shared_ptr<gIGrid<T>> gtmGResult;
 

@@ -14,7 +14,8 @@
 
 int tst_gBasicPattern() {
     std::shared_ptr<gIGrid<int>> gB =std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(50, 50, 0));
-    gBaseToPattern gBP(gB, gBaseToPattern<int>::gPatternType::gBPSquares, 0);
+    gBaseToPattern gBP(gB, gBaseToPattern<int>::gPatternType::gBPBlobSquares, 2);
+
 
     std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gB));
     gLAP->setTransformation({0,1,2,3,4,5});
@@ -25,7 +26,7 @@ int tst_gBasicPattern() {
     while(rG.isOpen) {
         rG.loop();
     }
-    return 0;
+
     return 0;
 }
 #endif //CITYOFWEIRDFISHES_TST_GBASICPATTERN_H

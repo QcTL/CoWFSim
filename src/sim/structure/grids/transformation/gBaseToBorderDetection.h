@@ -17,12 +17,13 @@ enum gBorderType {
 
 template<typename T>
 class gBaseToBorderDetection {
-
+public:
     gBaseToBorderDetection(std::shared_ptr<gIGrid<T>> gR, gBorderType gBType)
             : gGrid(gR), gUsedBorderType(gBType) {
     }
 
-    std::map<T, std::pair<std::pair<int, int>, uint8_t>> generate(std::function<bool(int)> gFValidNumberToBorder) {
+    std::map<T, std::vector<std::pair<std::pair<int, int>, uint8_t>>>
+    generate(std::function<bool(int)> gFValidNumberToBorder) {
         std::map<T, std::vector<std::pair<std::pair<int, int>, uint8_t>>> ret;
         std::pair<std::pair<int, int>, std::pair<int, int>> range = gGrid->rangeUse();
 
@@ -32,18 +33,22 @@ class gBaseToBorderDetection {
             case gBNonConnex:
                 for (int i = range.second.first; i < (range.second.second + 1); i++) {
                     for (int j = range.first.first; j < (range.first.second + 1); j++) {
-                        int vToSearch = gGrid.get(i, j);
+                        int vToSearch = gGrid->get(j, i);
                         if (gFValidNumberToBorder(vToSearch)) {
                             std::vector<std::pair<int, int>> dOffsets =
-                                    {{i + 1, j},
-                                     {i - 1, j},
+                                    {{i - 1, j + 1},
                                      {i,     j + 1},
-                                     {i,     j - 1}};
+                                     {i + 1, j + 1},
+                                     {i - 1, j},
+                                     {i + 1, j},
+                                     {i - 1, j - 1},
+                                     {i,     j - 1},
+                                     {i + 1, j - 1}};
                             uint8_t vRes = 0;
 
                             for (int k = 0; k < dOffsets.size(); k++) {
-                                if (gGrid->isInside(dOffsets[k].first, dOffsets[k].second) &&
-                                    gGrid.get(dOffsets[k].first, dOffsets[k].second) == vToSearch) {
+                                if (gGrid->isInside(dOffsets[k].second, dOffsets[k].first) &&
+                                    gGrid->get(dOffsets[k].second, dOffsets[k].first) == vToSearch) {
                                     vRes |= uint8_t(1) << k;
                                 }
                             }
