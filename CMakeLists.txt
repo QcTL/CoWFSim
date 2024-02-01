@@ -34,6 +34,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/display/layers/gILayer.h
         src/display/layers/tileset/gTileset.h
         src/display/layers/implementation/gLayerAirPollution.h
-        src/tests/tst_gBasicDisplay.h)
+        src/tests/tst_gBasicDisplay.h
+        src/tests/tst_gGenericKernel.h)
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)
