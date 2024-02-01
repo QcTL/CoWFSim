@@ -20,17 +20,27 @@ public:
         gBPSquares, gBPBlobSquares
     };
 
-    gBaseToPattern(std::shared_ptr<gIGrid<T>> gR, gPatternType type, int seed) : gtmGResult(gR) {
+    struct gPatternParameters{
+        int sizeBlockHeight;
+        int sizeBlockWidth;
+        int nBlocksX;
+        int nBlocksY;
+
+        gPatternParameters(int sizeBlockHeight, int sizeBlockWidth, int nBlocksX, int nBlocksY) : sizeBlockHeight(
+                sizeBlockHeight), sizeBlockWidth(sizeBlockWidth), nBlocksX(nBlocksX), nBlocksY(nBlocksY) {}
+    };
+
+    gBaseToPattern(std::shared_ptr<gIGrid<T>> gR, gPatternType type, gPatternParameters parameters, int seed) : gtmGResult(gR) {
         switch (type) {
             case gBPSquares:
-                genBasicSquaresToGrid(7, 7, 7, 7);
+                genBasicSquaresToGrid(parameters.sizeBlockWidth, parameters.sizeBlockHeight, parameters.nBlocksY, parameters.nBlocksX);
                 genDiagonalToGrid(35);
                 break;
             case gBPBlobSquares:
                 gen.seed(seed);
 
                 std::vector<std::vector<std::shared_ptr<std::list<std::pair<int, int>>>>>
-                        g = prepBlobSquares(genGridSquares(7, 7));
+                        g = prepBlobSquares(genGridSquares(parameters.nBlocksY, parameters.nBlocksX));
                 for (int i = 0; i < 30; i++) {
                     g = blobTwoSquaresV2(g);
                 }
@@ -39,7 +49,7 @@ public:
                 gBaseToBorderDetection gbDet(gGrid, gBorderType::gBNonConnex);
                 std::map<T, std::vector<std::pair<std::pair<int, int>, uint8_t>>> p = gbDet.generate(
                         [](int i) { return true; });
-                blobRoadsToGrid(p, gR);
+                blobRoadsToGrid(p, gR, parameters.sizeBlockWidth, parameters.sizeBlockHeight);
                 break;
         }
     }
@@ -177,8 +187,7 @@ private:
     }
 
     void blobRoadsToGrid(std::map<T, std::vector<std::pair<std::pair<int, int>, uint8_t>>> edges,
-                         std::shared_ptr<gIGrid<T>> gFinal) {
-        int sSquareHeight = 5, sSquareWidth = 5;
+                         std::shared_ptr<gIGrid<T>> gFinal, int sSquareWidth, int sSquareHeight) {
         for (const auto &mapElem: edges) {
             for (const auto &vecElem: mapElem.second) {
                 std::pair<int, int> pair = vecElem.first;
