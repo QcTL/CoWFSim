@@ -16,13 +16,9 @@ void rGlobal::setUp() {
     int GHeight = (gRange.second.second - gRange.second.first) + 1;
     int GTileSize = 16; //TODO CANVIAR PER SER GENERIC;
 
-    std::cout<< "Start SETUP"<< std::endl;
-
     vertices = sf::VertexArray(sf::Quads, GWidth * GHeight * 4);
     for (int x = gRange.first.first; x <= gRange.first.second; x++) {
         for (int y = gRange.second.first; y <= gRange.second.second; y++) {
-
-            std::cout<< x << " " << y << std::endl;
 
             sf::Vertex* quad = &vertices[(x + y * GWidth) * 4];
 
@@ -39,7 +35,6 @@ void rGlobal::setUp() {
         }
     }
 
-    std::cout<< "END SETUP"<< std::endl;
 }
 
 void rGlobal::loop() {
