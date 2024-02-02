@@ -14,7 +14,9 @@ void rGlobal::setUp() {
     std::pair<std::pair<int,int>,std::pair<int,int>> gRange = gSimL->gSLActual->lGrid->rangeUse();
     int GWidth = (gRange.first.second - gRange.first.first)  + 1;
     int GHeight = (gRange.second.second - gRange.second.first) + 1;
-    int GTileSize = 16; //TODO CANVIAR PER SER GENERIC;
+    int GTileSize = 32; //TODO CANVIAR PER SER GENERIC;
+
+    rView = sf::View(sf::FloatRect(0,0,800,600));
 
     vertices = sf::VertexArray(sf::Quads, GWidth * GHeight * 4);
     for (int x = gRange.first.first; x <= gRange.first.second; x++) {
@@ -44,9 +46,14 @@ void rGlobal::loop() {
             rWindow.close();
             isOpen = false;
         }
+        if (event.type == sf::Event::Resized)
+        {
+            rView.setSize(event.size.width, event.size.height);
+        }
     }
 
     rWindow.clear();
+    rWindow.setView(rView);
     rWindow.draw(vertices, gSimL->gSLActual->getTexture());
     rWindow.display();
 }
