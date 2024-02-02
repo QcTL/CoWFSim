@@ -1,12 +1,10 @@
 
 
 
-#include "src/tests/tst_gGaussian.h"
-#include "src/tests/tst_gGenericKernel.h"
+#include "src/tests/tst_gBasicDisplay.h"
 
 int main() {
 
-    tst_gGaussian();
-    //tst_gGenericKernel();
+    tst_gBasicDisplay();
     return 0;
 }
