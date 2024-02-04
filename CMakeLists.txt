@@ -38,6 +38,8 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/structure/grids/transformation/gBaseToPattern.h
         src/sim/structure/grids/transformation/gBaseToBorderDetection.h
         src/tests/tst_gBasicPattern.h
-        src/tests/tst_gGenericKernel.h)
+        src/tests/tst_gGenericKernel.h
+        src/sim/roads/rNodeFromGrid.h
+        src/tests/tst_gExtractRoads.h)
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)
