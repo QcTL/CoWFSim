@@ -15,7 +15,7 @@ struct rNode{
 
     rRNode *refCompressed;
     // Constructor
-    rNode() : rLeft(nullptr), rRight(nullptr), rTop(nullptr), rBottom(nullptr) {}
+    rNode() : rLeft(nullptr), rRight(nullptr), rTop(nullptr), rBottom(nullptr), refCompressed(nullptr) {}
 };
 
 #endif //CITYOFWEIRDFISHES_RNODE_H
