@@ -9,8 +9,8 @@ if(WIN32)
 include_directories("C:/Program Files/SFML-2.6.1/include")
 link_directories("C:/Program Files/SFML-2.6.1/lib")
 elseif(UNIX AND NOT APPLE)
-include_directories("path/to/linux/SFML/include")
-link_directories("path/to/linux/SFML/lib")
+include_directories("/home/ganymede/lib/SFML-2.6.1/include")
+link_directories("/home/ganymede/lib/SFML-2.6.1/lib")
 endif()
 
 add_executable(CityOfWeirdFishes main.cpp
@@ -40,6 +40,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/tests/tst_gBasicPattern.h
         src/tests/tst_gGenericKernel.h
         src/sim/roads/rNodeFromGrid.h
-        src/tests/tst_gExtractRoads.h)
+        src/tests/tst_gExtractRoads.h
+        src/common/RelPath.h)
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)
