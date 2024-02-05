@@ -7,12 +7,14 @@
 
 #include <string>
 #include <SFML/Graphics/Texture.hpp>
+#include "../../../common/RelPath.h"
 
 class gTileset{
 public:
     gTileset(std::string pthTS, int nPixelsSize, int tWidth, int tHeight):
         tsNWidth(tWidth), tsNHeight(tHeight), tsSize(nPixelsSize){
-        if (!tsTex.loadFromFile(R"(C:\Users\Robert\CityOfWeirdFishes\files\graphic\tilesets\)" + pthTS)) {
+        //if (!tsTex.loadFromFile(R"(C:\Users\Robert\CityOfWeirdFishes\files\graphic\tilesets\)" + pthTS)) {
+        if (!tsTex.loadFromFile((RelPath::relPath / "files" / "graphic" / "tilesets" / pthTS).string())){
             std::cout << "WARNING: A TEXTURE HAS NOT LOADED PROPERLY" << std::endl;
         }
     }
