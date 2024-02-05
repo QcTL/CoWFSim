@@ -41,6 +41,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/tests/tst_gGenericKernel.h
         src/sim/roads/rNodeFromGrid.h
         src/tests/tst_gExtractRoads.h
-        src/common/RelPath.h)
+        src/common/RelPath.h
+        src/tests/tst_gExtractRoadsCompressed.h)
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

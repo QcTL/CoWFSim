@@ -2,14 +2,13 @@
 
 
 #include <filesystem>
-#include "src/tests/tst_gExtractRoads.h"
 #include "src/common/RelPath.h"
-#include "src/tests/tst_Reader.h"
+#include "src/tests/tst_gExtractRoadsCompressed.h"
 
 int main() {
 
     RelPath::selRelPath(std::filesystem::current_path().parent_path());
-    //tst_gExtractRoads();
-    tst_ReaderV1();
+
+    tst_gExtractRoadsCompressed();
     return 0;
 }
