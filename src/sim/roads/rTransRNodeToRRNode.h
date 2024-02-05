@@ -32,80 +32,12 @@ private:
 
     static rRNode *rConversation(rRNode *prevAR, int dirFromPrev, int prevDirMajor, rNode *aR, uint8_t nCons) {
         //Dir 0 top, 1 right, 2 bottom, 3 left , -1 Començant
-        if(aR->refCompressed != nullptr){
+        if(aR->refCompressed != nullptr)
             return aR->refCompressed;
-        }
 
-        if(nFollow(aR) == 1){
-            if(dirFromPrev == -1){
-                rNode *aFollow = onlyOneSeq(aR, dirFromPrev).second;
-                int nextDir = onlyOneSeq(aR, dirFromPrev).first;
-                rRNode* r=  rConversation(prevAR, nextDir, prevDirMajor, aFollow, ++nCons);
-                aR ->refCompressed = aFollow ->refCompressed;
-                return r;
-            }else {
-                auto newAR = new rRNode(nCons);
-                switch (prevDirMajor) {
-                    case 0:
-                        newAR->rTop = prevAR;
-                        break;
-                    case 1:
-                        newAR->rRight = prevAR;
-                        break;
-                    case 2:
-                        newAR->rBottom = prevAR;
-                        break;
-                    case 3:
-                        newAR->rLeft = prevAR;
-                        break;
-                }
-                aR ->refCompressed = newAR;
-                return newAR;
-            }
-        } else if (nFollow(aR) == 2) { // VOL DIR QUE TU POTS SER OPTIMITZADA
-            //Per tant si tens un prevAR que pot ser o no valida per optmització,
-            //Aconseguir el node que es l'altre dle que s'ha vingut.
-            rNode *aFollow = onlyOneSeq(aR, dirFromPrev).second;
-            int nextDir = onlyOneSeq(aR, dirFromPrev).first;
-            if(nFollow(aFollow) > 2){
-                //Hem acabat de expendir-nos
-                auto newAR = new rRNode(nCons);
-                switch (prevDirMajor) {
-                    case 0:
-                        newAR->rTop = prevAR;
-                        break;
-                    case 1:
-                        newAR->rRight = prevAR;
-                        break;
-                    case 2:
-                        newAR->rBottom = prevAR;
-                        break;
-                    case 3:
-                        newAR->rLeft = prevAR;
-                        break;
-                }
-                aR ->refCompressed = newAR;
-                if (aR->rTop != nullptr && dirFromPrev != 0) {
-                    newAR->rTop = rConversation(newAR, 2, 2, aR->rTop, 1);
-                }
-                if (aR->rRight != nullptr && dirFromPrev != 1) {
-                    newAR->rRight = rConversation(newAR, 3, 3, aR->rRight, 1);
-                }
-                if (aR->rBottom != nullptr && dirFromPrev != 2) {
-                    newAR->rBottom = rConversation(newAR, 0, 0, aR->rBottom, 1);
-                }
-                if (aR->rLeft != nullptr && dirFromPrev != 3) {
-                    newAR->rLeft = rConversation(newAR, 1, 1, aR->rLeft, 1);
-                }
-                return newAR;
-            }else {
-                rRNode *r = rConversation(prevAR, nextDir, prevDirMajor, aFollow, ++nCons);
-                aR->refCompressed = aFollow->refCompressed;
-                return r;
-            }
-        } else { //L'anterior no ho sabem pero aquesta segur que no.
-            //Aixó vol dir que tenim la seguent si o si de la anterior en la direcció que s'hagui aprofundit
-            //Per tant hem de crear un altre rRNode Nou:
+        rNode *aFollow = onlyOneSeq(aR, dirFromPrev).second;
+        int nextDir = onlyOneSeq(aR, dirFromPrev).first;
+        if (nFollow(aR) > 2 || (nFollow(aR) == 2 && nFollow(aFollow) > 2) || (nFollow(aR) == 1 && dirFromPrev != -1)){
             rRNode *newAR;
             if (aR->refCompressed == nullptr) {
                 newAR = new rRNode(nCons);
@@ -113,7 +45,7 @@ private:
             } else {
                 newAR = aR->refCompressed;
             }
-            switch (dirFromPrev) {
+            switch (prevDirMajor) {
                 case 0:
                     newAR->rTop = prevAR;
                     break;
@@ -142,9 +74,11 @@ private:
             }
 
             return newAR;
+        }else if((nFollow(aR) == 1 && dirFromPrev == -1) || nFollow(aR) == 2){
+            rRNode *r = rConversation(prevAR, nextDir, prevDirMajor, aFollow, ++nCons);
+            aR->refCompressed = aFollow->refCompressed;
+            return r;
         }
-        //Ara l'hem de propagar per totes les direccions que tens menys per la que t'acaben de benir
-        //Aixó en teoria et farà set de les teves altres variables que tens disponibles sense realment tornar-ho.
     }
 
 public:

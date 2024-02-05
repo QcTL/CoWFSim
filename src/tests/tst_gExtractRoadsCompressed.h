@@ -30,7 +30,11 @@ int tst_gExtractRoadsCompressed() {
     gB->set(3,2, 1);
     gB->set(4,2, 1);
     gB->set(5,2, 1);
+    gB->set(6,2, 1);
+    gB->set(7,2, 1);
 
+
+    gB->set(6,3, 1);
     std::vector<rNode> r = rNodeFromGrid<int>::givenGrid(gB, 1);
     rNode * rOne = &r[0];
     rRNode * p = rTransRNodeToRRNode::conversion(rOne);
