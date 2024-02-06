@@ -26,6 +26,7 @@ private:
     std::shared_ptr<gSimLayers> gSimL;
     sf::RenderWindow rWindow;
     sf::View rView;
+
     sf::VertexArray vertices;
 };
 

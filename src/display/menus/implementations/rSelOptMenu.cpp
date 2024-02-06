@@ -7,7 +7,7 @@
 #include "../../../common/RelPath.h"
 
 
-rSelOptMenu::rSelOptMenu(const std::string &pthFileD):rIMenu() {
+rSelOptMenu::rSelOptMenu(const std::string &pthFileD):rIMenu(rIMenu::rRelativePos::pBottomRight) {
     std::map<std::string, std::string> sm = ReaderParameters::readFile(
             (RelPath::relPath / "files" / "graphic" / "menus" / (pthFileD + R"(.txt)")).string());
 
@@ -41,7 +41,7 @@ void rSelOptMenu::draw(sf::RenderWindow &rW) {
 }
 
 void rSelOptMenu::setNewSel(int v) {
-
+    //TODO CHANGE SO IT REFLECTS THE FLIP AND FLOPS
     sf::Vertex* quad = &dInfo[(pElemSel[cCurrenSel].second + pElemSel[cCurrenSel].first * gWidth) * 4];
     for (int k = 0; k < 4; k++) {
         quad[k].texCoords = lRefTiles[305][k];
