@@ -3,19 +3,16 @@
 //
 
 #include "rSelOptMenu.h"
+#include "../../../IO/ReaderParameters.h"
+#include "../../../common/RelPath.h"
 
 
-rSelOptMenu::rSelOptMenu(std::string pthFileD) {
-    std::ifstream file(pthFileD);
-    nlohmann::json j;
-    file >> j;
+rSelOptMenu::rSelOptMenu(const std::string &pthFileD):rIMenu() {
+    std::map<std::string, std::string> sm = ReaderParameters::readFile(
+            (RelPath::relPath / "files" / "graphic" / "menus" / (pthFileD + R"(.txt)")).string());
 
-    std::string type = j["type"];
-    std::string src = j["src"];
-    std::vector<nlohmann::json> options = j["options"];
+    std::ifstream file((RelPath::relPath / "files" / "graphic" / "menus" / sm["src"]).string());
 
-
-    std::ifstream fileTxt(R"(C:\Users\Robert\CityOfWeirdFishes\files\graphic\menus\)" + j["src"]);
     std::string line;
     std::vector<std::vector<int>> data;
 
@@ -28,4 +25,32 @@ rSelOptMenu::rSelOptMenu(std::string pthFileD) {
         }
         data.push_back(row);
     }
+
+    for (int i = 0; i < data.size(); ++i)
+        for (int j = 0; j < data[i].size(); ++j)
+            if (data[i][j] == 304 || data[i][j] == 305)
+                pElemSel.emplace_back(i, j);
+
+    file.close();
+    dInfo = getVertexMenu(data[0].size(),data.size(),data);
+    gWidth = data[0].size();
+}
+
+void rSelOptMenu::draw(sf::RenderWindow &rW) {
+    rW.draw(dInfo, &tsTex.tsTex);
+}
+
+void rSelOptMenu::setNewSel(int v) {
+
+    sf::Vertex* quad = &dInfo[(pElemSel[cCurrenSel].second + pElemSel[cCurrenSel].first * gWidth) * 4];
+    for (int k = 0; k < 4; k++) {
+        quad[k].texCoords = lRefTiles[305][k];
+    }
+
+    quad = &dInfo[(pElemSel[v].second + pElemSel[v].first * gWidth) * 4];
+    for (int k = 0; k < 4; k++) {
+        quad[k].texCoords = lRefTiles[304][k];
+    }
+
+    cCurrenSel = v;
 }

@@ -10,17 +10,23 @@
 #include <fstream>
 #include "../rIMenu.h"
 #include <fstream>
-#include <nlohmann/json.hpp>
 #include <vector>
 #include <sstream>
+#include <SFML/Graphics/RenderWindow.hpp>
 
 class rSelOptMenu : public rIMenu{
 
 public:
-    rSelOptMenu(std::string pthFileD);
+    explicit rSelOptMenu(const std::string& pthFileD);
+    void draw(sf::RenderWindow &rW) override;
+
+    void setNewSel(int v);
 
 private:
-    std::vector<std::vector<int>> mRawData;
+    std::vector<std::pair<int,int>> pElemSel;
+    sf::VertexArray dInfo;
+    int cCurrenSel = 0;
+    int gWidth = 0;
 };
 
 

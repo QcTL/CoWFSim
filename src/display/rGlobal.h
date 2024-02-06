@@ -15,14 +15,14 @@
 
 class rGlobal {
 public:
-        explicit rGlobal(std::shared_ptr<gSimLayers> gInfoL);
+        explicit rGlobal(std::shared_ptr<gSimLayers> gInfoL,  std::shared_ptr<rPileMenus> rPMenu);
 
         void setUp();
         void loop();
 
         bool isOpen = true;
 private:
-    std::unique_ptr<rPileMenus> rPMenu;
+    std::shared_ptr<rPileMenus> rPMenu;
     std::shared_ptr<gSimLayers> gSimL;
     sf::RenderWindow rWindow;
     sf::View rView;

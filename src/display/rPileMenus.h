@@ -13,8 +13,8 @@ class rPileMenus {
 public:
     rPileMenus()= default;
 
-    void addMenuTop(std::shared_ptr<rIMenu> nMenu) {
-        vTopActiveMenu = std::move(nMenu);
+    void addMenuTop(const std::shared_ptr<rIMenu>& nMenu) {
+        vTopActiveMenu = nMenu;
         vPresentMenus.push_back(nMenu);
     }
 

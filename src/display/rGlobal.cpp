@@ -5,8 +5,8 @@
 #include "rGlobal.h"
 #include <SFML/Graphics.hpp>
 
-rGlobal::rGlobal(std::shared_ptr<gSimLayers> gInfoL)
-    : gSimL(std::move(gInfoL)), rWindow(sf::RenderWindow(sf::VideoMode(800,600), "CoWF")) {
+rGlobal::rGlobal(std::shared_ptr<gSimLayers> gInfoL,  std::shared_ptr<rPileMenus> rPMenu)
+    : gSimL(std::move(gInfoL)), rPMenu(std::move(rPMenu)), rWindow(sf::RenderWindow(sf::VideoMode(800,600), "CoWF")) {
 
     rPMenu = std::make_unique<rPileMenus>();
 }
@@ -56,8 +56,9 @@ void rGlobal::loop() {
 
     rWindow.clear();
 
-    rPMenu->display(rWindow);
+
     rWindow.setView(rView);
     rWindow.draw(vertices, gSimL->gSLActual->getTexture());
+    rPMenu->display(rWindow);
     rWindow.display();
 }
