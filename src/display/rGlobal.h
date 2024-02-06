@@ -25,6 +25,7 @@ private:
     std::unique_ptr<rPileMenus> rPMenu;
     std::shared_ptr<gSimLayers> gSimL;
     sf::RenderWindow rWindow;
+    sf::View rView;
     sf::VertexArray vertices;
 };
 
