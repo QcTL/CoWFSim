@@ -22,7 +22,7 @@ struct rRNode {
 
 private:
     std::list<std::pair<int, uint8_t>> rRoadPresOrd;
-    std::list<int> rRoadObstructionsOrd;
+    std::vector<std::vector<bool>> rRoadObstructionsOrd;
 };
 
 rRNode::rRNode(uint8_t n) : nCompressed(n) {

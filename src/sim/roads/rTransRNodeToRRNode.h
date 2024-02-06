@@ -29,15 +29,14 @@ private:
         return {};
     }
 
-
     static rRNode *rConversation(rRNode *prevAR, int dirFromPrev, int prevDirMajor, rNode *aR, uint8_t nCons) {
         //Dir 0 top, 1 right, 2 bottom, 3 left , -1 Començant
-        if(aR->refCompressed != nullptr)
+        if (aR->refCompressed != nullptr)
             return aR->refCompressed;
 
         rNode *aFollow = onlyOneSeq(aR, dirFromPrev).second;
         int nextDir = onlyOneSeq(aR, dirFromPrev).first;
-        if (nFollow(aR) > 2 || (nFollow(aR) == 2 && nFollow(aFollow) > 2) || (nFollow(aR) == 1 && dirFromPrev != -1)){
+        if (nFollow(aR) > 2 || (nFollow(aR) == 2 && nFollow(aFollow) > 2) || (nFollow(aR) == 1 && dirFromPrev != -1)) {
             rRNode *newAR;
             if (aR->refCompressed == nullptr) {
                 newAR = new rRNode(nCons);
@@ -74,11 +73,13 @@ private:
             }
 
             return newAR;
-        }else if((nFollow(aR) == 1 && dirFromPrev == -1) || nFollow(aR) == 2){
+        } else if ((nFollow(aR) == 1 && dirFromPrev == -1) || nFollow(aR) == 2) {
             rRNode *r = rConversation(prevAR, nextDir, prevDirMajor, aFollow, ++nCons);
             aR->refCompressed = aFollow->refCompressed;
             return r;
         }
+
+        return nullptr;
     }
 
 public:

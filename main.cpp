@@ -9,6 +9,12 @@ int main() {
 
     RelPath::selRelPath(std::filesystem::current_path().parent_path());
 
-    tst_gExtractRoadsCompressed();
+    int n = 3;
+    int nBlocks = 10;
+    int x = 4;
+
+    return ((x + nBlocks - n) % nBlocks)-1;
+
+    //tst_gExtractRoadsCompressed();
     return 0;
 }
