@@ -19,7 +19,7 @@ int tst_gMenus() {
     std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(gSimLayers(gLAP));
 
     std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>();
-    std::shared_ptr<rSelOptMenu> rSom = std::make_shared<rSelOptMenu>("d_mSelectLayer");
+    std::shared_ptr<rSelOptMenu> rSom = std::make_shared<rSelOptMenu>("d_mSelectLayer", rIMenu::rRelativePos::pBottomRight);
     pPM->addMenuTop(rSom);
 
 
