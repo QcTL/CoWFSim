@@ -4,10 +4,9 @@
 
 #include "rSelOptMenu.h"
 #include "../../../IO/ReaderParameters.h"
-#include "../../../common/RelPath.h"
 
 
-rSelOptMenu::rSelOptMenu(const std::string &pthFileD, rIMenu::rRelativePos rPos):rIMenu(rPos) {
+rSelOptMenu::rSelOptMenu(const std::string &pthFileD, rIMenu::rRelativePos rPos) : rIMenu(rPos) {
     std::map<std::string, std::string> sm = ReaderParameters::readFile(
             (RelPath::relPath / "files" / "graphic" / "menus" / (pthFileD + R"(.txt)")).string());
 
@@ -28,25 +27,15 @@ rSelOptMenu::rSelOptMenu(const std::string &pthFileD, rIMenu::rRelativePos rPos)
 
     for (int i = 0; i < data.size(); ++i)
         for (int j = 0; j < data[i].size(); ++j)
-            if (data[i][j] == 304 || data[i][j] == 305)
-                switch (rPos) {
+            if (data[i][j] == 304 || data[i][j] == 305) {
+                auto row = (rPos == pBottomLeft || rPos == pBottomRight) ? data.size() - 1 - i : i;
+                auto col = (rPos == pTopRight || rPos == pBottomRight) ? data[i].size() - 1 - j : j;
+                pElemSel.emplace_back(row, col);
+            }
 
-                    case pBottomLeft:
-                        pElemSel.emplace_back(data.size()-1-i, j);
-                        break;
-                    case pBottomRight:
-                        pElemSel.emplace_back(data.size()-1-i,  data[i].size()-1-j);
-                        break;
-                    case pTopLeft:
-                        pElemSel.emplace_back(i, j);
-                        break;
-                    case pTopRight:
-                        pElemSel.emplace_back(i,  data[i].size()-1-j);
-                        break;
-                };
 
     file.close();
-    dInfo = getVertexMenu(data[0].size(),data.size(),data);
+    dInfo = getVertexMenu(data[0].size(), data.size(), data);
     gWidth = data[0].size();
 }
 
@@ -55,7 +44,7 @@ void rSelOptMenu::draw(sf::RenderWindow &rW) {
 }
 
 void rSelOptMenu::setNewSel(int v) {
-    sf::Vertex* quad = &dInfo[(pElemSel[cCurrenSel].second + pElemSel[cCurrenSel].first * gWidth) * 4];
+    sf::Vertex *quad = &dInfo[(pElemSel[cCurrenSel].second + pElemSel[cCurrenSel].first * gWidth) * 4];
     for (int k = 0; k < 4; k++) {
         quad[k].texCoords = lRefTiles[305][k];
     }
