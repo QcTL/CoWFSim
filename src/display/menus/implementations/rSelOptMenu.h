@@ -17,7 +17,7 @@
 class rSelOptMenu : public rIMenu{
 
 public:
-    explicit rSelOptMenu(const std::string& pthFileD);
+    explicit rSelOptMenu(const std::string& pthFileD, rIMenu::rRelativePos rPos);
     void draw(sf::RenderWindow &rW) override;
 
     void setNewSel(int v);
