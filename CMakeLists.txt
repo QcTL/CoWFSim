@@ -46,6 +46,12 @@ add_executable(CityOfWeirdFishes main.cpp
         src/display/menus/rIMenu.h
         src/display/menus/implementations/rSelOptMenu.cpp
         src/display/menus/implementations/rSelOptMenu.h
-        src/tests/tst_gMenus.h)
+        src/tests/tst_gMenus.h
+        src/sim/roads/transportation/gUniqueId.h
+        src/sim/roads/transportation/rToFollowDest.h
+        src/sim/roads/node/RNodeAttrs/rRMailbox.h
+        src/sim/roads/node/rInfoDists.h
+        src/tests/tst_gERCComm.h
+)
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

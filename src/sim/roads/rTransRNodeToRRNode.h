@@ -12,7 +12,6 @@ class rTransRNodeToRRNode {
     //Transform Road Node into Road Reduced Node
 
 private:
-
     static int nFollow(rNode *aR) {
         return (aR->rBottom != nullptr) + (aR->rTop != nullptr) + (aR->rRight != nullptr) + (aR->rLeft != nullptr);
     }
@@ -40,7 +39,9 @@ private:
         if (nFollow(aR) > 2 || (nFollow(aR) == 2 && nFollow(aFollow) > 2) || (nFollow(aR) == 1 && dirFromPrev != -1)){
             rRNode *newAR;
             if (aR->refCompressed == nullptr) {
-                newAR = new rRNode(nCons);
+                std::pair<uint32_t, uint32_t> pComp = aR->rPos;
+                newAR = new rRNode(nCons, nFollow(aR) > 2,
+                                   pComp.first/rSizeBlocs * (rSizeGrid/rSizeBlocs + 1) + pComp.second/rSizeBlocs);
                 aR->refCompressed = newAR;
             } else {
                 newAR = aR->refCompressed;
@@ -79,12 +80,20 @@ private:
             aR->refCompressed = aFollow->refCompressed;
             return r;
         }
-    }
 
+        return nullptr;
+    }
+    static uint16_t rSizeBlocs;
+    static uint16_t rSizeGrid;
 public:
-    static rRNode *conversion(rNode *rRoot) {
+    static rRNode *conversion(rNode *rRoot, uint16_t rSizeB, uint16_t rSizeG) {
+        rSizeBlocs = rSizeB;
+        rSizeGrid = rSizeG;
         return rConversation(nullptr, -1, -1, rRoot, 1);
     }
 };
+
+uint16_t rTransRNodeToRRNode::rSizeBlocs;
+uint16_t rTransRNodeToRRNode::rSizeGrid;
 
 #endif //CITYOFWEIRDFISHES_RTRANSRNODETORRNODE_H

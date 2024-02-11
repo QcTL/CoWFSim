@@ -8,6 +8,8 @@
 #include "rRNode.h"
 
 struct rNode{
+    std::pair<uint32_t , uint32_t> rPos;
+
     struct rNode* rLeft;
     struct rNode* rRight;
     struct rNode* rTop;
@@ -15,7 +17,7 @@ struct rNode{
 
     rRNode *refCompressed;
     // Constructor
-    rNode() : rLeft(nullptr), rRight(nullptr), rTop(nullptr), rBottom(nullptr), refCompressed(nullptr) {}
+    rNode(std::pair<uint32_t , uint32_t> nPos) : rLeft(nullptr), rRight(nullptr), rTop(nullptr), rBottom(nullptr), refCompressed(nullptr), rPos(nPos) {}
 };
 
 #endif //CITYOFWEIRDFISHES_RNODE_H
