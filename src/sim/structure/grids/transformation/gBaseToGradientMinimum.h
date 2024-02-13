@@ -30,28 +30,45 @@ public:
 
     gBaseToGradientMinimum(const std::vector<gtmElement> &lElements,
                            std::pair<int, int> strBiggestPos,
-                           std::shared_ptr<gIGrid<T>> gResult) : gtmGResult(std::move(gResult)),
-                                                                 gtmLElements(lElements) {
+                           std::shared_ptr<gIGrid<T>> gResult,
+                           int rSeed = -1) : gtmGResult(std::move(gResult)),
+                                             gtmLElements(lElements) {
         gtmToExtend.emplace_back(strBiggestPos, 0);
         gtmGResult->set(strBiggestPos.first, strBiggestPos.second, float(lElements.size() - 1));
 
-        std::random_device rd;
-        gen = std::mt19937(rd());
+        if (rSeed == -1) {
+            std::random_device rd;
+            gen = std::mt19937(rd());
+        } else {
+            gen.seed(rSeed);
+        }
     }
 
-    gBaseToGradientMinimum(const std::vector<gtmElement> &lElements,
-                           std::pair<int, int> strBiggestPos,
-                           std::shared_ptr<gIGrid<T>> gResult, int rSeed) : gtmGResult(std::move(gResult)),
-                                                                            gtmLElements(lElements) {
-        gtmToExtend.emplace_back(strBiggestPos, 0);
-        gtmGResult->set(strBiggestPos.first, strBiggestPos.second, float(lElements.size() - 1));
-        gen.seed(rSeed);
-    }
 
-    void generate() {
+    void generateV1() {
         while (!gtmToExtend.empty()) {
             std::pair<int, int> newPos = gtmToExtend.front().first;
-            extendValueGrid(newPos, gtmGResult->get(newPos.first, newPos.second), gtmToExtend.front().second);
+            extendValueGridV1(newPos, gtmGResult->get(newPos.first, newPos.second), gtmToExtend.front().second);
+            gtmToExtend.pop_front();
+        }
+    }
+
+    void generateV2() {
+        while (!gtmToExtend.empty()) {
+            std::pair<int, int> newPos = gtmToExtend.front().first;
+            std::vector<std::pair<int, int>> dOffsets =
+                    {{newPos.first,     newPos.second - 1},
+                     {newPos.first + 1, newPos.second - 1},
+                     {newPos.first + 1, newPos.second},
+                     {newPos.first + 1, newPos.second + 1},
+                     {newPos.first,     newPos.second + 1},
+                     {newPos.first - 1, newPos.second + 1},
+                     {newPos.first - 1, newPos.second},
+                     {newPos.first - 1, newPos.second - 1}};
+            for(int i = 0; i < dOffsets.size(); i++) {
+                extendValueGridV2(dOffsets[i], 2, i, 0);
+                gtmGResult->set(dOffsets[i].first, dOffsets[i].second, 2);
+            }
             gtmToExtend.pop_front();
         }
     }
@@ -65,7 +82,7 @@ private:
     std::mt19937 gen;
     std::bernoulli_distribution d;
 
-    void extendValueGrid(std::pair<int, int> pAct, float vChoose, int nConcurrent) {
+    void extendValueGridV1(std::pair<int, int> pAct, float vChoose, int nConcurrent) {
         std::vector<std::pair<int, int>> dOffsets =
                 {{pAct.first + 1, pAct.second},
                  {pAct.first - 1, pAct.second},
@@ -83,6 +100,33 @@ private:
 
                 gtmGResult->set(dOffset.first, dOffset.second, nValue);
                 gtmToExtend.emplace_back(dOffset, nValue == vChoose ? nConcurrent + 1 : 0);
+            }
+        }
+    }
+
+    void extendValueGridV2(std::pair<int, int> pAct, float vChoose, uint8_t vDir, int nConcurrent) {
+        std::vector<std::vector<std::pair<int, int>>> dOffsets =
+                {{{pAct.first + 1, pAct.second - 1}, {pAct.first,     pAct.second - 1}},
+                 {{pAct.first + 1, pAct.second - 1}, {pAct.first + 1, pAct.second}},
+                 {{pAct.first + 1, pAct.second + 1}, {pAct.first + 1, pAct.second}},
+                 {{pAct.first + 1, pAct.second + 1}, {pAct.first,     pAct.second + 1}},
+                 {{pAct.first - 1, pAct.second + 1}, {pAct.first,     pAct.second + 1}},
+                 {{pAct.first - 1, pAct.second + 1}, {pAct.first - 1, pAct.second}},
+                 {{pAct.first - 1, pAct.second - 1}, {pAct.first - 1, pAct.second}},
+                 {{pAct.first - 1, pAct.second - 1}, {pAct.first,     pAct.second - 1}}};
+
+        for (auto &dOffset: dOffsets[vDir]) {
+            if (gtmGResult->isInside(dOffset) && gtmGResult->get(dOffset.first, dOffset.second) == -1) {
+
+                gtmElement gtmE = gtmLElements[static_cast<int>(vChoose)];
+                float nValue = randomChoice(gtmE.cGoingDownBase + gtmE.cAddDownForIter * nConcurrent) ? vChoose - 1 :
+                               randomChoice(gtmE.cGoingUpBase + gtmE.cAddUpForIter * nConcurrent) ? vChoose + 1 :
+                               vChoose;
+                nValue = std::clamp(nValue, 0.0f, static_cast<float>(gtmLElements.size() - 1));
+
+                gtmGResult->set(dOffset.first, dOffset.second, nValue);
+                extendValueGridV2(dOffset, gtmGResult->get(dOffset.first, dOffset.second), vDir,
+                                  nValue == vChoose ? nConcurrent + 1 : 0);
             }
         }
     }
