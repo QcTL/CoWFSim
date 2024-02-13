@@ -19,7 +19,7 @@ void rGlobal::setUp() {
     int GHeight = (gRange.second.second - gRange.second.first) + 1;
     int GTileSize = 32; //TODO CANVIAR PER SER GENERIC;
     rPMenu->initialize(rWindow);
-    rView = sf::View(sf::FloatRect(0, 0, 800, 600));
+    rView = sf::View(sf::FloatRect(0, 0, 1400, 800));
 
     vertices = sf::VertexArray(sf::Quads, GWidth * GHeight * 4);
     for (int x = gRange.first.first; x <= gRange.first.second; x++) {
@@ -33,7 +33,6 @@ void rGlobal::setUp() {
             quad[3].position = sf::Vector2f(x * GTileSize, (y + 1) * GTileSize);
 
             for (int i = 0; i < 4; i++) {
-                //TODO PRECARGAR PER NO TIRAR TOTA LA RESTA DE LECTOR CADA COP;
                 quad[i].texCoords = gSimL->gSLActual->getTexPos(x, y)[i];
             }
 
@@ -44,23 +43,26 @@ void rGlobal::setUp() {
 
 void rGlobal::loop() {
     sf::Event event;
+    sf::View visibleArea;
     while (rWindow.pollEvent(event)) {
-        if (event.type == sf::Event::Closed) {
-            rWindow.close();
-            isOpen = false;
+        switch (event.type) {
+            case sf::Event::Closed:
+                rWindow.close();
+                isOpen = false;
+                break;
+            case sf::Event::Resized:
+                rView.setSize(event.size.width, event.size.height);
+                rPMenu->resizedScreen(event);
+                visibleArea = sf::View(sf::FloatRect(0, 0, event.size.width, event.size.height));
+                rWindow.setView(visibleArea);
+                break;
         }
-        if (event.type == sf::Event::Resized) {
-            rView.setSize(event.size.width, event.size.height);
-
-            rPMenu->resizedScreen(event);
-            sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
-            rWindow.setView(sf::View(visibleArea));
-        }
+        rCC.updateOnEvent(event, rWindow, rView);
     }
 
+    rCC.updateOnLoop(rView);
+
     rWindow.clear();
-
-
     rWindow.setView(rView);
     rWindow.draw(vertices, gSimL->gSLActual->getTexture());
     rPMenu->display(rWindow);
