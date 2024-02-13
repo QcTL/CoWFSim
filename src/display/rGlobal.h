@@ -12,6 +12,7 @@
 #include <SFML/Graphics/VertexArray.hpp>
 #include "rPileMenus.h"
 #include "layers/gSimLayers.h"
+#include "CameraControls.h"
 
 class rGlobal {
 public:
@@ -28,6 +29,7 @@ private:
     sf::View rView;
 
     sf::VertexArray vertices;
+    CameraControls rCC;
 };
 
 
