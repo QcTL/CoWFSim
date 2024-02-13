@@ -11,10 +11,10 @@
 
 struct rRMail{
     std::uint32_t mGridOrigin;
-    uint32_t mRoadEnd;
+    uint32_t mRoadStart;
     uint32_t mSizePath;
 
-    rRMail(uint32_t mGridOrigin, uint32_t mRoadEnd, uint32_t mSizePath) : mGridOrigin(mGridOrigin), mRoadEnd(mRoadEnd),
+    rRMail(uint32_t mGridOrigin, uint32_t mRoadStart, uint32_t mSizePath) : mGridOrigin(mGridOrigin), mRoadStart(mRoadStart),
                                                                           mSizePath(mSizePath) {}
 };
 

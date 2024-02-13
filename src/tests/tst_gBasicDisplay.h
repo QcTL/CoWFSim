@@ -33,7 +33,8 @@ int tst_gBasicDisplay() {
     gLAP->setTransformation({0,1,2,3,4,5});
     std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(gSimLayers(gLAP));
 
-    rGlobal rG(gSimL);
+    std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>();
+    rGlobal rG(gSimL, pPM);
     rG.setUp();
     while(rG.isOpen) {
         rG.loop();

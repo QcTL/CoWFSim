@@ -15,34 +15,40 @@
 #include "../sim/roads/rTransRNodeToRRNode.h"
 
 int tst_gERCComm() {
-    std::shared_ptr<gIGrid<int>> gB = std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(50, 50, 0));
+    std::shared_ptr<gIGrid<int>> gB = std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(10, 10, 0));
 
-    gB->set(0,0, 1);
-    gB->set(1,0, 1);
-    gB->set(2,0, 1);
-    gB->set(3,0, 1);
-    gB->set(4,0, 1);
-
+    gB->set(0,1, 1);
+    gB->set(1,1, 1);
     gB->set(2,1, 1);
-    gB->set(4,1, 1);
 
-    gB->set(2,2, 1);
-    gB->set(3,2, 1);
-    gB->set(4,2, 1);
-    gB->set(5,2, 1);
+    gB->set(1,0, 1);
+    gB->set(1,2, 1);
+
+    gB->set(0,3, 1);
+    gB->set(1,3, 1);
+    gB->set(2,3, 1);
 
 
     std::vector<rNode*> r = rNodeFromGrid<int>::givenGrid(gB, 1);
     rNode * rOne = r[0];
-    rRNode * p = rTransRNodeToRRNode::conversion(rOne, 4, 50);
-    std::cout<< p->isDecision << std::endl;
+    std::list<rRNode*> rLL = rTransRNodeToRRNode::conversion(rOne, 5, 10);
 
-    rInfoDist::initializeMatrix(4*4, 50/4*50/4);
+    rInfoDist::initializeMatrix(10/5*10/5,5*5, rLL.size());
 
-    p->sendInformationStart();
-    //Provem de que tots enviin un missatge inicial a algu altre.
     //TODO tambe falta lo important que es tenir la matriu de la grid sapiguent a quin node estan "compactat".
 
+    for (rRNode* node : rLL) {
+        node->sendInformationStart();
+    }
+
+    for(int i = 0; i < 3; i++) {
+        for (rRNode *node: rLL) {
+            node->sendNewInformation();
+        }
+    }
+
+
+    rInfoDist::seeMatrix();
     std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gB));
     gLAP->setTransformation({0, 1, 2, 3, 4, 5});
     std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(gSimLayers(gLAP));

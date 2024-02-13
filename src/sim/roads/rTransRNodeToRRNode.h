@@ -42,6 +42,7 @@ private:
                 std::pair<uint32_t, uint32_t> pComp = aR->rPos;
                 newAR = new rRNode(nCons, nFollow(aR) > 2,
                                    pComp.first/rSizeBlocs * (rSizeGrid/rSizeBlocs + 1) + pComp.second/rSizeBlocs);
+                llNodes.push_back(newAR);
                 aR->refCompressed = newAR;
             } else {
                 newAR = aR->refCompressed;
@@ -85,15 +86,19 @@ private:
     }
     static uint16_t rSizeBlocs;
     static uint16_t rSizeGrid;
+    static std::list<rRNode *> llNodes;
 public:
-    static rRNode *conversion(rNode *rRoot, uint16_t rSizeB, uint16_t rSizeG) {
+    static std::list<rRNode *> conversion(rNode *rRoot, uint16_t rSizeB, uint16_t rSizeG) {
         rSizeBlocs = rSizeB;
         rSizeGrid = rSizeG;
-        return rConversation(nullptr, -1, -1, rRoot, 1);
+        llNodes.clear();
+        rConversation(nullptr, -1, -1, rRoot, 1);
+        return llNodes;
     }
 };
 
 uint16_t rTransRNodeToRRNode::rSizeBlocs;
 uint16_t rTransRNodeToRRNode::rSizeGrid;
+std::list<rRNode *> rTransRNodeToRRNode::llNodes;
 
 #endif //CITYOFWEIRDFISHES_RTRANSRNODETORRNODE_H

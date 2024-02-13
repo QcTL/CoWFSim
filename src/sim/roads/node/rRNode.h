@@ -33,29 +33,38 @@ struct rRNode {
             //Enviar-ho al seguent si en tens;
             // amb la direccio canviada
             std::pair<uint8_t, rRNode *> sec = otherDir(dir);
-            sec.second->receive(r, sec.first);
+            if(sec.second != nullptr) {
+                rRMail rNew(r.mGridOrigin, r.mRoadStart, r.mSizePath + 1);
+                sec.second->receive(rNew, sec.first);
+            }
         } else {
             //Enviar-ho a rRMailbox;
             rMailBox.rMB.emplace(r, dir);
-            sendNewInformation(); //TEMPORALMENT;
         }
     }
 
     void sendNewInformation() {
         //check if the destination of any position inside the grid or some other grid is lower that what we had.
-        rRMail e = rMailBox.rMB.front().first;
-        if (rInfoDist::addIfShorter(rMailBox.rMB.front().first, uidNode, rMailBox.rMB.front().second)) {
-            // If true send the information to all the other elements in the other receiving end. + 1 in the dist
-            rRMail eN(e.mGridOrigin, e.mRoadEnd, e.mSizePath);
-            sendToNext(eN);
+        if(isDecision) {
+            while (!rMailBox.rMB.empty()) {
+                rRMail e = rMailBox.rMB.front().first;
+                if (rInfoDist::addIfShorter(e, uidNode, rBlock, rMailBox.rMB.front().second)) {
+                    // If true send the information to all the other elements in the other receiving end. + 1 in the dist
+                    rRMail eN(e.mGridOrigin, e.mRoadStart, e.mSizePath + 1);
+                    sendToNext(eN);
+                }
+                rMailBox.rMB.pop();
+            }
         }
         //Set that if you enter this intersection and want to go to another one, just go for the one you received.
     }
 
     void sendInformationStart(){
+        rInfoDist::addSelfDist(uidNode);
         rRMail eN(rBlock, uidNode, 1); // No es uidNode, es la posicio relativa de la carretera dins de la grid;
         sendToNext(eN);
     }
+
 private:
     std::list<std::pair<int, uint8_t>> rRoadPresOrd;
     std::list<int> rRoadObstructionsOrd;
@@ -65,11 +74,14 @@ private:
     void sendToNext(const rRMail& m){
         if (rTop != nullptr) {
             sendDirection(m, 0b00000000);
-        } else if (rRight != nullptr) {
+        }
+        if (rRight != nullptr) {
             sendDirection(m, 0b00000001);
-        } else if (rBottom != nullptr) {
+        }
+        if (rBottom != nullptr) {
             sendDirection(m, 0b00000010);
-        } else if (rLeft != nullptr) {
+        }
+        if (rLeft != nullptr) {
             sendDirection(m, 0b00000011);
         }
     }
@@ -78,7 +90,10 @@ private:
         uint8_t lastTwoBits = dDir & 0b11;
         rRNode *direction = getByDir(lastTwoBits);
 
-        direction->receive(mSend, dDir^0x02); //The dir is changed to reflect the direction the reciving end is comming from
+        if(direction != nullptr) {
+            direction->receive(mSend, dDir ^ 0x02);
+            //The dir is changed to reflect the direction the reciving end is comming from
+        }
     }
 
     std::pair<uint8_t, rRNode *> otherDir(uint8_t dirFromPrev) {
@@ -93,7 +108,7 @@ private:
         return {};
     }
 
-    rRNode* getByDir(const uint8_t n){
+    rRNode* getByDir(const uint8_t n) const{
         switch (n) {
             case 0b00:
                 return rTop;
@@ -103,6 +118,8 @@ private:
                 return rBottom;
             case 0b11:
                 return rLeft;
+            default:
+                return nullptr;
         }
     }
 
