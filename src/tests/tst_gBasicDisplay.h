@@ -14,15 +14,15 @@
 int tst_gBasicDisplay() {
 
 
-    std::shared_ptr<gIGrid<int>> gB =std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(10, 10, -1));
+    std::shared_ptr<gIGrid<int>> gB =std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(30, 30, -1));
 
     std::vector<gtmElement> vElem = {
             gtmElement(0.0, 0, 0.0, 0),
-            gtmElement(0.1, 0, 0.15, 0),
-            gtmElement(0.15, 0, 0.03, 0),};
+            gtmElement(0.5, 0, 0.05, 0),
+            gtmElement(0.15, 0, 0.3, 0),};
 
-    gBaseToGradientMinimum gBGM(vElem, {4, 4}, gB); // Pass ptr by reference
-    gBGM.generate();
+    gBaseToGradientMinimum gBGM(vElem, {15, 15}, gB); // Pass ptr by reference
+    gBGM.generateV2();
 
     std::cout << *dynamic_cast<gBasicGrid<int> *>(gB.get()) << std::endl;
     std::cout << "------------" << std::endl;
