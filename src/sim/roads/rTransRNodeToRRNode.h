@@ -12,7 +12,6 @@ class rTransRNodeToRRNode {
     //Transform Road Node into Road Reduced Node
 
 private:
-
     static int nFollow(rNode *aR) {
         return (aR->rBottom != nullptr) + (aR->rTop != nullptr) + (aR->rRight != nullptr) + (aR->rLeft != nullptr);
     }
@@ -40,7 +39,10 @@ private:
         if (nFollow(aR) > 2 || (nFollow(aR) == 2 && nFollow(aFollow) > 2) || (nFollow(aR) == 1 && dirFromPrev != -1)){
             rRNode *newAR;
             if (aR->refCompressed == nullptr) {
-                newAR = new rRNode(nCons);
+                std::pair<uint32_t, uint32_t> pComp = aR->rPos;
+                newAR = new rRNode(nCons, nFollow(aR) > 2,
+                                   pComp.first/rSizeBlocs * (rSizeGrid/rSizeBlocs + 1) + pComp.second/rSizeBlocs);
+                llNodes.push_back(newAR);
                 aR->refCompressed = newAR;
             } else {
                 newAR = aR->refCompressed;
@@ -79,12 +81,24 @@ private:
             aR->refCompressed = aFollow->refCompressed;
             return r;
         }
-    }
 
+        return nullptr;
+    }
+    static uint16_t rSizeBlocs;
+    static uint16_t rSizeGrid;
+    static std::list<rRNode *> llNodes;
 public:
-    static rRNode *conversion(rNode *rRoot) {
-        return rConversation(nullptr, -1, -1, rRoot, 1);
+    static std::list<rRNode *> conversion(rNode *rRoot, uint16_t rSizeB, uint16_t rSizeG) {
+        rSizeBlocs = rSizeB;
+        rSizeGrid = rSizeG;
+        llNodes.clear();
+        rConversation(nullptr, -1, -1, rRoot, 1);
+        return llNodes;
     }
 };
+
+uint16_t rTransRNodeToRRNode::rSizeBlocs;
+uint16_t rTransRNodeToRRNode::rSizeGrid;
+std::list<rRNode *> rTransRNodeToRRNode::llNodes;
 
 #endif //CITYOFWEIRDFISHES_RTRANSRNODETORRNODE_H

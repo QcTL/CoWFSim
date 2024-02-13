@@ -1,0 +1,11 @@
+//
+// Created by Laminar on 08/02/2024.
+//
+
+#ifndef CITYOFWEIRDFISHES_RTOFOLLOWDEST_H
+#define CITYOFWEIRDFISHES_RTOFOLLOWDEST_H
+
+class rToFollowDest{
+    
+};
+#endif //CITYOFWEIRDFISHES_RTOFOLLOWDEST_H
