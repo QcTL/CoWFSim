@@ -7,6 +7,7 @@
 
 #include "src/sim/structure/grids/transformation/gBaseToRiver.h"
 #include "src/sim/structure/grids/transformation/gBaseToLineRoads.h"
+#include "src/sim/structure/grids/transformation/gBaseToPattern.h"
 
 class SimInitialize {
 
@@ -29,8 +30,8 @@ public:
 
         std::vector<gtmElement> vElem = {
                 gtmElement(0.0, 0, 0.0, 0),
-                gtmElement(0.005, 0, 0.03, 0),
-                gtmElement(0.15, 0, 0.3, 0),};
+                gtmElement(0.01, 0, 0.04, 0),
+                gtmElement(0.07, 0, 0.1, 0),};
 
 
         std::shared_ptr<gIGrid<bool>> gUrbanCenterMask = std::make_shared<gBasicGrid<bool>>(
@@ -61,10 +62,31 @@ public:
         } else if (mValues.at("Mida_Simulacio") == "Molt_Gran") {
             lSizeRiver = 2.7;
         }
-        //if(mValues.at("Conte_Riu") == "on")
-            //gBaseToRiver<int> gBTR(gB, 20, 0.5, 100);
 
-        gBaseToLineRoads lineR(gB, 3, 0);
+        std::shared_ptr<gIGrid<bool>> gUrbanRoadsMask = std::make_shared<gBasicGrid<bool>>(
+                gBasicGrid<bool>(lSizeGrid, lSizeGrid, true));
+        gUrbanCenterMask = BasicTransformations::genMaskFromGrid(gB, {1,2});
+            //No pots ser simplement una mascara, ha de ser com el voltant de la ciutat i ha de tenir totes les caselles complertes per no deixar carreteres sense ser
+            //Compertes.
+
+
+        if(mValues.at("Conte_Riu") == "on")
+            gBaseToRiver<int> gBTR(gB, 20, lSizeRiver, 100);
+
+        if(mValues.at("Estructura_Ciutat") == "Graella"){
+            gBaseToPattern gBP(gB,
+                               gBaseToPattern<int>::gPatternType::gBPBlobSquares,
+                               gBaseToPattern<int>::gPatternParameters(4, 4, 20, 20), gUrbanCenterMask);
+
+        }else if(mValues.at("Estructura_Ciutat") == "Radial"){
+            gBaseToPattern gBP(gB,
+                               gBaseToPattern<int>::gPatternType::gBPSquares,
+                               gBaseToPattern<int>::gPatternParameters(4, 4, 20, 20), gUrbanCenterMask);
+        }
+
+        //srand(static_cast<unsigned int>(time(0))); dodo change this
+        for (int i = 0; i < std::stoi(mValues.at("Quanitat_Carrers_Princiapls")); i++)
+            gBaseToLineRoads lineR(gB, static_cast<float>(rand()) / static_cast<float>(RAND_MAX / 6) - 3, rand() % (lSizeGrid + 1));
 
         std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gB));
         gLAP->setTransformation({0, 1, 2, 3, 4, 5});

@@ -109,7 +109,7 @@ public:
             for (int j = gRange.second.first; j <= gRange.second.second; j++) {
                 for (const oLine &lines: lLines) {
                     if (isInLine({j, i}, lines) && pointLineDist({j, i}, lines.lF) <= rWidth) {
-                        gR->set(i, j, 3);
+                        gR->set(i, j, 5);
                     }
                 }
             }

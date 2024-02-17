@@ -21,12 +21,14 @@ public:
         int GWidth = (rSize.first.second - rSize.first.first) + 1;
 
         for (int j = 0; j < GWidth; j++) {
-            uint32_t yPre = std::round(dSteep * j + dHeight);
-            uint32_t yPost = std::round(dSteep * (j + 1) + dHeight);
+            int yPre = std::round(dSteep * j + dHeight);
+            int yPost = std::round(dSteep * (j + 1) + dHeight);
+            int mMax = std::max(yPre, yPost);
+            int mMin = std::min(yPre, yPost);
 
-            for (uint32_t k = yPre; k <= yPost; k++) {
+            for (int k = mMin; k <= mMax; k++) {
                 if (gGrid->isInside(j, k) && (!hasMask || gMask->get(j, k))) {
-                    gGrid->set(j, k, 3);
+                    gGrid->set(j, k, 4);
                 }
             }
         }

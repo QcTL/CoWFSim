@@ -68,28 +68,21 @@ private:
         std::pair<std::pair<int, int>, std::pair<int, int>> ranges = gtmGResult->rangeUse();
         for (int y = 0; y < nHeight; y++) {
             for (int x = 0; x < nWidth; x++) {
-                if(gtmGResult->isInside(x,y) && (!hasMask || gMask->get(x,y))) {
-                    std::pair<int, int> pTL = {x * (bWidth - 1), y * (bHeight - 1)};
+                std::pair<int, int> pTL = {x * (bWidth - 1), y * (bHeight - 1)};
 
+                if(gtmGResult->isInside(x,y) && (!hasMask || gMask->get(x,y))) {
                     for (int i = 0; i < bHeight; i++) {
-                        gtmGResult->set(pTL.first, pTL.second + i, 1);
-                        gtmGResult->set(pTL.first + bWidth - 1, pTL.second + i, 1);
+                        gtmGResult->set(pTL.first, pTL.second + i, 3);
+                        gtmGResult->set(pTL.first + bWidth - 1, pTL.second + i, 3);
                     }
 
                     for (int i = 0; i < bWidth; i++) {
                         gtmGResult->set(pTL.first + i, pTL.second, 1);
-                        gtmGResult->set(pTL.first + i, pTL.second + bHeight - 1, 1);
+                        gtmGResult->set(pTL.first + i, pTL.second + bHeight - 1, 3);
                     }
                 }
                 //gtmGResult->set(pTL.first, pTL.second, 2);
             }
-        }
-    }
-
-    void genDiagonalToGrid(int lenghtDiag) {
-        for (int i = 0; i < lenghtDiag; i++) {
-            gtmGResult->set(i, i, 1);
-            gtmGResult->set(i, i - 1, 1);
         }
     }
 
@@ -199,22 +192,23 @@ private:
         for (const auto &mapElem: edges) {
             for (const auto &vecElem: mapElem.second) {
                 std::pair<int, int> pair = vecElem.first;
+                pair = {pair.first * (sSquareWidth - 1), pair.second * (sSquareHeight - 1)};
                 if(gtmGResult->isInside(pair) && (!hasMask || gMask->get(pair))) {
-                    pair = {pair.first * (sSquareWidth - 1), pair.second * (sSquareHeight - 1)};
-
                     bool HasBttm = ((vecElem.second & (1 << 1)) == 0);
                     bool HasTop = ((vecElem.second & (1 << 6)) == 0);
                     bool HasLeft = ((vecElem.second & (1 << 3)) == 0);
                     bool HasRight = ((vecElem.second & (1 << 4)) == 0);
 
                     for (int i = 0; i < sSquareWidth; i++) {
-                        if (HasBttm) gtmGResult->set(pair.first + i, pair.second + sSquareHeight - 1, 1);
-                        if (HasTop) gtmGResult->set(pair.first + i, pair.second, 1);
+                        if (HasBttm) gtmGResult->set(pair.first + i, pair.second + sSquareHeight - 1, 3);
+                        if (HasTop) gtmGResult->set(pair.first + i, pair.second, 3);
                     }
+
                     for (int i = 0; i < sSquareHeight; i++) {
-                        if (HasLeft) gtmGResult->set(pair.first, pair.second + i, 1);
-                        if (HasRight) gtmGResult->set(pair.first + sSquareWidth - 1, pair.second + i, 1);
+                        if (HasLeft) gtmGResult->set(pair.first, pair.second + i, 3);
+                        if (HasRight) gtmGResult->set(pair.first + sSquareWidth - 1, pair.second + i, 3);
                     }
+
                 }
             }
         }

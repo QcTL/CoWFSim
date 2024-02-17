@@ -79,11 +79,11 @@ private:
                 gValid->get(dOffset.first, dOffset.second)) {
                 lPosActive lP;
                 if (gIter->get(dOffset.first, dOffset.second) == gActivePos.end()) {
-                    lP = lPosActive{lPieceDecided.pRel, __builtin_popcountll(lPieceDecided.pRel), dOffset};
+                    lP = lPosActive{lPieceDecided.pRel, static_cast<uint32_t>(__builtin_popcountll(lPieceDecided.pRel)), dOffset};
                 } else {
                     auto itToRep = gIter->get(dOffset.first, dOffset.second);
                     lP = lPosActive{lPieceDecided.pRel & itToRep->lpaValPiece,
-                                    __builtin_popcountll(lPieceDecided.pRel & itToRep->lpaValPiece), dOffset};
+                                    static_cast<uint32_t>(__builtin_popcountll(lPieceDecided.pRel & itToRep->lpaValPiece)), dOffset};
                     gActivePos.erase(itToRep);
                 }
 
