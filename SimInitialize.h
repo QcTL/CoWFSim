@@ -6,6 +6,7 @@
 #define CITYOFWEIRDFISHES_SIMINITIALIZE_H
 
 #include "src/sim/structure/grids/transformation/gBaseToRiver.h"
+#include "src/sim/structure/grids/transformation/gBaseToLineRoads.h"
 
 class SimInitialize {
 
@@ -60,8 +61,10 @@ public:
         } else if (mValues.at("Mida_Simulacio") == "Molt_Gran") {
             lSizeRiver = 2.7;
         }
-        if(mValues.at("Conte_Riu") == "on")
-            gBaseToRiver<int> gBTR(gB, 20, lSizeRiver, 100);
+        //if(mValues.at("Conte_Riu") == "on")
+            //gBaseToRiver<int> gBTR(gB, 20, 0.5, 100);
+
+        gBaseToLineRoads lineR(gB, 3, 0);
 
         std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gB));
         gLAP->setTransformation({0, 1, 2, 3, 4, 5});
