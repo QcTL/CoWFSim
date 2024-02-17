@@ -8,6 +8,8 @@
 #include <memory>
 #include <vector>
 #include <unordered_set>
+#include <map>
+
 #include "../gIGrid.h"
 #include "../gBasicGrid.h"
 
@@ -76,16 +78,30 @@ public:
         auto gRange = grid->rangeUse();
         int GWidth = (gRange.first.second - gRange.first.first) + 1;
         int GHeight = (gRange.second.second - gRange.second.first) + 1;
-        std::shared_ptr<gIGrid<bool>> retG = std::make_shared<gBasicGrid<bool>>(gBasicGrid<bool>(GWidth, GHeight, false));
+        std::shared_ptr<gIGrid<bool>> retG = std::make_shared<gBasicGrid<bool>>(
+                gBasicGrid<bool>(GWidth, GHeight, false));
 
         for (int i = gRange.second.first; i <= gRange.second.second; i++) {
             for (int j = gRange.first.first; j <= gRange.first.second; j++) {
-                if(sMask.find(grid->get(i,j)) != sMask.end()){
-                    retG->set(i,j,true);
+                if (sMask.find(grid->get(i, j)) != sMask.end()) {
+                    retG->set(i, j, true);
                 }
             }
         }
         return retG;
+    }
+
+    template<typename T>
+    static std::shared_ptr<gIGrid<T>> replaceValues(std::shared_ptr<gIGrid<T>> grid, const std::map<T, T>& repValues ){
+        auto gRange = grid->rangeUse();
+        for (int i = gRange.second.first; i <= gRange.second.second; i++) {
+            for (int j = gRange.first.first; j <= gRange.first.second; j++) {
+                if (repValues.find(grid->get(i,j)) != repValues.end()) {
+                    grid->set(i, j, repValues.at(grid->get(i,j)));
+                }
+            }
+        }
+        return grid;
     }
 
 };

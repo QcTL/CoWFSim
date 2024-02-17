@@ -10,6 +10,7 @@
 #include <random>
 #include <list>
 #include "../gIGrid.h"
+#include "../gBasicGrid.h"
 #include "gBaseToBorderDetection.h"
 
 
@@ -20,7 +21,7 @@ public:
         gBPSquares, gBPBlobSquares
     };
 
-    struct gPatternParameters{
+    struct gPatternParameters {
         int sizeBlockHeight;
         int sizeBlockWidth;
         int nBlocksX;
@@ -30,11 +31,14 @@ public:
                 sizeBlockHeight), sizeBlockWidth(sizeBlockWidth), nBlocksX(nBlocksX), nBlocksY(nBlocksY) {}
     };
 
-    gBaseToPattern(std::shared_ptr<gIGrid<T>> gR, gPatternType type, gPatternParameters parameters, int seed) : gtmGResult(gR) {
+    gBaseToPattern(std::shared_ptr<gIGrid<T>> gR, gPatternType type, gPatternParameters parameters,
+                   const std::shared_ptr<gIGrid<bool>> &pMask = nullptr ,int seed = -1)
+            : gtmGResult(gR), hasMask(pMask != nullptr), gMask(pMask) {
         switch (type) {
             case gBPSquares:
-                genBasicSquaresToGrid(parameters.sizeBlockWidth, parameters.sizeBlockHeight, parameters.nBlocksY, parameters.nBlocksX);
-                genDiagonalToGrid(35);
+                genBasicSquaresToGrid(parameters.sizeBlockWidth, parameters.sizeBlockHeight, parameters.nBlocksY,
+                                      parameters.nBlocksX);
+                //genDiagonalToGrid(35);
                 break;
             case gBPBlobSquares:
                 gen.seed(seed);
@@ -45,7 +49,7 @@ public:
                     g = blobTwoSquaresV2(g);
                 }
                 std::shared_ptr<gIGrid<int>> gGrid = blobToGrid(g);
-                std::cout << *dynamic_cast<gBasicGrid<int> *>(gGrid.get()) << std::endl;
+
                 gBaseToBorderDetection gbDet(gGrid, gBorderType::gBNonConnex);
                 std::map<T, std::vector<std::pair<std::pair<int, int>, uint8_t>>> p = gbDet.generate(
                         [](int i) { return true; });
@@ -56,23 +60,27 @@ public:
 
 private:
 
+    //MASK:
+    bool hasMask;
+    std::shared_ptr<gIGrid<bool>> gMask;
+
     void genBasicSquaresToGrid(int bWidth, int bHeight, int nHeight, int nWidth) {
         std::pair<std::pair<int, int>, std::pair<int, int>> ranges = gtmGResult->rangeUse();
-        for (int x = 0; x < nWidth; x++) {
-            for (int y = 0; y < nHeight; y++) {
-                std::pair<int, int> pTL = {x * (bWidth - 1), y * (bHeight - 1)};
-                std::cout << pTL.first << " - " << pTL.second << std::endl;
+        for (int y = 0; y < nHeight; y++) {
+            for (int x = 0; x < nWidth; x++) {
+                if(gtmGResult->isInside(x,y) && (!hasMask || gMask->get(x,y))) {
+                    std::pair<int, int> pTL = {x * (bWidth - 1), y * (bHeight - 1)};
 
-                for (int i = 0; i < bHeight; i++) {
-                    gtmGResult->set(pTL.first, pTL.second + i, 1);
-                    gtmGResult->set(pTL.first + bWidth - 1, pTL.second + i, 1);
+                    for (int i = 0; i < bHeight; i++) {
+                        gtmGResult->set(pTL.first, pTL.second + i, 1);
+                        gtmGResult->set(pTL.first + bWidth - 1, pTL.second + i, 1);
+                    }
+
+                    for (int i = 0; i < bWidth; i++) {
+                        gtmGResult->set(pTL.first + i, pTL.second, 1);
+                        gtmGResult->set(pTL.first + i, pTL.second + bHeight - 1, 1);
+                    }
                 }
-
-                for (int i = 0; i < bWidth; i++) {
-                    gtmGResult->set(pTL.first + i, pTL.second, 1);
-                    gtmGResult->set(pTL.first + i, pTL.second + bHeight - 1, 1);
-                }
-
                 //gtmGResult->set(pTL.first, pTL.second, 2);
             }
         }
@@ -191,20 +199,22 @@ private:
         for (const auto &mapElem: edges) {
             for (const auto &vecElem: mapElem.second) {
                 std::pair<int, int> pair = vecElem.first;
-                pair = {pair.first * (sSquareWidth - 1), pair.second * (sSquareHeight - 1)};
+                if(gtmGResult->isInside(pair) && (!hasMask || gMask->get(pair))) {
+                    pair = {pair.first * (sSquareWidth - 1), pair.second * (sSquareHeight - 1)};
 
-                bool HasBttm = ((vecElem.second & (1 << 1)) == 0);
-                bool HasTop = ((vecElem.second & (1 << 6)) == 0);
-                bool HasLeft = ((vecElem.second & (1 << 3)) == 0);
-                bool HasRight = ((vecElem.second & (1 << 4)) == 0);
+                    bool HasBttm = ((vecElem.second & (1 << 1)) == 0);
+                    bool HasTop = ((vecElem.second & (1 << 6)) == 0);
+                    bool HasLeft = ((vecElem.second & (1 << 3)) == 0);
+                    bool HasRight = ((vecElem.second & (1 << 4)) == 0);
 
-                for (int i = 0; i < sSquareWidth; i++) {
-                    if (HasBttm) gtmGResult->set(pair.first + i, pair.second + sSquareHeight - 1, 1);
-                    if (HasTop) gtmGResult->set(pair.first + i, pair.second, 1);
-                }
-                for (int i = 0; i < sSquareHeight; i++) {
-                    if (HasLeft) gtmGResult->set(pair.first, pair.second + i, 1);
-                    if (HasRight) gtmGResult->set(pair.first + sSquareWidth - 1, pair.second + i, 1);
+                    for (int i = 0; i < sSquareWidth; i++) {
+                        if (HasBttm) gtmGResult->set(pair.first + i, pair.second + sSquareHeight - 1, 1);
+                        if (HasTop) gtmGResult->set(pair.first + i, pair.second, 1);
+                    }
+                    for (int i = 0; i < sSquareHeight; i++) {
+                        if (HasLeft) gtmGResult->set(pair.first, pair.second + i, 1);
+                        if (HasRight) gtmGResult->set(pair.first + sSquareWidth - 1, pair.second + i, 1);
+                    }
                 }
             }
         }

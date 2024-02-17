@@ -37,7 +37,7 @@ int tst_gBasicWFC() {
     std::cout << "------------" << std::endl;
 
     std::shared_ptr<gIGrid<int>> gReal =std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(30, 30, 0));
-    gBaseToWFC wfc(gReal, b, {{1,3},{2,7},{3,6}},{15,15}, 1);
+    gBaseToWFC wfc(gReal, {{1,3},{2,7},{3,6}},{15,15}, 1, b);
 
     std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gReal));
     gLAP->setTransformation({0,1,2,3,4,5});
