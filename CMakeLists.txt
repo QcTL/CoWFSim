@@ -53,6 +53,11 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/roads/node/rInfoDists.h
         src/tests/tst_gERCComm.h
         src/display/CameraControls.h
+        src/sim/structure/grids/transformation/gBaseToWFC.h
+        src/sim/structure/grids/transformation/gBaseToRiver.h
+        src/tests/tst_gBasicRiver.h
+        src/tests/tst_gBasicWFC.h
+        src/tests/tst_gBasicWFCBasic.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

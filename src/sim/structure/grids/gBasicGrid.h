@@ -32,7 +32,7 @@ public:
             return data_[row][col];
         } else {
             std::cout << "WARNING: A GET OUTSIDE OF THE GRID HAS BEEN CALLED" << std::endl;
-            return -1;
+            return data_[0][0];
         }
     }
 
