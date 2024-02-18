@@ -2,8 +2,8 @@
 // Created by Laminar on 30/01/2024.
 //
 
-#ifndef CITYOFWEIRDFISHES_TST_GBASICDISPLAY_H
-#define CITYOFWEIRDFISHES_TST_GBASICDISPLAY_H
+#ifndef CITYOFWEIRDFISHES_TST_GBASICWFCBASIC_H
+#define CITYOFWEIRDFISHES_TST_GBASICWFCBASIC_H
 
 #include "../display/layers/implementation/gLayerAirPollution.h"
 #include "../sim/structure/grids/gBasicGrid.h"
@@ -33,7 +33,8 @@ int tst_gBasicWFCBasic() {
 
     std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gReal));
     gLAP->setTransformation({0,1,2,3,4,5});
-    std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(gSimLayers(gLAP));
+    std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(gSimLayers(gLAP, nullptr, gReal->rangeUse()));
+    gSimL->switchActual(gSimLayersTypes::G_AIRPOLLUTION);
 
     std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>();
     rGlobal rG(gSimL, pPM);
@@ -43,4 +44,4 @@ int tst_gBasicWFCBasic() {
     }
     return 0;
 }
-#endif //CITYOFWEIRDFISHES_TST_GBASICDISPLAY_H
+#endif //CITYOFWEIRDFISHES_TST_GBASICWFCBASIC_H

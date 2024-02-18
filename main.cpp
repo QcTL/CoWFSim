@@ -7,6 +7,9 @@
 #include "SimInitialize.h"
 #include "src/IO/ReaderParameters.h"
 #include "src/tests/tst_gBasicPattern.h"
+#include "src/tests/tst_gBasicDisplayGround.h"
+#include "SimInitializePreb.h"
+#include "src/tests/tst_gMenus.h"
 
 int main() {
     RelPath::selRelPath(std::filesystem::current_path().parent_path());
@@ -18,8 +21,9 @@ int main() {
         }
     std::cout << "------"<< std::endl;
 
+    tst_gMenus();
     SimInitialize::givenMap(sMVar);
-    //tst_gBasicPattern();
+    //SimInitializePreb::givenMap(sMVar);
 
     return 0;
 }

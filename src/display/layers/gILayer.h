@@ -12,9 +12,11 @@
 #include "../../sim/structure/grids/gIGrid.h"
 #include "tileset/gTileset.h"
 
+
 class gILayer {
 public:
-    gILayer(gTileset gTS, std::shared_ptr<gIGrid<int>> gGrid) : lTs(std::move(gTS)), lGrid(std::move(gGrid)) {}
+
+    gILayer(gTileset gTS) : lTs(std::move(gTS)) {}
 
     virtual ~gILayer() = default;
 
@@ -39,7 +41,6 @@ public:
     std::vector<sf::Vector2f> getTexPos(std::pair<int, int> pos) {
         return getTexPos(pos.first, pos.second);
     };
-    std::shared_ptr<gIGrid<int>> lGrid;
 
     sf::Texture *getTexture() {
         return &lTs.tsTex;
@@ -48,7 +49,6 @@ public:
 protected:
     gTileset lTs;
     std::vector<std::vector<sf::Vector2f>> lRefTiles;
-
 
 };
 

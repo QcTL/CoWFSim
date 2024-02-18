@@ -14,7 +14,7 @@ rGlobal::rGlobal(std::shared_ptr<gSimLayers> gInfoL, std::shared_ptr<rPileMenus>
 
 void rGlobal::setUp() {
 
-    std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gSimL->gSLActual->lGrid->rangeUse();
+    std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gSimL->gRangeUse;
     int GWidth = (gRange.first.second - gRange.first.first) + 1;
     int GHeight = (gRange.second.second - gRange.second.first) + 1;
     int GTileSize = 32; //TODO CANVIAR PER SER GENERIC;
