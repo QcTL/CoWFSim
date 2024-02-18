@@ -15,9 +15,9 @@ template<typename T>
 class gBasicGrid : public gIGrid<T> {
 
 public:
-    gBasicGrid(int rows, int cols) : data_(rows, std::vector<T>(cols)) {}
+    gBasicGrid(uint32_t rows, uint32_t cols) : data_(rows, std::vector<T>(cols)) {}
 
-    gBasicGrid(int rows, int cols, T defValue) : data_(rows, std::vector<T>(cols, defValue)) {}
+    gBasicGrid(uint32_t rows, uint32_t cols, T defValue) : data_(rows, std::vector<T>(cols, defValue)) {}
 
     void set(int row, int col, const T &value) override {
         if (isInside(row, col)) {

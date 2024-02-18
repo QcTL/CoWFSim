@@ -16,8 +16,7 @@ int tst_gBasicPattern() {
     std::shared_ptr<gIGrid<int>> gB = std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(50, 50, 0));
     gBaseToPattern gBP(gB,
                        gBaseToPattern<int>::gPatternType::gBPBlobSquares,
-                       gBaseToPattern<int>::gPatternParameters(3, 3, 9, 9),
-                       2);
+                       gBaseToPattern<int>::gPatternParameters(4, 4, 20, 20));
 
     std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gB));
     gLAP->setTransformation({0, 1, 2, 3, 4, 5});

@@ -17,7 +17,7 @@ int tst_gBasicRiver() {
 
     std::shared_ptr<gIGrid<int>> gB =std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(105, 105, 3));
 
-    gBaseToRiver<int> gBTR(gB, 100);
+    gBaseToRiver<int> gBTR(gB,20,1.6, 100);
 
     std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gB));
     gLAP->setTransformation({0,1,2,3,4,5});

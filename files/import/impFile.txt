@@ -1,0 +1,9 @@
+Centres_Urbans:2
+Estructura_Ciutat:Graella
+Ciutat_Central:on
+Quanitat_Node_Industrial:0
+Quanitat_Carrers_Princiapls:1
+Mida_Simulacio:Petita
+Estructures_Decoratives:off
+Conte_Riu:on
+Mida_Riu:Petita

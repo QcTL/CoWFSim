@@ -16,15 +16,15 @@
 int tst_gBasicWFCBasic() {
 
 
-    int rRows = 300;
-    int rCols = 300;
+    int rRows = 100;
+    int rCols = 100;
 
     //MASK:
     std::shared_ptr<gIGrid<bool>> b = std::make_shared<gBasicGrid<bool>>(gBasicGrid<bool>(rRows, rCols, -1));
 
     std::shared_ptr<gIGrid<int>> gReal =std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(rRows, rCols, 0));
 
-    gBaseToWFC wfc(gReal, b, {{1,3},{2,7},{3,6}},{rRows/2,rCols/2}, 1);
+    gBaseToWFC wfc(gReal, {{1,3},{2,7},{3,6}},{rRows/2,rCols/2}, 1);
 
     /*
     std::cout << *dynamic_cast<gBasicGrid<int> *>(gReal.get()) << std::endl;

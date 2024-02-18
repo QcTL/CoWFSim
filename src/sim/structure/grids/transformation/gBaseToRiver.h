@@ -68,18 +68,18 @@ private:
     }
 
 public:
-    explicit gBaseToRiver(std::shared_ptr<gIGrid<T>> gR, int rSeed = -1) {
+    explicit gBaseToRiver(std::shared_ptr<gIGrid<T>> gR, int nDetail, float fWidth,  int rSeed = -1) {
         std::list<oLine> lLines;
         std::default_random_engine generator;
         if (rSeed != -1)
             generator.seed(rSeed);
 
-        std::pair<uint32_t, uint32_t> p1 = {5, 5};
+        std::pair<uint32_t, uint32_t> p1 = {0, 0};
         //std::pair<uint32_t, uint32_t> p2 = {20, 73};
         std::pair<uint32_t, uint32_t> p3 = {100, 100};
         lLines = {oLine(p1, p3)};
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < nDetail; i++) {
             std::vector<double> weights;
             for (const oLine &line: lLines) {
                 weights.push_back(line.getWeight());
@@ -104,12 +104,12 @@ public:
         }
 
         std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gR->rangeUse();
-        double rWidth = 3;
+        double rWidth = fWidth;
         for (int i = gRange.first.first; i <= gRange.first.second; i++) {
             for (int j = gRange.second.first; j <= gRange.second.second; j++) {
                 for (const oLine &lines: lLines) {
                     if (isInLine({j, i}, lines) && pointLineDist({j, i}, lines.lF) <= rWidth) {
-                        gR->set(i, j, 1);
+                        gR->set(i, j, 5);
                     }
                 }
             }
