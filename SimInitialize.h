@@ -86,7 +86,9 @@ public:
 
         //srand(static_cast<unsigned int>(time(0))); dodo change this
         for (int i = 0; i < std::stoi(mValues.at("Quanitat_Carrers_Princiapls")); i++)
-            gBaseToLineRoads lineR(gB, static_cast<float>(rand()) / static_cast<float>(RAND_MAX / 6) - 3, rand() % (lSizeGrid + 1));
+            gBaseToLineRoads::givenFunction<int>(gB, static_cast<float>(rand()) / static_cast<float>(RAND_MAX / 6) - 3, rand() % (lSizeGrid + 1));
+
+        gBaseToLineRoads::givenTwoPoints<int>(gB, {20,20},{21,30});
 
         std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gB));
         gLAP->setTransformation({0, 1, 2, 3, 4, 5});
