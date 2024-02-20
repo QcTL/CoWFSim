@@ -58,6 +58,20 @@ private:
         for (int i = 0; i < sizeof(carreteres)/sizeof(carreteres[0]); i++) {
             addToMapSprites(33, getByPosTopLeft(lTs.getPos(carreteres[i] + 20)));
         }
+        //Water:
+        addToMapSprites(48, getByPosTopLeft(lTs.getPos(85)));
+        addToMapSprites(48, getByPosTopLeft(lTs.getPos(75)));
+        addToMapSprites(48, getByPosTopLeft(lTs.getPos(95)));
+        addToMapSprites(48, getByPosTopLeft(lTs.getPos(84)));
+        addToMapSprites(48, getByPosTopLeft(lTs.getPos(86)));
+        addToMapSprites(48, getByPosTopLeft(lTs.getPos(74)));
+        addToMapSprites(48, getByPosTopLeft(lTs.getPos(94)));
+        addToMapSprites(48, getByPosTopLeft(lTs.getPos(96)));
+        addToMapSprites(48, getByPosTopLeft(lTs.getPos(76)));
+        addToMapSprites(48, getByPosTopLeft(lTs.getPos(83)));
+        addToMapSprites(48, getByPosTopLeft(lTs.getPos(82)));
+        addToMapSprites(48, getByPosTopLeft(lTs.getPos(72)));
+        addToMapSprites(48, getByPosTopLeft(lTs.getPos(73)));
     }
 
     void addToMapSprites(const uint8_t& n, const std::vector<sf::Vector2f>& v){

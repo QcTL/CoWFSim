@@ -21,7 +21,7 @@ int tst_gMenus() {
     gSimL->switchActual(gSimLayersTypes::G_AIRPOLLUTION);
 
     std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>();
-    std::shared_ptr<rSelOptMenu> rSom = std::make_shared<rSelOptMenu>("d_mSelectLayer", rIMenu::rRelativePos::pBottomRight);
+    std::shared_ptr<rSelOptMenu> rSom = std::make_shared<rSelOptMenu>("d_mSelectLayer", rIMenu::rRelativePos::pTopLeft);
     pPM->addMenuTop(rSom);
 
 
