@@ -34,6 +34,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/display/layers/gILayer.h
         src/display/layers/tileset/gTileset.h
         src/display/layers/implementation/gLayerAirPollution.h
+        src/display/layers/implementation/gLayerCity.h
         src/tests/tst_gBasicDisplay.h
         src/sim/structure/grids/transformation/gBaseToPattern.h
         src/sim/structure/grids/transformation/gBaseToBorderDetection.h
@@ -59,8 +60,9 @@ add_executable(CityOfWeirdFishes main.cpp
         src/tests/tst_gBasicWFC.h
         src/tests/tst_gBasicWFCBasic.h
         SimInitialize.h
-        src/display/layers/implementation/gLayerCity.h
         src/sim/structure/grids/transformation/gBaseToLineRoads.h
+        src/tests/tst_gBasicDisplayGround.h
+        SimInitializePreb.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

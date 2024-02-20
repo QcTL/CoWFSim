@@ -33,7 +33,7 @@ public:
             case gBNonConnex:
                 for (int i = range.second.first; i < (range.second.second + 1); i++) {
                     for (int j = range.first.first; j < (range.first.second + 1); j++) {
-                        int vToSearch = gGrid->get(j, i);
+                        T vToSearch = gGrid->get(j, i);
                         if (gFValidNumberToBorder(vToSearch)) {
                             std::vector<std::pair<int, int>> dOffsets =
                                     {{i - 1, j + 1},
