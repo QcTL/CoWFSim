@@ -2,8 +2,8 @@
 // Created by Laminar on 30/01/2024.
 //
 
-#ifndef CITYOFWEIRDFISHES_TST_GBASICPATTERN_H
-#define CITYOFWEIRDFISHES_TST_GBASICPATTERN_H
+#ifndef CITYOFWEIRDFISHES_TST_GEXTRACTROADS_H
+#define CITYOFWEIRDFISHES_TST_GEXTRACTROADS_H
 
 #include <memory>
 #include "../sim/structure/grids/gBasicGrid.h"
@@ -40,4 +40,4 @@ int tst_gExtractRoads() {
     return 0;
 }
 
-#endif //CITYOFWEIRDFISHES_TST_GBASICPATTERN_H
+#endif //CITYOFWEIRDFISHES_TST_GEXTRACTROADS_H

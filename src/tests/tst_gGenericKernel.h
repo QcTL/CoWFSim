@@ -2,8 +2,8 @@
 // Created by Laminar on 28/01/2024.
 //
 
-#ifndef CITYOFWEIRDFISHES_TST_GGAUSSIAN_H
-#define CITYOFWEIRDFISHES_TST_GGAUSSIAN_H
+#ifndef CITYOFWEIRDFISHES_TST_GKERNEL_H
+#define CITYOFWEIRDFISHES_TST_GKERNEL_H
 
 #include "../sim/structure/grids/transformation/gBaseToGradientMinimum.h"
 #include "../sim/structure/grids/gBasicGrid.h"
@@ -21,4 +21,4 @@ int tst_gGenericKernel() {
     return 0;
 }
 
-#endif //CITYOFWEIRDFISHES_TST_GGAUSSIAN_H
+#endif //CITYOFWEIRDFISHES_TST_GKERNEL_H

@@ -48,11 +48,11 @@ public:
                 for (int i = 0; i < 30; i++) {
                     g = blobTwoSquaresV2(g);
                 }
-                std::shared_ptr<gIGrid<int>> gGrid = blobToGrid(g);
+                std::shared_ptr<gIGrid<T>> gGrid = blobToGrid(g);
 
-                gBaseToBorderDetection gbDet(gGrid, gBorderType::gBNonConnex);
+                gBaseToBorderDetection<T> gbDet(gGrid, gBorderType::gBNonConnex);
                 std::map<T, std::vector<std::pair<std::pair<int, int>, uint8_t>>> p = gbDet.generate(
-                        [](int i) { return true; });
+                        [](T i) { return true; });
                 blobRoadsToGrid(p, gR, parameters.sizeBlockWidth, parameters.sizeBlockHeight);
                 break;
         }
@@ -169,10 +169,10 @@ private:
         return gSquares;
     }
 
-    std::shared_ptr<gIGrid<int>>
+    std::shared_ptr<gIGrid<T>>
     blobToGrid(std::vector<std::vector<std::shared_ptr<std::list<std::pair<int, int>>>>> gInput) {
-        std::shared_ptr<gIGrid<int>> gB = std::make_shared<gBasicGrid<int>>(
-                gBasicGrid<int>(gInput.size(), gInput[0].size(), -1));
+        std::shared_ptr<gIGrid<T>> gB = std::make_shared<gBasicGrid<T>>(
+                gBasicGrid<T>(gInput.size(), gInput[0].size(), -1));
 
         for (int i = 0; i < gInput.size(); i++) {
             for (int j = 0; j < gInput[i].size(); j++) {

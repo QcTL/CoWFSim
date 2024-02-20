@@ -2,8 +2,8 @@
 // Created by Laminar on 30/01/2024.
 //
 
-#ifndef CITYOFWEIRDFISHES_TST_GBASICDISPLAY_H
-#define CITYOFWEIRDFISHES_TST_GBASICDISPLAY_H
+#ifndef CITYOFWEIRDFISHES_TST_GBASICWFC_H
+#define CITYOFWEIRDFISHES_TST_GBASICWFC_H
 
 #include "../display/layers/implementation/gLayerAirPollution.h"
 #include "../sim/structure/grids/gBasicGrid.h"
@@ -51,4 +51,4 @@ int tst_gBasicWFC() {
     }
     return 0;
 }
-#endif //CITYOFWEIRDFISHES_TST_GBASICDISPLAY_H
+#endif //CITYOFWEIRDFISHES_TST_GBASICWFC_H

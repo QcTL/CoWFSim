@@ -2,8 +2,8 @@
 // Created by Laminar on 11/02/2024.
 //
 
-#ifndef CITYOFWEIRDFISHES_TST_GBASICPATTERN_H
-#define CITYOFWEIRDFISHES_TST_GBASICPATTERN_H
+#ifndef CITYOFWEIRDFISHES_TST_GERCCOMM_H
+#define CITYOFWEIRDFISHES_TST_GERCCOMM_H
 
 #include <memory>
 #include "../sim/structure/grids/gBasicGrid.h"
@@ -63,4 +63,4 @@ int tst_gERCComm() {
     return 0;
 }
 
-#endif //CITYOFWEIRDFISHES_TST_GBASICPATTERN_H
+#endif //CITYOFWEIRDFISHES_TST_GERCCOMM_H
