@@ -102,7 +102,6 @@ public:
         while (!rMailBox.rMB.empty()) {
             rRMail e = rMailBox.rMB.front().first;
             if (rInfoDist::addIfShorter(e, uidNode, rBlock, rMailBox.rMB.front().second)) {
-                // If true send the information to all the other elements in the other receiving end. + 1 in the dist
                 rRMail eN(e.mGridOrigin, e.mRoadStart, e.mSizePath + 1);
                 sendToNext(eN);
             }
@@ -115,7 +114,6 @@ public:
             uint8_t dToTake = reqTakeCar.front();
             reqTakeCar.pop_front();
             carActInside = getByDir(dToTake)->takeCarPrep(dToTake ^ 0x02);
-
             notifyEnterNext(
                     rInfoDist::returnDirToDist(
                             rActiveVehicle::getDestByCar(carActInside.first).first,
@@ -157,7 +155,6 @@ private:
 class rRNodeL : public rRNodeI {
     //LINE
 public:
-
     rRNodeL(uint16_t rBlock, uint8_t nCompressed) :
             rRNodeI(rBlock), nCompressed(nCompressed), dFirst(nCompressed), dSecond(nCompressed) {
         std::vector<bool> elements(10, true);
@@ -186,7 +183,7 @@ public:
                     it = dFirst.lOrderedCars.erase(it);
                     std::cout << "EL COTXE A ARRIBAT A LA SEVA DESTINACIO " << uidNode << "-" << rBlock << std::endl;
                 } else {
-                    notifyEnterNext(getBiggestOther().first, c);
+                    notifyEnterNext(dEndFirst, c);
                     ++it;
                 }
             } else if (!dFirst.pState[c.second + 1]) {
@@ -208,7 +205,7 @@ public:
                     it = dSecond.lOrderedCars.erase(it);
                     std::cout << "EL COTXE A ARRIBAT A LA SEVA DESTINACIO " << uidNode << "-" << rBlock << std::endl;
                 } else {
-                    notifyEnterNext(getBiggestOther().first, c);
+                    notifyEnterNext(dEndSecond, c);
                     ++it;
                 }
             } else if (!dSecond.pState[c.second + 1]) {
@@ -234,7 +231,6 @@ private:
 
     std::pair<uint32_t, uint32_t> takeCarPrep(const uint8_t &dDir) override {
         std::pair<uint32_t, uint32_t> cRet;
-
         // Remove from the appropriate data structure based on dDir
         if (dDir == dEndFirst) {
             // Remove from first
@@ -257,7 +253,7 @@ private:
 
     void enterCar(const uint8_t &dDir) override {
         std::pair<uint32_t, uint32_t> cNext = getByDir(dDir)->takeCarPrep(dDir ^ 0x02);
-        if (isTheSmallestEntrance(dDir) && !dFirst.pState[0]) {
+        if (dEndFirst == dDir && !dFirst.pState[0]) {
             dFirst.pState[0] = true;
             dFirst.lOrderedCars.push_back(cNext);
         } else if (!dSecond.pState[0]) {
@@ -299,21 +295,6 @@ private:
         return {pMin, pMax};
     }
 
-
-    bool isTheSmallestEntrance(const uint8_t &dDir) {
-        uint8_t pMin = 5;
-        if (rLeft != nullptr)
-            pMin = std::min((uint8_t) 3, pMin);
-        if (rBottom != nullptr)
-            pMin = std::min((uint8_t) 2, pMin);
-        if (rRight != nullptr)
-            pMin = std::min((uint8_t) 1, pMin);
-        if (rTop != nullptr)
-            pMin = std::min((uint8_t) 0, pMin);
-
-        return dDir == pMin;
-    }
-
     std::pair<uint8_t, std::shared_ptr<rRNodeI>> otherDir(uint8_t dirFromPrev) {
         if (rTop != nullptr && dirFromPrev != 0)
             return {2, rTop};
@@ -323,30 +304,6 @@ private:
             return {1, rLeft};
         if (rRight != nullptr && dirFromPrev != 1)
             return {3, rRight};
-        return {};
-    }
-
-    std::pair<uint8_t, std::shared_ptr<rRNodeI>> getSmallestOther() {
-        if (rTop != nullptr)
-            return {0, rTop};
-        if (rRight != nullptr)
-            return {1, rBottom};
-        if (rBottom != nullptr)
-            return {2, rLeft};
-        if (rLeft != nullptr)
-            return {3, rRight};
-        return {};
-    }
-
-    std::pair<uint8_t, std::shared_ptr<rRNodeI>> getBiggestOther() {
-        if (rLeft != nullptr)
-            return {3, rTop};
-        if (rBottom != nullptr)
-            return {2, rBottom};
-        if (rRight != nullptr)
-            return {1, rLeft};
-        if (rTop != nullptr)
-            return {0, rRight};
         return {};
     }
 };
