@@ -10,54 +10,25 @@
 #include <memory>
 #include "RNodeAttrs/rRMailbox.h"
 #include "../transportation/gUniqueId.h"
+#include "../transportation/rActiveVehicles.h"
 #include "rInfoDists.h"
 
-struct rRNode {
-    uint8_t nCompressed;
-    //Represents how many roads this single node represents;
 
-    uint32_t uidNode;
-    bool isDecision;
-    uint16_t rBlock;
-    rRMailbox rMailBox;
+class rRNodeI {
+public:
+    explicit rRNodeI(uint16_t rBlock) : uidNode(gUniqueId::gen(rBlock)), rBlock(rBlock), rLeft(nullptr),
+                                        rRight(nullptr),
+                                        rTop(nullptr), rBottom(nullptr) {}
 
-    struct rRNode *rLeft;
-    struct rRNode *rRight;
-    struct rRNode *rTop;
-    struct rRNode *rBottom;
+    virtual void receive(const rRMail &r, const uint8_t &dir) = 0;
 
-    explicit rRNode(uint8_t n, bool isDecision, uint16_t nBlock);
+    virtual void sendNewInformation() = 0;
 
-    void receive(const rRMail &r, const uint8_t &dir) {
-        if (!isDecision) { //Si no es decisio i te un altre a l'altre costat
-            //Enviar-ho al seguent si en tens;
-            // amb la direccio canviada
-            std::pair<uint8_t, rRNode *> sec = otherDir(dir);
-            if (sec.second != nullptr) {
-                rRMail rNew(r.mGridOrigin, r.mRoadStart, r.mSizePath + 1);
-                sec.second->receive(rNew, sec.first);
-            }
-        } else {
-            //Enviar-ho a rRMailbox;
-            rMailBox.rMB.emplace(r, dir);
-        }
-    }
+    virtual void tick() = 0;
 
-    void sendNewInformation() {
-        //check if the destination of any position inside the grid or some other grid is lower that what we had.
-        if (isDecision) {
-            while (!rMailBox.rMB.empty()) {
-                rRMail e = rMailBox.rMB.front().first;
-                if (rInfoDist::addIfShorter(e, uidNode, rBlock, rMailBox.rMB.front().second)) {
-                    // If true send the information to all the other elements in the other receiving end. + 1 in the dist
-                    rRMail eN(e.mGridOrigin, e.mRoadStart, e.mSizePath + 1);
-                    sendToNext(eN);
-                }
-                rMailBox.rMB.pop();
-            }
-        }
-        //Set that if you enter this intersection and want to go to another one, just go for the one you received.
-    }
+    virtual std::pair<uint32_t, uint32_t> takeCarPrep(const uint8_t &dDir) = 0;
+
+    virtual void addNewCar(uint32_t idDest, uint16_t blockDest) = 0;
 
     void sendInformationStart() {
         rInfoDist::addSelfDist(uidNode);
@@ -65,149 +36,36 @@ struct rRNode {
         sendToNext(eN);
     }
 
-    ///TRANSPORT SYSTEM:
-    void tick() {
-        if (!isDecision) {
-            //Is a straight road and doesn't exisits a decision;
+    std::shared_ptr<rRNodeI> rLeft;
+    std::shared_ptr<rRNodeI> rRight;
+    std::shared_ptr<rRNodeI> rTop;
+    std::shared_ptr<rRNodeI> rBottom;
 
-            for (const auto c: lOrderedCarsD1) {
-                if (c.second + 1 >= nCompressed) {
-                    //Toca anar al seguent node, per aixo hem de saber en quina direccio esta;
-                } else if (!isLOccupated[c.second + 1]) {
-                    //Pot abancar a la seguent possico
-                    isLOccupated[c.second] = false;
-                    isLOccupated[c.second + 1] = true;
-                } else {
-                    //No pot fer res i s'ha de quedar quiet
-                }
-            }
+protected:
+    uint32_t uidNode;
+    uint16_t rBlock;
 
-            //Si ha de entrar algu
-            addAndReturn(el
-            cotxe, la
-            direccio);
-            //Podem fer que envii una notificaco a la bustia i si ho acconsegueix que l'elimini del anterior.
-            //Que a causa de la compressio sera 100% un creuament.
-        } else {
-            if(!lNextTop.empty() && rTop->canEnter(2)){
-                std::pair<uint32_t, uint32_t> cEx;
-                switch (lNextTop.front()) {
-                    case 0:
-                        //??? HOW
-                        break;
-                    case 1:
-                        cEx = rRight->removeLast();
-                        break;
-                    case 2:
-                        cEx = rBottom->removeLast();
-                        break;
-                    case 3:
-                        cEx = rLeft->removeLast();
-                        break;
-                }
-                rTop->enter(cEx.first, 2);
-            }
-        }
-    }
-
-    bool canEnter(uint8_t dirFrom){
-        if(!isDecision){
-            return  isLOccupated[0];
-        }else{
-            //TODO;
-        }
-    }
-
-    void addToCrossing(uint8_t dirFrom, uint32_t idCar) {
-        uint8_t dirNext; //Given the idCar get the destination and for that the next corse of actionn
-        switch (dirNext) {
-            case 0:
-                lNextTop.push_back(dirFrom);
-                break;
-            case 1:
-                lNextRight.push_back(dirFrom);
-                break;
-            case 2:
-                lNextBottom.push_back(dirFrom);
-                break;
-            case 3:
-                lNextLeft.push_back(dirFrom);
-                break;
-        }
-
-    }
-
-    typename std::list<std::pair<uint32_t, uint32_t>>::iterator
-    addAndReturn(const std::pair<uint32_t, uint32_t> &lP, bool dir) {
-
-        auto bRoad = dir ? lOrderedCarsD1.begin() : lOrderedCarsD2.begin();
-        auto eRoad = dir ? lOrderedCarsD1.end() : lOrderedCarsD2.end();
-
-        auto itNewAdded = std::lower_bound(bRoad, eRoad, lP,
-                                           [](const std::pair<uint32_t, uint32_t> &a,
-                                              const std::pair<uint32_t, uint32_t> &b) {
-                                               return a.second < b.second;
-                                           });
-        return dir ? lOrderedCarsD1.insert(itNewAdded, lP) : lOrderedCarsD2.insert(itNewAdded, lP);
-    }
-
-private:
-    std::list<std::pair<int, uint8_t>> rRoadPresOrd;
-    std::list<int> rRoadObstructionsOrd;
-
-    /// TRANSPORTATION //
-
-    //ROAD:
-    std::list<std::pair<uint32_t, uint32_t>> lOrderedCarsD1; //Direction 1
-    std::list<std::pair<uint32_t, uint32_t>> lOrderedCarsD2; //Direction 2
-    std::vector<bool> isLOccupated;
-
-    //CRUZE:
-    std::list<uint8_t> lNextTop;
-    std::list<uint8_t> lNextBottom;
-    std::list<uint8_t> lNextRight;
-    std::list<uint8_t> lNextLeft;
-
-    /// COMMUNICATIONS //
+    virtual void enterCar(const uint8_t &dDir) = 0;
 
     void sendToNext(const rRMail &m) {
-        if (rTop != nullptr) {
-            sendDirection(m, 0b00000000);
-        }
-        if (rRight != nullptr) {
-            sendDirection(m, 0b00000001);
-        }
-        if (rBottom != nullptr) {
-            sendDirection(m, 0b00000010);
-        }
-        if (rLeft != nullptr) {
-            sendDirection(m, 0b00000011);
+        for (int dir = 0; dir < 4; ++dir) {
+            if ((rTop != nullptr && dir == 0) ||
+                (rRight != nullptr && dir == 1) ||
+                (rBottom != nullptr && dir == 2) ||
+                (rLeft != nullptr && dir == 3)) {
+                sendDirection(m, dir);
+            }
         }
     }
 
     void sendDirection(rRMail mSend, uint8_t dDir) {
         uint8_t lastTwoBits = dDir & 0b11;
-        rRNode *direction = getByDir(lastTwoBits);
-
-        if (direction != nullptr) {
-            direction->receive(mSend, dDir ^ 0x02);
-            //The dir is changed to reflect the direction the reciving end is comming from
-        }
+        std::shared_ptr<rRNodeI> direction = getByDir(lastTwoBits);
+        if (direction != nullptr)
+            direction->receive(mSend, dDir ^ 0x02); // Dir is the perspective of the receiver;
     }
 
-    std::pair<uint8_t, rRNode *> otherDir(uint8_t dirFromPrev) {
-        if (rTop != nullptr && dirFromPrev != 0)
-            return {2, rTop};
-        if (rBottom != nullptr && dirFromPrev != 2)
-            return {0, rBottom};
-        if (rLeft != nullptr && dirFromPrev != 3)
-            return {1, rLeft};
-        if (rRight != nullptr && dirFromPrev != 1)
-            return {3, rRight};
-        return {};
-    }
-
-    rRNode *getByDir(const uint8_t n) const {
+    [[nodiscard]] std::shared_ptr<rRNodeI> getByDir(const uint8_t n) const {
         switch (n) {
             case 0b00:
                 return rTop;
@@ -222,14 +80,270 @@ private:
         }
     }
 
+    void notifyEnterNext(const uint8_t &dDir, const std::pair<uint32_t, uint32_t> &cNext) {
+        uint8_t lastTwoBits = dDir & 0b11;
+        std::shared_ptr<rRNodeI> direction = getByDir(lastTwoBits);
+        if (direction != nullptr)
+            direction->enterCar(dDir ^ 0x02);
+    }
 };
 
-rRNode::rRNode(uint8_t n, bool isDecision, uint16_t nBlock) : nCompressed(n), isDecision(isDecision), rBlock(nBlock) {
-    uidNode = gUniqueId::gen(nBlock);
-    rLeft = nullptr;
-    rRight = nullptr;
-    rTop = nullptr;
-    rBottom = nullptr;
-}
+
+class rRNodeC : public rRNodeI {
+    //CROSSING
+public:
+    rRNodeC(uint16_t rBlock) : rRNodeI(rBlock), itsEmpty(true) {}
+
+    void receive(const rRMail &r, const uint8_t &dir) override {
+        rMailBox.rMB.emplace(r, dir);
+    }
+
+    void sendNewInformation() override {
+        while (!rMailBox.rMB.empty()) {
+            rRMail e = rMailBox.rMB.front().first;
+            if (rInfoDist::addIfShorter(e, uidNode, rBlock, rMailBox.rMB.front().second)) {
+                // If true send the information to all the other elements in the other receiving end. + 1 in the dist
+                rRMail eN(e.mGridOrigin, e.mRoadStart, e.mSizePath + 1);
+                sendToNext(eN);
+            }
+            rMailBox.rMB.pop();
+        }
+    }
+
+    void tick() override {
+        if (itsEmpty && !reqTakeCar.empty()) {
+            uint8_t dToTake = reqTakeCar.front();
+            reqTakeCar.pop_front();
+            carActInside = getByDir(dToTake)->takeCarPrep(dToTake ^ 0x02);
+
+            notifyEnterNext(
+                    rInfoDist::returnDirToDist(
+                            rActiveVehicle::getDestByCar(carActInside.first).first,
+                            rActiveVehicle::getDestByCar(carActInside.first).second,
+                            rBlock, uidNode), carActInside);
+        }
+    }
+
+    std::pair<uint32_t, uint32_t> takeCarPrep(const uint8_t &dDir) override {
+        itsEmpty = true;
+        return carActInside;
+    }
+
+    void addNewCar(uint32_t idDest, uint16_t blockDest) override{
+    }
+
+
+private:
+    void enterCar(const uint8_t &dDir) override {
+        /*
+        if (itsEmpty) {
+            carActInside = getByDir(dDir)->takeCarPrep(dDir ^ 0x02);
+            itsEmpty = false;
+            notifyEnterNext(
+                    rInfoDist::returnDirToDist(
+                            rActiveVehicle::getDestByCar(carActInside.first).first,
+                            rActiveVehicle::getDestByCar(carActInside.first).second,
+                            rBlock, uidNode), carActInside);
+        } else*/
+        reqTakeCar.push_back(dDir);
+    }
+
+    std::list<uint8_t> reqTakeCar;
+
+    std::pair<uint32_t, uint32_t> carActInside;
+    bool itsEmpty;
+    rRMailbox rMailBox;
+};
+
+class rRNodeL : public rRNodeI {
+    //LINE
+public:
+
+    rRNodeL(uint16_t rBlock, uint8_t nCompressed) :
+            rRNodeI(rBlock), nCompressed(nCompressed), dFirst(nCompressed), dSecond(nCompressed) {
+        std::vector<bool> elements(10, true);
+    }
+
+    void receive(const rRMail &r, const uint8_t &dir) override {
+        std::pair<uint8_t, std::shared_ptr<rRNodeI>> sec = otherDir(dir);
+        if (sec.second != nullptr) {
+            rRMail rNew(r.mGridOrigin, r.mRoadStart, r.mSizePath + 1);
+            sec.second->receive(rNew, sec.first);
+        }
+    }
+
+    void sendNewInformation() override {
+        //TODO CHANGE IT BECAUSE IT CANNOT BE IN THE CONSTRUCTOR BECAUSE NOT ALL THE NEIGHTBORES ARE SET;
+        dEndFirst = getDirEntrances().first;
+        dEndSecond = getDirEntrances().second;
+    }
+
+    void tick() override {
+        for (auto it = dFirst.lOrderedCars.begin(); it != dFirst.lOrderedCars.end();) {
+            auto& c = *it;
+            if (c.second + 1 >= nCompressed) {
+                if (rActiveVehicle::getDestByCar(c.first).first == uidNode &&
+                    rActiveVehicle::getDestByCar(c.first).second == rBlock) {
+                    it = dFirst.lOrderedCars.erase(it);
+                    std::cout << "EL COTXE A ARRIBAT A LA SEVA DESTINACIO " << uidNode << "-" << rBlock << std::endl;
+                } else {
+                    notifyEnterNext(getBiggestOther().first, c);
+                    ++it;
+                }
+            } else if (!dFirst.pState[c.second + 1]) {
+                // Update state
+                dFirst.pState[c.second] = false;
+                dFirst.pState[c.second + 1] = true;
+                ++c.second;
+                ++it;
+            } else {
+                ++it;
+            }
+        }
+
+        for (auto it = dSecond.lOrderedCars.begin(); it != dSecond.lOrderedCars.end();) {
+            auto& c = *it;
+            if (c.second + 1 >= nCompressed) {
+                if (rActiveVehicle::getDestByCar(c.first).first == uidNode &&
+                    rActiveVehicle::getDestByCar(c.first).second == rBlock) {
+                    it = dSecond.lOrderedCars.erase(it);
+                    std::cout << "EL COTXE A ARRIBAT A LA SEVA DESTINACIO " << uidNode << "-" << rBlock << std::endl;
+                } else {
+                    notifyEnterNext(getBiggestOther().first, c);
+                    ++it;
+                }
+            } else if (!dSecond.pState[c.second + 1]) {
+                // Update state
+                dSecond.pState[c.second] = false;
+                dSecond.pState[c.second + 1] = true;
+                ++c.second;
+                ++it;
+            } else {
+                ++it;
+            }
+        }
+    }
+
+    void addNewCar(uint32_t idDest, uint16_t blockDest) override{
+        std::pair<uint32_t, uint32_t> newCar = {rActiveVehicle::addCar(idDest, blockDest), 0};
+        //TODO CONTROLAR LA DIRECCIO INICIAL;
+        dFirst.pState[0] = true;
+        dFirst.lOrderedCars.push_back(newCar);
+    }
+
+private:
+
+    std::pair<uint32_t, uint32_t> takeCarPrep(const uint8_t &dDir) override {
+        if (dDir == dEndFirst) {
+            //REMOVE FROM FIRST
+            dFirst.pState[dFirst.pState.size()-1] = false;
+            std::pair<uint32_t , uint32_t> cRet = dFirst.lOrderedCars.front();
+            dFirst.lOrderedCars.pop_front();
+            cRet.second = 0;
+            return cRet;
+        } else if (dDir == dEndSecond) {
+            //REMOVE FROM SECOND
+            dSecond.pState[dSecond.pState.size()-1] = false;
+            std::pair<uint32_t , uint32_t> cRet = dSecond.lOrderedCars.front();
+            dSecond.lOrderedCars.pop_front();
+            return cRet;
+        };
+    }
+
+    void enterCar(const uint8_t &dDir) override {
+        std::pair<uint32_t, uint32_t> cNext = getByDir(dDir)->takeCarPrep(dDir ^ 0x02);
+        if (isTheSmallestEntrance(dDir) && !dFirst.pState[0]) {
+            dFirst.pState[0] = true;
+            dFirst.lOrderedCars.push_back(cNext);
+        } else if (!dSecond.pState[0]) {
+            dSecond.pState[0] = true;
+            dSecond.lOrderedCars.push_back(cNext);
+        }
+    }
+
+    uint8_t nCompressed;
+
+    struct rRoad {
+        explicit rRoad(uint8_t nCompressed) : pState(nCompressed, false) {}
+
+        std::vector<bool> pState;
+        std::list<std::pair<uint32_t, uint32_t>> lOrderedCars;
+    };
+
+    rRoad dFirst;
+    uint8_t dEndFirst;
+    rRoad dSecond;
+    uint8_t dEndSecond;
+
+    std::pair<uint8_t, uint8_t> getDirEntrances() {
+        uint8_t pMin = 5;
+        uint8_t pMax = 0;
+        if (rLeft != nullptr)
+            pMin = std::min((uint8_t) 3, pMin);
+        pMax = std::min((uint8_t) 3, pMax);
+        if (rBottom != nullptr)
+            pMin = std::min((uint8_t) 2, pMin);
+        pMax = std::min((uint8_t) 2, pMax);
+        if (rRight != nullptr)
+            pMin = std::min((uint8_t) 1, pMin);
+        pMax = std::min((uint8_t) 1, pMax);
+        if (rTop != nullptr)
+            pMin = std::min((uint8_t) 0, pMin);
+        pMax = std::min((uint8_t) 0, pMax);
+
+        return {pMin, pMax};
+    }
+
+
+    bool isTheSmallestEntrance(const uint8_t &dDir) {
+        uint8_t pMin = 5;
+        if (rLeft != nullptr)
+            pMin = std::min((uint8_t) 3, pMin);
+        if (rBottom != nullptr)
+            pMin = std::min((uint8_t) 2, pMin);
+        if (rRight != nullptr)
+            pMin = std::min((uint8_t) 1, pMin);
+        if (rTop != nullptr)
+            pMin = std::min((uint8_t) 0, pMin);
+
+        return dDir == pMin;
+    }
+
+    std::pair<uint8_t, std::shared_ptr<rRNodeI>> otherDir(uint8_t dirFromPrev) {
+        if (rTop != nullptr && dirFromPrev != 0)
+            return {2, rTop};
+        if (rBottom != nullptr && dirFromPrev != 2)
+            return {0, rBottom};
+        if (rLeft != nullptr && dirFromPrev != 3)
+            return {1, rLeft};
+        if (rRight != nullptr && dirFromPrev != 1)
+            return {3, rRight};
+        return {};
+    }
+
+    std::pair<uint8_t, std::shared_ptr<rRNodeI>> getSmallestOther() {
+        if (rTop != nullptr)
+            return {0, rTop};
+        if (rRight != nullptr)
+            return {1, rBottom};
+        if (rBottom != nullptr)
+            return {2, rLeft};
+        if (rLeft != nullptr)
+            return {3, rRight};
+        return {};
+    }
+
+    std::pair<uint8_t, std::shared_ptr<rRNodeI>> getBiggestOther() {
+        if (rLeft != nullptr)
+            return {3, rTop};
+        if (rBottom != nullptr)
+            return {2, rBottom};
+        if (rRight != nullptr)
+            return {1, rLeft};
+        if (rTop != nullptr)
+            return {0, rRight};
+        return {};
+    }
+};
 
 #endif //CITYOFWEIRDFISHES_RRNODE_H
