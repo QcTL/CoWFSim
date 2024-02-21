@@ -45,10 +45,13 @@ int tst_gVeh() {
     }
 
 
-    auto it = std::next(rLL.begin(), 1); // Iterator to the second element
-    it->get()->addNewCar(2,0);
-    it->get()->tick();
-    it->get()->addNewCar(3,0);
+    auto it = std::next(rLL.begin(), 2); // Iterator to the second element
+    it->get()->addNewCar(1,0);
+
+    auto it2 = std::next(rLL.begin(), 3); // Iterator to the second element
+    it2->get()->addNewCar(1,0);
+
+
     for(int i = 0; i < 255; i++) {
         for (const std::shared_ptr<rRNodeI>& node: rLL) {
             node->tick();

@@ -129,8 +129,7 @@ public:
         return carActInside;
     }
 
-    void addNewCar(uint32_t idDest, uint16_t blockDest) override{
-    }
+    void addNewCar(uint32_t idDest, uint16_t blockDest) override {}
 
 
 private:
@@ -180,7 +179,7 @@ public:
 
     void tick() override {
         for (auto it = dFirst.lOrderedCars.begin(); it != dFirst.lOrderedCars.end();) {
-            auto& c = *it;
+            auto &c = *it;
             if (c.second + 1 >= nCompressed) {
                 if (rActiveVehicle::getDestByCar(c.first).first == uidNode &&
                     rActiveVehicle::getDestByCar(c.first).second == rBlock) {
@@ -202,7 +201,7 @@ public:
         }
 
         for (auto it = dSecond.lOrderedCars.begin(); it != dSecond.lOrderedCars.end();) {
-            auto& c = *it;
+            auto &c = *it;
             if (c.second + 1 >= nCompressed) {
                 if (rActiveVehicle::getDestByCar(c.first).first == uidNode &&
                     rActiveVehicle::getDestByCar(c.first).second == rBlock) {
@@ -224,7 +223,7 @@ public:
         }
     }
 
-    void addNewCar(uint32_t idDest, uint16_t blockDest) override{
+    void addNewCar(uint32_t idDest, uint16_t blockDest) override {
         std::pair<uint32_t, uint32_t> newCar = {rActiveVehicle::addCar(idDest, blockDest), 0};
         //TODO CONTROLAR LA DIRECCIO INICIAL;
         dFirst.pState[0] = true;
@@ -234,20 +233,26 @@ public:
 private:
 
     std::pair<uint32_t, uint32_t> takeCarPrep(const uint8_t &dDir) override {
+        std::pair<uint32_t, uint32_t> cRet;
+
+        // Remove from the appropriate data structure based on dDir
         if (dDir == dEndFirst) {
-            //REMOVE FROM FIRST
-            dFirst.pState[dFirst.pState.size()-1] = false;
-            std::pair<uint32_t , uint32_t> cRet = dFirst.lOrderedCars.front();
-            dFirst.lOrderedCars.pop_front();
-            cRet.second = 0;
-            return cRet;
+            // Remove from first
+            if (!dFirst.lOrderedCars.empty()) {
+                dFirst.pState[dFirst.pState.size() - 1] = false;
+                cRet = dFirst.lOrderedCars.front();
+                dFirst.lOrderedCars.pop_front();
+                cRet.second = 0;
+            }
         } else if (dDir == dEndSecond) {
-            //REMOVE FROM SECOND
-            dSecond.pState[dSecond.pState.size()-1] = false;
-            std::pair<uint32_t , uint32_t> cRet = dSecond.lOrderedCars.front();
-            dSecond.lOrderedCars.pop_front();
-            return cRet;
-        };
+            // Remove from second
+            if (!dSecond.lOrderedCars.empty()) {
+                dSecond.pState[dSecond.pState.size() - 1] = false;
+                cRet = dSecond.lOrderedCars.front();
+                dSecond.lOrderedCars.pop_front();
+            }
+        }
+        return cRet;
     }
 
     void enterCar(const uint8_t &dDir) override {
