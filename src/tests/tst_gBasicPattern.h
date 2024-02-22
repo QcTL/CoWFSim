@@ -22,7 +22,7 @@ int tst_gBasicPattern() {
     gLAP->setTransformation({0, 1, 2, 3, 4, 5});
     std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(gLAP, nullptr, gB->rangeUse());
 
-    std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>();
+    std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
     rGlobal rG(gSimL, pPM);
     rG.setUp();
     while (rG.isOpen) {

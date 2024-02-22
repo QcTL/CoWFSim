@@ -19,12 +19,14 @@ public:
         pBottomLeft, pBottomRight, pTopLeft, pTopRight, pCenter, pCenterBottom, pCenterTop
     };
 
-    rIMenu(rRelativePos rRelativePos) : tsTex(gTileset("ts_menuFont8.png", 8, 40, 10)),
-                                        rPos(rRelativePos) {
+    rIMenu(const std::shared_ptr<rIMenu>& mParent, rRelativePos rRelativePos) : tsTex(gTileset("ts_menuFont8.png", 8, 40, 10)),
+                                        rPos(rRelativePos), parentMenu(mParent) {
         setTransformation();
     }
 
     virtual void draw(sf::RenderWindow &rW) = 0;
+    virtual void setResponse(int v) = 0;
+    virtual bool interact(const sf::Event& event, const sf::RenderWindow& rWindow) = 0;
 
     void setTransformation() {
         int tSize = tsTex.getTileSize();
@@ -142,11 +144,46 @@ public:
         return v;
     }
 
+
     rRelativePos getRPos() {
         return rPos;
     }
 
+    sf::Vector2<uint32_t> getAbsPos(const sf::RenderWindow& rW, uint menuH, int menuW, const sf::Vector2<int>& mouseP){
+        auto wS = rW.getSize();
+        switch (rPos) {
+            case pBottomLeft:
+                    return {(unsigned int)mouseP.x,mouseP.y - (wS.y - menuH)};
+            case pBottomRight:
+                    return {mouseP.x - (wS.x - menuW),mouseP.y - (wS.y - menuH) };
+            case pTopLeft:
+                    return {(unsigned int)mouseP.x, (unsigned int) mouseP.y };
+            case pTopRight:
+                    return {mouseP.x - (wS.x - menuW), (unsigned int) mouseP.y};
+        }
+    }
+
+    bool isInside(const sf::RenderWindow& rW, int menuH, int menuW, const sf::Vector2<int>& mouseP){
+        auto wS = rW.getSize();
+        switch (rPos) {
+            case pBottomLeft:
+                if(mouseP.x >= 0 && mouseP.x < menuW &&  mouseP.y >= (wS.y - menuH) && mouseP.y < wS.y)
+                    return true;
+            case pBottomRight:
+                if(mouseP.x >= (wS.x - menuW) && mouseP.x < wS.x &&  mouseP.y >= (wS.y - menuH) && mouseP.y < wS.y)
+                    return true;
+            case pTopLeft:
+                if(mouseP.x >= 0 && mouseP.x < menuW && mouseP.y >= 0 && mouseP.y < menuH)
+                    return true;
+            case pTopRight:
+                if(mouseP.x >= (wS.x - menuW) && mouseP.x < wS.x && mouseP.y >= 0 && mouseP.y < menuH)
+                    return true;
+        }
+        return false;
+    }
+
 protected:
+    std::shared_ptr<rIMenu> parentMenu;
     gTileset tsTex;
     sf::VertexArray v;
     std::vector<std::vector<sf::Vector2f>> lRefTiles;

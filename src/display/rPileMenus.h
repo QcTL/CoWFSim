@@ -8,10 +8,11 @@
 #include <utility>
 
 #include "menus/rIMenu.h"
+#include "layers/gSimLayers.h"
 
 class rPileMenus {
 public:
-    rPileMenus() = default;
+    rPileMenus(const std::shared_ptr<gSimLayers>& gSimL):inSim(gSimL){};
 
     void addMenuTop(const std::shared_ptr<rIMenu> &nMenu) {
         vTopActiveMenu = nMenu;
@@ -69,8 +70,13 @@ public:
         rViewTopRight = sf::View(sf::FloatRect(width, 0, -width, height));
     }
 
-private:
+    void updateOnEvent(const sf::Event& event, const sf::RenderWindow& rWindow){
+        vTopActiveMenu->interact(event, rWindow);
+    }
+
     std::shared_ptr<rIMenu> vTopActiveMenu;
+    std::shared_ptr<gSimLayers> inSim;
+private:
     std::vector<uint8_t> vOrderMenus;
     std::vector<std::pair<int, std::shared_ptr<rIMenu>>> vPresentMenus;
 
