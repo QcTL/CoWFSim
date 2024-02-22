@@ -31,7 +31,7 @@ public:
 
             for (int k = mMin; k <= mMax; k++) {
                 if (gGrid->isInside(j, k) && (!hasMask || gMask->get(j, k))) {
-                    gGrid->set(j, k, 3);
+                    gGrid->set(j, k, 4);
                 }
             }
         }
@@ -55,13 +55,13 @@ public:
 
             for (int k = mMin; k <= mMax; k++) {
                 if (gGrid->isInside(j, k) && (!hasMask || gMask->get(j, k))) {
-                    gGrid->set(j, k, 3);
+                    gGrid->set(j, k, 4);
                 }
             }
         }
 
-        gGrid->set(pStart, 3);
-        gGrid->set(pEnd, 3);
+        gGrid->set(pStart, 4);
+        gGrid->set(pEnd, 4);
     }
 
 };

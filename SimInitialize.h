@@ -8,6 +8,7 @@
 #include "src/sim/structure/grids/transformation/gBaseToRiver.h"
 #include "src/sim/structure/grids/transformation/gBaseToLineRoads.h"
 #include "src/sim/structure/grids/transformation/gBaseToPattern.h"
+#include "src/display/menus/implementations/rBaseMenu.h"
 
 class SimInitialize {
 
@@ -77,10 +78,12 @@ public:
         if (mValues.at("Conte_Riu") == "on")
             gBaseToRiver<uint32_t> gBTR(gB, 20, lSizeRiver, 100);
 
+
+
         //RIVER TRANSFORMATION
-        gBaseToBorderDetection gbDetRiver(gB, gBorderType::gBNonConnex);
-        std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint8_t>>> pRiver = gbDetRiver.generate(
-                [](uint32_t i) { return i == 5; });
+        std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint8_t>>> pRiver = gBaseToBorderDetection::generate<uint32_t>(
+                gB, {gBorderType::gBNonConnex, gBorderOutside::gIsGroup}, {},
+                BasicTransformations::genMaskFromGrid(gB, {5}));
 
         for (const auto &map_element: pRiver) {
             for (const auto &elm: map_element.second) {
@@ -88,10 +91,12 @@ public:
                 uint8_t p = 0;
 
                 if ((elm.second & (1 << 6)) && (elm.second & (1 << 1))) {
-                    p = (elm.second & (1 << 4) && !(elm.second & (1 << 3))) ? 1 : (elm.second & (1 << 3) && !(elm.second & (1 << 4))) ? 2 : 0;
+                    p = (elm.second & (1 << 4) && !(elm.second & (1 << 3))) ? 1 : (elm.second & (1 << 3) &&
+                                                                                   !(elm.second & (1 << 4))) ? 2 : 0;
                 } else if ((elm.second & (1 << 3)) && (elm.second & (1 << 4))) {
-                    p = (elm.second & (1 << 1) && !(elm.second & (1 << 6))) ? 3 : (elm.second & (1 << 6) && !(elm.second & (1 << 1))) ? 4 : 0;
-                }else if ((elm.second & (1 << 4)) && (elm.second & (1 << 1))) {
+                    p = (elm.second & (1 << 1) && !(elm.second & (1 << 6))) ? 3 : (elm.second & (1 << 6) &&
+                                                                                   !(elm.second & (1 << 1))) ? 4 : 0;
+                } else if ((elm.second & (1 << 4)) && (elm.second & (1 << 1))) {
                     p = 5;
                 } else if ((elm.second & (1 << 3)) && (elm.second & (1 << 1))) {
                     p = 6;
@@ -119,13 +124,18 @@ public:
                                gBaseToPattern<uint32_t>::gPatternParameters(4, 4, 20, 20), gUrbanCenterMask);
         }
 
-
+        //srand(static_cast<unsigned int>(time(0))); dodo change this
+        for (int i = 0; i < std::stoi(mValues.at("Quanitat_Carrers_Princiapls")); i++)
+            gBaseToLineRoads::givenFunction<uint32_t>(gB,
+                                                      static_cast<float>(rand()) / static_cast<float>(RAND_MAX / 6) - 3,
+                                                      rand() % (lSizeGrid + 1));
 
 
         //TODO MILLORAR EL ORDRE EN EL QUE ES FA PER ARA ES FA DOS COPS:
-        gBaseToBorderDetection gbDet(gB, gBorderType::gBNonConnex);
-        std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint8_t>>> p = gbDet.generate(
-                [](uint32_t i) { return i == 3; });
+
+        std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint8_t>>> p =
+                gBaseToBorderDetection::generate(gB, {gBorderType::gBNonConnex, gBorderOutside::gIsNotGroup}, {3, 4},
+                                                 BasicTransformations::genMaskFromGrid(gB, {3,4}));
 
         for (const auto &map_element: p) {
             for (const auto &elm: map_element.second) {
@@ -134,34 +144,17 @@ public:
                             | ((elm.second & (1 << 4)) != 0) << 2
                             | ((elm.second & (1 << 6)) != 0) << 1
                             | ((elm.second & (1 << 3)) != 0);
-                gB->set({elm.first.second, elm.first.first},
-                        (((uint32_t) (uint8_t) strtol("100001", NULL, 2)) << 24) + p);
+                if(gB->get(elm.first.second, elm.first.first) == 3) {
+                    gB->set({elm.first.second, elm.first.first},
+                            (((uint32_t) (uint8_t) strtol("100001", NULL, 2)) << 24) + p);
+                }else{
+                    gB->set({elm.first.second, elm.first.first},
+                            (((uint32_t) (uint8_t) strtol("100000", NULL, 2)) << 24) + p);
+                }
             }
         }
 
-        //srand(static_cast<unsigned int>(time(0))); dodo change this
-        for (int i = 0; i < std::stoi(mValues.at("Quanitat_Carrers_Princiapls")); i++)
-            gBaseToLineRoads::givenFunction<uint32_t>(gB,
-                                                      static_cast<float>(rand()) / static_cast<float>(RAND_MAX / 6) - 3,
-                                                      rand() % (lSizeGrid + 1));
 
-        gBaseToBorderDetection gbDet2(gB, gBorderType::gBNonConnex);
-        std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint8_t>>> p2 = gbDet.generate(
-                [](uint32_t i) { return i == 3; });
-
-        for (const auto &map_element: p2) {
-            for (const auto &elm: map_element.second) {
-                //8 code to 4:
-                uint8_t p = ((elm.second & (1 << 1)) != 0) << 3
-                            | ((elm.second & (1 << 4)) != 0) << 2
-                            | ((elm.second & (1 << 6)) != 0) << 1
-                            | ((elm.second & (1 << 3)) != 0);
-                gB->set({elm.first.second, elm.first.first},
-                        (((uint32_t) (uint8_t) strtol("100000", NULL, 2)) << 24) + p);
-            }
-        }
-
-        //END TODO ANTERIOR
 
 
         //std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gB));
@@ -175,8 +168,11 @@ public:
         std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(nullptr, gLC, gB->rangeUse());
         //gSimL->switchActual(gSimLayersTypes::G_AIRPOLLUTION);
 
-
         std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
+        std::shared_ptr<rBaseMenu> rBasic = std::make_shared<rBaseMenu>(
+                pPM, rIMenu::rRelativePos::pBottomRight);
+        pPM->addMenuTop(rBasic);
+
         rGlobal rG(gSimL, pPM);
         rG.setUp();
         while (rG.isOpen) {
