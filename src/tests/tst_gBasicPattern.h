@@ -16,13 +16,19 @@ int tst_gBasicPattern() {
     std::shared_ptr<gIGrid<int>> gB = std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(50, 50, 0));
     gBaseToPattern gBP(gB,
                        gBaseToPattern<int>::gPatternType::gBPBlobSquares,
-                       gBaseToPattern<int>::gPatternParameters(4, 4, 20, 20));
+                       gBaseToPattern<int>::gPatternParameters(3, 3, 3, 3));
 
     std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gB));
     gLAP->setTransformation({0, 1, 2, 3, 4, 5});
     std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(gLAP, nullptr, gB->rangeUse());
+    gSimL->switchActual(gSimLayersTypes::G_AIRPOLLUTION);
 
     std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
+    std::shared_ptr<rBaseMenu> rBasic = std::make_shared<rBaseMenu>(
+            pPM, rIMenu::rRelativePos::pBottomRight);
+    pPM->addMenuTop(rBasic);
+
+
     rGlobal rG(gSimL, pPM);
     rG.setUp();
     while (rG.isOpen) {

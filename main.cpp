@@ -21,8 +21,9 @@ int main() {
     }
     std::cout << "------" << std::endl;
 
-    tst_gMenus();
-    //SimInitialize::givenMap(sMVar);
+    //tst_gBasicPattern();
+    //tst_gMenus();
+    SimInitialize::givenMap(sMVar);
     //SimInitializePreb::givenMap(sMVar);
 
     return 0;

@@ -32,7 +32,7 @@ public:
     };
 
     gBaseToPattern(std::shared_ptr<gIGrid<T>> gR, gPatternType type, gPatternParameters parameters,
-                   const std::shared_ptr<gIGrid<bool>> &pMask = nullptr ,int seed = -1)
+                   const std::shared_ptr<gIGrid<bool>> &pMask = nullptr, int seed = -1)
             : gtmGResult(gR), hasMask(pMask != nullptr), gMask(pMask) {
         switch (type) {
             case gBPSquares:
@@ -50,9 +50,9 @@ public:
                 }
                 std::shared_ptr<gIGrid<T>> gGrid = blobToGrid(g);
 
-                gBaseToBorderDetection<T> gbDet(gGrid, gBorderType::gBNonConnex);
-                std::map<T, std::vector<std::pair<std::pair<int, int>, uint8_t>>> p = gbDet.generate(
-                        [](T i) { return true; });
+                auto p = gBaseToBorderDetection::generate(gGrid,
+                                                          {gBorderType::gBNonConnex, gBorderOutside::gIsNotGroup},{});
+
                 blobRoadsToGrid(p, gR, parameters.sizeBlockWidth, parameters.sizeBlockHeight);
                 break;
         }
@@ -70,7 +70,7 @@ private:
             for (int x = 0; x < nWidth; x++) {
                 std::pair<int, int> pTL = {x * (bWidth - 1), y * (bHeight - 1)};
 
-                if(gtmGResult->isInside(x,y) && (!hasMask || gMask->get(x,y))) {
+                if (gtmGResult->isInside(x, y) && (!hasMask || gMask->get(x, y))) {
                     for (int i = 0; i < bHeight; i++) {
                         gtmGResult->set(pTL.first, pTL.second + i, 3);
                         gtmGResult->set(pTL.first + bWidth - 1, pTL.second + i, 3);
@@ -193,7 +193,7 @@ private:
             for (const auto &vecElem: mapElem.second) {
                 std::pair<int, int> pair = vecElem.first;
                 pair = {pair.first * (sSquareWidth - 1), pair.second * (sSquareHeight - 1)};
-                if(gtmGResult->isInside(pair) && (!hasMask || gMask->get(pair))) {
+                if (gtmGResult->isInside(pair) && (!hasMask || gMask->get(pair))) {
                     bool HasBttm = ((vecElem.second & (1 << 1)) == 0);
                     bool HasTop = ((vecElem.second & (1 << 6)) == 0);
                     bool HasLeft = ((vecElem.second & (1 << 3)) == 0);

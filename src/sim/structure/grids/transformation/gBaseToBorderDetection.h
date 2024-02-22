@@ -15,26 +15,39 @@ enum gBorderType {
     gBConnex, gBNonConnex
 };
 
-template<typename T>
+enum gBorderOutside {
+    gIsGroup, gIsNotGroup
+};
+
+struct gObjectBorderDet {
+    gBorderType gBT;
+    gBorderOutside gBO;
+};
+
+
 class gBaseToBorderDetection {
 public:
-    gBaseToBorderDetection(std::shared_ptr<gIGrid<T>> gR, gBorderType gBType)
-            : gGrid(gR), gUsedBorderType(gBType) {
-    }
 
-    std::map<T, std::vector<std::pair<std::pair<int, int>, uint8_t>>>
-    generate(std::function<bool(int)> gFValidNumberToBorder) {
+    template<typename T>
+    static std::map<T, std::vector<std::pair<std::pair<int, int>, uint8_t>>>
+    generate(const std::shared_ptr<gIGrid<T>> &gGrid, gObjectBorderDet gOBD,
+             std::vector<T> groupConnect = std::vector<T>(), const std::shared_ptr<gIGrid<bool>> &pMask = nullptr) {
+
+        bool hasMask = pMask != nullptr;
+        bool hasDiffGroup = !groupConnect.empty();
+        std::unordered_set<int> setGroup(groupConnect.begin(), groupConnect.end());
+
         std::map<T, std::vector<std::pair<std::pair<int, int>, uint8_t>>> ret;
         std::pair<std::pair<int, int>, std::pair<int, int>> range = gGrid->rangeUse();
 
-        switch (gUsedBorderType) {
+        switch (gOBD.gBT) {
             case gBConnex:
                 break;
             case gBNonConnex:
                 for (int i = range.second.first; i < (range.second.second + 1); i++) {
                     for (int j = range.first.first; j < (range.first.second + 1); j++) {
                         T vToSearch = gGrid->get(j, i);
-                        if (gFValidNumberToBorder(vToSearch)) {
+                        if (!hasMask || pMask->get(j, i)) {
                             std::vector<std::pair<int, int>> dOffsets =
                                     {{i - 1, j + 1},
                                      {i,     j + 1},
@@ -47,10 +60,19 @@ public:
                             uint8_t vRes = 0;
 
                             for (int k = 0; k < dOffsets.size(); k++) {
-                                if (gGrid->isInside(dOffsets[k].second, dOffsets[k].first) &&
-                                    gGrid->get(dOffsets[k].second, dOffsets[k].first) == vToSearch) {
+                                if (gGrid->isInside(dOffsets[k].second, dOffsets[k].first)) {
+                                    T valNext = gGrid->get(dOffsets[k].second, dOffsets[k].first);
+
+                                    if ((!hasMask || pMask->get(dOffsets[k].second, dOffsets[k].first)) &&
+                                        (valNext == vToSearch ||
+                                         (hasDiffGroup && setGroup.find(valNext) != setGroup.end()))) {
+                                        vRes |= uint8_t(1) << k;
+                                    }
+                                } else if (gOBD.gBO == gBorderOutside::gIsGroup &&
+                                           !gGrid->isInside(dOffsets[k].second, dOffsets[k].first)) {
                                     vRes |= uint8_t(1) << k;
                                 }
+
                             }
                             ret[vToSearch].push_back({{i, j}, vRes});
                         }
@@ -60,11 +82,6 @@ public:
         }
         return ret;
     }
-
-private:
-    std::shared_ptr<gIGrid<T>> gGrid;
-    gBorderType gUsedBorderType;
-    std::unordered_set<int> gBorderedValues;
 };
 
 #endif //CITYOFWEIRDFISHES_GBASETOBORDERDETECTION_H
