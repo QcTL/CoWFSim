@@ -63,6 +63,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/structure/grids/transformation/gBaseToLineRoads.h
         src/tests/tst_gBasicDisplayGround.h
         SimInitializePreb.h
+        src/display/menus/implementations/rBaseMenu.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

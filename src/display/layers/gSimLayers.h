@@ -25,6 +25,7 @@ public:
     }
 
     void switchActual(gSimLayersTypes toChange) {
+        hasChanged = true;
         switch (toChange) {
             case G_CITY:
                 gSLActual = gSL_C;
@@ -38,6 +39,9 @@ public:
     }
     std::pair<std::pair<int,int>,std::pair<int,int>>  gRangeUse;
     std::shared_ptr<gILayer> gSLActual;
+    bool hasChanged = false; //TODO AIXO s'ha de canviar ha de haver una altre millor manera de notificar al global que ha de tornar a mirar els valors del dallo
+    //cridant la funcio setup;
+
 private:
 
     std::shared_ptr<gLayerAirPollution> gSL_AP;

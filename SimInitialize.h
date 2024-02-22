@@ -176,7 +176,7 @@ public:
         //gSimL->switchActual(gSimLayersTypes::G_AIRPOLLUTION);
 
 
-        std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>();
+        std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
         rGlobal rG(gSimL, pPM);
         rG.setUp();
         while (rG.isOpen) {

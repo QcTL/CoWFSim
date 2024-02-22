@@ -30,6 +30,8 @@ private:
 
     sf::VertexArray vertices;
     CameraControls rCC;
+
+    void reloadCellValues();
 };
 
 

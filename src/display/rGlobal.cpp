@@ -13,14 +13,18 @@ rGlobal::rGlobal(std::shared_ptr<gSimLayers> gInfoL, std::shared_ptr<rPileMenus>
 }
 
 void rGlobal::setUp() {
+    //AIXO s'ha de cridar despres de cada canvii de layers...
+    rPMenu->initialize(rWindow);
+    rView = sf::View(sf::FloatRect(0, 0, 1400, 800));
 
+    reloadCellValues();
+}
+
+void rGlobal::reloadCellValues(){
     std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gSimL->gRangeUse;
     int GWidth = (gRange.first.second - gRange.first.first) + 1;
     int GHeight = (gRange.second.second - gRange.second.first) + 1;
     int GTileSize = 32; //TODO CANVIAR PER SER GENERIC;
-    rPMenu->initialize(rWindow);
-    rView = sf::View(sf::FloatRect(0, 0, 1400, 800));
-
     vertices = sf::VertexArray(sf::Quads, GWidth * GHeight * 4);
     for (int x = gRange.first.first; x <= gRange.first.second; x++) {
         for (int y = gRange.second.first; y <= gRange.second.second; y++) {
@@ -38,7 +42,6 @@ void rGlobal::setUp() {
 
         }
     }
-
 }
 
 void rGlobal::loop() {
@@ -58,6 +61,12 @@ void rGlobal::loop() {
                 break;
         }
         rCC.updateOnEvent(event, rWindow, rView);
+        rPMenu->updateOnEvent(event,rWindow);
+    }
+
+    if(gSimL->hasChanged){ //TODO CANVIAR s'HA DE CRIDAR SETUP DES DE GSiml
+        gSimL->hasChanged = false;
+        reloadCellValues();
     }
 
     rCC.updateOnLoop(rView);
