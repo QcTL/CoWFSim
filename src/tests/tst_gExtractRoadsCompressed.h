@@ -37,7 +37,7 @@ int tst_gExtractRoadsCompressed() {
     gB->set(6,3, 1);
     std::vector<rNode*> r = rNodeFromGrid<int>::givenGrid(gB, 1);
     rNode * rOne = r[0];
-    rRNode * p = rTransRNodeToRRNode::conversion(rOne);
+    std::shared_ptr<rRNodeI> p = rTransRNodeToRRNode::conversion(rOne);
 
     std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gB));
     gLAP->setTransformation({0, 1, 2, 3, 4, 5});

@@ -3,13 +3,10 @@
 
 #include <filesystem>
 #include "src/common/RelPath.h"
-#include "src/tests/tst_gBasicWFCBasic.h"
-#include "SimInitialize.h"
 #include "src/IO/ReaderParameters.h"
-#include "src/tests/tst_gBasicPattern.h"
-#include "src/tests/tst_gBasicDisplayGround.h"
-#include "SimInitializePreb.h"
-#include "src/tests/tst_gMenus.h"
+#include "src/tests/tst_gERCComm.h"
+#include "src/tests/tst_gVeh.h"
+#include "SimInitialize.h"
 
 int main() {
     RelPath::selRelPath(std::filesystem::current_path().parent_path());
@@ -21,6 +18,8 @@ int main() {
     }
     std::cout << "------" << std::endl;
 
+    tst_gVeh();
+    //SimInitialize::givenMap(sMVar);
     //tst_gBasicPattern();
     //tst_gMenus();
     SimInitialize::givenMap(sMVar);
