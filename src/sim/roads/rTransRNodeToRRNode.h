@@ -29,7 +29,7 @@ private:
     }
 
 
-    static rRNode *rConversation(rRNode *prevAR, int dirFromPrev, int prevDirMajor, rNode *aR, uint8_t nCons) {
+    static std::shared_ptr<rRNodeI> rConversation(const std::shared_ptr<rRNodeI>& prevAR, int dirFromPrev, int prevDirMajor, rNode *aR, uint8_t nCons) {
         //Dir 0 top, 1 right, 2 bottom, 3 left , -1 Començant
         if(aR->refCompressed != nullptr)
             return aR->refCompressed;
@@ -37,11 +37,14 @@ private:
         rNode *aFollow = onlyOneSeq(aR, dirFromPrev).second;
         int nextDir = onlyOneSeq(aR, dirFromPrev).first;
         if (nFollow(aR) > 2 || (nFollow(aR) == 2 && nFollow(aFollow) > 2) || (nFollow(aR) == 1 && dirFromPrev != -1)){
-            rRNode *newAR;
+            std::shared_ptr<rRNodeI> newAR;
             if (aR->refCompressed == nullptr) {
                 std::pair<uint32_t, uint32_t> pComp = aR->rPos;
-                newAR = new rRNode(nCons, nFollow(aR) > 2,
-                                   pComp.first/rSizeBlocs * (rSizeGrid/rSizeBlocs + 1) + pComp.second/rSizeBlocs);
+                if(nFollow(aR) > 2){
+                    newAR = std::make_shared<rRNodeC>(rRNodeC((uint16_t)pComp.first/rSizeBlocs * (rSizeGrid/rSizeBlocs + 1) + pComp.second/rSizeBlocs));
+                }else{
+                    newAR = std::make_shared<rRNodeL>(rRNodeL((uint16_t)pComp.first/rSizeBlocs * (rSizeGrid/rSizeBlocs + 1) + pComp.second/rSizeBlocs, nCons));
+                }
                 llNodes.push_back(newAR);
                 aR->refCompressed = newAR;
             } else {
@@ -77,7 +80,7 @@ private:
 
             return newAR;
         }else if((nFollow(aR) == 1 && dirFromPrev == -1) || nFollow(aR) == 2){
-            rRNode *r = rConversation(prevAR, nextDir, prevDirMajor, aFollow, ++nCons);
+            std::shared_ptr<rRNodeI> r = rConversation(prevAR, nextDir, prevDirMajor, aFollow, ++nCons);
             aR->refCompressed = aFollow->refCompressed;
             return r;
         }
@@ -86,9 +89,9 @@ private:
     }
     static uint16_t rSizeBlocs;
     static uint16_t rSizeGrid;
-    static std::list<rRNode *> llNodes;
+    static std::list<std::shared_ptr<rRNodeI>> llNodes;
 public:
-    static std::list<rRNode *> conversion(rNode *rRoot, uint16_t rSizeB, uint16_t rSizeG) {
+    static std::list<std::shared_ptr<rRNodeI>> conversion(rNode *rRoot, uint16_t rSizeB, uint16_t rSizeG) {
         rSizeBlocs = rSizeB;
         rSizeGrid = rSizeG;
         llNodes.clear();
@@ -99,6 +102,6 @@ public:
 
 uint16_t rTransRNodeToRRNode::rSizeBlocs;
 uint16_t rTransRNodeToRRNode::rSizeGrid;
-std::list<rRNode *> rTransRNodeToRRNode::llNodes;
+std::list<std::shared_ptr<rRNodeI>> rTransRNodeToRRNode::llNodes;
 
 #endif //CITYOFWEIRDFISHES_RTRANSRNODETORRNODE_H

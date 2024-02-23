@@ -32,6 +32,12 @@ public:
         return false;
     }
 
+    static uint8_t returnDirToDist(const uint32_t destNode, const uint16_t destGrid, const uint16_t actGrid, const uint32_t uidNodeAct){
+        uint32_t indexPos =
+                (destGrid == actGrid) ? uTotalBlocks + destNode: (destGrid + uTotalBlocks - actGrid) % uTotalBlocks;
+        return  (dMatrixDist[uidNodeAct][indexPos] >> 29) & 3;
+    }
+
     static void initializeMatrix(uint32_t uNumBlocks, uint32_t uNumMaxRoadForBlock, uint32_t nTotalRoads){
         dMatrixDist = std::vector<std::vector<uint32_t>>(nTotalRoads, std::vector<uint32_t>(uNumBlocks + uNumMaxRoadForBlock, 0));
         uTotalBlocks = uNumBlocks;
