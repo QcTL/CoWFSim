@@ -18,6 +18,7 @@ int main() {
     }
     std::cout << "------" << std::endl;
 
+    tst_gVeh();
     //SimInitialize::givenMap(sMVar);
     //tst_gBasicPattern();
     //tst_gMenus();

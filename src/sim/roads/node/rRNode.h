@@ -12,13 +12,17 @@
 #include "../transportation/gUniqueId.h"
 #include "../transportation/rActiveVehicles.h"
 #include "rInfoDists.h"
+#include "../../../display/rRemoteUpdateGrid.h"
 
 
 class rRNodeI {
 public:
-    explicit rRNodeI(uint16_t rBlock) : uidNode(gUniqueId::gen(rBlock)), rBlock(rBlock), rLeft(nullptr),
-                                        rRight(nullptr),
-                                        rTop(nullptr), rBottom(nullptr) {}
+    explicit rRNodeI(uint16_t rBlock)
+            : uidNode(gUniqueId::gen(rBlock)), rBlock(rBlock), rRefPos({}),
+              rLeft(nullptr),
+              rRight(nullptr),
+              rTop(nullptr),
+              rBottom(nullptr) {}
 
     virtual void receive(const rRMail &r, const uint8_t &dir) = 0;
 
@@ -41,6 +45,11 @@ public:
     std::shared_ptr<rRNodeI> rTop;
     std::shared_ptr<rRNodeI> rBottom;
 
+    void addRefPos(const std::pair<uint32_t ,uint32_t>& pNew){
+        rRefPos.push_back(pNew);
+    }
+
+    std::shared_ptr<gIGrid<int>> tTransit;
 protected:
     uint32_t uidNode;
     uint16_t rBlock;
@@ -86,13 +95,22 @@ protected:
         if (direction != nullptr)
             direction->enterCar(dDir ^ 0x02);
     }
-};
 
+    void updateRefGrid(int nValue){
+        for(const auto& p: rRefPos){
+            tTransit->set(p, nValue);
+        }
+        rRemoteUpdateGrid::setHasToChange(true);
+    }
+
+private:
+    std::vector<std::pair<uint32_t, uint32_t>> rRefPos;
+};
 
 class rRNodeC : public rRNodeI {
     //CROSSING
 public:
-    rRNodeC(uint16_t rBlock) : rRNodeI(rBlock), itsEmpty(true) {}
+    explicit rRNodeC(uint16_t rBlock) : rRNodeI(rBlock), itsEmpty(true) {}
 
     void receive(const rRMail &r, const uint8_t &dir) override {
         rMailBox.rMB.emplace(r, dir);
@@ -110,20 +128,25 @@ public:
     }
 
     void tick() override {
-        if (itsEmpty && !reqTakeCar.empty()) {
-            uint8_t dToTake = reqTakeCar.front();
-            reqTakeCar.pop_front();
-            carActInside = getByDir(dToTake)->takeCarPrep(dToTake ^ 0x02);
+        if(!itsEmpty){
             notifyEnterNext(
                     rInfoDist::returnDirToDist(
                             rActiveVehicle::getDestByCar(carActInside.first).first,
                             rActiveVehicle::getDestByCar(carActInside.first).second,
                             rBlock, uidNode), carActInside);
+        }else if (!reqTakeCar.empty()) {
+            uint8_t dToTake = reqTakeCar.front();
+            reqTakeCar.pop_front();
+            carActInside = getByDir(dToTake)->takeCarPrep(dToTake ^ 0x02);
+            itsEmpty = false;
+            updateRefGrid(true);
         }
+
     }
 
     std::pair<uint32_t, uint32_t> takeCarPrep(const uint8_t &dDir) override {
         itsEmpty = true;
+        updateRefGrid(false);
         return carActInside;
     }
 
@@ -174,16 +197,21 @@ public:
         dEndSecond = getDirEntrances().second;
     }
 
+    bool hasChanged = false;
     void tick() override {
         for (auto it = dFirst.lOrderedCars.begin(); it != dFirst.lOrderedCars.end();) {
             auto &c = *it;
             if (c.second + 1 >= nCompressed) {
                 if (rActiveVehicle::getDestByCar(c.first).first == uidNode &&
                     rActiveVehicle::getDestByCar(c.first).second == rBlock) {
+                    dFirst.pState[c.second] = false;
                     it = dFirst.lOrderedCars.erase(it);
-                    std::cout << "EL COTXE A ARRIBAT A LA SEVA DESTINACIO " << uidNode << "-" << rBlock << std::endl;
-                } else {
+                    hasChanged = true;
+                } else if(!hasRequestedFirst){
+                    hasRequestedFirst = true;
                     notifyEnterNext(dEndFirst, c);
+                    ++it;
+                }else if(hasRequestedFirst){
                     ++it;
                 }
             } else if (!dFirst.pState[c.second + 1]) {
@@ -202,10 +230,14 @@ public:
             if (c.second + 1 >= nCompressed) {
                 if (rActiveVehicle::getDestByCar(c.first).first == uidNode &&
                     rActiveVehicle::getDestByCar(c.first).second == rBlock) {
+                    dSecond.pState[c.second] = false;
                     it = dSecond.lOrderedCars.erase(it);
-                    std::cout << "EL COTXE A ARRIBAT A LA SEVA DESTINACIO " << uidNode << "-" << rBlock << std::endl;
-                } else {
+                    hasChanged = true;
+                } else if(!hasRequestedSecond){
+                    hasRequestedSecond = true;
                     notifyEnterNext(dEndSecond, c);
+                    ++it;
+                }else if(hasRequestedSecond){
                     ++it;
                 }
             } else if (!dSecond.pState[c.second + 1]) {
@@ -218,6 +250,10 @@ public:
                 ++it;
             }
         }
+        if(hasChanged){
+            hasChanged = false;
+            updateRefGrid(std::max(dFirst.lOrderedCars.size(), dSecond.lOrderedCars.size()));
+        }
     }
 
     void addNewCar(uint32_t idDest, uint16_t blockDest) override {
@@ -225,6 +261,7 @@ public:
         //TODO CONTROLAR LA DIRECCIO INICIAL;
         dFirst.pState[0] = true;
         dFirst.lOrderedCars.push_back(newCar);
+        hasChanged = true;
     }
 
 private:
@@ -239,6 +276,8 @@ private:
                 cRet = dFirst.lOrderedCars.front();
                 dFirst.lOrderedCars.pop_front();
                 cRet.second = 0;
+                hasRequestedFirst = false;
+                hasChanged = true;
             }
         } else if (dDir == dEndSecond) {
             // Remove from second
@@ -246,6 +285,9 @@ private:
                 dSecond.pState[dSecond.pState.size() - 1] = false;
                 cRet = dSecond.lOrderedCars.front();
                 dSecond.lOrderedCars.pop_front();
+                cRet.second = 0;
+                hasRequestedSecond = false;
+                hasChanged = true;
             }
         }
         return cRet;
@@ -253,12 +295,14 @@ private:
 
     void enterCar(const uint8_t &dDir) override {
         std::pair<uint32_t, uint32_t> cNext = getByDir(dDir)->takeCarPrep(dDir ^ 0x02);
-        if (dEndFirst == dDir && !dFirst.pState[0]) {
+        if (dEndFirst != dDir && !dFirst.pState[0]) {
             dFirst.pState[0] = true;
             dFirst.lOrderedCars.push_back(cNext);
+            hasChanged = true;
         } else if (!dSecond.pState[0]) {
             dSecond.pState[0] = true;
             dSecond.lOrderedCars.push_back(cNext);
+            hasChanged = true;
         }
     }
 
@@ -273,8 +317,11 @@ private:
 
     rRoad dFirst;
     uint8_t dEndFirst;
+    bool hasRequestedFirst = false;
+
     rRoad dSecond;
     uint8_t dEndSecond;
+    bool hasRequestedSecond = false;
 
     std::pair<uint8_t, uint8_t> getDirEntrances() {
         uint8_t pMin = 5;

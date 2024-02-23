@@ -3,6 +3,7 @@
 //
 
 #include "rGlobal.h"
+#include "rRemoteUpdateGrid.h"
 #include <SFML/Graphics.hpp>
 
 rGlobal::rGlobal(std::shared_ptr<gSimLayers> gInfoL, std::shared_ptr<rPileMenus> rPMenu)
@@ -20,7 +21,7 @@ void rGlobal::setUp() {
     reloadCellValues();
 }
 
-void rGlobal::reloadCellValues(){
+void rGlobal::reloadCellValues() {
     std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gSimL->gRangeUse;
     int GWidth = (gRange.first.second - gRange.first.first) + 1;
     int GHeight = (gRange.second.second - gRange.second.first) + 1;
@@ -44,6 +45,16 @@ void rGlobal::reloadCellValues(){
     }
 }
 
+void rGlobal::reloadSingularCell(int pX, int pY) {
+    std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gSimL->gRangeUse;
+    int GWidth = (gRange.first.second - gRange.first.first) + 1;
+
+    sf::Vertex *quad = &vertices[(pX + pY * GWidth) * 4];
+    for (int i = 0; i < 4; i++) {
+        quad[i].texCoords = gSimL->gSLActual->getTexPos(pX, pY)[i];
+    }
+}
+
 void rGlobal::loop() {
     sf::Event event;
     sf::View visibleArea;
@@ -61,16 +72,14 @@ void rGlobal::loop() {
                 break;
         }
         rCC.updateOnEvent(event, rWindow, rView);
-        rPMenu->updateOnEvent(event,rWindow);
-    }
-
-    if(gSimL->hasChanged){ //TODO CANVIAR s'HA DE CRIDAR SETUP DES DE GSiml
-        gSimL->hasChanged = false;
-        reloadCellValues();
+        rPMenu->updateOnEvent(event, rWindow);
     }
 
     rCC.updateOnLoop(rView);
-
+    if(rRemoteUpdateGrid::hasToUpdate) {
+        reloadCellValues();
+        rRemoteUpdateGrid::setHasToChange(false);
+    }
     rWindow.clear();
     rWindow.setView(rView);
     rWindow.draw(vertices, gSimL->gSLActual->getTexture());

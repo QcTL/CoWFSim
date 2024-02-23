@@ -16,12 +16,16 @@
 
 class rGlobal {
 public:
-        explicit rGlobal(std::shared_ptr<gSimLayers> gInfoL,  std::shared_ptr<rPileMenus> rPMenu);
+    explicit rGlobal(std::shared_ptr<gSimLayers> gInfoL, std::shared_ptr<rPileMenus> rPMenu);
 
-        void setUp();
-        void loop();
+    void setUp();
 
-        bool isOpen = true;
+    void loop();
+
+    bool isOpen = true;
+
+    void reloadSingularCell(int pX, int pY);
+
 private:
     std::shared_ptr<rPileMenus> rPMenu;
     std::shared_ptr<gSimLayers> gSimL;

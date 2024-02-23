@@ -27,6 +27,11 @@ public:
             case 1:
                 refPile->inSim->switchActual(gSimLayersTypes::G_CITY);
                 break;
+            case 2:
+                refPile->inSim->switchActual(gSimLayersTypes::G_TRANSIT);
+                break;
+            default:
+                break;
         }
         lstValueLayer = v;
         refPile->removeTop();
@@ -40,6 +45,8 @@ public:
                             refPile->vTopActiveMenu,lstValueLayer ,"d_mSelectLayer", rIMenu::rRelativePos::pBottomRight);
                     refPile->addMenuTop(rSom);
                 }
+            default:
+                break;
         }
         return false;
     }

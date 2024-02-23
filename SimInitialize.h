@@ -9,6 +9,8 @@
 #include "src/sim/structure/grids/transformation/gBaseToLineRoads.h"
 #include "src/sim/structure/grids/transformation/gBaseToPattern.h"
 #include "src/display/menus/implementations/rBaseMenu.h"
+#include "src/sim/structure/grids/transformation/gBaseToGradientMinimum.h"
+#include "src/sim/structure/grids/transformation/gBasicTransformations.h"
 
 class SimInitialize {
 
@@ -165,7 +167,7 @@ public:
         gB = BasicTransformations::replaceValues(gB, {{1, ((uint32_t) (uint8_t) strtol("00010001", NULL, 2)) << 24}});
 
         std::shared_ptr<gLayerCity> gLC = std::make_shared<gLayerCity>(gLayerCity(gB));
-        std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(nullptr, gLC, gB->rangeUse());
+        std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(nullptr, gLC, nullptr, gB->rangeUse());
         //gSimL->switchActual(gSimLayersTypes::G_AIRPOLLUTION);
 
         std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);

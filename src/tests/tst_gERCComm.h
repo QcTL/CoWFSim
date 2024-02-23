@@ -13,36 +13,38 @@
 #include "../display/rGlobal.h"
 #include "../sim/roads/rNodeFromGrid.h"
 #include "../sim/roads/rTransRNodeToRRNode.h"
+#include "../display/menus/implementations/rBaseMenu.h"
 
 int tst_gERCComm() {
     std::shared_ptr<gIGrid<int>> gB = std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(10, 10, 0));
+    std::shared_ptr<gIGrid<int>> gTransit = std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(10, 10, 0));
 
-    gB->set(0,1, 1);
-    gB->set(1,1, 1);
-    gB->set(2,1, 1);
+    gB->set(0, 1, 1);
+    gB->set(1, 1, 1);
+    gB->set(2, 1, 1);
 
-    gB->set(1,0, 1);
-    gB->set(1,2, 1);
+    gB->set(1, 0, 1);
+    gB->set(1, 2, 1);
 
-    gB->set(0,3, 1);
-    gB->set(1,3, 1);
-    gB->set(2,3, 1);
+    gB->set(0, 3, 1);
+    gB->set(1, 3, 1);
+    gB->set(2, 3, 1);
 
 
-    std::vector<rNode*> r = rNodeFromGrid<int>::givenGrid(gB, 1);
-    rNode * rOne = r[0];
-    std::list<std::shared_ptr<rRNodeI>> rLL = rTransRNodeToRRNode::conversion(rOne, 5, 10);
+    std::vector<rNode *> r = rNodeFromGrid<int>::givenGrid(gB, 1);
+    rNode *rOne = r[0];
+    std::list<std::shared_ptr<rRNodeI>> rLL = rTransRNodeToRRNode::conversion(rOne, 5, 10, gTransit);
 
-    rInfoDist::initializeMatrix(10/5*10/5,5*5, rLL.size());
+    rInfoDist::initializeMatrix(10 / 5 * 10 / 5, 5 * 5, rLL.size());
 
     //TODO tambe falta lo important que es tenir la matriu de la grid sapiguent a quin node estan "compactat".
 
-    for (const std::shared_ptr<rRNodeI>& node : rLL) {
+    for (const std::shared_ptr<rRNodeI> &node: rLL) {
         node->sendInformationStart();
     }
 
-    for(int i = 0; i < 3; i++) {
-        for (const std::shared_ptr<rRNodeI>& node: rLL) {
+    for (int i = 0; i < 3; i++) {
+        for (const std::shared_ptr<rRNodeI> &node: rLL) {
             node->sendNewInformation();
         }
     }
@@ -50,11 +52,14 @@ int tst_gERCComm() {
     rInfoDist::seeMatrix();
     std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gB));
     gLAP->setTransformation({0, 1, 2, 3, 4, 5});
-    std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(gLAP, nullptr, gB->rangeUse());
+    std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(gLAP, nullptr, nullptr, gB->rangeUse());
     gSimL->switchActual(gSimLayersTypes::G_AIRPOLLUTION);
 
-    std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>();
-    rGlobal rG(gSimL,pPM);
+    std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
+    std::shared_ptr<rBaseMenu> rBasic = std::make_shared<rBaseMenu>(
+            pPM, rIMenu::rRelativePos::pBottomRight);
+    pPM->addMenuTop(rBasic);
+    rGlobal rG(gSimL, pPM);
     rG.setUp();
     while (rG.isOpen) {
         rG.loop();
