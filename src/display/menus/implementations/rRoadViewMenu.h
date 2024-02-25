@@ -26,24 +26,7 @@ public:
     explicit rRoadViewMenu(const std::shared_ptr<rIMenu> &mParent, const std::shared_ptr<rRNodeI> &refView,
                            const std::string &pthFileD, rIMenu::rRelativePos rPos) : rIMenu(mParent, rPos) {
 
-        std::map<std::string, std::string> sm = ReaderParameters::readFile(
-                (RelPath::relPath / "files" / "graphic" / "menus" / (pthFileD + R"(.txt)")).string());
-
-        std::ifstream file((RelPath::relPath / "files" / "graphic" / "menus" / sm["src"]).string());
-
-        std::string line;
-        std::vector<std::vector<int>> data;
-
-        while (std::getline(file, line)) {
-            std::vector<int> row;
-            std::istringstream iss(line);
-            int value;
-            while (iss >> value) {
-                row.push_back(value);
-            }
-            data.push_back(row);
-        }
-
+        std::vector<std::vector<int>> data = extractDataFromFile(pthFileD);
 
         pElemNRoadsTop = {{},
                           {}};
@@ -67,7 +50,6 @@ public:
                 }
             }
         }
-        file.close();
 
         dInfo = getVertexMenu((int) data[0].size(), (int) data.size(), data);
         gWidth = (int) data[0].size();
@@ -98,7 +80,6 @@ public:
         }
         return false;
     }
-
 
     void pressedCell(std::pair<int, int> cPressed) {
         parentMenu->setResponse(0);
