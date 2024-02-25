@@ -10,6 +10,7 @@
 #include "../rIMenu.h"
 #include "../../rPileMenus.h"
 #include "rSelOptMenu.h"
+#include "rRoadViewMenu.h"
 
 class rBaseMenu : public rIMenu {
 public:
@@ -42,13 +43,27 @@ public:
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::M) {
                     std::shared_ptr<rSelOptMenu> rSom = std::make_shared<rSelOptMenu>(
-                            refPile->vTopActiveMenu,lstValueLayer ,"d_mSelectLayer", rIMenu::rRelativePos::pBottomRight);
+                            refPile->vTopActiveMenu, lstValueLayer, "d_mSelectLayer",
+                            rIMenu::rRelativePos::pBottomRight);
                     refPile->addMenuTop(rSom);
+                } else if (event.key.code == sf::Keyboard::S) {
+                    std::shared_ptr<rRoadViewMenu> rRoad = std::make_shared<rRoadViewMenu>(
+                            refPile->vTopActiveMenu, nullptr, "d_mRoadsViewLayer", rIMenu::rRelativePos::pTopLeft);
+                    refPile->addMenuTop(rRoad);
                 }
             default:
                 break;
         }
         return false;
+    }
+
+    void pressedCell(std::pair<int, int> cPressed) {
+        std::cout << cPressed.first << ":" << cPressed.second << std::endl;
+        if (gSinNodes::gNodes[cPressed.first][cPressed.second] != nullptr) {
+            std::shared_ptr<rRoadViewMenu> rRoad = std::make_shared<rRoadViewMenu>(
+                    refPile->vTopActiveMenu, gSinNodes::gNodes[cPressed.first][cPressed.second]->refCompressed , "d_mRoadsViewLayer", rIMenu::rRelativePos::pTopLeft);
+            refPile->addMenuTop(rRoad);
+        }
     }
 
 private:

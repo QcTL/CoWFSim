@@ -33,9 +33,13 @@ private:
     sf::View rView;
 
     sf::VertexArray vertices;
+    sf::VertexArray verSelector;
     CameraControls rCC;
 
+    std::pair<int , int> rPosCursor;
+
     void reloadCellValues();
+    void reloadSelValue();
 };
 
 

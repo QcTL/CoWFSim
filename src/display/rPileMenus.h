@@ -12,7 +12,7 @@
 
 class rPileMenus {
 public:
-    rPileMenus(const std::shared_ptr<gSimLayers>& gSimL):inSim(gSimL){};
+    rPileMenus(const std::shared_ptr<gSimLayers> &gSimL) : inSim(gSimL) {};
 
     void addMenuTop(const std::shared_ptr<rIMenu> &nMenu) {
         vTopActiveMenu = nMenu;
@@ -51,7 +51,7 @@ public:
         rViewBottomLeft.setSize(e.size.width, -height);
         rViewBottomLeft.setCenter(e.size.width / 2, e.size.height / 2);
 
-        rViewBottomRight.setSize(-width,  -height);
+        rViewBottomRight.setSize(-width, -height);
         rViewBottomRight.setCenter(e.size.width / 2, e.size.height / 2);
 
         rViewTopLeft.setSize(e.size.width, height);
@@ -70,8 +70,12 @@ public:
         rViewTopRight = sf::View(sf::FloatRect(width, 0, -width, height));
     }
 
-    void updateOnEvent(const sf::Event& event, const sf::RenderWindow& rWindow){
+    void updateOnEvent(const sf::Event &event, const sf::RenderWindow &rWindow) {
         vTopActiveMenu->interact(event, rWindow);
+    }
+
+    void pressedCell(std::pair<int, int> cPressed) {
+        vTopActiveMenu->pressedCell(cPressed);
     }
 
     std::shared_ptr<rIMenu> vTopActiveMenu;

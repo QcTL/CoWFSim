@@ -61,9 +61,7 @@ void rSelOptMenu::setNewSel(int v) {
     cCurrenSel = v;
 }
 
-void rSelOptMenu::setResponse(int v) {
-
-}
+void rSelOptMenu::setResponse(int v) {}
 
 bool rSelOptMenu::interact(const sf::Event &event, const sf::RenderWindow &rWindow) {
     switch (event.type) {
@@ -81,6 +79,8 @@ bool rSelOptMenu::interact(const sf::Event &event, const sf::RenderWindow &rWind
                 }
                 return true;
             }
+            break;
+        default:
             break;
     }
     return false;

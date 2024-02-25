@@ -10,6 +10,7 @@
 #include <unordered_set>
 #include "../structure/grids/gIGrid.h"
 #include "node/rNode.h"
+#include "../structure/grids/gSinNodes.h"
 
 template<typename T>
 class rNodeFromGrid {
@@ -29,12 +30,13 @@ public:
                 if (g->get(i, j) == vRoads && (rIndexAlready.find(j + gWidth*i) == rIndexAlready.end())) {
                     auto* n = new rNode({i,j});
                     mPointers[i][j] = n;
-                    std::cout << "[" << i << "]"<< "[" << j << "]" << std::endl;
                     discoverRec(n, g, rIndexAlready, vRoads, {i,j}, gWidth, mPointers);
                     ret.push_back(n);
                 }
             }
         }
+
+        gSinNodes::setGrid(mPointers);
         return ret;
     }
 

@@ -27,6 +27,7 @@ public:
     virtual void draw(sf::RenderWindow &rW) = 0;
     virtual void setResponse(int v) = 0;
     virtual bool interact(const sf::Event& event, const sf::RenderWindow& rWindow) = 0;
+    virtual void pressedCell(std::pair<int, int> cPressed) = 0;
 
     void setTransformation() {
         int tSize = tsTex.getTileSize();
