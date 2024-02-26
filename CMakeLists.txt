@@ -68,6 +68,8 @@ add_executable(CityOfWeirdFishes main.cpp
         src/display/menus/implementations/rBaseMenu.h
         src/display/layers/implementation/gLayerTransit.h
         src/display/rRemoteUpdateGrid.h
+        src/display/menus/implementations/rRoadViewMenu.h
+        src/sim/structure/grids/gSinNodes.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

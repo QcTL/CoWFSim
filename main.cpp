@@ -22,7 +22,7 @@ int main() {
     //SimInitialize::givenMap(sMVar);
     //tst_gBasicPattern();
     //tst_gMenus();
-    SimInitialize::givenMap(sMVar);
+    //SimInitialize::givenMap(sMVar);
     //SimInitializePreb::givenMap(sMVar);
 
     return 0;

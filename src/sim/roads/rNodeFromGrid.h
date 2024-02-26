@@ -10,6 +10,7 @@
 #include <unordered_set>
 #include "../structure/grids/gIGrid.h"
 #include "node/rNode.h"
+#include "../structure/grids/gSinNodes.h"
 
 template<typename T>
 class rNodeFromGrid {
@@ -23,18 +24,18 @@ public:
         int gHeight = (gRange.first.second - gRange.first.first) + 1;
         std::vector<std::vector<rNode*>> mPointers(gWidth, std::vector<rNode*>(gHeight, nullptr));
 
-
         for (int i = gRange.first.first; i <= gRange.first.second; i++) {
             for (int j = gRange.second.first; j <= gRange.second.second; j++) {
                 if (g->get(i, j) == vRoads && (rIndexAlready.find(j + gWidth*i) == rIndexAlready.end())) {
                     auto* n = new rNode({i,j});
                     mPointers[i][j] = n;
-                    std::cout << "[" << i << "]"<< "[" << j << "]" << std::endl;
                     discoverRec(n, g, rIndexAlready, vRoads, {i,j}, gWidth, mPointers);
                     ret.push_back(n);
                 }
             }
         }
+
+        gSinNodes::setGrid(mPointers);
         return ret;
     }
 
@@ -51,7 +52,6 @@ private:
             std::pair<int, int> nP = dOffsets[i];
             if (g->isInside(nP.first, nP.second) && g->get(nP.first, nP.second) == vRoads && (rIndexAlready.find(nP.second + gWidth*nP.first) == rIndexAlready.end())) {
                 rNode* nNew = mPointers[nP.first][nP.second];
-                std::cout << "[" << nP.first << "]"<< "[" << nP.second << "]" << std::endl;
                 if(nNew == nullptr){
                     nNew = new rNode({nP.first,nP.second});
                     mPointers[nP.first][nP.second] = nNew;
@@ -69,7 +69,6 @@ private:
                     n->rTop = nNew;
                     nNew->rBottom = n;
                 }
-                //discoverRec(*nNew, g, rIndexAlready, vRoads, nP, gWidth);
             }
         }
         for (int i =0; i < dOffsets.size(); i++) {

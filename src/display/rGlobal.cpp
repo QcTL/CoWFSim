@@ -19,6 +19,32 @@ void rGlobal::setUp() {
     rView = sf::View(sf::FloatRect(0, 0, 1400, 800));
 
     reloadCellValues();
+
+    verSelector = sf::VertexArray(sf::Quads, 4);
+
+    int GTileSize = 32;
+    sf::Vertex *quad = &verSelector[0];
+
+    quad[0].position = sf::Vector2f(0, 0);
+    quad[1].position = sf::Vector2f(GTileSize, 0);
+    quad[2].position = sf::Vector2f(GTileSize, GTileSize);
+    quad[3].position = sf::Vector2f(0, GTileSize);
+
+    sf::Color whiteColor = sf::Color::White;
+    quad[0].texCoords = sf::Vector2f(whiteColor.r, whiteColor.g);
+    quad[1].texCoords = sf::Vector2f(whiteColor.r, whiteColor.g);
+    quad[2].texCoords = sf::Vector2f(whiteColor.r, whiteColor.g);
+    quad[3].texCoords = sf::Vector2f(whiteColor.r, whiteColor.g);
+}
+
+void rGlobal::reloadSelValue() {
+
+    int GTileSize = 32;
+    sf::Vertex *quad = &verSelector[0];
+    quad[0].position = sf::Vector2f(rPosCursor.first * GTileSize, rPosCursor.second * GTileSize);
+    quad[1].position = sf::Vector2f((rPosCursor.first + 1) * GTileSize, rPosCursor.second * GTileSize);
+    quad[2].position = sf::Vector2f((rPosCursor.first + 1) * GTileSize, (rPosCursor.second + 1) * GTileSize);
+    quad[3].position = sf::Vector2f(rPosCursor.first * GTileSize, (rPosCursor.second + 1) * GTileSize);
 }
 
 void rGlobal::reloadCellValues() {
@@ -56,7 +82,7 @@ void rGlobal::reloadSingularCell(int pX, int pY) {
 }
 
 void rGlobal::loop() {
-    sf::Event event;
+    sf::Event event{};
     sf::View visibleArea;
     while (rWindow.pollEvent(event)) {
         switch (event.type) {
@@ -70,19 +96,43 @@ void rGlobal::loop() {
                 visibleArea = sf::View(sf::FloatRect(0, 0, event.size.width, event.size.height));
                 rWindow.setView(visibleArea);
                 break;
+            case sf::Event::MouseButtonPressed:
+                if (event.mouseButton.button == sf::Mouse::Right) {
+                    gSimL->pressedCell(rPosCursor);
+                    rPMenu->pressedCell(rPosCursor);
+                }
+                break;
+            case sf::Event::MouseMoved: {
+                sf::Vector2f viewCoords = rWindow.mapPixelToCoords(sf::Mouse::getPosition(rWindow), rView);
+                int xCoord = static_cast<int>(viewCoords.x / 32);
+                int yCoord = static_cast<int>(viewCoords.y / 32);
+
+                if (gSimL->gRangeUse.first.first <= xCoord && xCoord <= gSimL->gRangeUse.first.second &&
+                    gSimL->gRangeUse.second.first <= yCoord && yCoord <= gSimL->gRangeUse.second.second) {
+                    rPosCursor = {xCoord, yCoord};
+                    reloadSelValue();
+                }
+            }
+                break;
+            default:
+                break;
         }
         rCC.updateOnEvent(event, rWindow, rView);
         rPMenu->updateOnEvent(event, rWindow);
     }
 
     rCC.updateOnLoop(rView);
-    if(rRemoteUpdateGrid::hasToUpdate) {
+    rPMenu->updateOnLoop(rView);
+    if (rRemoteUpdateGrid::hasToUpdate) {
         reloadCellValues();
         rRemoteUpdateGrid::setHasToChange(false);
     }
     rWindow.clear();
     rWindow.setView(rView);
+
+
     rWindow.draw(vertices, gSimL->gSLActual->getTexture());
+    rWindow.draw(verSelector);
     rPMenu->display(rWindow);
     rWindow.display();
 }

@@ -6,6 +6,7 @@
 #define CITYOFWEIRDFISHES_GSIMLAYERS_H
 
 #include <utility>
+#include <SFML/Window/Event.hpp>
 
 #include "gILayer.h"
 
@@ -44,6 +45,10 @@ public:
             case G_UNDERGROUND:
                 return;
         }
+    }
+
+    void pressedCell(std::pair<int, int> cPressed) {
+        //std::cout << cPressed.first << ":" << cPressed.second << std::endl;
     }
 
     std::pair<std::pair<int, int>, std::pair<int, int>> gRangeUse;

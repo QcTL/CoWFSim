@@ -12,6 +12,7 @@
 #include <SFML/Window/Event.hpp>
 #include "../../common/RelPath.h"
 #include "../layers/tileset/gTileset.h"
+#include "../../IO/ReaderParameters.h"
 
 class rIMenu {
 public:
@@ -27,6 +28,9 @@ public:
     virtual void draw(sf::RenderWindow &rW) = 0;
     virtual void setResponse(int v) = 0;
     virtual bool interact(const sf::Event& event, const sf::RenderWindow& rWindow) = 0;
+    virtual void pressedCell(std::pair<int, int> cPressed) = 0;
+    virtual void update() {}
+
 
     void setTransformation() {
         int tSize = tsTex.getTileSize();
@@ -161,6 +165,7 @@ public:
             case pTopRight:
                     return {mouseP.x - (wS.x - menuW), (unsigned int) mouseP.y};
         }
+        return {};
     }
 
     bool isInside(const sf::RenderWindow& rW, int menuH, int menuW, const sf::Vector2<int>& mouseP){
@@ -188,6 +193,30 @@ protected:
     sf::VertexArray v;
     std::vector<std::vector<sf::Vector2f>> lRefTiles;
     rRelativePos rPos;
+
+
+    static std::vector<std::vector<int>> extractDataFromFile(const std::string &pthFileD){
+        std::map<std::string, std::string> sm = ReaderParameters::readFile(
+                (RelPath::relPath / "files" / "graphic" / "menus" / (pthFileD + R"(.txt)")).string());
+
+        std::ifstream file((RelPath::relPath / "files" / "graphic" / "menus" / sm["src"]).string());
+
+        std::string line;
+        std::vector<std::vector<int>> data;
+
+        while (std::getline(file, line)) {
+            std::vector<int> row;
+            std::istringstream iss(line);
+            int value;
+            while (iss >> value) {
+                row.push_back(value);
+            }
+            data.push_back(row);
+        }
+
+        file.close();
+        return data;
+    }
 };
 
 #endif //CITYOFWEIRDFISHES_RIMENU_H

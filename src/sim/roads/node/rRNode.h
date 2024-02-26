@@ -40,12 +40,18 @@ public:
         sendToNext(eN);
     }
 
+    virtual float getOccupancy() = 0;
+
+    virtual int getCapacity() = 0;
+
+    virtual std::list<uint32_t> getPosRoad(int idRoad) = 0;
+
     std::shared_ptr<rRNodeI> rLeft;
     std::shared_ptr<rRNodeI> rRight;
     std::shared_ptr<rRNodeI> rTop;
     std::shared_ptr<rRNodeI> rBottom;
 
-    void addRefPos(const std::pair<uint32_t ,uint32_t>& pNew){
+    void addRefPos(const std::pair<uint32_t, uint32_t> &pNew) {
         rRefPos.push_back(pNew);
     }
 
@@ -96,8 +102,8 @@ protected:
             direction->enterCar(dDir ^ 0x02);
     }
 
-    void updateRefGrid(int nValue){
-        for(const auto& p: rRefPos){
+    void updateRefGrid(int nValue) {
+        for (const auto &p: rRefPos) {
             tTransit->set(p, nValue);
         }
         rRemoteUpdateGrid::setHasToChange(true);
@@ -128,13 +134,13 @@ public:
     }
 
     void tick() override {
-        if(!itsEmpty){
+        if (!itsEmpty) {
             notifyEnterNext(
                     rInfoDist::returnDirToDist(
                             rActiveVehicle::getDestByCar(carActInside.first).first,
                             rActiveVehicle::getDestByCar(carActInside.first).second,
                             rBlock, uidNode), carActInside);
-        }else if (!reqTakeCar.empty()) {
+        } else if (!reqTakeCar.empty()) {
             uint8_t dToTake = reqTakeCar.front();
             reqTakeCar.pop_front();
             carActInside = getByDir(dToTake)->takeCarPrep(dToTake ^ 0x02);
@@ -152,6 +158,14 @@ public:
 
     void addNewCar(uint32_t idDest, uint16_t blockDest) override {}
 
+    float getOccupancy() { return itsEmpty ? 0 : 1.0; }
+
+    int getCapacity() { return 1; }
+
+    std::list<uint32_t> getPosRoad(int idRoad) {
+        if (itsEmpty) return {};
+        return {0};
+    }
 
 private:
     void enterCar(const uint8_t &dDir) override {
@@ -198,6 +212,7 @@ public:
     }
 
     bool hasChanged = false;
+
     void tick() override {
         for (auto it = dFirst.lOrderedCars.begin(); it != dFirst.lOrderedCars.end();) {
             auto &c = *it;
@@ -207,11 +222,11 @@ public:
                     dFirst.pState[c.second] = false;
                     it = dFirst.lOrderedCars.erase(it);
                     hasChanged = true;
-                } else if(!hasRequestedFirst){
+                } else if (!hasRequestedFirst) {
                     hasRequestedFirst = true;
                     notifyEnterNext(dEndFirst, c);
                     ++it;
-                }else if(hasRequestedFirst){
+                } else if (hasRequestedFirst) {
                     ++it;
                 }
             } else if (!dFirst.pState[c.second + 1]) {
@@ -233,11 +248,11 @@ public:
                     dSecond.pState[c.second] = false;
                     it = dSecond.lOrderedCars.erase(it);
                     hasChanged = true;
-                } else if(!hasRequestedSecond){
+                } else if (!hasRequestedSecond) {
                     hasRequestedSecond = true;
                     notifyEnterNext(dEndSecond, c);
                     ++it;
-                }else if(hasRequestedSecond){
+                } else if (hasRequestedSecond) {
                     ++it;
                 }
             } else if (!dSecond.pState[c.second + 1]) {
@@ -250,7 +265,7 @@ public:
                 ++it;
             }
         }
-        if(hasChanged){
+        if (hasChanged) {
             hasChanged = false;
             updateRefGrid(std::max(dFirst.lOrderedCars.size(), dSecond.lOrderedCars.size()));
         }
@@ -263,6 +278,26 @@ public:
         dFirst.lOrderedCars.push_back(newCar);
         hasChanged = true;
     }
+
+    float getOccupancy() {
+        return std::max(dFirst.lOrderedCars.size() / nCompressed, dSecond.lOrderedCars.size() / nCompressed);
+    }
+
+    int getCapacity() { return nCompressed; }
+
+    std::list<uint32_t> getPosRoad(int idRoad) {
+        std::list<uint32_t> intList;
+        if (idRoad == 0) {
+            std::transform(dFirst.lOrderedCars.begin(), dFirst.lOrderedCars.end(), std::back_inserter(intList),
+                           [](const std::pair<uint32_t, uint32_t> &p) { return p.first; });
+        } else {
+
+            std::transform(dSecond.lOrderedCars.begin(), dSecond.lOrderedCars.end(), std::back_inserter(intList),
+                           [](const std::pair<uint32_t, uint32_t> &p) { return p.first; });
+        }
+        return intList;
+    }
+
 
 private:
 

@@ -3,28 +3,11 @@
 //
 
 #include "rSelOptMenu.h"
-#include "../../../IO/ReaderParameters.h"
 
 
 rSelOptMenu::rSelOptMenu(const std::shared_ptr<rIMenu> &mParent, int strValue, const std::string &pthFileD,
                          rIMenu::rRelativePos rPos) : rIMenu(mParent, rPos) {
-    std::map<std::string, std::string> sm = ReaderParameters::readFile(
-            (RelPath::relPath / "files" / "graphic" / "menus" / (pthFileD + R"(.txt)")).string());
-
-    std::ifstream file((RelPath::relPath / "files" / "graphic" / "menus" / sm["src"]).string());
-
-    std::string line;
-    std::vector<std::vector<int>> data;
-
-    while (std::getline(file, line)) {
-        std::vector<int> row;
-        std::istringstream iss(line);
-        int value;
-        while (iss >> value) {
-            row.push_back(value);
-        }
-        data.push_back(row);
-    }
+    std::vector<std::vector<int>> data = extractDataFromFile(pthFileD);
 
     for (int i = 0; i < data.size(); ++i)
         for (int j = 0; j < data[i].size(); ++j)
@@ -34,8 +17,6 @@ rSelOptMenu::rSelOptMenu(const std::shared_ptr<rIMenu> &mParent, int strValue, c
                 pElemSel.emplace_back(row, col);
                 pElemSelAbs.emplace_back(i, j);
             }
-
-    file.close();
     dInfo = getVertexMenu((int) data[0].size(), (int) data.size(), data);
     gWidth = (int) data[0].size();
     gHeight = (int) data.size();
@@ -61,9 +42,7 @@ void rSelOptMenu::setNewSel(int v) {
     cCurrenSel = v;
 }
 
-void rSelOptMenu::setResponse(int v) {
-
-}
+void rSelOptMenu::setResponse(int v) {}
 
 bool rSelOptMenu::interact(const sf::Event &event, const sf::RenderWindow &rWindow) {
     switch (event.type) {
@@ -82,6 +61,7 @@ bool rSelOptMenu::interact(const sf::Event &event, const sf::RenderWindow &rWind
                 return true;
             }
             break;
+        default:
+            return false;
     }
-    return false;
 }
