@@ -122,6 +122,7 @@ void rGlobal::loop() {
     }
 
     rCC.updateOnLoop(rView);
+    rPMenu->updateOnLoop(rView);
     if (rRemoteUpdateGrid::hasToUpdate) {
         reloadCellValues();
         rRemoteUpdateGrid::setHasToChange(false);

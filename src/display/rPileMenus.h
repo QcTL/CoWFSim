@@ -74,6 +74,11 @@ public:
         vTopActiveMenu->interact(event, rWindow);
     }
 
+
+    void updateOnLoop(const sf::View &view) {
+        vTopActiveMenu->update();
+    }
+
     void pressedCell(std::pair<int, int> cPressed) {
         vTopActiveMenu->pressedCell(cPressed);
     }

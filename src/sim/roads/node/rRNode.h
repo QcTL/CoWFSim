@@ -44,6 +44,8 @@ public:
 
     virtual int getCapacity() = 0;
 
+    virtual std::list<uint32_t> getPosRoad(int idRoad) = 0;
+
     std::shared_ptr<rRNodeI> rLeft;
     std::shared_ptr<rRNodeI> rRight;
     std::shared_ptr<rRNodeI> rTop;
@@ -157,7 +159,13 @@ public:
     void addNewCar(uint32_t idDest, uint16_t blockDest) override {}
 
     float getOccupancy() { return itsEmpty ? 0 : 1.0; }
-    int getCapacity() {return 1;}
+
+    int getCapacity() { return 1; }
+
+    std::list<uint32_t> getPosRoad(int idRoad) {
+        if (itsEmpty) return {};
+        return {0};
+    }
 
 private:
     void enterCar(const uint8_t &dDir) override {
@@ -275,7 +283,21 @@ public:
         return std::max(dFirst.lOrderedCars.size() / nCompressed, dSecond.lOrderedCars.size() / nCompressed);
     }
 
-    int getCapacity() {return nCompressed;}
+    int getCapacity() { return nCompressed; }
+
+    std::list<uint32_t> getPosRoad(int idRoad) {
+        std::list<uint32_t> intList;
+        if (idRoad == 0) {
+            std::transform(dFirst.lOrderedCars.begin(), dFirst.lOrderedCars.end(), std::back_inserter(intList),
+                           [](const std::pair<uint32_t, uint32_t> &p) { return p.first; });
+        } else {
+
+            std::transform(dSecond.lOrderedCars.begin(), dSecond.lOrderedCars.end(), std::back_inserter(intList),
+                           [](const std::pair<uint32_t, uint32_t> &p) { return p.first; });
+        }
+        return intList;
+    }
+
 
 private:
 

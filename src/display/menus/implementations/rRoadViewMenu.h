@@ -7,7 +7,6 @@
 
 #include "../rIMenu.h"
 #include "../../../sim/roads/node/rRNode.h"
-#include "../../../IO/ReaderParameters.h"
 
 std::string uint16_to_padded_string(const uint16_t num) {
     std::string str = std::to_string(num);
@@ -24,7 +23,8 @@ std::string uint16_to_padded_string(const uint16_t num) {
 class rRoadViewMenu : public rIMenu {
 public:
     explicit rRoadViewMenu(const std::shared_ptr<rIMenu> &mParent, const std::shared_ptr<rRNodeI> &refView,
-                           const std::string &pthFileD, rIMenu::rRelativePos rPos) : rIMenu(mParent, rPos) {
+                           const std::string &pthFileD, rIMenu::rRelativePos rPos)
+            : rIMenu(mParent, rPos), rSelRoad(refView) {
 
         std::vector<std::vector<int>> data = extractDataFromFile(pthFileD);
 
@@ -58,8 +58,21 @@ public:
         setNewOcc(refView->getOccupancy());
         setNumberComp(refView->getCapacity());
 
+        int gDiff = 30 / (refView->getCapacity() + 1);
+        for (int i = 0; i < refView->getCapacity(); i++) {
+            pPosCarTop.emplace_back(2, (i + 1) * gDiff);
+            pPosCarBottom.emplace_back(8, (i + 1) * gDiff);
+        }
+
+
         setSizeRoads(1, true);
         setSizeRoads(1, false);
+
+        setRoadsCars(refView->getPosRoad(0), refView->getPosRoad(1));
+    }
+
+    void update() override {
+        setRoadsCars(rSelRoad->getPosRoad(0), rSelRoad->getPosRoad(1));
     }
 
     void draw(sf::RenderWindow &rW) override {
@@ -79,6 +92,7 @@ public:
                 break;
         }
         return false;
+        //FALTA QUE ES PUGI ACTUALIZAR CADA TICK PER PODER REPRESENTAR EL DALLO;
     }
 
     void pressedCell(std::pair<int, int> cPressed) {
@@ -88,18 +102,24 @@ public:
 private:
 
     std::vector<std::pair<int, int>> pElemOcc;
-    std::vector<std::vector<std::pair<int, int>>> pElemNRoadsTop;
-    std::vector<std::vector<std::pair<int, int>>> pElemNRoadsBottom;
     std::vector<std::pair<int, int>> pElemNumSize;
+
+    std::vector<std::vector<std::pair<int, int>>> pElemNRoadsTop;
+    std::vector<std::pair<int, int>> pPosCarTop;
+
+    std::vector<std::vector<std::pair<int, int>>> pElemNRoadsBottom;
+    std::vector<std::pair<int, int>> pPosCarBottom;
 
     sf::VertexArray dInfo;
     int gWidth = 0;
     int gHeight = 0;
 
+    std::shared_ptr<rRNodeI> rSelRoad;
+
     void setNewOcc(const float fRate) {
         if (fRate < 0 || fRate > 1)
             return;
-        int nTurnOn = (int) (5 * (1-fRate));
+        int nTurnOn = (int) (5 * (1 - fRate));
         for (int i = 0; i < pElemOcc.size(); i++) {
             sf::Vertex *quad = &dInfo[(pElemOcc[i].second + pElemOcc[i].first * gWidth) * 4];
             if (i >= nTurnOn) {
@@ -144,13 +164,37 @@ private:
         std::string vToShow = uint16_to_padded_string(rComp);
         for (int i = 0; i < 4; i++) {
             sf::Vertex *quad = &dInfo[(pElemNumSize[i].second + pElemNumSize[i].first * gWidth) * 4];
-
             for (int k = 0; k < 4; k++) {
-                quad[k].texCoords = lRefTiles[std::abs('0' - vToShow[i]) + 48][k];
+                quad[k].texCoords = lRefTiles[vToShow[i] - '0' + 48][k];
             }
         }
     }
 
+    void setRoadsCars(const std::list<uint32_t> &rListPosTop, const std::list<uint32_t> &rListPosBottom) {
+        //1rst clear all the lines that could be had cars from the last one;
+        for (int i = 3; i < 33; i++) {
+            sf::Vertex *quadTop = &dInfo[(2 * gWidth + i) * 4];
+            sf::Vertex *quadBottom = &dInfo[(8 * gWidth + i) * 4];
+            for (int k = 0; k < 4; k++) {
+                quadTop[k].texCoords = lRefTiles[32][k];
+                quadBottom[k].texCoords = lRefTiles[32][k];
+            }
+        }
+
+        //Check the position relative and put it in the corresponding position;
+        for (const auto &p: rListPosTop) {
+            sf::Vertex *quad = &dInfo[(pPosCarTop[p].second + pPosCarTop[p].first * gWidth) * 4];
+            for (int k = 0; k < 4; k++) {
+                quad[k].texCoords = lRefTiles[48][k];
+            }
+        }
+        for (const auto &p: rListPosBottom) {
+            sf::Vertex *quad = &dInfo[(pPosCarBottom[p].second + pPosCarBottom[p].first * gWidth) * 4];
+            for (int k = 0; k < 4; k++) {
+                quad[k].texCoords = lRefTiles[48][k];
+            }
+        }
+    }
 };
 
 #endif //CITYOFWEIRDFISHES_RROADVIEWMENU_H

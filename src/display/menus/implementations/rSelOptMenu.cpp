@@ -3,7 +3,6 @@
 //
 
 #include "rSelOptMenu.h"
-#include "../../../IO/ReaderParameters.h"
 
 
 rSelOptMenu::rSelOptMenu(const std::shared_ptr<rIMenu> &mParent, int strValue, const std::string &pthFileD,
@@ -63,7 +62,6 @@ bool rSelOptMenu::interact(const sf::Event &event, const sf::RenderWindow &rWind
             }
             break;
         default:
-            break;
+            return false;
     }
-    return false;
 }
