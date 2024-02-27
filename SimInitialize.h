@@ -8,15 +8,16 @@
 #include "src/sim/structure/grids/transformation/gBaseToRiver.h"
 #include "src/sim/structure/grids/transformation/gBaseToLineRoads.h"
 #include "src/sim/structure/grids/transformation/gBaseToPattern.h"
-#include "src/display/menus/implementations/rBaseMenu.h"
 #include "src/sim/structure/grids/transformation/gBaseToGradientMinimum.h"
 #include "src/sim/structure/grids/transformation/gBasicTransformations.h"
+#include "src/sim/sMainSimulator.h"
+#include "src/sim/structure/grids/transformation/sGridToSimulator.h"
+#include "src/display/rGlobal.h"
+#include "src/display/menus/implementation/rBaseMenu.h"
 
 class SimInitialize {
-
 public:
     static int givenMap(const std::map<std::string, std::string> &mValues) {
-
 
         uint32_t lSizeGrid = 0;
         if (mValues.at("Mida_Simulacio") == "Petita") {
@@ -28,6 +29,7 @@ public:
         } else if (mValues.at("Mida_Simulacio") == "Molt_Gran") {
             lSizeGrid = 200;
         }
+        std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(lSizeGrid);
 
         std::shared_ptr<gIGrid<uint32_t>> gB = std::make_shared<gBasicGrid<uint32_t>>(
                 gBasicGrid<uint32_t>(lSizeGrid, lSizeGrid, -1));
@@ -58,6 +60,7 @@ public:
         }
         gB = BasicTransformations::replaceValues(gB, {{-1, 0}});
 
+        //sGridToSimulator::gToTypeCell(sMS->gLayer, gB);
 
         float lSizeRiver = 0;
         if (mValues.at("Mida_Simulacio") == "Petita") {
@@ -79,7 +82,6 @@ public:
         //RIVER
         if (mValues.at("Conte_Riu") == "on")
             gBaseToRiver<uint32_t> gBTR(gB, 20, lSizeRiver, 100);
-
 
 
         //RIVER TRANSFORMATION
@@ -127,17 +129,18 @@ public:
         }
 
         //srand(static_cast<unsigned int>(time(0))); dodo change this
+        /*
         for (int i = 0; i < std::stoi(mValues.at("Quanitat_Carrers_Princiapls")); i++)
             gBaseToLineRoads::givenFunction<uint32_t>(gB,
                                                       static_cast<float>(rand()) / static_cast<float>(RAND_MAX / 6) - 3,
                                                       rand() % (lSizeGrid + 1));
-
+        */
 
         //TODO MILLORAR EL ORDRE EN EL QUE ES FA PER ARA ES FA DOS COPS:
 
         std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint8_t>>> p =
                 gBaseToBorderDetection::generate(gB, {gBorderType::gBNonConnex, gBorderOutside::gIsNotGroup}, {3, 4},
-                                                 BasicTransformations::genMaskFromGrid(gB, {3,4}));
+                                                 BasicTransformations::genMaskFromGrid(gB, {3, 4}));
 
         for (const auto &map_element: p) {
             for (const auto &elm: map_element.second) {
@@ -146,10 +149,10 @@ public:
                             | ((elm.second & (1 << 4)) != 0) << 2
                             | ((elm.second & (1 << 6)) != 0) << 1
                             | ((elm.second & (1 << 3)) != 0);
-                if(gB->get(elm.first.second, elm.first.first) == 3) {
+                if (gB->get(elm.first.second, elm.first.first) == 3) {
                     gB->set({elm.first.second, elm.first.first},
                             (((uint32_t) (uint8_t) strtol("100001", NULL, 2)) << 24) + p);
-                }else{
+                } else {
                     gB->set({elm.first.second, elm.first.first},
                             (((uint32_t) (uint8_t) strtol("100000", NULL, 2)) << 24) + p);
                 }
@@ -163,22 +166,28 @@ public:
         //gLAP->setTransformation({0, 1, 2, 3, 4, 5});
 
 
-        gB = BasicTransformations::replaceValues(gB, {{2, ((uint32_t) (uint8_t) strtol("00010000", NULL, 2)) << 24}});
-        gB = BasicTransformations::replaceValues(gB, {{1, ((uint32_t) (uint8_t) strtol("00010001", NULL, 2)) << 24}});
+        gB = BasicTransformations::replaceValues(gB,
+                                                 {{2, ((uint32_t) (uint8_t) strtol("00010000", nullptr, 2)) << 24}});
+        gB = BasicTransformations::replaceValues(gB,
+                                                 {{1, ((uint32_t) (uint8_t) strtol("00010001", nullptr, 2)) << 24}});
 
-        std::shared_ptr<gLayerCity> gLC = std::make_shared<gLayerCity>(gLayerCity(gB));
-        std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(nullptr, gLC, nullptr, gB->rangeUse());
-        //gSimL->switchActual(gSimLayersTypes::G_AIRPOLLUTION);
+        sGridToSimulator::gToCurStruct(sMS->gLayerCurStruct, sMS->gLayerTypeGen, gB);
+        sMS->completedStartGrid();
 
+        std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gLayerAirPollution,
+                                                                           sMS->gLayerCurStruct, sMS->gLayerTransit);
+        //MENUS
         std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
-        std::shared_ptr<rBaseMenu> rBasic = std::make_shared<rBaseMenu>(
-                pPM, rIMenu::rRelativePos::pBottomRight);
+        std::shared_ptr<rBaseMenu> rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->gLayerTypeGen,
+                                                                        sMS->gLayerRoads, sMS->gLayerOwnership, sMS->sTComp));
         pPM->addMenuTop(rBasic);
+
 
         rGlobal rG(gSimL, pPM);
         rG.setUp();
         while (rG.isOpen) {
             rG.loop();
+            sMS->tick();
         }
         return 0;
     }

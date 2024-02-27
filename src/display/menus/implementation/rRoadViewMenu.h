@@ -85,7 +85,7 @@ public:
         switch (event.type) {
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::Escape) {
-                    parentMenu->setResponse(0);
+                    parentMenu->setResponse(-1);
                 }
                 break;
             default:
@@ -96,7 +96,7 @@ public:
     }
 
     void pressedCell(std::pair<int, int> cPressed) {
-        parentMenu->setResponse(0);
+        parentMenu->setResponse(-1);
     }
 
 private:

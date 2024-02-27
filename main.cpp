@@ -2,10 +2,9 @@
 
 
 #include <filesystem>
-#include "src/common/RelPath.h"
+#include <iostream>
 #include "src/IO/ReaderParameters.h"
-#include "src/tests/tst_gERCComm.h"
-#include "src/tests/tst_gVeh.h"
+#include "src/common/RelPath.h"
 #include "SimInitialize.h"
 
 int main() {
@@ -18,12 +17,7 @@ int main() {
     }
     std::cout << "------" << std::endl;
 
-    tst_gVeh();
-    //SimInitialize::givenMap(sMVar);
-    //tst_gBasicPattern();
-    //tst_gMenus();
-    //SimInitialize::givenMap(sMVar);
-    //SimInitializePreb::givenMap(sMVar);
+    SimInitialize::givenMap(sMVar);
 
     return 0;
 }

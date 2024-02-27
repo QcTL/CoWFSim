@@ -7,7 +7,7 @@
 
 #include "../display/layers/implementation/gLayerAirPollution.h"
 #include "../sim/structure/grids/gBasicGrid.h"
-#include "../display/layers/gSimLayers.h"
+#include "../display/layers/gDispLayers.h"
 #include "../display/rGlobal.h"
 #include "../sim/structure/grids/transformation/gBaseToGradientMinimum.h"
 
@@ -34,7 +34,7 @@ int tst_gBasicDisplayGround() {
 
     std::shared_ptr<gIGrid<uint32_t>> gC =std::make_shared<gBasicGrid<uint32_t>>(gBasicGrid<uint32_t>(30, 30, ((uint32_t)(uint8_t)strtol("00000000", NULL, 2)) << 24));
     std::shared_ptr<gLayerCity> gLC = std::make_shared<gLayerCity>(gLayerCity(gC));
-    std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(gLAP, gLC,gAP->rangeUse());
+    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(gLAP, gLC, gAP->rangeUse());
 
     std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
     rGlobal rG(gSimL, pPM);

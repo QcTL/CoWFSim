@@ -9,10 +9,10 @@
 #include "../sim/structure/grids/gBasicGrid.h"
 #include "../sim/structure/grids/transformation/gBaseToPattern.h"
 #include "../display/layers/implementation/gLayerAirPollution.h"
-#include "../display/layers/gSimLayers.h"
+#include "../display/layers/gDispLayers.h"
 #include "../display/rGlobal.h"
 #include "../sim/roads/rNodeFromGrid.h"
-#include "../sim/roads/rTransRNodeToRRNode.h"
+//#include "../sim/roads/rTransRNodeToRRNode.h"
 
 int tst_gExtractRoadsCompressed() {
     std::shared_ptr<gIGrid<int>> gB = std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(50, 50, 0));
@@ -41,7 +41,7 @@ int tst_gExtractRoadsCompressed() {
 
     std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gB));
     gLAP->setTransformation({0, 1, 2, 3, 4, 5});
-    std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(gSimLayers(gLAP));
+    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(gSimLayers(gLAP));
 
 
     std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>();

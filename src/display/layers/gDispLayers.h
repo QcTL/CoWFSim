@@ -2,8 +2,8 @@
 // Created by Laminar on 29/01/2024.
 //
 
-#ifndef CITYOFWEIRDFISHES_GSIMLAYERS_H
-#define CITYOFWEIRDFISHES_GSIMLAYERS_H
+#ifndef CITYOFWEIRDFISHES_GDISPLAYERS_H
+#define CITYOFWEIRDFISHES_GDISPLAYERS_H
 
 #include <utility>
 #include <SFML/Window/Event.hpp>
@@ -14,20 +14,20 @@
 #include "implementation/gLayerAirPollution.h"
 #include "implementation/gLayerTransit.h"
 #include "../rRemoteUpdateGrid.h"
-
+#include "../transformations/gTransSimToDisp.h"
 
 enum gSimLayersTypes {
     G_CITY, G_AIRPOLLUTION, G_UNDERGROUND, G_TRANSIT
 };
 
-class gSimLayers {
+class gDispLayers {
 public:
-    explicit gSimLayers(
-            const std::shared_ptr<gLayerAirPollution> &gLAP,
-            const std::shared_ptr<gLayerCity> &gLC,
-            const std::shared_ptr<gLayerTransit> &gT,
-            const std::pair<std::pair<int, int>, std::pair<int, int>> &rangeUse)
-            : gSL_AP(gLAP), gSL_C(gLC), gSL_T(gT), gRangeUse(rangeUse) {
+    explicit gDispLayers(const std::shared_ptr<gIGrid<uint8_t>> &gSimAP, const std::shared_ptr<gIGrid<uint32_t>> &gSimC,
+                         const std::shared_ptr<gIGrid<uint8_t>> &gSimT)
+            : gSL_AP(gTransSimToDisp::gToLayerAirPollution(gSimAP)),
+              gSL_C(gTransSimToDisp::gToLayerCity(gSimC)),
+              gSL_T(gTransSimToDisp::gToLayerTransit(gSimT)),
+              gRangeUse(gSimAP->rangeUse()) {
         gSLActual = gSL_C;
     }
 
@@ -47,9 +47,7 @@ public:
         }
     }
 
-    void pressedCell(std::pair<int, int> cPressed) {
-        //std::cout << cPressed.first << ":" << cPressed.second << std::endl;
-    }
+    void pressedCell(std::pair<int, int> cPressed) {}
 
     std::pair<std::pair<int, int>, std::pair<int, int>> gRangeUse;
     std::shared_ptr<gILayer> gSLActual;
@@ -60,4 +58,4 @@ private:
     std::shared_ptr<gLayerTransit> gSL_T;
 };
 
-#endif //CITYOFWEIRDFISHES_GSIMLAYERS_H
+#endif //CITYOFWEIRDFISHES_GDISPLAYERS_H

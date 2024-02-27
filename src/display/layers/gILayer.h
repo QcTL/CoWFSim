@@ -16,7 +16,7 @@
 class gILayer {
 public:
 
-    gILayer(gTileset gTS) : lTs(std::move(gTS)) {}
+    explicit gILayer(gTileset gTS) : lTs(std::move(gTS)) {}
 
     virtual ~gILayer() = default;
 

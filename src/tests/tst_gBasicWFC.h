@@ -7,7 +7,7 @@
 
 #include "../display/layers/implementation/gLayerAirPollution.h"
 #include "../sim/structure/grids/gBasicGrid.h"
-#include "../display/layers/gSimLayers.h"
+#include "../display/layers/gDispLayers.h"
 #include "../display/rGlobal.h"
 #include "../sim/structure/grids/transformation/gBaseToGradientMinimum.h"
 #include "../sim/structure/grids/transformation/gBasicTransformations.h"
@@ -41,7 +41,7 @@ int tst_gBasicWFC() {
 
     std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gReal));
     gLAP->setTransformation({0,1,2,3,4,5});
-    std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(gSimLayers(gLAP));
+    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(gSimLayers(gLAP));
 
     std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>();
     rGlobal rG(gSimL, pPM);

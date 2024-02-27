@@ -24,7 +24,7 @@ int tst_gMenus() {
     std::shared_ptr<gLayerCity> gLC = std::make_shared<gLayerCity>(gLayerCity(gCity));
 
     //DISPLAY
-    std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(gLAP, gLC, gB->rangeUse());
+    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(gLAP, gLC, gB->rangeUse());
 
     //MENUS
     std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);

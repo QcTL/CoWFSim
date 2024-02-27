@@ -51,7 +51,7 @@ public:
                 std::shared_ptr<gIGrid<T>> gGrid = blobToGrid(g);
 
                 auto p = gBaseToBorderDetection::generate(gGrid,
-                                                          {gBorderType::gBNonConnex, gBorderOutside::gIsNotGroup},{});
+                                                          {gBorderType::gBNonConnex, gBorderOutside::gIsNotGroup}, {});
 
                 blobRoadsToGrid(p, gR, parameters.sizeBlockWidth, parameters.sizeBlockHeight);
                 break;

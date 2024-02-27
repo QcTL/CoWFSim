@@ -9,14 +9,14 @@
 #include "../sim/structure/grids/gBasicGrid.h"
 #include "../sim/structure/grids/transformation/gBaseToPattern.h"
 #include "../display/layers/implementation/gLayerAirPollution.h"
-#include "../display/layers/gSimLayers.h"
+#include "../display/layers/gDispLayers.h"
 #include "../display/rGlobal.h"
 #include "../sim/roads/rNodeFromGrid.h"
-#include "../sim/roads/rTransRNodeToRRNode.h"
+//#include "../sim/roads/rTransRNodeToRRNode.h"
 
 int tst_gVeh() {
     std::shared_ptr<gIGrid<int>> gB = std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(10, 10, 0));
-    std::shared_ptr<gIGrid<int>> gTransit = std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(10, 10, 0));
+    std::shared_ptr<gIGrid<uint8_t>> gTransit = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(10, 10, 0));
 
     gB->set(0,2, 1);
     gB->set(1,0, 1);
@@ -61,7 +61,7 @@ int tst_gVeh() {
     gT->setTransformation({0, 1, 2, 3, 4, 5});
 
 
-    std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(gLAP, nullptr, gT, gB->rangeUse());
+    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(gLAP, nullptr, gT, gB->rangeUse());
     gSimL->switchActual(gSimLayersTypes::G_TRANSIT);
 
     std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);

@@ -92,7 +92,7 @@ public:
     }
 
     template<typename T>
-    static std::shared_ptr<gIGrid<T>> replaceValues(std::shared_ptr<gIGrid<T>> grid, const std::map<T, T>& repValues ){
+    static std::shared_ptr<gIGrid<T>> replaceValues(const std::shared_ptr<gIGrid<T>>& grid, const std::map<T, T>& repValues ){
         auto gRange = grid->rangeUse();
         for (int i = gRange.second.first; i <= gRange.second.second; i++) {
             for (int j = gRange.first.first; j <= gRange.first.second; j++) {

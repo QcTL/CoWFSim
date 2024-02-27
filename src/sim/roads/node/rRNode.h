@@ -8,11 +8,13 @@
 #include <list>
 #include <cstdint>
 #include <memory>
+#include <algorithm>
 #include "RNodeAttrs/rRMailbox.h"
 #include "../transportation/gUniqueId.h"
 #include "../transportation/rActiveVehicles.h"
 #include "rInfoDists.h"
 #include "../../../display/rRemoteUpdateGrid.h"
+#include "../../structure/grids/gIGrid.h"
 
 
 class rRNodeI {
@@ -55,7 +57,7 @@ public:
         rRefPos.push_back(pNew);
     }
 
-    std::shared_ptr<gIGrid<int>> tTransit;
+    std::shared_ptr<gIGrid<uint8_t>> tTransit;
 protected:
     uint32_t uidNode;
     uint16_t rBlock;
@@ -102,7 +104,7 @@ protected:
             direction->enterCar(dDir ^ 0x02);
     }
 
-    void updateRefGrid(int nValue) {
+    void updateRefGrid(uint8_t nValue) {
         for (const auto &p: rRefPos) {
             tTransit->set(p, nValue);
         }

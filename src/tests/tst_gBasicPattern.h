@@ -9,7 +9,7 @@
 #include "../sim/structure/grids/gBasicGrid.h"
 #include "../sim/structure/grids/transformation/gBaseToPattern.h"
 #include "../display/layers/implementation/gLayerAirPollution.h"
-#include "../display/layers/gSimLayers.h"
+#include "../display/layers/gDispLayers.h"
 #include "../display/rGlobal.h"
 
 int tst_gBasicPattern() {
@@ -20,7 +20,7 @@ int tst_gBasicPattern() {
 
     std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gB));
     gLAP->setTransformation({0, 1, 2, 3, 4, 5});
-    std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(gLAP, nullptr, gB->rangeUse());
+    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(gLAP, nullptr, gB->rangeUse());
     gSimL->switchActual(gSimLayersTypes::G_AIRPOLLUTION);
 
     std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);

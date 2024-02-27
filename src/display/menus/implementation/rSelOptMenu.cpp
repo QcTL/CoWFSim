@@ -57,11 +57,12 @@ bool rSelOptMenu::interact(const sf::Event &event, const sf::RenderWindow &rWind
                             parentMenu->setResponse(i);
                         }
                     }
+                    return true;
                 }
-                return true;
             }
             break;
         default:
             return false;
     }
+    return false;
 }

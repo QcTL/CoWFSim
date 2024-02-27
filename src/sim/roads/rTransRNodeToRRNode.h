@@ -12,11 +12,11 @@ class rTransRNodeToRRNode {
     //Transform Road Node into Road Reduced Node
 
 private:
-    static int nFollow(rNode *aR) {
+    int nFollow(rNode *aR) {
         return (aR->rBottom != nullptr) + (aR->rTop != nullptr) + (aR->rRight != nullptr) + (aR->rLeft != nullptr);
     }
 
-    static std::pair<int, rNode *> onlyOneSeq(rNode *aR, int dirFromPrev) {
+    std::pair<int, rNode *> onlyOneSeq(rNode *aR, int dirFromPrev) {
         if (aR->rTop != nullptr && dirFromPrev != 0)
             return {2, aR->rTop};
         if (aR->rBottom != nullptr && dirFromPrev != 2)
@@ -29,9 +29,9 @@ private:
     }
 
 
-    static std::shared_ptr<rRNodeI>
+    std::shared_ptr<rRNodeI>
     rConversation(const std::shared_ptr<rRNodeI> &prevAR, int dirFromPrev, int prevDirMajor, rNode *aR, uint8_t nCons,
-                  const std::shared_ptr<gIGrid<int>> &tTransit) {
+                  const std::shared_ptr<gIGrid<uint8_t>> &tTransit) {
         //Dir 0 top, 1 right, 2 bottom, 3 left , -1 Començant
         if (aR->refCompressed != nullptr)
             return aR->refCompressed;
@@ -71,6 +71,8 @@ private:
                 case 3:
                     newAR->rLeft = prevAR;
                     break;
+                default:
+                    break;
             }
 
             if (aR->rTop != nullptr && dirFromPrev != 0) {
@@ -97,12 +99,12 @@ private:
         return nullptr;
     }
 
-    static uint16_t rSizeBlocs;
-    static uint16_t rSizeGrid;
-    static std::list<std::shared_ptr<rRNodeI>> llNodes;
+    uint16_t rSizeBlocs;
+    uint16_t rSizeGrid;
+    std::list<std::shared_ptr<rRNodeI>> llNodes;
 public:
-    static std::list<std::shared_ptr<rRNodeI>>
-    conversion(rNode *rRoot, uint16_t rSizeB, uint16_t rSizeG, const std::shared_ptr<gIGrid<int>> &tTransit) {
+    std::list<std::shared_ptr<rRNodeI>>
+    conversion(rNode *rRoot, uint16_t rSizeB, uint16_t rSizeG, const std::shared_ptr<gIGrid<uint8_t>> &tTransit) {
         rSizeBlocs = rSizeB;
         rSizeGrid = rSizeG;
         llNodes.clear();
@@ -110,9 +112,5 @@ public:
         return llNodes;
     }
 };
-
-uint16_t rTransRNodeToRRNode::rSizeBlocs;
-uint16_t rTransRNodeToRRNode::rSizeGrid;
-std::list<std::shared_ptr<rRNodeI>> rTransRNodeToRRNode::llNodes;
 
 #endif //CITYOFWEIRDFISHES_RTRANSRNODETORRNODE_H

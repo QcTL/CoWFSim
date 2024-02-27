@@ -153,7 +153,7 @@ public:
         return rPos;
     }
 
-    sf::Vector2<uint32_t> getAbsPos(const sf::RenderWindow& rW, uint menuH, int menuW, const sf::Vector2<int>& mouseP){
+    sf::Vector2<uint32_t> getAbsPos(const sf::RenderWindow& rW, uint32_t menuH, int menuW, const sf::Vector2<int>& mouseP){
         auto wS = rW.getSize();
         switch (rPos) {
             case pBottomLeft:

@@ -8,11 +8,11 @@
 #include <utility>
 
 #include "menus/rIMenu.h"
-#include "layers/gSimLayers.h"
+#include "layers/gDispLayers.h"
 
 class rPileMenus {
 public:
-    rPileMenus(const std::shared_ptr<gSimLayers> &gSimL) : inSim(gSimL) {};
+    rPileMenus(const std::shared_ptr<gDispLayers> &gSimL) : inSim(gSimL) {};
 
     void addMenuTop(const std::shared_ptr<rIMenu> &nMenu) {
         vTopActiveMenu = nMenu;
@@ -84,7 +84,7 @@ public:
     }
 
     std::shared_ptr<rIMenu> vTopActiveMenu;
-    std::shared_ptr<gSimLayers> inSim;
+    std::shared_ptr<gDispLayers> inSim;
 private:
     std::vector<uint8_t> vOrderMenus;
     std::vector<std::pair<int, std::shared_ptr<rIMenu>>> vPresentMenus;
