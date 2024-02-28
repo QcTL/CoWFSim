@@ -49,17 +49,19 @@ public:
 
     void addCompanyAtPosition(const std::shared_ptr<gIGrid<std::list<uint32_t>>> &gLayer,
                               const std::pair<uint32_t, uint32_t> nPos) {
-        gLayer->get(nPos).push_front(vTotalComp.addComp(0));
+        auto p = gLayer->get(nPos);
+        p.push_front(vTotalComp.addComp(0));
+        gLayer->set(nPos, p);
     }
 
     std::shared_ptr<obj_company> getCompanyByUUID(uint32_t index){
         return vTotalComp.getDestByComp(index);
     }
 
-    std::list<obj_company> getListCompByUUID(const std::list<uint32_t>& tList){
-        std::list<obj_company> r;
+    std::vector<obj_company> getVectCompByUUID(const std::list<uint32_t>& tList){
+        std::vector<obj_company> r;
         for(const uint32_t l : tList){
-            r.push_front(*getCompanyByUUID(l));
+            r.push_back(*getCompanyByUUID(l));
         }
         return r;
     }

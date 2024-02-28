@@ -20,15 +20,15 @@ public:
     static int givenMap(const std::map<std::string, std::string> &mValues) {
 
         uint32_t lSizeGrid = 0;
-        if (mValues.at("Mida_Simulacio") == "Petita") {
-            lSizeGrid = 50;
-        } else if (mValues.at("Mida_Simulacio") == "Mitjana") {
+        if (mValues.at("Mida_Simulacio") == "Petita")
             lSizeGrid = 100;
-        } else if (mValues.at("Mida_Simulacio") == "Gran") {
+        else if (mValues.at("Mida_Simulacio") == "Mitjana")
+            lSizeGrid = 100;
+        else if (mValues.at("Mida_Simulacio") == "Gran")
             lSizeGrid = 150;
-        } else if (mValues.at("Mida_Simulacio") == "Molt_Gran") {
+        else if (mValues.at("Mida_Simulacio") == "Molt_Gran")
             lSizeGrid = 200;
-        }
+
         std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(lSizeGrid);
 
         std::shared_ptr<gIGrid<uint32_t>> gB = std::make_shared<gBasicGrid<uint32_t>>(
@@ -53,7 +53,7 @@ public:
             vPosCentre = {{30, 30},
                           {70, 70}};
         for (int i = 0; i < std::stoi(mValues.at("Centres_Urbans")); i++) {
-            gBaseToGradientMinimum gBGM(vElem, vPosCentre[i], gB, gUrbanCenterMask);
+            gBaseToGradientMinimum<uint32_t> gBGM(vElem, vPosCentre[i], gB, -1, gUrbanCenterMask);
             gBGM.generateV2();
             gUrbanCenterMask = BasicTransformations::genMaskFromGrid(gB, {0});
             gB = BasicTransformations::replaceValues(gB, {{0, -1}});
@@ -63,15 +63,14 @@ public:
         //sGridToSimulator::gToTypeCell(sMS->gLayer, gB);
 
         float lSizeRiver = 0;
-        if (mValues.at("Mida_Simulacio") == "Petita") {
+        if (mValues.at("Mida_Simulacio") == "Petita")
             lSizeRiver = 1;
-        } else if (mValues.at("Mida_Simulacio") == "Mitjana") {
+        else if (mValues.at("Mida_Simulacio") == "Mitjana")
             lSizeRiver = 1.5;
-        } else if (mValues.at("Mida_Simulacio") == "Gran") {
+        else if (mValues.at("Mida_Simulacio") == "Gran")
             lSizeRiver = 2;
-        } else if (mValues.at("Mida_Simulacio") == "Molt_Gran") {
+        else if (mValues.at("Mida_Simulacio") == "Molt_Gran")
             lSizeRiver = 2.7;
-        }
 
         std::shared_ptr<gIGrid<bool>> gUrbanRoadsMask = std::make_shared<gBasicGrid<bool>>(
                 gBasicGrid<bool>(lSizeGrid, lSizeGrid, true));
@@ -136,6 +135,9 @@ public:
                                                       rand() % (lSizeGrid + 1));
         */
 
+        for(int i = 0; i < 10; i++) {
+            gBaseToLineRoads::randToCenter<uint32_t>(gB, {lSizeGrid / 2, lSizeGrid / 2});
+        }
         //TODO MILLORAR EL ORDRE EN EL QUE ES FA PER ARA ES FA DOS COPS:
 
         std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint8_t>>> p =
@@ -179,7 +181,8 @@ public:
         //MENUS
         std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
         std::shared_ptr<rBaseMenu> rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->gLayerTypeGen,
-                                                                        sMS->gLayerRoads, sMS->gLayerOwnership, sMS->sTComp));
+                                                                                  sMS->gLayerRoads,
+                                                                                  sMS->gLayerOwnership, sMS->sTComp));
         pPM->addMenuTop(rBasic);
 
 

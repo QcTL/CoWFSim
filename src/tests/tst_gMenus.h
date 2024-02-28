@@ -6,40 +6,30 @@
 #define CITYOFWEIRDFISHES_TST_GMENUS_H
 
 
-#include "../display/menus/implementations/rSelOptMenu.h"
 #include "../display/rGlobal.h"
 #include "../sim/structure/grids/gBasicGrid.h"
-#include "../display/menus/implementations/rBaseMenu.h"
+#include "../sim/sMainSimulator.h"
+#include "../display/menus/implementation/rBaseMenu.h"
 
 int tst_gMenus() {
 
+    std::shared_ptr<gIGrid<uint8_t>> gB = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(30, 30, 255));
+    std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(30);
 
-    //AIR
-    std::shared_ptr<gIGrid<int>> gB =std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(10, 10, 3));
-    std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gB));
-    gLAP->setTransformation({0,1,2,3,4,5});
 
-    //CITY
-    std::shared_ptr<gIGrid<uint32_t>> gCity =std::make_shared<gBasicGrid<uint32_t>>(gBasicGrid<uint32_t>(10, 10, 0));
-    std::shared_ptr<gLayerCity> gLC = std::make_shared<gLayerCity>(gLayerCity(gCity));
-
-    //DISPLAY
-    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(gLAP, gLC, gB->rangeUse());
-
+    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gLayerAirPollution,
+                                                                       sMS->gLayerCurStruct, sMS->gLayerTransit);
     //MENUS
     std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
-    std::shared_ptr<rBaseMenu> rBasic =  std::make_shared<rBaseMenu>(
-            pPM, rIMenu::rRelativePos::pBottomRight);
+    std::shared_ptr<rBaseMenu> rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->gLayerTypeGen,
+                                                                              sMS->gLayerRoads,
+                                                                              sMS->gLayerOwnership, sMS->sTComp));
     pPM->addMenuTop(rBasic);
-
-
     rGlobal rG(gSimL, pPM);
     rG.setUp();
-    int i = 0;
-    while(rG.isOpen) {
-        i ++;
-        //rSom->setNewSel((i/ 1000) % 5);
+    while (rG.isOpen) {
         rG.loop();
+        sMS->tick();
     }
     return 0;
 }

@@ -12,35 +12,37 @@
 #include "../sim/structure/grids/transformation/gBaseToGradientMinimum.h"
 #include "../sim/structure/grids/transformation/gBasicTransformations.h"
 #include "../sim/structure/grids/transformation/gBaseToWFC.h"
+#include "../sim/sMainSimulator.h"
+#include "../display/menus/implementation/rBaseMenu.h"
 
 int tst_gBasicWFCBasic() {
 
 
     int rRows = 100;
     int rCols = 100;
-
+    std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(rRows);
     //MASK:
     std::shared_ptr<gIGrid<bool>> b = std::make_shared<gBasicGrid<bool>>(gBasicGrid<bool>(rRows, rCols, -1));
 
-    std::shared_ptr<gIGrid<int>> gReal =std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(rRows, rCols, 0));
+    std::shared_ptr<gIGrid<uint8_t>> gReal =std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(rRows, rCols, 0));
 
     gBaseToWFC wfc(gReal, {{1,3},{2,7},{3,6}},{rRows/2,rCols/2}, 1);
 
-    /*
-    std::cout << *dynamic_cast<gBasicGrid<int> *>(gReal.get()) << std::endl;
-    std::cout << "------------" << std::endl;
-    */
+    sMS->gLayerAirPollution = gReal;
 
-    std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gReal));
-    gLAP->setTransformation({0,1,2,3,4,5});
-    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(gDispLayers(gLAP, nullptr, gReal->rangeUse()));
-    gSimL->switchActual(gSimLayersTypes::G_AIRPOLLUTION);
-
+    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gLayerAirPollution,
+                                                                       sMS->gLayerCurStruct, sMS->gLayerTransit);
+    //MENUS
     std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
+    std::shared_ptr<rBaseMenu> rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->gLayerTypeGen,
+                                                                              sMS->gLayerRoads,
+                                                                              sMS->gLayerOwnership, sMS->sTComp));
+    pPM->addMenuTop(rBasic);
     rGlobal rG(gSimL, pPM);
     rG.setUp();
-    while(rG.isOpen) {
+    while (rG.isOpen) {
         rG.loop();
+        sMS->tick();
     }
     return 0;
 }

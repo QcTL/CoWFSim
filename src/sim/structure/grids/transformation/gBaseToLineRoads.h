@@ -44,7 +44,8 @@ public:
                                std::shared_ptr<gIGrid<bool>> gMask = nullptr) {
         hasMask = gMask != nullptr;
 
-        double dSteep = (pEnd.first - pStart.first) != 0 ?  (pEnd.second - pStart.second) /(pEnd.first - pStart.first) : 0;
+        double dSteep =
+                (pEnd.first - pStart.first) != 0 ? (pEnd.second - pStart.second) / (pEnd.first - pStart.first) : 0;
         double dHeight = pStart.second - dSteep * pStart.first;
 
         for (int j = pStart.first; j < pEnd.first; j++) {
@@ -64,7 +65,62 @@ public:
         gGrid->set(pEnd, 4);
     }
 
+    template<typename T>
+    static void randToCenter(std::shared_ptr<gIGrid<T>> gGrid,
+                             std::pair<int, int> pCenter,
+                             std::shared_ptr<gIGrid<bool>> gMask = nullptr, int seed = -1) {
+        hasMask = gMask != nullptr;
+        if (seed == -1) {
+            seed = std::chrono::system_clock::now().time_since_epoch().count();
+        }
+
+        auto gRange = gGrid->rangeUse();
+        int GWidth = (gRange.first.second - gRange.first.first) + 1;
+        int GHeight = (gRange.second.second - gRange.second.first) + 1;
+
+        std::mt19937 gen(seed);
+        std::uniform_int_distribution<int> distrib(-GWidth - GHeight, GWidth + GHeight);
+        int n = distrib(gen);
+
+        //TODO REFACTOR THIS
+        std::pair<int, int> pStart;
+        if (n > 0) {
+            pStart = {std::min(n, GWidth), (n - GHeight > 0 ? n - GHeight : 0)};
+        } else {
+            pStart = {std::abs(n) - GWidth < 0 ? std::min(std::abs(n), GWidth) : 0,
+                      (GHeight - (std::abs(n) - GWidth > 0 ? std::abs(n) - GHeight : 0))};
+        }
+
+        double dSteep =
+                (pCenter.first - pStart.first) != 0 ? (pCenter.second - pStart.second + 0.0) /
+                                                      (pCenter.first - pStart.first)
+                                                    : 0;
+        double dHeight = pStart.second - dSteep * pStart.first;
+        int start = pStart.first;
+        int end = pCenter.first;
+        int step = start > end ? -1 : 1;
+        bool hasFoundRoad = false;
+
+        for (int j = start; (step > 0) == (j < end); j += step) {
+            int yPre = std::round(dSteep * j + dHeight);
+            int yPost = std::round(dSteep * (j + 1) + dHeight);
+            int mMax = std::max(yPre, yPost);
+            int mMin = std::min(yPre, yPost);
+
+            for (int k = mMin; k <= mMax; k++) {
+                if (gGrid->isInside(j, k) && (gGrid->get(j, k) == 3 || gGrid->get(j, k) == 4)) {
+                    gGrid->set(j, k, 4);
+                    hasFoundRoad = true;
+                }
+                if (gGrid->isInside(j, k) && (!hasMask || gMask->get(j, k)))
+                    gGrid->set(j, k, 4);
+            }
+            if (hasFoundRoad)
+                return;
+        }
+    }
 };
+
 bool gBaseToLineRoads::hasMask;
 
 #endif //CITYOFWEIRDFISHES_GBASETOLINEROADS_H

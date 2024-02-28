@@ -90,13 +90,14 @@ public:
     }
 
     void pressedCell(std::pair<int, int> cPressed) override {
+        std::cout << cPressed.first << ":" << cPressed.second << std::endl;
         switch (refLTypes->get(cPressed)) {
             case 1: {
                 if (!refLBuild->get(cPressed).empty()) {
                     std::shared_ptr<rCellViewMenu> rComp = std::make_shared<rCellViewMenu>(
                             rCellViewMenu(refPile->vTopActiveMenu,
-                                          refSComp->getListCompByUUID(refLBuild->get(cPressed)),
-                                          "d_mCellViewLayer", rIMenu::rRelativePos::pTopLeft));
+                                          refSComp->getVectCompByUUID(refLBuild->get(cPressed)),
+                                          "d_mCellViewLayer", refPile));
                     refPile->addMenuTop(rComp);
                 }
             }

@@ -31,11 +31,12 @@ public:
     gBaseToGradientMinimum(const std::vector<gtmElement> &lElements,
                            std::pair<int, int> strBiggestPos,
                            std::shared_ptr<gIGrid<T>> gResult,
+                           T toRepValue,
                            const std::shared_ptr<gIGrid<bool>> &pMask = nullptr,
                            int rSeed = -1) : gtmGResult(std::move(gResult)),
                                              gtmLElements(lElements),
                                              hasMask(pMask != nullptr),
-                                             gMask(pMask){
+                                             gMask(pMask), toRepValue(toRepValue){
         gtmToExtend.emplace_back(strBiggestPos, 0);
         gtmGResult->set(strBiggestPos.first, strBiggestPos.second, float(lElements.size() - 1));
 
@@ -89,6 +90,8 @@ private:
     std::mt19937 gen;
     std::bernoulli_distribution d;
 
+    T toRepValue;
+
     void extendValueGridV1(std::pair<int, int> pAct, float vChoose, int nConcurrent) {
         std::vector<std::pair<int, int>> dOffsets =
                 {{pAct.first + 1, pAct.second},
@@ -97,7 +100,7 @@ private:
                  {pAct.first,     pAct.second - 1}};
 
         for (auto &dOffset: dOffsets) {
-            if (gtmGResult->isInside(dOffset) && (!hasMask || gMask->get(dOffset)) && gtmGResult->get(dOffset.first, dOffset.second) == -1) {
+            if (gtmGResult->isInside(dOffset) && (!hasMask || gMask->get(dOffset)) && gtmGResult->get(dOffset.first, dOffset.second) == toRepValue) {
 
                 gtmElement gtmE = gtmLElements[static_cast<int>(vChoose)];
                 float nValue = randomChoice(gtmE.cGoingDownBase + gtmE.cAddDownForIter * nConcurrent) ? vChoose - 1 :
@@ -123,7 +126,7 @@ private:
                  {{pAct.first - 1, pAct.second - 1}, {pAct.first,     pAct.second - 1}}};
 
         for (int i = 0; i < dOffsets[vDir].size(); i++ ) {
-            if (gtmGResult->isInside(dOffsets[vDir][i]) && (!hasMask || gMask->get(dOffsets[vDir][i])) && gtmGResult->get(dOffsets[vDir][i]) == -1) {
+            if (gtmGResult->isInside(dOffsets[vDir][i]) && (!hasMask || gMask->get(dOffsets[vDir][i])) && gtmGResult->get(dOffsets[vDir][i]) == toRepValue) {
 
                 gtmElement gtmE = gtmLElements[static_cast<int>(vChoose)];
                 float nValue = randomChoice(gtmE.cGoingDownBase + gtmE.cAddDownForIter * nConcurrent) ? vChoose - 1 :

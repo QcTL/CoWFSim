@@ -58,7 +58,7 @@ public:
 
 
     //MEMORY:
-    std::shared_ptr<sTotalCompany> sTComp;
+    std::shared_ptr<sTotalCompany> sTComp = std::make_shared<sTotalCompany>(100);
 
 private:
     void extractRoadsFromLayer() {
@@ -71,6 +71,8 @@ private:
             rListRRoads = rTransRNodeToRRNode().conversion(rOne, sqrt(sizeL), sizeL, gLayerTransit);
             rInfoDist::initializeMatrix(sizeL / sqrt(sizeL) * sizeL / sqrt(sizeL), sizeL, rListRRoads.size());
         }
+
+        sTComp->addCompanyAtPosition(gLayerOwnership, {25, 25});
     };
     std::list<std::shared_ptr<rRNodeI>> rListRRoads;
     int sizeL;

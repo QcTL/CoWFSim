@@ -37,8 +37,6 @@ int tst_gERCComm() {
 
     rInfoDist::initializeMatrix(10 / 5 * 10 / 5, 5 * 5, rLL.size());
 
-    //TODO tambe falta lo important que es tenir la matriu de la grid sapiguent a quin node estan "compactat".
-
     for (const std::shared_ptr<rRNodeI> &node: rLL) {
         node->sendInformationStart();
     }

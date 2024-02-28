@@ -12,10 +12,12 @@
 #include "../display/layers/gDispLayers.h"
 #include "../display/rGlobal.h"
 #include "../sim/roads/rNodeFromGrid.h"
-//#include "../sim/roads/rTransRNodeToRRNode.h"
+#include "../display/menus/implementation/rBaseMenu.h"
 
 int tst_gExtractRoadsCompressed() {
-    std::shared_ptr<gIGrid<int>> gB = std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(50, 50, 0));
+
+    std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(50);
+    std::shared_ptr<gIGrid<uint8_t>> gB = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(50, 50, 0));
 
     gB->set(0,0, 1);
     gB->set(1,0, 1);
@@ -33,24 +35,26 @@ int tst_gExtractRoadsCompressed() {
     gB->set(6,2, 1);
     gB->set(7,2, 1);
 
-
     gB->set(6,3, 1);
-    std::vector<rNode*> r = rNodeFromGrid<int>::givenGrid(gB, 1);
-    rNode * rOne = r[0];
-    std::shared_ptr<rRNodeI> p = rTransRNodeToRRNode::conversion(rOne);
 
-    std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gB));
-    gLAP->setTransformation({0, 1, 2, 3, 4, 5});
-    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(gSimLayers(gLAP));
+    sMS->gLayerAirPollution = gB;
+    sMS->completedStartGrid();
 
 
-    std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>();
-    rGlobal rG(gSimL,pPM);
+    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gLayerAirPollution,
+                                                                       sMS->gLayerCurStruct, sMS->gLayerTransit);
+    //MENUS
+    std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
+    std::shared_ptr<rBaseMenu> rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->gLayerTypeGen,
+                                                                              sMS->gLayerRoads,
+                                                                              sMS->gLayerOwnership, sMS->sTComp));
+    pPM->addMenuTop(rBasic);
+    rGlobal rG(gSimL, pPM);
     rG.setUp();
     while (rG.isOpen) {
         rG.loop();
+        sMS->tick();
     }
-
     return 0;
 }
 

@@ -6,14 +6,14 @@
 #define CITYOFWEIRDFISHES_RCELLVIEWMENU_H
 
 #include "../rIMenu.h"
+#include "rCompViewLayer.h"
 
 class rCellViewMenu : public rIMenu {
 public:
-    //explicit rCellViewMenu(const std::shared_ptr<rIMenu> &mParent, const std::shared_ptr<rCellNode> &refCell,
-    explicit rCellViewMenu(const std::shared_ptr<rIMenu> &mParent, const std::list<obj_company>& rShow,
-                           const std::string &pthFileD, rIMenu::rRelativePos rPos)
-    //         : rIMenu(mParent, rPos), rSelCell(refCell) {
-            : rIMenu(mParent, rPos) {
+    explicit rCellViewMenu(const std::shared_ptr<rIMenu> &mParent, const std::vector<obj_company> &rShow,
+                           const std::string &pthFileD,
+                           const std::shared_ptr<rPileMenus> &mPiles)
+            : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft), refPile(mPiles), compShow(rShow) {
         std::vector<std::vector<int>> data = extractDataFromFile(pthFileD);
 
         for (int i = 0; i < data.size(); ++i) {
@@ -54,8 +54,8 @@ public:
         gHeight = (int) data.size();
 
         int index = 0;
-        for (const auto& it : rShow) {
-            if(index < 3)
+        for (const auto &it: rShow) {
+            if (index < 3)
                 setText(0, it.nName, "100k");
             index++;
         }
@@ -77,16 +77,22 @@ public:
             case sf::Event::MouseButtonPressed:
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     sf::Vector2<int> pMouse = sf::Mouse::getPosition(rWindow);
+                    std::cout<< pMouse.x << ":" << pMouse.y<< std::endl;
+                    std::cout<<"TO" << gHeight * 16 << ":" <<gWidth * 16 << std::endl;
                     if (isInside(rWindow, gHeight * 16, gWidth * 16, pMouse)) {
                         //Now check if its in the same line as some element select;
                         sf::Vector2<unsigned int> absPos = getAbsPos(rWindow, gHeight * 16, gWidth * 16, pMouse);
                         for (int i = 0; i < pElemSelAbs.size(); i++) {
                             if (pElemSelAbs[i].first * 16 < absPos.y && pElemSelAbs[i].first * 16 + 16 >= absPos.y) {
-                                parentMenu->setResponse(i);
+                                std::cout <<"YEP "<< i<<std::endl;
+                                std::shared_ptr<rCompViewLayer> rComp = std::make_shared<rCompViewLayer>(
+                                        rCompViewLayer(refPile->vTopActiveMenu, compShow[i],
+                                        "d_mCompViewLayer"));
+                                refPile->addMenuTop(rComp);
                             }
                         }
                     } else {
-                        parentMenu->setResponse(-1);
+                       // parentMenu->setResponse(-1);
                     }
                     return true;
                 }
@@ -123,6 +129,9 @@ private:
                                                {{0, 0}, 0}},
                                        {{{0, 0}, 0},
                                                {{0, 0}, 0}}};
+
+    std::shared_ptr<rPileMenus> refPile;
+    std::vector<obj_company> compShow;
 
     void setNewSel(int v) {
         sf::Vertex *quad = &dInfo[(pElemSel[cCurrenSel].second + pElemSel[cCurrenSel].first * gWidth) * 4];

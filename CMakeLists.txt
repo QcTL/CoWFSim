@@ -45,7 +45,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/structure/grids/transformation/gBaseToRiver.h
         src/sim/structure/grids/transformation/gBaseToLineRoads.h
         SimInitialize.h
-#        SimInitializePreb.h
+        #        SimInitializePreb.h
         src/sim/roads/transportation/rActiveVehicles.h
         src/display/menus/implementation/rBaseMenu.h
         src/display/layers/implementation/gLayerTransit.h
@@ -57,24 +57,25 @@ add_executable(CityOfWeirdFishes main.cpp
         src/display/transformations/gTransSimToDisp.h
         src/sim/structure/grids/transformation/sGridToSimulator.h
         src/sim/structure/obj/sTotalCompany.h
-)
+        src/display/menus/implementation/rCompViewLayer.h
+        src/display/menus/oCommonMenus.h
+        src/tests/tst_gBasicDisplay.h
+        src/tests/tst_gBasicDisplayGround.h
+        src/tests/tst_gBasicGrid.h
+        src/tests/tst_gBasicPattern.h
+        src/tests/tst_gBasicRiver.h
+        src/tests/tst_gBasicWFC.h
+        src/tests/tst_gBasicWFCBasic.h
+        src/tests/tst_gBtoGM.h
+        #        src/tests/tst_gERCComm.h
+        src/tests/tst_gExtractRoads.h
+        src/tests/tst_gExtractRoadsCompressed.h
+        src/tests/tst_gGaussian.h
+        src/tests/tst_gGenericKernel.h
+        src/tests/tst_gMenus.h
+        #        src/tests/tst_gVeh.h
+        src/tests/tst_Reader.h
 
-#        src/tests/tst_Reader.h
-#        src/tests/tst_TransRNodeRRNode.h
-#        src/tests/tst_gBasicGrid.h
-#        src/tests/tst_gBtoGM.h
-#        src/tests/tst_gGaussian.h
-#        src/tests/tst_gBasicDisplay.h
-#        src/tests/tst_gBasicPattern.h
-#        src/tests/tst_gGenericKernel.h
-#        src/tests/tst_gExtractRoads.h
-#        src/tests/tst_gExtractRoadsCompressed.h
-#        src/tests/tst_gMenus.h
-#        src/tests/tst_gERCComm.h
-#        src/tests/tst_gBasicRiver.h
-#        src/tests/tst_gBasicWFC.h
-#        src/tests/tst_gBasicWFCBasic.h
-#        src/tests/tst_gBasicDisplayGround.h
-#        src/tests/tst_gVeh.h)
+)
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

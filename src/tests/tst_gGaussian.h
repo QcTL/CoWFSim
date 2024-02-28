@@ -17,7 +17,7 @@ int tst_gGaussian() {
             gtmElement(0.05, 0, 0.1, 0),
             gtmElement(0.25, 0, 0.1, 0),};
 
-    gBaseToGradientMinimum<double> gBGM(vElem, {5, 5}, ptr, 35); // Pass ptr by reference
+    gBaseToGradientMinimum<double> gBGM(vElem, {5, 5}, ptr, -1); // Pass ptr by reference
     gBGM.generateV1();
 
     std::cout << *dynamic_cast<gBasicGrid<double> *>(ptr.get()) << std::endl;
