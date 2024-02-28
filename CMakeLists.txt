@@ -75,6 +75,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/tests/tst_gMenus.h
         #        src/tests/tst_gVeh.h
         src/tests/tst_Reader.h
+        src/sim/structure/grids/transformation/gBaseToNearestRoad.h
 
 )
 

@@ -15,6 +15,7 @@
 #include "structure/grids/gIGrid.h"
 #include "structure/obj/sCommon.h"
 #include "structure/obj/sTotalCompany.h"
+#include "structure/grids/transformation/gBaseToNearestRoad.h"
 
 class sMainSimulator {
 
@@ -27,6 +28,7 @@ public:
         gLayerTransit = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
         gLayerOwnership = std::make_shared<gBasicGrid<std::list<uint32_t>>>
                 (gBasicGrid<std::list<uint32_t>>(lSize, lSize, {}));
+        gLayerNextRoad = std::make_shared<gBasicGrid<rNode *>>(gBasicGrid<rNode *>(lSize, lSize, nullptr));
     }
 
 
@@ -35,6 +37,7 @@ public:
     std::shared_ptr<gIGrid<uint8_t>> gLayerTypeBuild;
     std::shared_ptr<gIGrid<std::list<uint32_t>>> gLayerOwnership;
     std::shared_ptr<gIGrid<uint32_t>> gLayerCurStruct;
+    std::shared_ptr<gIGrid<rNode *>> gLayerNextRoad;
 
     //AIR POLLUTION
     std::shared_ptr<gIGrid<uint8_t>> gLayerAirPollution;
@@ -73,6 +76,8 @@ private:
         }
 
         sTComp->addCompanyAtPosition(gLayerOwnership, {25, 25});
+        gBaseToNearestRoad::givenMatRef(gLayerNextRoad,gLayerRoads, gLayerTypeGen);
+        std::cout << "WE" << std::endl;
     };
     std::list<std::shared_ptr<rRNodeI>> rListRRoads;
     int sizeL;

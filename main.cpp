@@ -19,8 +19,8 @@ int main() {
     }
     std::cout << "------" << std::endl;
 
-    tst_gMenus();
-    //SimInitialize::givenMap(sMVar);
+    //tst_gMenus();
+    SimInitialize::givenMap(sMVar);
 
     return 0;
 }
