@@ -98,6 +98,7 @@ public:
     void pressedCell(std::pair<int, int> cPressed) {
         parentMenu->setResponse(-1);
     }
+    uint32_t getType() override{return 3;}
 
 private:
 

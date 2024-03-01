@@ -27,6 +27,7 @@ public:
     bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override;
 
     void pressedCell(std::pair<int, int> cPressed) {}
+    uint32_t getType() override{return 4;}
 
 private:
     void setNewSel(int v);

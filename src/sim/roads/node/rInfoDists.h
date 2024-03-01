@@ -11,21 +11,21 @@
 
 class rInfoDist{
 public:
-    static bool addIfShorter(const rRMail &r, const uint32_t &uidNode,const uint16_t &actGrid, const uint8_t &dir){
+    static bool addIfShorter(const rRMail &r, const uint32_t &GIdNode,const uint16_t &actGrid, const uint8_t &dir){
 
         uint32_t indexPos =
                 (r.mGridOrigin == actGrid) ? uTotalBlocks+ r.mRoadStart: (r.mGridOrigin + uTotalBlocks - actGrid) % uTotalBlocks;
 
         //Caution no es simplement mRoadEnd, es allo de primer blocs i despres la mRoadEnd
-        if((dMatrixDist[uidNode][indexPos]& ~(0x7u << 29)) > (r.mSizePath & ~(0x7u << 29)) || !(dMatrixDist[uidNode][indexPos] & (1u << 31))){
+        if((dMatrixDist[GIdNode][indexPos]& ~(0x7u << 29)) > (r.mSizePath & ~(0x7u << 29)) || !(dMatrixDist[GIdNode][indexPos] & (1u << 31))){
             //Deixem el 30 i 29 bit en la dir correcte i el primer bit esquerra com a 1 per ja estar assignat
-            dMatrixDist[uidNode][indexPos] = ((dMatrixDist[uidNode][indexPos] & ~(0x3u << 29)) | ((dir & 0x3) << 29)) | (1u << 31);
+            dMatrixDist[GIdNode][indexPos] = ((dMatrixDist[GIdNode][indexPos] & ~(0x3u << 29)) | ((dir & 0x3) << 29)) | (1u << 31);
             //Afegim la distancia
-            std::bitset<32> binary(dMatrixDist[uidNode][indexPos]);
+            std::bitset<32> binary(dMatrixDist[GIdNode][indexPos]);
             std::cout <<binary  << std::endl;
 
-            dMatrixDist[uidNode][indexPos] =  dMatrixDist[uidNode][indexPos] & (0x7u << 29) | r.mSizePath & ~(0x7u << 29);
-            std::bitset<32> binary2(dMatrixDist[uidNode][indexPos]);
+            dMatrixDist[GIdNode][indexPos] =  dMatrixDist[GIdNode][indexPos] & (0x7u << 29) | r.mSizePath & ~(0x7u << 29);
+            std::bitset<32> binary2(dMatrixDist[GIdNode][indexPos]);
             std::cout << binary2  << std::endl;
             return true;
         }

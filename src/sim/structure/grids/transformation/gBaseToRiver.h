@@ -1,7 +1,3 @@
-//
-// Created by Laminar on 16/02/2024.
-//
-
 #ifndef CITYOFWEIRDFISHES_GBASETORIVER_H
 #define CITYOFWEIRDFISHES_GBASETORIVER_H
 
@@ -38,8 +34,9 @@ private:
         }
 
         double getMaxDist(const std::pair<uint32_t, uint32_t> &p) {
-            return std::max( (p.first - lP1.first) * (p.first - lP1.first) + (p.second - lP1.second) * (p.second - lP1.second),
-                             (p.first - lP2.first) * (p.first - lP2.first) + (p.second - lP2.second) * (p.second - lP2.second)) ;
+            return std::max(
+                    (p.first - lP1.first) * (p.first - lP1.first) + (p.second - lP1.second) * (p.second - lP1.second),
+                    (p.first - lP2.first) * (p.first - lP2.first) + (p.second - lP2.second) * (p.second - lP2.second));
         }
 
     private:
@@ -52,23 +49,22 @@ private:
         }
     };
 
-
-    std::pair<uint32_t, uint32_t>
+    static std::pair<uint32_t, uint32_t>
     interpolate(const std::pair<uint32_t, uint32_t> &p1, const std::pair<uint32_t, uint32_t> &p2, double t) {
         return {(1 - t) * p1.first + t * p2.first, (1 - t) * p1.second + t * p2.second};
     }
 
-    bool isInLine(std::pair<uint32_t, uint32_t> p, oLine l) {
-        return l.getMaxDist(p) < l.getSize()+1;
+    static bool isInLine(std::pair<uint32_t, uint32_t> p, oLine l) {
+        return l.getMaxDist(p) < l.getSize() + 1;
     }
 
-    double pointLineDist(const std::pair<uint32_t, uint32_t> &p, std::vector<double> rRect) {
+    static double pointLineDist(const std::pair<uint32_t, uint32_t> &p, std::vector<double> rRect) {
         return std::abs(rRect[0] * p.first + rRect[1] * p.second + rRect[2]) /
                std::sqrt(rRect[0] * rRect[0] + rRect[1] * rRect[1]);
     }
 
 public:
-    explicit gBaseToRiver(std::shared_ptr<gIGrid<T>> gR, int nDetail, float fWidth,  int rSeed = -1) {
+    static void generate(std::shared_ptr<gIGrid<T>> gR, int nDetail, float fWidth, T endValue, int rSeed = -1) {
         std::list<oLine> lLines;
         std::default_random_engine generator;
         if (rSeed != -1)
@@ -109,7 +105,7 @@ public:
             for (int j = gRange.second.first; j <= gRange.second.second; j++) {
                 for (const oLine &lines: lLines) {
                     if (isInLine({j, i}, lines) && pointLineDist({j, i}, lines.lF) <= rWidth) {
-                        gR->set(i, j, 5);
+                        gR->set(i, j, endValue);
                     }
                 }
             }
@@ -117,4 +113,4 @@ public:
     }
 };
 
-#endif //CITYOFWEIRDFISHES_GBASETORIVER_H
+#endif

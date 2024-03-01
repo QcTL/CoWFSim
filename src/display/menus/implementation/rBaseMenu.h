@@ -13,27 +13,6 @@
 #include "rRoadViewMenu.h"
 #include "rCellViewMenu.h"
 
-struct cellInf {
-    enum CellInf_TypeCell {
-        CELLINF_TYPE1_MIXED,
-        CELLINF_TYPE1_EXCLUSIVE,
-        CELLINF_TYPE2_MIXED,
-        CELLINF_TYPE2_EXCLUSIVE,
-        CELLINF_TYPE3_MIXED,
-        CELLINF_TYPE3_EXCLUSIVE,
-        CELLINF_TYPE4_INDUSTRIAL,
-        CELLINF_TYPE5_FARMLAND,
-        CELLINF_TYPE6_PROTECTED,
-    };
-    struct CellInf_Owner {
-        uint8_t o_type;
-        uint32_t o_uuid;
-    };
-
-    CellInf_TypeCell ci_type;
-    CellInf_Owner ci_owner;
-};
-
 class rBaseMenu : public rIMenu {
 public:
     rBaseMenu(const std::shared_ptr<rPileMenus> &rPile,
@@ -49,24 +28,22 @@ public:
     void draw(sf::RenderWindow &rW) override {}
 
     void setResponse(int v) override {
-
-        //TODO CHENGE IT SO ITS ONLY WHEN ITS THE TIME
-        switch (v) {
-            case -1:
-                break;
-            case 0:
-                refPile->inSim->switchActual(gSimLayersTypes::G_AIRPOLLUTION);
-                break;
-            case 1:
-                refPile->inSim->switchActual(gSimLayersTypes::G_CITY);
-                break;
-            case 3:
-                refPile->inSim->switchActual(gSimLayersTypes::G_TRANSIT);
-                break;
-            default:
-                break;
+        if (refPile->vTopActiveMenu->getType() == 4) {
+            switch (v) {
+                case 0:
+                    refPile->inSim->switchActual(gSimLayersTypes::G_AIRPOLLUTION);
+                    break;
+                case 1:
+                    refPile->inSim->switchActual(gSimLayersTypes::G_CITY);
+                    break;
+                case 3:
+                    refPile->inSim->switchActual(gSimLayersTypes::G_TRANSIT);
+                    break;
+                default:
+                    break;
+            }
+            lstValueLayer = v;
         }
-        lstValueLayer = v;
         refPile->removeTop();
     }
 
@@ -111,6 +88,10 @@ public:
                 }
                 break;
         }
+    }
+
+    uint32_t getType() override{
+        return 0;
     }
 
 private:

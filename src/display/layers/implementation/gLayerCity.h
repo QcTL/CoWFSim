@@ -13,7 +13,7 @@
 class gLayerCity : public gILayer {
 public:
     explicit gLayerCity(const std::shared_ptr<gIGrid<uint32_t>> &gGrid)
-    : gILayer(gTileset("ts_city16.png", 16, 10, 10)), lGrid(gGrid) {
+    : gILayer(gTileset("ts_city16.png", 16, 10, 12)), lGrid(gGrid) {
         getInfoBlocks();
     }
 
@@ -29,7 +29,7 @@ private:
 
     void getInfoBlocks() {
         // Define the positions for each sprite
-        int carreteres[] = {23, 39, 38, 35, 29, 23, 25, 37, 28, 34, 33, 36, 24, 27, 26, 32};
+        int carreteres[] = {22, 39, 38, 35, 29, 23, 25, 37, 28, 34, 33, 36, 24, 27, 26, 32};
 
         // Empty
         addToMapSprites(0, getByPosTopLeft(lTs.getPos(5)));
@@ -58,6 +58,11 @@ private:
         for (int i = 0; i < sizeof(carreteres)/sizeof(carreteres[0]); i++) {
             addToMapSprites(33, getByPosTopLeft(lTs.getPos(carreteres[i] + 20)));
         }
+        // Fields:
+        for (int i = 0; i < sizeof(carreteres)/sizeof(carreteres[0]); i++) {
+            addToMapSprites(64, getByPosTopLeft(lTs.getPos(carreteres[i] + 80)));
+        }
+
         //Water:
         addToMapSprites(48, getByPosTopLeft(lTs.getPos(85)));
         addToMapSprites(48, getByPosTopLeft(lTs.getPos(75)));

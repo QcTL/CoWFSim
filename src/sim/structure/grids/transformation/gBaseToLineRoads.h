@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <memory>
 #include <cmath>
+#include <set>
 #include "../gIGrid.h"
 
 
@@ -67,12 +68,13 @@ public:
 
     template<typename T>
     static void randToCenter(std::shared_ptr<gIGrid<T>> gGrid,
-                             std::pair<int, int> pCenter,
+                             std::pair<int, int> pCenter, T endValue, std::vector<T> toStopValues,
                              std::shared_ptr<gIGrid<bool>> gMask = nullptr, int seed = -1) {
         hasMask = gMask != nullptr;
         if (seed == -1) {
             seed = std::chrono::system_clock::now().time_since_epoch().count();
         }
+        std::set<T> sStopValues(toStopValues.begin(), toStopValues.end());
 
         auto gRange = gGrid->rangeUse();
         int GWidth = (gRange.first.second - gRange.first.first) + 1;
@@ -108,12 +110,12 @@ public:
             int mMin = std::min(yPre, yPost);
 
             for (int k = mMin; k <= mMax; k++) {
-                if (gGrid->isInside(j, k) && (gGrid->get(j, k) == 3 || gGrid->get(j, k) == 4)) {
-                    gGrid->set(j, k, 4);
+                if (gGrid->isInside(j, k) && ( sStopValues.find(gGrid->get(j, k)) != sStopValues.end())) {
+                    gGrid->set(j, k, endValue);
                     hasFoundRoad = true;
                 }
                 if (gGrid->isInside(j, k) && (!hasMask || gMask->get(j, k)))
-                    gGrid->set(j, k, 4);
+                    gGrid->set(j, k, endValue);
             }
             if (hasFoundRoad)
                 return;

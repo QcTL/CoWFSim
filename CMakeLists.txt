@@ -73,9 +73,18 @@ add_executable(CityOfWeirdFishes main.cpp
         src/tests/tst_gGaussian.h
         src/tests/tst_gGenericKernel.h
         src/tests/tst_gMenus.h
-        #        src/tests/tst_gVeh.h
+        src/tests/tst_gVeh.h
         src/tests/tst_Reader.h
         src/sim/structure/grids/transformation/gBaseToNearestRoad.h
+        src/sim/structure/grids/transformation/cEspec/gHelpBlobbing.h
+        src/sim/structure/grids/transformation/gBaseToField.h
+        src/sim/layers/implementations/sLayerType.h
+        src/sim/structure/grids/transformation/gBaseClosestToPoint.h
+        src/sim/structure/grids/transformation/gPointToNearestElem.h
+        src/tests/tst_gBasicNewWay.h
+        src/sim/structure/grids/transformation/cEspec/gHelpPerlinNoise.h
+        src/sim/structure/grids/transformation/cEspec/db_perlin.hpp
+        src/sim/layers/implementations/sLayerCells.h
 
 )
 

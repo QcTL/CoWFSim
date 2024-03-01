@@ -57,6 +57,13 @@ public:
 
     void completedStartGrid() {
         extractRoadsFromLayer();
+        for(int i = 0; i < 2000; i++){
+            for (const std::shared_ptr<rRNodeI> &node: rListRRoads) {
+                node->sendInformationStart();
+                node->sendNewInformation();
+            }
+        }
+        rInfoDist::seeMatrix();
     }
 
 
@@ -77,7 +84,6 @@ private:
 
         sTComp->addCompanyAtPosition(gLayerOwnership, {25, 25});
         gBaseToNearestRoad::givenMatRef(gLayerNextRoad,gLayerRoads, gLayerTypeGen);
-        std::cout << "WE" << std::endl;
     };
     std::list<std::shared_ptr<rRNodeI>> rListRRoads;
     int sizeL;

@@ -83,7 +83,7 @@ public:
     }
 
     void pressedCell(std::pair<int, int> cPressed) override {}
-
+    uint32_t getType() override{return 2;}
 private:
     sf::VertexArray dInfo;
     int gWidth = 0;

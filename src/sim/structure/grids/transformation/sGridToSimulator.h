@@ -56,6 +56,8 @@ public:
                     case 33:
                         gType->set(i, j, 2);
                         break;
+                    case 64:
+                        gType->set(i, j, 4);
                     default:
                         gType->set(i, j, 1);
                         break;

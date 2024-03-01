@@ -29,6 +29,7 @@ public:
     virtual void setResponse(int v) = 0;
     virtual bool interact(const sf::Event& event, const sf::RenderWindow& rWindow) = 0;
     virtual void pressedCell(std::pair<int, int> cPressed) = 0;
+    virtual uint32_t getType() = 0;
     virtual void update() {}
 
 

@@ -104,6 +104,7 @@ public:
     }
 
     void pressedCell(std::pair<int, int> cPressed) override {}
+    uint32_t getType() override{return 1;}
 
 private:
 

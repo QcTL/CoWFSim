@@ -44,11 +44,11 @@ private:
                 std::pair<uint32_t, uint32_t> pComp = aR->rPos;
                 if (nFollow(aR) > 2) {
                     newAR = std::make_shared<rRNodeC>(
-                            rRNodeC((uint16_t) pComp.first / rSizeBlocs * (rSizeGrid / rSizeBlocs + 1) +
+                            rRNodeC((uint16_t) pComp.first / rSizeBlocs * (rSizeGrid / rSizeBlocs) +
                                     pComp.second / rSizeBlocs));
                 } else {
                     newAR = std::make_shared<rRNodeL>(
-                            rRNodeL((uint16_t) pComp.first / rSizeBlocs * (rSizeGrid / rSizeBlocs + 1) +
+                            rRNodeL((uint16_t) pComp.first / rSizeBlocs * (rSizeGrid / rSizeBlocs) +
                                     pComp.second / rSizeBlocs, nCons));
                 }
                 newAR->tTransit = tTransit;
