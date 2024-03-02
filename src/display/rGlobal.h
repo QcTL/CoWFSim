@@ -16,7 +16,8 @@
 
 class rGlobal {
 public:
-    explicit rGlobal(std::shared_ptr<gDispLayers> gInfoL, std::shared_ptr<rPileMenus> rPMenu);
+    explicit rGlobal(const std::shared_ptr<gDispLayers> &gInfoL, const std::shared_ptr<rPileMenus> &rPMenu);
+    rGlobal();
 
     void setUp();
 
@@ -36,9 +37,10 @@ private:
     sf::VertexArray verSelector;
     CameraControls rCC;
 
-    std::pair<int , int> rPosCursor;
+    std::pair<int, int> rPosCursor;
 
     void reloadCellValues();
+
     void reloadSelValue();
 };
 

@@ -65,16 +65,16 @@ public:
         rW.draw(dInfo, &tsTex.tsTex);
     }
 
-    void setResponse(int v) override {}
+    void setResponse(int v, uint16_t lID) override {}
 
     bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override {
         switch (event.type) {
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::Escape)
-                    parentMenu->setResponse(-1);
+                    parentMenu->setResponse(-1,1);
                 break;
             case sf::Event::MouseButtonPressed:
-                parentMenu->setResponse(-1);
+                parentMenu->setResponse(-1,1);
                 break;
             default:
                 break;
@@ -83,7 +83,6 @@ public:
     }
 
     void pressedCell(std::pair<int, int> cPressed) override {}
-    uint32_t getType() override{return 2;}
 private:
     sf::VertexArray dInfo;
     int gWidth = 0;

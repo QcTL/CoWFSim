@@ -15,11 +15,11 @@
 
 class rBaseMenu : public rIMenu {
 public:
-    rBaseMenu(const std::shared_ptr<rPileMenus> &rPile,
-              const std::shared_ptr<gIGrid<uint8_t>> &gType,
-              const std::vector<std::vector<rNode *>> &gRoads,
-              const std::shared_ptr<gIGrid<std::list<uint32_t>>> &gLayerOwn,
-              const std::shared_ptr<sTotalCompany> &sTComp)
+    explicit rBaseMenu(const std::shared_ptr<rPileMenus> &rPile,
+                       const std::shared_ptr<gIGrid<uint8_t>> &gType,
+                       const std::vector<std::vector<rNode *>> &gRoads,
+                       const std::shared_ptr<gIGrid<std::list<uint32_t>>> &gLayerOwn,
+                       const std::shared_ptr<sTotalCompany> &sTComp)
             : rIMenu(nullptr, rIMenu::rRelativePos::pBottomRight),
               refPile(rPile), lstValueLayer(1),
               refLRoads(gRoads), refLTypes(gType), refLBuild(gLayerOwn), refSComp(sTComp) {
@@ -27,8 +27,8 @@ public:
 
     void draw(sf::RenderWindow &rW) override {}
 
-    void setResponse(int v) override {
-        if (refPile->vTopActiveMenu->getType() == 4) {
+    void setResponse(int v, uint16_t lID) override {
+        if (lID == 3) {
             switch (v) {
                 case 0:
                     refPile->inSim->switchActual(gSimLayersTypes::G_AIRPOLLUTION);
@@ -43,8 +43,23 @@ public:
                     break;
             }
             lstValueLayer = v;
+        } else if (lID == 16) {
+            switch (v) {
+                case 0:
+                    refPile->rInteractionGameVel = 0.0;
+                    break;
+                case 1:
+                    refPile->rInteractionGameVel = 1000.0;
+                    break;
+                case 2:
+                    refPile->rInteractionGameVel = 100.0;
+                    break;
+                default:
+                    break;
+            }
         }
-        refPile->removeTop();
+        if (lID < 16)
+            refPile->removeTop();
     }
 
     bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override {
@@ -90,9 +105,6 @@ public:
         }
     }
 
-    uint32_t getType() override{
-        return 0;
-    }
 
 private:
     std::shared_ptr<rPileMenus> refPile;

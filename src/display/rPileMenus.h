@@ -9,10 +9,11 @@
 
 #include "menus/rIMenu.h"
 #include "layers/gDispLayers.h"
+#include "menus/implementation/AlwaysOD/rGUIClock.h"
 
 class rPileMenus {
 public:
-    rPileMenus(const std::shared_ptr<gDispLayers> &gSimL) : inSim(gSimL) {};
+    explicit rPileMenus(const std::shared_ptr<gDispLayers> &gSimL) : inSim(gSimL) {};
 
     void addMenuTop(const std::shared_ptr<rIMenu> &nMenu) {
         vTopActiveMenu = nMenu;
@@ -25,6 +26,9 @@ public:
     }
 
     void display(sf::RenderWindow &rW) {
+        rW.setView(rViewTopRight);
+        gClock->draw(rW);
+
         for (const auto &m: vPresentMenus) {
             switch (m.first) {
                 case 0:
@@ -45,7 +49,6 @@ public:
     }
 
     void resizedScreen(sf::Event e) {
-
         int height = e.size.height;
         int width = e.size.width;
         rViewBottomLeft.setSize(e.size.width, -height);
@@ -68,10 +71,12 @@ public:
         rViewBottomRight = sf::View(sf::FloatRect(width, height, -width, -height));
         rViewTopLeft = sf::View(sf::FloatRect(0, 0, width, height));
         rViewTopRight = sf::View(sf::FloatRect(width, 0, -width, height));
+        gClock = std::make_shared<rGUIClock>(vTopActiveMenu, "d_mGUIClock");
     }
 
     void updateOnEvent(const sf::Event &event, const sf::RenderWindow &rWindow) {
         vTopActiveMenu->interact(event, rWindow);
+        gClock->interact(event, rWindow);
     }
 
 
@@ -85,6 +90,9 @@ public:
 
     std::shared_ptr<rIMenu> vTopActiveMenu;
     std::shared_ptr<gDispLayers> inSim;
+    std::shared_ptr<rGUIClock> gClock;
+
+    double rInteractionGameVel = 0;
 private:
     std::vector<uint8_t> vOrderMenus;
     std::vector<std::pair<int, std::shared_ptr<rIMenu>>> vPresentMenus;

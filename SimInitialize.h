@@ -17,11 +17,11 @@
 #include "src/sim/structure/grids/transformation/gBaseToField.h"
 #include "src/sim/layers/implementations/sLayerType.h"
 #include "src/sim/layers/implementations/sLayerCells.h"
+#include "src/common/sMainContainer.h"
 
 class SimInitialize {
 public:
     static int givenMap(const std::map<std::string, std::string> &mValues) {
-
         uint32_t lSizeGrid = 0;
         if (mValues.at("Mida_Simulacio") == "Petita")
             lSizeGrid = 100;
@@ -41,34 +41,9 @@ public:
 
         sMS->completedStartGrid();
 
-        std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gLayerAirPollution,
-                                                                           sMS->gLayerCurStruct, sMS->gLayerTransit);
-        //MENUS
-        std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
-        std::shared_ptr<rBaseMenu> rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->gLayerTypeGen,
-                                                                                  sMS->gLayerRoads,
-                                                                                  sMS->gLayerOwnership, sMS->sTComp));
-        pPM->addMenuTop(rBasic);
+        sMainContainer sMC(sMS);
 
-        //START TRANSIT;
-       // uint32_t p1 = sMS->gLayerRoads[22][51]->refCompressed->locIdNode;
-       // uint32_t b1 = sMS->gLayerRoads[22][51]->refCompressed->rBlock;
-       // sMS->gLayerRoads[43][39]->refCompressed->addNewCar(p1, b1);
-
-
-        rGlobal rG(gSimL, pPM);
-        rG.setUp();
-        int p = 0;
-        while (rG.isOpen) {
-            if (p > 2000) {
-                sMS->tick();
-                p = 0;
-            } else {
-                p += 1;
-            }
-            rG.loop();
-
-        }
+        sMC.gameLoop();
         return 0;
     }
 

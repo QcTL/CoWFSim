@@ -6,10 +6,9 @@
 #include "rRemoteUpdateGrid.h"
 #include <SFML/Graphics.hpp>
 
-rGlobal::rGlobal(std::shared_ptr<gDispLayers> gInfoL, std::shared_ptr<rPileMenus> rPMenu)
+rGlobal::rGlobal(const std::shared_ptr<gDispLayers>& gInfoL,const std::shared_ptr<rPileMenus>& rPMenu)
         : gSimL(std::move(gInfoL)), rPMenu(std::move(rPMenu)),
           rWindow(sf::RenderWindow(sf::VideoMode(1400, 800), "CoWF")) {
-
 
 }
 
@@ -136,3 +135,5 @@ void rGlobal::loop() {
     rPMenu->display(rWindow);
     rWindow.display();
 }
+
+rGlobal::rGlobal() = default;

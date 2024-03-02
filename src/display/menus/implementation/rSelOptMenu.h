@@ -22,12 +22,11 @@ public:
 
     void draw(sf::RenderWindow &rW) override;
 
-    void setResponse(int v) override;
+    void setResponse(int v, uint16_t lID) override;
 
     bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override;
 
     void pressedCell(std::pair<int, int> cPressed) {}
-    uint32_t getType() override{return 4;}
 
 private:
     void setNewSel(int v);

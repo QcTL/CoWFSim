@@ -14,7 +14,8 @@
 #include "../sim/roads/rNodeFromGrid.h"
 #include "../display/menus/implementation/rBaseMenu.h"
 #include "../sim/layers/implementations/sLayerType.h"
-//#include "../sim/roads/rTransRNodeToRRNode.h"
+#include "../common/sMainContainer.h"
+
 
 int tst_gVeh() {
     std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(100);
@@ -32,39 +33,26 @@ int tst_gVeh() {
 */
 
     gBaseToPattern<uint8_t> gBP(gB,
-                                 gBaseToPattern<uint8_t>::gPatternType::gBPBlobSquares,
-                                 gBaseToPattern<uint8_t>::gPatternParameters(4, 4, 25, 25),
-                                 2);
+                                gBaseToPattern<uint8_t>::gPatternType::gBPBlobSquares,
+                                gBaseToPattern<uint8_t>::gPatternParameters(4, 4, 25, 25),
+                                2);
 
     sMS->gLayerTypeGen = gB;
     sMS->gLayerAirPollution = gB;
     sMS->completedStartGrid();
 
 
-    sMS->gLayerRoads[0][0]->refCompressed->addNewCar(sMS->gLayerRoads[12][9]->refCompressed->locIdNode,
-                                                     sMS->gLayerRoads[12][9]->refCompressed->rBlock);
+    sMS->gLayerRoads[0][0]->refCompressed->addNewCar(sMS->gLayerRoads[75][75]->refCompressed->locIdNode,
+                                                     sMS->gLayerRoads[75][75]->refCompressed->rBlock);
 
-    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gLayerAirPollution,
-                                                                       sMS->gLayerCurStruct, sMS->gLayerTransit);
-    //MENUS
-    std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
-    std::shared_ptr<rBaseMenu> rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->gLayerTypeGen,
-                                                                              sMS->gLayerRoads,
-                                                                              sMS->gLayerOwnership, sMS->sTComp));
-    pPM->addMenuTop(rBasic);
-    rGlobal rG(gSimL, pPM);
-    rG.setUp();
-    int p = 0;
-    while (rG.isOpen) {
-        if( p > 4000) {
-            sMS->tick();
-            p = 0;
-            std::cout<< "STEP" << std::endl;
-        }else{
-            p += 1;
-        }
-        rG.loop();
-    }
+
+    //START TRANSIT;
+    // uint32_t p1 = sMS->gLayerRoads[22][51]->refCompressed->locIdNode;
+    // uint32_t b1 = sMS->gLayerRoads[22][51]->refCompressed->rBlock;
+    // sMS->gLayerRoads[43][39]->refCompressed->addNewCar(p1, b1);
+    sMainContainer sMC(sMS);
+
+    sMC.gameLoop();
     return 0;
 }
 

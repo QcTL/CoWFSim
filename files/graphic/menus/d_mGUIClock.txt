@@ -1,0 +1,2 @@
+type:guiClock
+src:mGUIClock.txt

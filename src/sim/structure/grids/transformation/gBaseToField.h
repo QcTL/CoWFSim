@@ -55,20 +55,30 @@ private:
                           std::shared_ptr<gIGrid<T>> gFinal) {
         for (const auto &mapElem: edges) {
             //if (mapElem.second.size() >= 5) {
+
+
+            bool hasAllInsideMask = true;
             for (const auto &vecElem: mapElem.second) {
                 std::pair<int, int> pair = vecElem.first;
-                if (gFinal->isInside({pair.second, pair.first}) &&
-                    (!hasMask || gMask->get({pair.second, pair.first})) &&
-                    gFinal->get(pair.second, pair.first) == 0) {
-                    uint8_t p = ((vecElem.second & (1 << 1)) != 0) << 3
-                                | ((vecElem.second & (1 << 4)) != 0) << 2
-                                | ((vecElem.second & (1 << 6)) != 0) << 1
-                                | ((vecElem.second & (1 << 3)) != 0);
-                    gFinal->set({vecElem.first.second, vecElem.first.first},
-                                (((uint32_t) (uint8_t) strtol("1000000", nullptr, 2)) << 24) + p);
+                if ((hasMask && !gMask->get({pair.second, pair.first})) ||
+                    !gFinal->isInside({pair.second, pair.first}) || !gFinal->get(pair.second, pair.first) == 0) {
+                    hasAllInsideMask = false;
+                    break;
                 }
             }
-            // }
+            if (!hasAllInsideMask)
+                continue;
+
+            for (const auto &vecElem: mapElem.second) {
+                std::pair<int, int> pair = vecElem.first;
+                uint8_t p = ((vecElem.second & (1 << 1)) != 0) << 3
+                            | ((vecElem.second & (1 << 4)) != 0) << 2
+                            | ((vecElem.second & (1 << 6)) != 0) << 1
+                            | ((vecElem.second & (1 << 3)) != 0);
+                gFinal->set({vecElem.first.second, vecElem.first.first},
+                            (((uint32_t) (uint8_t) strtol("1000000", nullptr, 2)) << 24) + p);
+
+            }
         }
     }
 

@@ -79,13 +79,13 @@ public:
         rW.draw(dInfo, &tsTex.tsTex);
     }
 
-    void setResponse(int v) override {}
+    void setResponse(int v, uint16_t lID) override {}
 
     bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override {
         switch (event.type) {
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::Escape) {
-                    parentMenu->setResponse(-1);
+                    parentMenu->setResponse(-1,2);
                 }
                 break;
             default:
@@ -96,9 +96,8 @@ public:
     }
 
     void pressedCell(std::pair<int, int> cPressed) {
-        parentMenu->setResponse(-1);
+        parentMenu->setResponse(-1,2);
     }
-    uint32_t getType() override{return 3;}
 
 private:
 
