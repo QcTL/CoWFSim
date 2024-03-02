@@ -21,10 +21,10 @@ int main() {
     }
     std::cout << "------" << std::endl;
 
-    tst_gVeh();
+    //tst_gVeh();
     //tst_gMenus();
     //tst_gBasicNewWay(sMVar);
-    //SimInitialize::givenMap(sMVar);
+    SimInitialize::givenMap(sMVar);
 
     return 0;
 }

@@ -25,7 +25,7 @@ struct ctrct_leaseCell{
 
 std::vector<std::string> vNames = {"Whiterock", "Zunzon", "TentAroma", "Prova"};
 
-struct obj_company{
+struct objCompany{
     uint32_t c_uuid{};
     std::string nName;
     std::vector<std::pair<uint32_t, uint32_t>>  c_cOwn;
@@ -33,9 +33,9 @@ struct obj_company{
     std::list<ctrct_leaseCell>  c_cRentedOther;
     std::map<uint32_t, int> c_pOwn;
 
-    obj_company() = default;
+    objCompany() = default;
 
-    explicit obj_company(uint32_t cUuid) : c_uuid(cUuid) {
+    explicit objCompany(uint32_t cUuid) : c_uuid(cUuid) {
         nName = vNames[cUuid % vNames.size()];
     }
 };

@@ -85,6 +85,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/structure/grids/transformation/cEspec/gHelpPerlinNoise.h
         src/sim/structure/grids/transformation/cEspec/db_perlin.hpp
         src/sim/layers/implementations/sLayerCells.h
+        src/sim/behaviour/sCompanyCompiler.h
 
 )
 

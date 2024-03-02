@@ -52,9 +52,9 @@ public:
                 dis_col = std::uniform_int_distribution<>(0, parameters.nBlocksY - 1);
                 dis_dir = std::uniform_int_distribution<>(0, 3);
 
-                //for (int i = 0; i < 30; i++) {
-                //    g = gHelpBlobbing::blobTwoPositions(g, gen, dis_row, dis_col, dis_dir);
-                //}
+                for (int i = 0; i < 30; i++) {
+                    g = gHelpBlobbing::blobTwoPositions(g, gen, dis_row, dis_col, dis_dir);
+                }
 
                 std::shared_ptr<gIGrid<T>> gGrid = gHelpBlobbing::blobToGrid<T>(g);
                 auto p = gBaseToBorderDetection::generate(gGrid,

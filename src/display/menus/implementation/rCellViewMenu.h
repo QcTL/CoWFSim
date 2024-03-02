@@ -10,7 +10,7 @@
 
 class rCellViewMenu : public rIMenu {
 public:
-    explicit rCellViewMenu(const std::shared_ptr<rIMenu> &mParent, const std::vector<obj_company> &rShow,
+    explicit rCellViewMenu(const std::shared_ptr<rIMenu> &mParent, const std::vector<objCompany> &rShow,
                            const std::string &pthFileD,
                            const std::shared_ptr<rPileMenus> &mPiles)
             : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft), refPile(mPiles), compShow(rShow) {
@@ -132,7 +132,7 @@ private:
                                                {{0, 0}, 0}}};
 
     std::shared_ptr<rPileMenus> refPile;
-    std::vector<obj_company> compShow;
+    std::vector<objCompany> compShow;
 
     void setNewSel(int v) {
         sf::Vertex *quad = &dInfo[(pElemSel[cCurrenSel].second + pElemSel[cCurrenSel].first * gWidth) * 4];

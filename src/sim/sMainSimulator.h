@@ -21,7 +21,7 @@ class sMainSimulator {
 
 public:
     explicit sMainSimulator(int lSize) : sizeL(lSize) {
-        gLayerTypeBuild = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
+        gLayerTypeSoil = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
         gLayerTypeGen = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
         gLayerCurStruct = std::make_shared<gBasicGrid<uint32_t>>(gBasicGrid<uint32_t>(lSize, lSize, 0));
         gLayerAirPollution = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
@@ -34,7 +34,16 @@ public:
 
     //CITY
     std::shared_ptr<gIGrid<uint8_t>> gLayerTypeGen;
-    std::shared_ptr<gIGrid<uint8_t>> gLayerTypeBuild;
+    std::shared_ptr<gIGrid<uint8_t>> gLayerTypeSoil;
+        // TYPE 1 Mixed
+        // TYPE 2 Mixed
+        // TYPE 3 Mixed
+        // TYPE 1 Industrial
+        // TYPE 1 Farm
+        // TYPE 1 Protected
+        // TYPE 1 Obstacle, can be circumvented
+        // TYPE 2 Obstacle, solid
+
     std::shared_ptr<gIGrid<std::list<uint32_t>>> gLayerOwnership;
     std::shared_ptr<gIGrid<uint32_t>> gLayerCurStruct;
     std::shared_ptr<gIGrid<rNode *>> gLayerNextRoad;

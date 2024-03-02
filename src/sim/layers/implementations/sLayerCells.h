@@ -21,6 +21,7 @@ class sLayerCells {
 public:
     static std::shared_ptr<gIGrid<uint32_t>> gen(
             uint32_t lSize, const std::shared_ptr<gIGrid<uint8_t>> &gTypeSoil,
+            const std::shared_ptr<gIGrid<uint8_t>> &gTypeGen,
             const std::map<std::string, std::string> &mValues) {
         std::shared_ptr<gIGrid<uint32_t>> gCell =
                 std::make_shared<gBasicGrid<uint32_t>>(gBasicGrid<uint32_t>(lSize, lSize, 0));
@@ -53,7 +54,6 @@ public:
                            (((uint32_t) (uint8_t) strtol("110000", nullptr, 2)) << 24) + p);
             }
         }
-
         //ROADS:
 
         //INTRACITY;
@@ -62,21 +62,25 @@ public:
         if (mValues.at("Estructura_Ciutat") == "Graella") {
             gBaseToPattern<uint32_t> gBP(gCell,
                                          gBaseToPattern<uint32_t>::gPatternType::gBPBlobSquares,
-                                         gBaseToPattern<uint32_t>::gPatternParameters(4, 4, 20, 20),
+                                         gBaseToPattern<uint32_t>::gPatternParameters(5, 5, 20, 20),
                                          idTypeRoadIntra,
                                          BasicTransformations::genMaskFromGrid(gTypeSoil, {1, 2, 3}));
 
         } else if (mValues.at("Estructura_Ciutat") == "Radial") {
             gBaseToPattern<uint32_t> gBP(gCell,
                                          gBaseToPattern<uint32_t>::gPatternType::gBPSquares,
-                                         gBaseToPattern<uint32_t>::gPatternParameters(4, 4, 20, 20),
+                                         gBaseToPattern<uint32_t>::gPatternParameters(5, 5, 20, 20),
                                          idTypeRoadIntra,
                                          BasicTransformations::genMaskFromGrid(gTypeSoil, {1, 2, 3}));
         }
         //OUTER CITY
         for (int i = 0; i < 10; i++) {
-            gBaseToLineRoads::randToCenter<uint32_t>(gCell, {lSize / 2, lSize / 2}, idTypeRoadOuter, {idTypeRoadIntra, idTypeRoadOuter});
+            gBaseToLineRoads::randToCenter<uint32_t>(gCell, {lSize / 2, lSize / 2}, idTypeRoadOuter,
+                                                     {idTypeRoadIntra, idTypeRoadOuter});
         }
+
+        BasicTransformations::copyWhere(gTypeGen, gCell, {{idTypeRoadIntra, 2},
+                                                          {idTypeRoadOuter, 2}});
 
         std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint8_t>>> p =
                 gBaseToBorderDetection::generate(gCell, {gBorderType::gBNonConnex, gBorderOutside::gIsNotGroup},

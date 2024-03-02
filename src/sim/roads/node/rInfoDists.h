@@ -21,12 +21,12 @@ public:
             //Deixem el 30 i 29 bit en la dir correcte i el primer bit esquerra com a 1 per ja estar assignat
             dMatrixDist[GIdNode][indexPos] = ((dMatrixDist[GIdNode][indexPos] & ~(0x3u << 29)) | ((dir & 0x3) << 29)) | (1u << 31);
             //Afegim la distancia
-            std::bitset<32> binary(dMatrixDist[GIdNode][indexPos]);
-            std::cout <<binary  << std::endl;
+            //std::bitset<32> binary(dMatrixDist[GIdNode][indexPos]);
+            //std::cout <<binary  << std::endl;
 
             dMatrixDist[GIdNode][indexPos] =  dMatrixDist[GIdNode][indexPos] & (0x7u << 29) | r.mSizePath & ~(0x7u << 29);
-            std::bitset<32> binary2(dMatrixDist[GIdNode][indexPos]);
-            std::cout << binary2  << std::endl;
+            //std::bitset<32> binary2(dMatrixDist[GIdNode][indexPos]);
+            //std::cout << binary2  << std::endl;
             return true;
         }
         return false;

@@ -11,7 +11,7 @@
 
 class rCompViewLayer : public rIMenu {
 public:
-    explicit rCompViewLayer(const std::shared_ptr<rIMenu> &mParent, const obj_company &rShow,
+    explicit rCompViewLayer(const std::shared_ptr<rIMenu> &mParent, const objCompany &rShow,
                             const std::string &pthFileD)
             : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft) {
         std::vector<std::vector<int>> data = extractDataFromFile(pthFileD);

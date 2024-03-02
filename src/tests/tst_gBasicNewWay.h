@@ -30,7 +30,7 @@ int tst_gBasicNewWay( const std::map<std::string, std::string> &mValues) {
 
     std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(lSizeGrid);
 
-    sMS->gLayerAirPollution = sLayerType::gen(lSizeGrid, mValues);
+    sMS->gLayerAirPollution = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
 
     std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gLayerAirPollution,
                                                                        sMS->gLayerCurStruct, sMS->gLayerTransit);

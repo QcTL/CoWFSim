@@ -34,10 +34,10 @@ public:
 
         std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(lSizeGrid);
 
-        sMS->gLayerTypeGen = sLayerType::gen(lSizeGrid, mValues);
-        sMS->gLayerAirPollution = sLayerType::gen(lSizeGrid, mValues);
+        sMS->gLayerTypeSoil = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
+        sMS->gLayerAirPollution = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
 
-        sMS->gLayerCurStruct = sLayerCells::gen(lSizeGrid,sMS->gLayerTypeGen, mValues);
+        sMS->gLayerCurStruct = sLayerCells::gen(lSizeGrid, sMS->gLayerTypeSoil, sMS->gLayerTypeGen, mValues);
 
         sMS->completedStartGrid();
 
@@ -51,19 +51,19 @@ public:
         pPM->addMenuTop(rBasic);
 
         //START TRANSIT;
-        uint32_t  p1 = sMS->gLayerRoads[22][51]->refCompressed->locIdNode;
-        uint32_t  b1 = sMS->gLayerRoads[22][51]->refCompressed->rBlock;
-        sMS->gLayerRoads[43][39]->refCompressed->addNewCar(p1,b1);
+       // uint32_t p1 = sMS->gLayerRoads[22][51]->refCompressed->locIdNode;
+       // uint32_t b1 = sMS->gLayerRoads[22][51]->refCompressed->rBlock;
+       // sMS->gLayerRoads[43][39]->refCompressed->addNewCar(p1, b1);
 
 
         rGlobal rG(gSimL, pPM);
         rG.setUp();
         int p = 0;
         while (rG.isOpen) {
-            if( p > 2000) {
-                    sMS->tick();
+            if (p > 2000) {
+                sMS->tick();
                 p = 0;
-            }else{
+            } else {
                 p += 1;
             }
             rG.loop();

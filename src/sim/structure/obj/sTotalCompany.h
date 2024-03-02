@@ -14,7 +14,7 @@ class rVectorCompanies {
 public:
 
     rVectorCompanies(uint32_t nMaxCompanies) {
-        tVecComp = std::vector<std::pair<uint32_t, std::shared_ptr<obj_company>>>(nMaxCompanies, {-1, nullptr});
+        tVecComp = std::vector<std::pair<uint32_t, std::shared_ptr<objCompany>>>(nMaxCompanies, {-1, nullptr});
         for (int i = 0; i < nMaxCompanies - 1; i++) {
             tVecComp[i] = {i + 1, nullptr};
         }
@@ -22,14 +22,14 @@ public:
         fEmpty = 0;
     }
 
-    std::shared_ptr<obj_company> getDestByComp(uint32_t rCar) {
+    std::shared_ptr<objCompany> getDestByComp(uint32_t rCar) {
         return tVecComp[rCar].second;
     }
 
     uint32_t addComp(uint32_t destPos) {
         uint32_t prevFEmpty = fEmpty;
         fEmpty = tVecComp[fEmpty].first;
-        tVecComp[prevFEmpty] = {destPos, std::make_shared<obj_company>(prevFEmpty)};
+        tVecComp[prevFEmpty] = {destPos, std::make_shared<objCompany>(prevFEmpty)};
         return prevFEmpty;
     }
 
@@ -39,7 +39,7 @@ public:
     }
 
 private:
-    std::vector<std::pair<uint32_t, std::shared_ptr<obj_company>>> tVecComp;
+    std::vector<std::pair<uint32_t, std::shared_ptr<objCompany>>> tVecComp;
     uint32_t fEmpty;
 };
 
@@ -54,12 +54,12 @@ public:
         gLayer->set(nPos, p);
     }
 
-    std::shared_ptr<obj_company> getCompanyByUUID(uint32_t index){
+    std::shared_ptr<objCompany> getCompanyByUUID(uint32_t index){
         return vTotalComp.getDestByComp(index);
     }
 
-    std::vector<obj_company> getVectCompByUUID(const std::list<uint32_t>& tList){
-        std::vector<obj_company> r;
+    std::vector<objCompany> getVectCompByUUID(const std::list<uint32_t>& tList){
+        std::vector<objCompany> r;
         for(const uint32_t l : tList){
             r.push_back(*getCompanyByUUID(l));
         }
