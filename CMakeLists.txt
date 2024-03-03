@@ -91,6 +91,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/structure/grids/transformation/gBaseToStartBuildings.h
         src/sim/structure/grids/transformation/gBaseToInertiaRoads.h
         src/sim/structure/grids/transformation/gBaseToIRF.h
+        src/sim/structure/obj/sTotalCivil.h
 
 )
 

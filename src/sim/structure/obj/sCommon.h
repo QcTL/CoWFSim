@@ -14,8 +14,10 @@
 #include <string>
 
 
-struct ctrct_leaseCell{
-    enum TypePayment{LC_PAY_MONTH, LC_PAY_YEAR, LC_PAY_ONCE};
+struct ctrct_leaseCell {
+    enum TypePayment {
+        LC_PAY_MONTH, LC_PAY_YEAR, LC_PAY_ONCE
+    };
     uint32_t ct_strDate;
     uint32_t ct_endDate;
     TypePayment ct_typePayment;
@@ -25,12 +27,12 @@ struct ctrct_leaseCell{
 
 std::vector<std::string> vNames = {"Whiterock", "Zunzon", "TentAroma", "Prova"};
 
-struct objCompany{
+struct objCompany {
     uint32_t c_uuid{};
     std::string nName;
-    std::vector<std::pair<uint32_t, uint32_t>>  c_cOwn;
-    std::list<uint32_t>  c_cRentedSelf;
-    std::list<ctrct_leaseCell>  c_cRentedOther;
+    std::vector<std::pair<uint32_t, uint32_t>> c_cOwn;
+    std::list<uint32_t> c_cRentedSelf;
+    std::list<ctrct_leaseCell> c_cRentedOther;
     std::map<uint32_t, int> c_pOwn;
 
     objCompany() = default;
@@ -40,6 +42,17 @@ struct objCompany{
     }
 };
 
+struct objRoadTravel {
+    std::pair<int, int> c_RStart;
+    std::pair<int, int> c_REnd;
+};
+
+struct objCivil {
+    objRoadTravel c_Travel;
+
+    uint32_t c_TBegin;
+    uint32_t c_TEnd;
+};
 
 
 #endif //CITYOFWEIRDFISHES_SCOMMON_H

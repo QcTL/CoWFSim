@@ -17,6 +17,7 @@
 #include "structure/obj/sTotalCompany.h"
 #include "structure/grids/transformation/gBaseToNearestRoad.h"
 #include "../display/rPileMenus.h"
+#include "structure/obj/sTotalCivil.h"
 
 class sMainSimulator {
 
@@ -37,14 +38,14 @@ public:
     //CITY
     std::shared_ptr<gIGrid<uint8_t>> gLayerTypeGen;
     std::shared_ptr<gIGrid<uint8_t>> gLayerTypeSoil;
-        // TYPE 1 Mixed
-        // TYPE 2 Mixed
-        // TYPE 3 Mixed
-        // TYPE 1 Industrial
-        // TYPE 1 Farm
-        // TYPE 1 Protected
-        // TYPE 1 Obstacle, can be circumvented
-        // TYPE 2 Obstacle, solid
+    // TYPE 1 Mixed
+    // TYPE 2 Mixed
+    // TYPE 3 Mixed
+    // TYPE 1 Industrial
+    // TYPE 1 Farm
+    // TYPE 1 Protected
+    // TYPE 1 Obstacle, can be circumvented
+    // TYPE 2 Obstacle, solid
 
     std::shared_ptr<gIGrid<std::list<uint32_t>>> gLayerOwnership;
     std::shared_ptr<gIGrid<uint32_t>> gLayerCurStruct;
@@ -56,6 +57,7 @@ public:
     //ROADS
     std::vector<std::vector<rNode *>> gLayerRoads;
     std::shared_ptr<gIGrid<uint8_t>> gLayerTransit;
+    std::vector<rNode *> gTotalNodes;
 
     std::shared_ptr<rPileMenus> rInteraction;
 
@@ -67,33 +69,32 @@ public:
         pTickMinute++;
         if (pTickMinute > 5) {
             pTickMinute = 0;
-            bool cHour = gClock.rVMinute + 5 > 59;
             gClock.rVMinute = (gClock.rVMinute + 5) % 60;
-            if (cHour) {
-                bool cPartDay = gClock.rVHour + 1 > 12;
+            if (gClock.rVMinute == 0) {
                 gClock.rVHour = (gClock.rVHour + 1) % 13;
                 if (gClock.rVHour == 0)
                     gClock.rVHour++;
-                if (cPartDay) {
-                    bool cDay = !gClock.rVIsAM;
-                    gClock.rVIsAM = !gClock.rVIsAM;
-                    if (cDay) {
-                        bool cMonth = gClock.rVDay + 1 > 30;
-                        gClock.rVDay = (gClock.rVDay + 1) % 31;
-                        if (gClock.rVDay == 0)
-                            gClock.rVDay++;
-                        if (cMonth) {
-                            bool cYear = gClock.rVMonth + 1 > 12;
-                            gClock.rVMonth = (gClock.rVMonth + 1) % 13;
-                            if (gClock.rVMonth == 0)
-                                gClock.rVMonth++;
-                            if (cYear) {
-                                gClock.rVYear++;
-                            }
-                        }
+                if (!gClock.rVIsAM) {
+                    gClock.rVDay = (gClock.rVDay + 1) % 31;
+                    if (gClock.rVDay == 0)
+                        gClock.rVDay++;
+                    if (gClock.rVMonth == 0) {
+                        gClock.rVMonth = (gClock.rVMonth + 1) % 13;
+                        if (gClock.rVMonth == 0)
+                            gClock.rVMonth++;
+                        gClock.rVYear++;
                     }
                 }
             }
+
+            auto newRoutes = sTCivil->getEndStartPoints(
+                    gClock.rVMinute / 5 + gClock.rVHour * 12 + (gClock.rVIsAM ? 0 : 144));
+            for (auto r: newRoutes) {
+                uint32_t locId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->locIdNode;
+                uint16_t blocId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->rBlock;
+                gLayerRoads[r.c_RStart.first][r.c_RStart.second]->refCompressed->addNewCar(locId, blocId);
+            }
+
             rInteraction->gClock->setClock(gClock);
         }
 
@@ -119,6 +120,7 @@ public:
 
     //MEMORY:
     std::shared_ptr<sTotalCompany> sTComp = std::make_shared<sTotalCompany>(100);
+    std::shared_ptr<sTotalCivil> sTCivil = std::make_shared<sTotalCivil>();
 
 private:
     void extractRoadsFromLayer() {
@@ -139,12 +141,36 @@ private:
             for (uint32_t j = 0; j < r.second[i].size(); ++j) {
                 if (r.second[i][j] != nullptr) {
                     gLayerTransit->set(i, j, 1);
+                    gTotalNodes.push_back(r.second[i][j]);
                 }
+            }
+        }
+
+        //TEST DAILY COMMUTE:
+        for (int i = 0; i < 10; i++) {
+            uint32_t tTime = i;
+            uint32_t tTimeEnd = i + 48;
+
+            for (int j = 0; j < 6; j++) {
+                int idP1;
+                int idP2;
+                choseFromVector(gTotalNodes.size(), idP1, idP2);
+
+                sTCivil->addRuteCivil({{gTotalNodes[idP1]->rPos, gTotalNodes[idP2]->rPos}, tTime, tTimeEnd});
             }
         }
     };
     std::list<std::shared_ptr<rRNodeI>> rListRRoads;
     int sizeL;
+
+    void choseFromVector(const int size, int &first, int &second) {
+        first = rand() % size;
+        second = rand() % (size - 1);
+
+        if (second >= first) {
+            ++second;
+        }
+    }
 };
 
 #endif //CITYOFWEIRDFISHES_SMAINSIMULATOR_H
