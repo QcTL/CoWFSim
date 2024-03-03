@@ -172,7 +172,7 @@ private:
 
     void setRoadsCars(const std::list<uint32_t> &rListPosTop, const std::list<uint32_t> &rListPosBottom) {
         //1rst clear all the lines that could be had cars from the last one;
-        for (int i = 3; i < 33; i++) {
+        for (int i = 3; i < 32; i++) {
             sf::Vertex *quadTop = &dInfo[(2 * gWidth + i) * 4];
             sf::Vertex *quadBottom = &dInfo[(8 * gWidth + i) * 4];
             for (int k = 0; k < 4; k++) {

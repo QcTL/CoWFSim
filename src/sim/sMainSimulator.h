@@ -30,6 +30,7 @@ public:
         gLayerOwnership = std::make_shared<gBasicGrid<std::list<uint32_t>>>
                 (gBasicGrid<std::list<uint32_t>>(lSize, lSize, {}));
         gLayerNextRoad = std::make_shared<gBasicGrid<rNode *>>(gBasicGrid<rNode *>(lSize, lSize, nullptr));
+        gClock = {0, 0, true, 1, 1, 0};
     }
 
 
@@ -60,33 +61,34 @@ public:
 
     rGUIClock::objClockValues gClock;
     uint8_t pTickMinute = 0;
+
     void tick() {
 
-        pTickMinute ++;
-        if(pTickMinute > 5){
+        pTickMinute++;
+        if (pTickMinute > 5) {
             pTickMinute = 0;
             bool cHour = gClock.rVMinute + 5 > 59;
-            gClock.rVMinute = gClock.rVMinute + 5 % 60;
-            if(cHour){
+            gClock.rVMinute = (gClock.rVMinute + 5) % 60;
+            if (cHour) {
                 bool cPartDay = gClock.rVHour + 1 > 12;
-                gClock.rVHour = gClock.rVHour + 1 % 13;
-                if(gClock.rVHour == 0)
-                    gClock.rVHour ++;
-                if(cPartDay){
+                gClock.rVHour = (gClock.rVHour + 1) % 13;
+                if (gClock.rVHour == 0)
+                    gClock.rVHour++;
+                if (cPartDay) {
                     bool cDay = !gClock.rVIsAM;
                     gClock.rVIsAM = !gClock.rVIsAM;
-                    if(cDay){
+                    if (cDay) {
                         bool cMonth = gClock.rVDay + 1 > 30;
-                        gClock.rVDay = gClock.rVDay + 1 % 31;
-                        if(gClock.rVDay == 0)
-                            gClock.rVDay ++;
-                        if(cMonth){
+                        gClock.rVDay = (gClock.rVDay + 1) % 31;
+                        if (gClock.rVDay == 0)
+                            gClock.rVDay++;
+                        if (cMonth) {
                             bool cYear = gClock.rVMonth + 1 > 12;
-                            gClock.rVMonth = gClock.rVMonth + 1 % 13;
-                            if(gClock.rVMonth == 0)
-                                gClock.rVMonth ++;
-                            if(cYear){
-                                gClock.rVYear ++;
+                            gClock.rVMonth = (gClock.rVMonth + 1) % 13;
+                            if (gClock.rVMonth == 0)
+                                gClock.rVMonth++;
+                            if (cYear) {
+                                gClock.rVYear++;
                             }
                         }
                     }
@@ -105,7 +107,7 @@ public:
 
     void completedStartGrid() {
         extractRoadsFromLayer();
-        for(int i = 0; i < 2000; i++){
+        for (int i = 0; i < 2000; i++) {
             for (const std::shared_ptr<rRNodeI> &node: rListRRoads) {
                 node->sendInformationStart();
                 node->sendNewInformation();
@@ -131,7 +133,15 @@ private:
         }
 
         sTComp->addCompanyAtPosition(gLayerOwnership, {25, 25});
-        gBaseToNearestRoad::givenMatRef(gLayerNextRoad,gLayerRoads, gLayerTypeGen);
+        gBaseToNearestRoad::givenMatRef(gLayerNextRoad, gLayerRoads, gLayerTypeGen);
+
+        for (uint32_t i = 0; i < r.second.size(); ++i) {
+            for (uint32_t j = 0; j < r.second[i].size(); ++j) {
+                if (r.second[i][j] != nullptr) {
+                    gLayerTransit->set(i, j, 1);
+                }
+            }
+        }
     };
     std::list<std::shared_ptr<rRNodeI>> rListRRoads;
     int sizeL;

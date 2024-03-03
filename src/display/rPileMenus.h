@@ -26,7 +26,7 @@ public:
     }
 
     void display(sf::RenderWindow &rW) {
-        rW.setView(rViewTopRight);
+        rW.setView(rViewTopLeft);
         gClock->draw(rW);
 
         for (const auto &m: vPresentMenus) {

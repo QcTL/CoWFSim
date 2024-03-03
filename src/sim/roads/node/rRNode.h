@@ -107,7 +107,7 @@ protected:
 
     void updateRefGrid(uint8_t nValue) {
         for (const auto &p: rRefPos) {
-            tTransit->set(p, nValue);
+            tTransit->set(p, nValue + 1);
         }
         rRemoteUpdateGrid::setHasToChange(true);
     }
@@ -138,11 +138,18 @@ public:
 
     void tick() override {
         if (!itsEmpty) {
-            notifyEnterNext(
-                    rInfoDist::returnDirToDist(
-                            rActiveVehicle::getDestByCar(carActInside.first).first,
-                            rActiveVehicle::getDestByCar(carActInside.first).second,
-                            rBlock, globIdNode), carActInside);
+            if (rActiveVehicle::getDestByCar(carActInside.first).second == rBlock &&
+                rActiveVehicle::getDestByCar(carActInside.first).first == locIdNode) {
+                itsEmpty = true;
+                updateRefGrid(false);
+            } else {
+                notifyEnterNext(
+                        rInfoDist::returnDirToDist(
+                                rActiveVehicle::getDestByCar(carActInside.first).first,
+                                rActiveVehicle::getDestByCar(carActInside.first).second,
+                                rBlock, globIdNode), carActInside);
+            }
+
         } else if (!reqTakeCar.empty()) {
             uint8_t dToTake = reqTakeCar.front();
             reqTakeCar.pop_front();
@@ -384,7 +391,7 @@ private:
             sVec.push_back(0);
 
         auto [minIt, maxIt] = std::minmax_element(sVec.begin(), sVec.end());
-        return {*maxIt, *minIt};
+        return {maxIt != sVec.end() ? *maxIt : -1, minIt != sVec.end() ? *minIt : -1};
     }
 
     std::pair<uint8_t, std::shared_ptr<rRNodeI>> otherDir(uint8_t dirFromPrev) {

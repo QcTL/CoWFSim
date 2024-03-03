@@ -88,6 +88,9 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/behaviour/sCompanyCompiler.h
         src/display/menus/implementation/AlwaysOD/rGUIClock.h
         src/common/sMainContainer.h
+        src/sim/structure/grids/transformation/gBaseToStartBuildings.h
+        src/sim/structure/grids/transformation/gBaseToInertiaRoads.h
+        src/sim/structure/grids/transformation/gBaseToIRF.h
 
 )
 

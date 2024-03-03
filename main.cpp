@@ -1,6 +1,3 @@
-
-
-
 #include <filesystem>
 #include <iostream>
 #include "src/IO/ReaderParameters.h"

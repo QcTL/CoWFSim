@@ -21,7 +21,7 @@ public:
                                                 const std::map<std::string, std::string> &mValues) {
         std::shared_ptr<gIGrid<uint8_t>> gLayerTypeSoil =
                 std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
-        std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gLayerTypeSoil->rangeUse();
+       std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gLayerTypeSoil->rangeUse();
 
         float lSizeRiver = 0;
         if (mValues.at("Mida_Simulacio") == "Petita")
@@ -59,7 +59,7 @@ public:
         for (int i = gRange.first.first; i <= gRange.first.second; ++i) {
             for (int j = gRange.second.first; j <= gRange.second.second; ++j) {
                 if (wMask->get(i, j)
-                    && gPointToNearestElem::find<uint8_t>(gLayerTypeSoil, {i, j}, 5, 6).first > 0) {
+                    && gPointToNearestElem::find<uint8_t>(gLayerTypeSoil, {i, j}, 5, 15).first > 0) {
                     gLayerTypeSoil->set(i, j, 4);
                 }
             }

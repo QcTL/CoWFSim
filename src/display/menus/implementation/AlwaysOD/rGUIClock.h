@@ -20,7 +20,7 @@ public:
 
 
     explicit rGUIClock(const std::shared_ptr<rIMenu> &mParent,
-                       const std::string &pthFileD) : rIMenu(mParent, rRelativePos::pTopRight) {
+                       const std::string &pthFileD) : rIMenu(mParent, rRelativePos::pTopLeft) {
         std::vector<std::vector<int>> data = extractDataFromFile(pthFileD);
         dInfo = getVertexMenu((int) data[0].size(), (int) data.size(), data);
         gWidth = (int) data[0].size();
@@ -60,7 +60,12 @@ public:
     // de venir de algun altre lloc.
 
     void setClock(const objClockValues &vNew) {
-        setText(0, std::to_string(vNew.rVHour % 13) + ':' + std::to_string(vNew.rVMinute % 60) +
+
+        std::string gHour = std::to_string(vNew.rVHour % 13);
+        std::string gMinutes = std::to_string(vNew.rVMinute % 60);
+        setText(0, (vNew.rVHour < 10 ? "0" : "") + gHour +
+                   ':' +
+                   (vNew.rVMinute < 10 ? "0" : "") + gMinutes +
                    (vNew.rVIsAM ? "am" : "pm"));
         setText(1, std::to_string(vNew.rVDay % 32) + '/' + std::to_string(vNew.rVMonth % 13));
         setText(2, std::to_string(vNew.rVYear));
@@ -124,7 +129,7 @@ private:
     void setText(const uint8_t tVal, const std::string &cText) {
         for (int i = 0; i < comV[tVal].pLength; i++) {
             sf::Vertex *quad = &dInfo[
-                    (comV[tVal].pStartText.second - i + comV[tVal].pStartText.first * gWidth) * 4];
+                    (comV[tVal].pStartText.second + i + comV[tVal].pStartText.first * gWidth) * 4];
             for (int k = 0; k < 4; k++) {
                 if (i >= cText.size())
                     quad[k].texCoords = lRefTiles[32][k];
