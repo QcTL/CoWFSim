@@ -28,8 +28,8 @@ public:
         PerlinNoise pN;
 
         std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gRes->rangeUse();
-        float GWidth = (gRange.first.second - gRange.first.first) + 1;
-        float GHeight = (gRange.second.second - gRange.second.first) + 1;
+        double GWidth = (gRange.first.second - gRange.first.first) + 1;
+        double GHeight = (gRange.second.second - gRange.second.first) + 1;
         for (int i = gRange.first.first; i <= gRange.first.second; ++i) {
             for (int j = gRange.second.first; j <= gRange.second.second; ++j) {
                 if (!hasMask || pMask->get(i, j)) {

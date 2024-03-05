@@ -17,7 +17,7 @@ public:
         std::pair<std::pair<int, int>, std::pair<int, int>> gRange = rGrid->rangeUse();
         for (int i = gRange.first.first; i <= gRange.first.second; i++) {
             for (int j = gRange.second.first; j <= gRange.second.second; j++) {
-                if (genType->get(i, j) == 1) {
+                if (genType->get(i, j) == 1 || genType->get(i, j) == 4) {
                     uint8_t dDist = 1;
                     rNode *nearRoad = nullptr;
                     while (dDist < 16 && nearRoad == nullptr) {

@@ -27,7 +27,7 @@ int tst_gBasicRiver() {
     std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
     std::shared_ptr<rBaseMenu> rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->gLayerTypeGen,
                                                                               sMS->gLayerRoads,
-                                                                              sMS->gLayerOwnership, sMS->sTComp));
+                                                                              sMS->sComp->gLayerOwnership, sMS->sComp->sTComp));
     pPM->addMenuTop(rBasic);
     rGlobal rG(gSimL, pPM);
     rG.setUp();

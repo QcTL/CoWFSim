@@ -10,26 +10,33 @@
 #include "../../structure/obj/sCommon.h"
 #include "production/sTotalRecipes.h"
 #include "../../structure/grids/gIGrid.h"
+#include "sCompanyTimer.h"
 
 class sCompanyActions {
-
-    static bool gProduceProduct(const objCompany &oC, uint32_t gItemGen, sTotalRecipes &sTR,
-                                const std::shared_ptr<gIGrid<uint8_t>> &gType) {
-        if (!hasResources(oC, gItemGen, sTR) || !hasTypeOwn(oC, gItemGen, sTR, gType))
+public:
+    static bool gProduceProduct(std::shared_ptr<objCompany> &oC, uint32_t gItemGen, sTotalRecipes &sTR,
+                                const std::shared_ptr<gIGrid<uint8_t>> &gType,
+                                const std::shared_ptr<sCompanyTimer> &gCTimer) {
+        if (!hasResources(*oC, gItemGen, sTR) || !hasTypeOwn(*oC, gItemGen, sTR, gType))
             return false;
 
-        //TODO..
-        //Restar els elements del map de la empresa;
-        //Posar un timer amb el temps necessari que sera comprobat cada tick per si es aquell
-        //Afegir li la id +1 en el final.
+        for (const auto &gElem: sTR.getById(gItemGen).pr_reqProdId)
+            oC->c_pOwn[gElem] -= 1;
 
+        gCTimer->addTimer(gItemGen, sTR.getById(gItemGen).pr_reqTime, oC->c_uuid);
         return true;
     }
 
+    static void gCompletedProduct(const std::shared_ptr<objCompany> &oC, uint32_t gItemGen) {
+        if (oC->c_pOwn.find(gItemGen) != oC->c_pOwn.end())
+            oC->c_pOwn[gItemGen] = 1;
+        else
+            oC->c_pOwn[gItemGen] += 1;
+    }
 
 private:
 
-    static bool hasTypeOwn(const objCompany &oC, uint32_t gItemGen, sTotalRecipes &sTR,
+    static bool hasTypeOwn(objCompany &oC, uint32_t gItemGen, sTotalRecipes &sTR,
                            const std::shared_ptr<gIGrid<uint8_t>> &gType) {
         std::unordered_set<uint8_t> companyOwnTypes;
 
@@ -43,7 +50,7 @@ private:
         return false;
     }
 
-    static bool hasResources(const objCompany &oC, uint32_t gItemGen, sTotalRecipes &sTR) {
+    static bool hasResources(objCompany &oC, uint32_t gItemGen, sTotalRecipes &sTR) {
         std::map<uint32_t, uint8_t> gQuant;
         objProdRecipe oPR = sTR.getById(gItemGen);
         for (const auto &nObj: oPR.pr_reqProdId)

@@ -21,7 +21,7 @@ int main() {
     //tst_gVeh();
     //tst_gMenus();
     //tst_gBasicNewWay(sMVar);
-    SimInitialize::givenMap(sMVar);
-
+    //SimInitialize::givenMap(sMVar);
+    // 0xFF
     return 0;
 }

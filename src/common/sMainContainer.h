@@ -23,7 +23,7 @@ public:
         sMS->rInteraction = pPM;
         rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->gLayerTypeGen,
                                                        sMS->gLayerRoads,
-                                                       sMS->gLayerOwnership, sMS->sTComp));
+                                                       sMS->sComp->gLayerOwnership, sMS->sComp->sTComp));
         pPM->addMenuTop(rBasic);
 
         rG = std::make_shared<rGlobal>(gSimL, pPM);

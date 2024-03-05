@@ -18,6 +18,7 @@
 #include "structure/grids/transformation/gBaseToNearestRoad.h"
 #include "../display/rPileMenus.h"
 #include "structure/obj/sTotalCivil.h"
+#include "behaviour/company/sMCompany.h"
 
 class sMainSimulator {
 
@@ -28,12 +29,10 @@ public:
         gLayerCurStruct = std::make_shared<gBasicGrid<uint32_t>>(gBasicGrid<uint32_t>(lSize, lSize, 0));
         gLayerAirPollution = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
         gLayerTransit = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
-        gLayerOwnership = std::make_shared<gBasicGrid<std::list<uint32_t>>>
-                (gBasicGrid<std::list<uint32_t>>(lSize, lSize, {}));
         gLayerNextRoad = std::make_shared<gBasicGrid<rNode *>>(gBasicGrid<rNode *>(lSize, lSize, nullptr));
         gClock = {0, 0, true, 1, 1, 0};
+        sComp = std::make_shared<sMCompany>(lSize);
     }
-
 
     //CITY
     std::shared_ptr<gIGrid<uint8_t>> gLayerTypeGen;
@@ -47,7 +46,6 @@ public:
     // TYPE 1 Obstacle, can be circumvented
     // TYPE 2 Obstacle, solid
 
-    std::shared_ptr<gIGrid<std::list<uint32_t>>> gLayerOwnership;
     std::shared_ptr<gIGrid<uint32_t>> gLayerCurStruct;
     std::shared_ptr<gIGrid<rNode *>> gLayerNextRoad;
 
@@ -118,13 +116,12 @@ public:
     }
 
     void completedStartCompanies(const std::vector<std::vector<std::pair<int, int>>> &gPosCompanies) {
-        for (const auto &posNewComp: gPosCompanies)
-            sTComp->addCompanyAtPosition(gLayerOwnership, posNewComp);
+        sComp->completedStartCompanies(gPosCompanies);
     }
 
 
     //MEMORY:
-    std::shared_ptr<sTotalCompany> sTComp = std::make_shared<sTotalCompany>(1000);
+    std::shared_ptr<sMCompany> sComp;
     std::shared_ptr<sTotalCivil> sTCivil = std::make_shared<sTotalCivil>();
 
 private:

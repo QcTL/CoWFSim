@@ -94,6 +94,10 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/structure/obj/sTotalCivil.h
         src/sim/behaviour/company/sCompanyActions.h
         src/sim/behaviour/company/production/sTotalRecipes.h
+        src/sim/behaviour/company/sCompanyTimer.h
+        src/sim/behaviour/company/sMCompany.h
+        src/sim/behaviour/market/sMMarket.h
+        src/sim/behaviour/market/sMarketListing.h
 
 )
 

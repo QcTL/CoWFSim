@@ -88,7 +88,7 @@ public:
         //HOUSES:
         gBaseToStartBuildings::gen(gCell, gTypeSoil, gTypeGen, {1, 2, 3}, 0);
 
-        /*
+
         std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gCell->rangeUse();
         for (int i = gRange.first.first; i <= gRange.first.second; ++i) {
             for (int j = gRange.second.first; j <= gRange.second.second; ++j) {
@@ -98,13 +98,13 @@ public:
                     gCell->set(i, j, idTypeRoadOuter);
                 }
             }
-        }*/
+        }
 
         BasicTransformations::copyWhere(gTypeGen, gCell, {{idTypeRoadIntra, 2},
                                                           {idTypeRoadOuter, 2}});
 
-        //gBaseToIRF::gen<uint32_t>(gCell, gTypeGen, {50,
-        //                                            0}, {0, 1}, {idTypeRoadIntra, idTypeRoadOuter}, 20, 1);
+        gBaseToIRF::gen<uint32_t>(gCell, gTypeGen, {50, 0},
+                                  {0, 1}, {idTypeRoadIntra, idTypeRoadOuter}, 20, 1);
 
         std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint8_t>>> p =
                 gBaseToBorderDetection::generate(gCell, {gBorderType::gBNonConnex, gBorderOutside::gIsNotGroup},
