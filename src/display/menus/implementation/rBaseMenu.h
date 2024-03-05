@@ -84,13 +84,24 @@ public:
     void pressedCell(std::pair<int, int> cPressed) override {
         std::cout << cPressed.first << ":" << cPressed.second << std::endl;
         switch (refLTypes->get(cPressed)) {
-            case 1: {
+            case 1:
+            case 4:{
                 if (!refLBuild->get(cPressed).empty()) {
-                    std::shared_ptr<rCellViewMenu> rComp = std::make_shared<rCellViewMenu>(
-                            rCellViewMenu(refPile->vTopActiveMenu,
-                                          refSComp->getVectCompByUUID(refLBuild->get(cPressed)),
-                                          "d_mCellViewLayer", refPile));
-                    refPile->addMenuTop(rComp);
+                    if (refLBuild->get(cPressed).size() == 1) {
+                        std::shared_ptr<rCompViewLayer> rComp = std::make_shared<rCompViewLayer>(
+                                rCompViewLayer(refPile->vTopActiveMenu,
+                                               *refSComp->getCompanyByUUID(refLBuild->get(cPressed).front()),
+                                               "d_mCompViewLayer"));
+                        refPile->addMenuTop(rComp);
+                        std::cout << "YEP" << std::endl;
+                    } else {
+                        std::shared_ptr<rCellViewMenu> rComp = std::make_shared<rCellViewMenu>(
+                                rCellViewMenu(refPile->vTopActiveMenu,
+                                              refSComp->getVectCompByUUID(refLBuild->get(cPressed)),
+                                              "d_mCellViewLayer", refPile));
+
+                        refPile->addMenuTop(rComp);
+                    }
                 }
             }
                 break;

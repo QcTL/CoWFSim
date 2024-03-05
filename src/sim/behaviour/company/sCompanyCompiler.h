@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <cstdint>
-#include "../structure/obj/sCommon.h"
+#include "../../structure/obj/sCommon.h"
 
 class sCompanyCompiler {
 

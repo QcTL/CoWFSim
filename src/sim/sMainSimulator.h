@@ -117,9 +117,14 @@ public:
         rInfoDist::seeMatrix();
     }
 
+    void completedStartCompanies(const std::vector<std::vector<std::pair<int, int>>> &gPosCompanies) {
+        for (const auto &posNewComp: gPosCompanies)
+            sTComp->addCompanyAtPosition(gLayerOwnership, posNewComp);
+    }
+
 
     //MEMORY:
-    std::shared_ptr<sTotalCompany> sTComp = std::make_shared<sTotalCompany>(100);
+    std::shared_ptr<sTotalCompany> sTComp = std::make_shared<sTotalCompany>(1000);
     std::shared_ptr<sTotalCivil> sTCivil = std::make_shared<sTotalCivil>();
 
 private:
@@ -128,13 +133,11 @@ private:
                 gLayerTypeGen, 2);
         gLayerRoads = r.second;
         std::cout << r.first.size() << std::endl;
-        if (!r.first.empty()) {
-            rNode *rOne = r.first[0];
-            rListRRoads = rTransRNodeToRRNode().conversion(rOne, sqrt(sizeL), sizeL, gLayerTransit);
+        for (const auto &rNode: r.first) {
+            rListRRoads.merge(rTransRNodeToRRNode().conversion(rNode, sqrt(sizeL), sizeL, gLayerTransit));
             rInfoDist::initializeMatrix(sizeL / sqrt(sizeL) * sizeL / sqrt(sizeL), sizeL, rListRRoads.size());
         }
 
-        sTComp->addCompanyAtPosition(gLayerOwnership, {25, 25});
         gBaseToNearestRoad::givenMatRef(gLayerNextRoad, gLayerRoads, gLayerTypeGen);
 
         for (uint32_t i = 0; i < r.second.size(); ++i) {

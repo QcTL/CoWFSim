@@ -74,7 +74,7 @@ public:
                     parentMenu->setResponse(-1,1);
                 break;
             case sf::Event::MouseButtonPressed:
-                parentMenu->setResponse(-1,1);
+                //parentMenu->setResponse(-1,1);
                 break;
             default:
                 break;

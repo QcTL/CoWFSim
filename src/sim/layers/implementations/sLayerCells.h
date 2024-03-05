@@ -22,7 +22,12 @@
 
 class sLayerCells {
 public:
-    static std::shared_ptr<gIGrid<uint32_t>> gen(
+    struct retObjSLayerCells {
+        std::shared_ptr<gIGrid<uint32_t>> gMatrix;
+        std::vector<std::vector<std::pair<int, int>>> gCompanyPositions;
+    };
+
+    static retObjSLayerCells gen(
             uint32_t lSize, const std::shared_ptr<gIGrid<uint8_t>> &gTypeSoil,
             const std::shared_ptr<gIGrid<uint8_t>> &gTypeGen,
             const std::map<std::string, std::string> &mValues) {
@@ -120,7 +125,6 @@ public:
 
         //FIELDS:
         gBaseToField<uint32_t> gBFields(gCell, 0, BasicTransformations::genMaskFromGrid(gTypeSoil, {4}));
-
         /*
         BasicTransformations::replaceValues(gCell,
                                             {{2, ((uint32_t) (uint8_t) strtol("00010000", nullptr, 2)) << 24}});
@@ -128,10 +132,7 @@ public:
                                             {{1, ((uint32_t) (uint8_t) strtol("00010001", nullptr, 2)) << 24}});
         */
 
-
-
-
-        return gCell;
+        return {gCell, gBFields.genCollectivePositions()};
     }
 
 };

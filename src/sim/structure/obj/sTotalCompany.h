@@ -26,10 +26,10 @@ public:
         return tVecComp[rCar].second;
     }
 
-    uint32_t addComp(uint32_t destPos) {
+    uint32_t addComp(const std::vector<std::pair<int, int>> &sTilesStart) {
         uint32_t prevFEmpty = fEmpty;
         fEmpty = tVecComp[fEmpty].first;
-        tVecComp[prevFEmpty] = {destPos, std::make_shared<objCompany>(prevFEmpty)};
+        tVecComp[prevFEmpty] = {0, std::make_shared<objCompany>(prevFEmpty, sTilesStart)};
         return prevFEmpty;
     }
 
@@ -48,19 +48,22 @@ public:
     explicit sTotalCompany(uint32_t maxComp) : vTotalComp(maxComp) {}
 
     void addCompanyAtPosition(const std::shared_ptr<gIGrid<std::list<uint32_t>>> &gLayer,
-                              const std::pair<uint32_t, uint32_t> nPos) {
-        auto p = gLayer->get(nPos);
-        p.push_front(vTotalComp.addComp(0));
-        gLayer->set(nPos, p);
+                              const std::vector<std::pair<int, int>> &vecNPos) {
+        uint32_t idNewComp = vTotalComp.addComp(vecNPos);
+        for (const auto &nPos: vecNPos) {
+            auto p = gLayer->get({nPos.second, nPos.first});
+            p.push_front(idNewComp); //AAAAAAAAAAAAAAAAAAAAAA
+            gLayer->set({nPos.second, nPos.first}, p);//TODO no m'agrada que aixo vulgi dir que estem creant una copia.
+        }
     }
 
-    std::shared_ptr<objCompany> getCompanyByUUID(uint32_t index){
+    std::shared_ptr<objCompany> getCompanyByUUID(uint32_t index) {
         return vTotalComp.getDestByComp(index);
     }
 
-    std::vector<objCompany> getVectCompByUUID(const std::list<uint32_t>& tList){
+    std::vector<objCompany> getVectCompByUUID(const std::list<uint32_t> &tList) {
         std::vector<objCompany> r;
-        for(const uint32_t l : tList){
+        for (const uint32_t l: tList) {
             r.push_back(*getCompanyByUUID(l));
         }
         return r;

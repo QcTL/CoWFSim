@@ -37,9 +37,13 @@ public:
         sMS->gLayerTypeSoil = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
         sMS->gLayerAirPollution = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
 
-        sMS->gLayerCurStruct = sLayerCells::gen(lSizeGrid, sMS->gLayerTypeSoil, sMS->gLayerTypeGen, mValues);
+        sLayerCells::retObjSLayerCells retCells =
+                sLayerCells::gen(lSizeGrid, sMS->gLayerTypeSoil, sMS->gLayerTypeGen, mValues);
+        sMS->gLayerCurStruct = retCells.gMatrix;
+
 
         sMS->completedStartGrid();
+        sMS->completedStartCompanies(retCells.gCompanyPositions);
 
         sMainContainer sMC(sMS);
 

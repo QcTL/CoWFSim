@@ -28,7 +28,6 @@ public:
     }
 
     std::vector<objRoadTravel> getEndStartPoints(uint32_t cTime) {
-        int p = mExitTimesCivil.size();
         std::vector<objRoadTravel> rRet;
         if (mExitTimesCivil[cTime].empty())
             return {};

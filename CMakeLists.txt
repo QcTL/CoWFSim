@@ -85,13 +85,15 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/structure/grids/transformation/cEspec/gHelpPerlinNoise.h
         src/sim/structure/grids/transformation/cEspec/db_perlin.hpp
         src/sim/layers/implementations/sLayerCells.h
-        src/sim/behaviour/sCompanyCompiler.h
+        src/sim/behaviour/company/sCompanyCompiler.h
         src/display/menus/implementation/AlwaysOD/rGUIClock.h
         src/common/sMainContainer.h
         src/sim/structure/grids/transformation/gBaseToStartBuildings.h
         src/sim/structure/grids/transformation/gBaseToInertiaRoads.h
         src/sim/structure/grids/transformation/gBaseToIRF.h
         src/sim/structure/obj/sTotalCivil.h
+        src/sim/behaviour/company/sCompanyActions.h
+        src/sim/behaviour/company/production/sTotalRecipes.h
 
 )
 
