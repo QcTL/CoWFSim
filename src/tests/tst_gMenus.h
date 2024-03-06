@@ -17,7 +17,7 @@ int tst_gMenus() {
     std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(30);
 
 
-    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gLayerAirPollution,
+    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gTotalAirPollution->gLayerAirPollution ,
                                                                        sMS->gLayerCurStruct, sMS->gLayerTransit);
     //MENUS
     std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);

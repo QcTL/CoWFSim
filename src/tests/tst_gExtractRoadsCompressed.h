@@ -37,11 +37,11 @@ int tst_gExtractRoadsCompressed() {
 
     gB->set(6,3, 1);
 
-    sMS->gLayerAirPollution = gB;
+    sMS->gTotalAirPollution->gLayerAirPollution = gB;
     sMS->completedStartGrid();
 
 
-    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gLayerAirPollution,
+    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gTotalAirPollution->gLayerAirPollution ,
                                                                        sMS->gLayerCurStruct, sMS->gLayerTransit);
     //MENUS
     std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);

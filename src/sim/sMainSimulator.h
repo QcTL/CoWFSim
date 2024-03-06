@@ -19,6 +19,7 @@
 #include "../display/rPileMenus.h"
 #include "structure/obj/sTotalRoutes.h"
 #include "behaviour/company/sMCompany.h"
+#include "behaviour/airPollution/gMainAirPollution.h"
 
 class sMainSimulator {
 
@@ -29,8 +30,12 @@ public:
         gLayerCurStruct = std::make_shared<gBasicGrid<uint32_t>>(gBasicGrid<uint32_t>(lSize, lSize, 0));
         gLayerTransit = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
         gLayerNextRoad = std::make_shared<gBasicGrid<rNode *>>(gBasicGrid<rNode *>(lSize, lSize, nullptr));
+
+        sComp = std::make_shared<sMCompany>(lSize, gLayerTypeGen);
+        gTotalAirPollution = std::make_shared<gMainAirPollution>(lSize);
+
         gClock = {0, 0, true, 1, 1, 0};
-        sComp = std::make_shared<sMCompany>(lSize);
+
     }
 
     //CITY
@@ -56,7 +61,7 @@ public:
     std::shared_ptr<gIGrid<rNode *>> gLayerNextRoad;
 
     //AIR POLLUTION
-    std::shared_ptr<gIGrid<uint8_t>> gLayerAirPollution;
+    std::shared_ptr<gMainAirPollution> gTotalAirPollution;
 
     //ROADS
     std::vector<std::vector<rNode *>> gLayerRoads;
@@ -91,15 +96,16 @@ public:
                 }
             }
 
-          /*  auto newRoutes = sTotalEmploye.blabla TODO
-            for (auto r: newRoutes) {
-                uint32_t locId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->locIdNode;
-                uint16_t blocId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->rBlock;
-                gLayerRoads[r.c_RStart.first][r.c_RStart.second]->refCompressed->addNewCar(locId, blocId);
-            }
-            */
-          //  gClock.rVMinute / 5 + gClock.rVHour * 12 + (gClock.rVIsAM ? 0 : 144) PER EL TICK DE sTOTALEMPLOYEE;
+            /*  auto newRoutes = sTotalEmploye.blabla TODO
+              for (auto r: newRoutes) {
+                  uint32_t locId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->locIdNode;
+                  uint16_t blocId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->rBlock;
+                  gLayerRoads[r.c_RStart.first][r.c_RStart.second]->refCompressed->addNewCar(locId, blocId);
+              }
+              */
+            //  gClock.rVMinute / 5 + gClock.rVHour * 12 + (gClock.rVIsAM ? 0 : 144) PER EL TICK DE sTOTALEMPLOYEE;
             rInteraction->gClock->setClock(gClock);
+            gTotalAirPollution->tick(gLayerTypeGen);
         }
 
 
@@ -153,6 +159,7 @@ private:
         }
 
         //TEST DAILY COMMUTE:
+        /*
         for (int i = 0; i < 10; i++) {
             uint32_t tTime = i;
             uint32_t tTimeEnd = i + 48;
@@ -164,7 +171,7 @@ private:
 
                 sTCivil->addRuteCivil({{gTotalNodes[idP1]->rPos, gTotalNodes[idP2]->rPos}, tTime, tTimeEnd});
             }
-        }
+        }*/
     };
     std::list<std::shared_ptr<rRNodeI>> rListRRoads;
     int sizeL;

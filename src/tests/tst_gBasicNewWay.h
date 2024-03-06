@@ -16,7 +16,7 @@
 #include "../sim/structure/grids/transformation/gBasicTransformations.h"
 #include "../sim/layers/implementations/sLayerType.h"
 
-int tst_gBasicNewWay( const std::map<std::string, std::string> &mValues) {
+int tst_gBasicNewWay(const std::map<std::string, std::string> &mValues) {
 
     uint32_t lSizeGrid = 0;
     if (mValues.at("Mida_Simulacio") == "Petita")
@@ -30,16 +30,17 @@ int tst_gBasicNewWay( const std::map<std::string, std::string> &mValues) {
 
     std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(lSizeGrid);
 
-    sMS->gLayerAirPollution = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
+    sMS->gTotalAirPollution->gLayerAirPollution = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
 
-    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gLayerAirPollution,
+    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gTotalAirPollution->gLayerAirPollution,
                                                                        sMS->gLayerCurStruct, sMS->gLayerTransit);
 
     //MENUS
     std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
     std::shared_ptr<rBaseMenu> rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->gLayerTypeGen,
                                                                               sMS->gLayerRoads,
-                                                                              sMS->sComp->gLayerOwnership, sMS->sComp->sTComp));
+                                                                              sMS->sComp->gLayerOwnership,
+                                                                              sMS->sComp->sTComp));
     pPM->addMenuTop(rBasic);
     rGlobal rG(gSimL, pPM);
     rG.setUp();

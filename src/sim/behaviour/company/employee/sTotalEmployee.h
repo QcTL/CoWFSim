@@ -2,8 +2,8 @@
 // Created by Laminar on 05/03/2024.
 //
 
-#ifndef CITYOFWEIRDFISHES_STOTALEMPLOYE_H
-#define CITYOFWEIRDFISHES_STOTALEMPLOYE_H
+#ifndef CITYOFWEIRDFISHES_STOTALEMPLOYEE_H
+#define CITYOFWEIRDFISHES_STOTALEMPLOYEE_H
 
 #include <cstdint>
 #include <vector>
@@ -33,4 +33,4 @@ private:
     //Given company id Returns a list of iterators in the sTotalRoutes;
 };
 
-#endif //CITYOFWEIRDFISHES_STOTALEMPLOYE_H
+#endif //CITYOFWEIRDFISHES_STOTALEMPLOYEE_H

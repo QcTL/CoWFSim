@@ -98,9 +98,9 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/behaviour/company/sMCompany.h
         src/sim/behaviour/market/sMMarket.h
         src/sim/behaviour/market/sMarketListing.h
-        src/sim/behaviour/company/employee/sTotalEmploye.h
+        src/sim/behaviour/company/employee/sTotalEmployee.h
         src/sim/behaviour/airPollution/gMainAirPollution.h
-
+        src/tests/tst_gWindExpansion.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

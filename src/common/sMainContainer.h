@@ -16,7 +16,7 @@ public:
     explicit sMainContainer(const std::shared_ptr<sMainSimulator> &sMS)
             : sMS(sMS) {
 
-        gSimL = std::make_shared<gDispLayers>(sMS->gLayerAirPollution,
+        gSimL = std::make_shared<gDispLayers>(sMS->gTotalAirPollution->gLayerAirPollution,
                                               sMS->gLayerCurStruct, sMS->gLayerTransit);
         pPM = std::make_shared<rPileMenus>(gSimL);
         //MENUS

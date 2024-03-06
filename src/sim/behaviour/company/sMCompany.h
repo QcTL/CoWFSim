@@ -15,10 +15,11 @@
 class sMCompany {
 public:
 
-    explicit sMCompany(uint32_t lSize) {
+    explicit sMCompany(uint32_t lSize, const std::shared_ptr<gIGrid<uint8_t>> &gTypeRef)
+            : sCompRecipes(std::make_shared<sTotalRecipes>("FObjProduced.csv")) {
         gLayerOwnership = std::make_shared<gBasicGrid<std::list<uint32_t>>>
                 (gBasicGrid<std::list<uint32_t>>(lSize, lSize, {}));
-        sCompA = std::make_shared<sCompanyActions>(*sCompRecipes, nullptr, sCompT); //TODO TYPE
+        sCompA = std::make_shared<sCompanyActions>(*sCompRecipes, gTypeRef, sCompT); //TODO TYPE
     }
 
     void tick(uint32_t tTime) {
@@ -28,7 +29,7 @@ public:
         if (tTime % (3600 * 3) == 0) { //ONCE EVERY 3 HOURS
             for (sCompanyCompiler::sCCIntentions sCCI: sTComp->getTotalIntentions()) {
                 sCompA->gTryIntention(sCCI);
-                    //TODO restar score si ho fa malament; sumar una mica si ho fa be
+                //TODO restar score si ho fa malament; sumar una mica si ho fa be
             }
         }
 

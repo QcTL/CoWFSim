@@ -16,11 +16,12 @@ public:
     explicit gMainAirPollution(int lSize) {
         gLayerAirPollution = std::make_shared<gBasicGrid<uint8_t >>
                 (gBasicGrid<uint8_t>(lSize, lSize, 0));
+        recomputeWindMat({-0.75, 0.5});
     }
 
     void tick(std::shared_ptr<gIGrid<uint8_t>> &gBasicType) {
 
-        BasicTransformations::copyWhere(gLayerAirPollution, gBasicType, {{3, 1}});
+        BasicTransformations::copyWhere(gLayerAirPollution, gBasicType, {{3, 8}});
 
 
         BasicTransformations::Kernel<double> k(
@@ -42,17 +43,26 @@ public:
             }
         }
 
+        int idx = 0;
         for (int i = range.second.first; i <= range.second.second; i++) {
-            for (int j = range.first.first; j <= range.first.second; j++) {
+            for (int j = range.first.first; j <= range.first.second; j++, idx++) {
                 double r = 0;
                 for (int k = 0; k < kernelIndices.size(); k++) {
                     int dx = i + kernelIndices[k].first;
                     int dy = j + kernelIndices[k].second;
                     if (gLayerAirPollution->isInside(dx, dy)) {
-                        r += kernelValues[k] * gLayerAirPollution->get(dx, dy);
+                        r += kernelValues[k] * (double) gLayerAirPollution->get(dx, dy) / 8.0 * 0.8;
                     }
                 }
-                gLayerAirPollution->set(i, j, static_cast<uint8_t>(std::round(std::max(r, 1.0) * 255)));
+                nAttributes[idx] = r;
+            }
+        }
+
+        idx = 0;
+        for (int i = range.second.first; i <= range.second.second; i++) {
+            for (int j = range.first.first; j <= range.first.second; j++, idx++) {
+                gLayerAirPollution->set(i, j, static_cast<uint8_t>(
+                        std::round(std::min(std::max(nAttributes[idx] - 0.005, 0.0), 1.0) * 8)));
             }
         }
     }

@@ -38,7 +38,7 @@ int tst_gVeh() {
                                 2);
 
     sMS->gLayerTypeGen = gB;
-    sMS->gLayerAirPollution = gB;
+    sMS->gTotalAirPollution->gLayerAirPollution  = gB;
     sMS->completedStartGrid();
 
 
