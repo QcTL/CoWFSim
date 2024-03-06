@@ -7,7 +7,6 @@
 
 #include "sCompanyTimer.h"
 #include "sCompanyActions.h"
-#include "sCompanyCompiler.h"
 
 #include "../../structure/obj/sTotalCompany.h"
 #include "../../structure/grids/gIGrid.h"
@@ -19,13 +18,20 @@ public:
     explicit sMCompany(uint32_t lSize) {
         gLayerOwnership = std::make_shared<gBasicGrid<std::list<uint32_t>>>
                 (gBasicGrid<std::list<uint32_t>>(lSize, lSize, {}));
+        sCompA = std::make_shared<sCompanyActions>(*sCompRecipes, nullptr, sCompT); //TODO TYPE
     }
 
     void tick(uint32_t tTime) {
         if (sCompT->hasToChange(tTime)) // Aixi no hem de crear un vector vuit cada frame.
             for (std::pair<uint32_t, uint32_t> &t: sCompT->checkForTime(tTime))
                 sCompA->gCompletedProduct(sTComp->getCompanyByUUID(t.second), t.first);
-        //TODO actions compilers of companyies;
+        if (tTime % (3600 * 3) == 0) { //ONCE EVERY 3 HOURS
+            for (sCompanyCompiler::sCCIntentions sCCI: sTComp->getTotalIntentions()) {
+                sCompA->gTryIntention(sCCI);
+                    //TODO restar score si ho fa malament; sumar una mica si ho fa be
+            }
+        }
+
     }
 
     void completedStartCompanies(const std::vector<std::vector<std::pair<int, int>>> &gPosCompanies) {
@@ -39,7 +45,7 @@ private:
 
     std::shared_ptr<sCompanyTimer> sCompT;
     std::shared_ptr<sCompanyActions> sCompA;
-    std::shared_ptr<sCompanyCompiler> sCompC;
+    std::shared_ptr<sTotalRecipes> sCompRecipes;
 };
 
 #endif //CITYOFWEIRDFISHES_SMCOMPANY_H

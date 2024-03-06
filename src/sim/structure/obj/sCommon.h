@@ -42,6 +42,7 @@ struct objCompany {
     std::list<ctrct_leaseCell> c_cRentedOther;
     std::map<uint32_t, int> c_pOwn;
 
+    std::pair<uint32_t, uint32_t> c_StrEndTime;
     std::vector<uint64_t> c_cCode;
 
     objCompany() = default;

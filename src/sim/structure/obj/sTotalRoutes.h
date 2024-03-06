@@ -2,8 +2,8 @@
 // Created by Laminar on 03/03/2024.
 //
 
-#ifndef CITYOFWEIRDFISHES_STOTALCIVIL_H
-#define CITYOFWEIRDFISHES_STOTALCIVIL_H
+#ifndef CITYOFWEIRDFISHES_STOTALROUTES_H
+#define CITYOFWEIRDFISHES_STOTALROUTES_H
 
 #include <map>
 #include <cstdint>
@@ -11,20 +11,22 @@
 #include <bits/shared_ptr.h>
 #include "sCommon.h"
 
-class sTotalCivil {
+class sTotalRoutes {
 
 public:
 
-    sTotalCivil() {
-        mExitTimesCivil = std::vector<std::vector<objCivil>>(288);
+    sTotalRoutes() {
+        mExitTimesCivil = std::vector<std::list<objCivil>>(288);
     };
 
-    void addRuteCivil(const objCivil &oC) {
+    std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator> addRuteCivil(const objCivil &oC) {
         auto p = std::make_shared<objCivil>(oC);
         vUniqueCivil.push_back(p);
 
         mExitTimesCivil[oC.c_TBegin].push_back(oC);
         mExitTimesCivil[oC.c_TEnd].push_back(oC);
+
+        return {mExitTimesCivil[oC.c_TBegin].rbegin().base(), mExitTimesCivil[oC.c_TEnd].rbegin().base()};
     }
 
     std::vector<objRoadTravel> getEndStartPoints(uint32_t cTime) {
@@ -43,8 +45,8 @@ public:
     };
 private:
     std::vector<std::shared_ptr<objCivil>> vUniqueCivil;
-    std::vector<std::vector<objCivil>> mExitTimesCivil;
+    std::vector<std::list<objCivil>> mExitTimesCivil;
 
 };
 
-#endif //CITYOFWEIRDFISHES_STOTALCIVIL_H
+#endif //CITYOFWEIRDFISHES_STOTALROUTES_H

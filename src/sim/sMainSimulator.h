@@ -17,7 +17,7 @@
 #include "structure/obj/sTotalCompany.h"
 #include "structure/grids/transformation/gBaseToNearestRoad.h"
 #include "../display/rPileMenus.h"
-#include "structure/obj/sTotalCivil.h"
+#include "structure/obj/sTotalRoutes.h"
 #include "behaviour/company/sMCompany.h"
 
 class sMainSimulator {
@@ -27,7 +27,6 @@ public:
         gLayerTypeSoil = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
         gLayerTypeGen = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
         gLayerCurStruct = std::make_shared<gBasicGrid<uint32_t>>(gBasicGrid<uint32_t>(lSize, lSize, 0));
-        gLayerAirPollution = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
         gLayerTransit = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
         gLayerNextRoad = std::make_shared<gBasicGrid<rNode *>>(gBasicGrid<rNode *>(lSize, lSize, nullptr));
         gClock = {0, 0, true, 1, 1, 0};
@@ -36,6 +35,13 @@ public:
 
     //CITY
     std::shared_ptr<gIGrid<uint8_t>> gLayerTypeGen;
+    //VAL 0: NOTHING;
+    //VAL 1: CIVIL BUILDING;
+    //VAL 2: FACTORY BUILDING;
+    //VAL 3: HEAVY FACTORY BUILDING;
+    //VAL 4: FIELDS;
+    //VAL 5: ROADS;
+
     std::shared_ptr<gIGrid<uint8_t>> gLayerTypeSoil;
     // TYPE 1 Mixed
     // TYPE 2 Mixed
@@ -85,14 +91,14 @@ public:
                 }
             }
 
-            auto newRoutes = sTCivil->getEndStartPoints(
-                    gClock.rVMinute / 5 + gClock.rVHour * 12 + (gClock.rVIsAM ? 0 : 144));
+          /*  auto newRoutes = sTotalEmploye.blabla TODO
             for (auto r: newRoutes) {
                 uint32_t locId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->locIdNode;
                 uint16_t blocId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->rBlock;
                 gLayerRoads[r.c_RStart.first][r.c_RStart.second]->refCompressed->addNewCar(locId, blocId);
             }
-
+            */
+          //  gClock.rVMinute / 5 + gClock.rVHour * 12 + (gClock.rVIsAM ? 0 : 144) PER EL TICK DE sTOTALEMPLOYEE;
             rInteraction->gClock->setClock(gClock);
         }
 
@@ -122,7 +128,7 @@ public:
 
     //MEMORY:
     std::shared_ptr<sMCompany> sComp;
-    std::shared_ptr<sTotalCivil> sTCivil = std::make_shared<sTotalCivil>();
+    std::shared_ptr<sTotalRoutes> sTCivil = std::make_shared<sTotalRoutes>();
 
 private:
     void extractRoadsFromLayer() {

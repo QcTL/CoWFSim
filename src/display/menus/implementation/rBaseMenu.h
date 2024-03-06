@@ -72,7 +72,7 @@ public:
                     refPile->addMenuTop(rSom);
                 } else if (event.key.code == sf::Keyboard::S) {
                     std::shared_ptr<rRoadViewMenu> rRoad = std::make_shared<rRoadViewMenu>(
-                            refPile->vTopActiveMenu, nullptr, "d_mRoadsViewLayer", rIMenu::rRelativePos::pTopLeft);
+                            refPile->vTopActiveMenu, nullptr, "d_mRoadsViewLayer", rIMenu::rRelativePos::pBottomLeft);
                     refPile->addMenuTop(rRoad);
                 }
             default:
@@ -109,7 +109,7 @@ public:
                 if (refLRoads[cPressed.first][cPressed.second] != nullptr) {
                     std::shared_ptr<rRoadViewMenu> rRoad = std::make_shared<rRoadViewMenu>(
                             refPile->vTopActiveMenu, refLRoads[cPressed.first][cPressed.second]->refCompressed,
-                            "d_mRoadsViewLayer", rIMenu::rRelativePos::pTopLeft);
+                            "d_mRoadsViewLayer", rIMenu::rRelativePos::pBottomLeft);
                     refPile->addMenuTop(rRoad);
                 }
                 break;

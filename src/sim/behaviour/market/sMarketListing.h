@@ -21,6 +21,10 @@ public:
         std::pair<int, int> sMO_pos;
         uint16_t sMO_quality;
         uint32_t sMO_askingPrice;
+
+        bool operator==(const sMOffering &other) const {
+            return other.sMO_pos == sMO_pos;
+        }
     };
 
     void addListing(const sMOffering &sMO) {
@@ -29,11 +33,11 @@ public:
         ), sMO);
     }
 
-    void shuffleListing(){
+    void shuffleListing() {
         if (!sMList.empty()) {
             sMOffering lBottomRank = sMList.back();
             sMList.pop_back();
-            lBottomRank.sMO_askingPrice *=   static_cast<uint32_t>(std::floor(lBottomRank.sMO_askingPrice * 0.95));
+            lBottomRank.sMO_askingPrice *= static_cast<uint32_t>(std::floor(lBottomRank.sMO_askingPrice * 0.95));
             addListing(lBottomRank);
         }
     }
@@ -49,10 +53,13 @@ public:
                                                        b.sMO_quality / b.sMO_askingPrice;
                                             });
         if (maxIterator != typeCorrectList.end()) {
-            sMList.erase(maxIterator);
             return *maxIterator; //POTSER JA S'HA ELIMINAT LA REFERENCIA I AIXO EM PETARA A LA CARA :)
         }
         return {};
+    }
+
+    void buyOffering(sMOffering &offer) {
+        sMList.remove(offer);
     }
 
 private:

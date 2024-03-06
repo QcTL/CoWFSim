@@ -9,6 +9,7 @@
 #include <memory>
 #include "sCommon.h"
 #include "../grids/gIGrid.h"
+#include "../../behaviour/company/sCompanyCompiler.h"
 
 class rVectorCompanies {
 public:
@@ -36,6 +37,18 @@ public:
     void removeComp(uint32_t rCar) {
         tVecComp[rCar] = {fEmpty, {}};
         fEmpty = rCar;
+    }
+
+    std::vector<sCompanyCompiler::sCCIntentions> getTotalIntentions() {
+        std::vector<sCompanyCompiler::sCCIntentions> ret;
+        for (auto &i: tVecComp) {
+            if (i.first == -1) {
+                std::vector<sCompanyCompiler::sCCIntentions> rComp = sCompanyCompiler::givenCode(i.second->c_cCode,
+                                                                                                 i.second);
+                ret.insert(ret.end(), rComp.begin(), rComp.end());
+            }
+        }
+        return ret;
     }
 
 private:
@@ -68,6 +81,8 @@ public:
         }
         return r;
     }
+
+    std::vector<sCompanyCompiler::sCCIntentions> getTotalIntentions() { return vTotalComp.getTotalIntentions(); }
 
 private:
     rVectorCompanies vTotalComp;

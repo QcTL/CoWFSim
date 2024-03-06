@@ -91,13 +91,15 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/structure/grids/transformation/gBaseToStartBuildings.h
         src/sim/structure/grids/transformation/gBaseToInertiaRoads.h
         src/sim/structure/grids/transformation/gBaseToIRF.h
-        src/sim/structure/obj/sTotalCivil.h
+        src/sim/structure/obj/sTotalRoutes.h
         src/sim/behaviour/company/sCompanyActions.h
         src/sim/behaviour/company/production/sTotalRecipes.h
         src/sim/behaviour/company/sCompanyTimer.h
         src/sim/behaviour/company/sMCompany.h
         src/sim/behaviour/market/sMMarket.h
         src/sim/behaviour/market/sMarketListing.h
+        src/sim/behaviour/company/employee/sTotalEmploye.h
+        src/sim/behaviour/airPollution/gMainAirPollution.h
 
 )
 
