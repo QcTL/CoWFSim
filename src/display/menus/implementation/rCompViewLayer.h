@@ -18,7 +18,7 @@ public:
 
         comV = std::vector<defTxtCompany>(9, {{0, 0}});
 
-        std::vector<uint8_t> sLengths = {11,5,5,13,6, 9,4,9,4,9};
+        std::vector<uint8_t> sLengths = {11,5,5,13,6, 9,4,9,4,9,4};
 
         for (int i = 0; i < data.size(); ++i) {
             for (int j = 0; j < data[i].size(); ++j) {
@@ -52,6 +52,14 @@ public:
         setText(2, oCommonMenus::getCompNumber(rShow.c_cRentedOther.size()));
         setText(3, "1023450");
         setText(4, "25.34");
+
+
+        setText(5, "");
+        setText(6, "");
+
+        setText(7, "");
+        setText(8, "");
+
         if(rShow.c_pOwn.begin() != rShow.c_pOwn.end()) {
             setText(5, std::to_string(rShow.c_pOwn.begin()->first));
             setText(6, oCommonMenus::getCompNumber(rShow.c_pOwn.begin()->second));

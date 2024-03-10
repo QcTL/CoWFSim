@@ -29,7 +29,7 @@ public:
         std::default_random_engine re(seed == -1 ? std::random_device{}() : seed);
         std::uniform_real_distribution<double> unif(-deviation, deviation);
 
-        while (gType->isInside(pActive) and gType->get(pActive) != 2) {
+        while (gType->isInside(pActive) and gType->get(pActive) != 5) {
             gOutput->set(pActive, valueEnd[maxDepthFractal]);
             gType->set(pActive, 2);
 

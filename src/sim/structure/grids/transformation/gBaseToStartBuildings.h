@@ -24,29 +24,39 @@ public:
         else
             srand(seed);
 
-
         // Generate a random number between 0 and n
-
 
         for (int i = gRange.first.first; i <= gRange.first.second; ++i) {
             for (int j = gRange.second.first; j <= gRange.second.second; ++j) {
-                if (sGroupSoil.find(tSoil->get(i, j)) != sGroupSoil.end() &&
-                    tType->get(i, j) == 0 &&
+                if (sGroupSoil.find(tSoil->get(i, j)) != sGroupSoil.end() && tType->get(i, j) == 0 &&
                     rand() % (tSoil->get(i, j)) == 0) {
-                    tType->set(i, j, 1);
                     switch (tSoil->get(i, j)) {
-                        case 1:
+                        case TypeSoil_T1Urban:
                             tOutput->set(i, j, (((uint32_t) (uint8_t) strtol("00010000", nullptr, 2)) << 24) +
                                                rand() % (4 + 1));
+                            tType->set(i, j, 1);
                             break;
-                        case 2:
+                        case TypeSoil_T2Urban:
                             tOutput->set(i, j, (((uint32_t) (uint8_t) strtol("00010001", nullptr, 2)) << 24) +
                                                rand() % (1 + 1));
+                            tType->set(i, j, 1);
                             break;
-                        case 3:
+                        case TypeSoil_T3Urban:
                             tOutput->set(i, j, (((uint32_t) (uint8_t) strtol("00010010", nullptr, 2)) << 24) +
                                                rand() % (1 + 1));
+                            tType->set(i, j, 1);
                             break;
+                        case TypeSoil_T1Factory:
+                            tOutput->set(i, j, (((uint32_t) (uint8_t) strtol("00010101", nullptr, 2)) << 24) +
+                                               rand() % (2 + 1));
+                            tType->set(i, j, 3);
+                            break;
+                        case TypeSoil_T2Factory:
+                            tOutput->set(i, j, (((uint32_t) (uint8_t) strtol("00010101", nullptr, 2)) << 24) +
+                                               rand() % (2 + 1));
+                            tType->set(i, j, 2);
+                            break;
+
                     }
                 }
             }

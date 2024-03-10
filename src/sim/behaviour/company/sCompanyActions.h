@@ -21,12 +21,12 @@ public:
                     const std::shared_ptr<sCompanyTimer> &gCTimer)
             : sCA_CTR(sTR), sCA_gTimer(gCTimer), sCA_gType(gType) {}
 
-    bool gTryIntention(sCompanyCompiler::sCCIntentions &sCCI) {
+    bool gTryIntention(sCompanyCompiler::sCCIntentions &sCCI, const std::shared_ptr<gIGrid<uint8_t>> &gAirPollution,
+                       const std::shared_ptr<gIGrid<uint8_t>> &gTypeSoil, uint32_t actTimer) {
         switch (sCCI.scc_type) {
             case sCompanyCompiler::sCCIntentions::CELL_Buy: {
                 sMarketListing::sMOffering sMOff = sCA_MarketListing->getOfferingByType(sCCI.scc_addIdInfo, sCA_gType);
-                //TODO some evaluation and add the element;
-                //and remove it from the owner;
+                //TODO some evaluation and add the element; and remove it from the owner;
                 sCA_MarketListing->buyOffering(sMOff);
             }
                 break;
@@ -40,13 +40,14 @@ public:
                          0, 0});
                 break;
             case sCompanyCompiler::sCCIntentions::OBJ_Produce:
-                gProduceProduct(sCCI.scc_objCompany, sCCI.scc_addIdInfo);
+                gProduceProduct(sCCI.scc_objCompany, sCCI.scc_addIdInfo, actTimer);
                 break;
         }
+        return true;
     }
 
     static void gCompletedProduct(const std::shared_ptr<objCompany> &oC, uint32_t gItemGen) {
-        if (oC->c_pOwn.find(gItemGen) != oC->c_pOwn.end())
+        if (oC->c_pOwn.find(gItemGen) == oC->c_pOwn.end())
             oC->c_pOwn[gItemGen] = 1;
         else
             oC->c_pOwn[gItemGen] += 1;
@@ -54,14 +55,14 @@ public:
 
 private:
 
-    bool gProduceProduct(std::shared_ptr<objCompany> &oC, uint32_t gItemGen) {
+    bool gProduceProduct(std::shared_ptr<objCompany> &oC, uint32_t gItemGen, uint32_t actTime) {
         if (!hasResources(*oC, gItemGen, sCA_CTR) || !hasTypeOwn(*oC, gItemGen, sCA_CTR, sCA_gType))
             return false;
 
         for (const auto &gElem: sCA_CTR.getById(gItemGen).pr_reqProdId)
             oC->c_pOwn[gElem] -= 1;
 
-        sCA_gTimer->addTimer(gItemGen, sCA_CTR.getById(gItemGen).pr_reqTime, oC->c_uuid);
+        sCA_gTimer->addTimer(gItemGen, sCA_CTR.getById(gItemGen).pr_reqTime + actTime, oC->c_uuid);
         return true;
     }
 

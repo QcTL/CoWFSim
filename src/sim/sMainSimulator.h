@@ -30,9 +30,12 @@ public:
         gLayerCurStruct = std::make_shared<gBasicGrid<uint32_t>>(gBasicGrid<uint32_t>(lSize, lSize, 0));
         gLayerTransit = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
         gLayerNextRoad = std::make_shared<gBasicGrid<rNode *>>(gBasicGrid<rNode *>(lSize, lSize, nullptr));
-
-        sComp = std::make_shared<sMCompany>(lSize, gLayerTypeGen);
         gTotalAirPollution = std::make_shared<gMainAirPollution>(lSize);
+
+        sComp = std::make_shared<sMCompany>(lSize,
+                                            gLayerTypeGen,
+                                            gLayerTypeSoil,
+                                            gTotalAirPollution->gLayerAirPollution);
 
         gClock = {0, 0, true, 1, 1, 0};
 
@@ -48,10 +51,12 @@ public:
     //VAL 5: ROADS;
 
     std::shared_ptr<gIGrid<uint8_t>> gLayerTypeSoil;
+    // NOTHING
     // TYPE 1 Mixed
     // TYPE 2 Mixed
     // TYPE 3 Mixed
     // TYPE 1 Industrial
+    // TYPE 2 Industrial
     // TYPE 1 Farm
     // TYPE 1 Protected
     // TYPE 1 Obstacle, can be circumvented
@@ -81,29 +86,33 @@ public:
             gClock.rVMinute = (gClock.rVMinute + 5) % 60;
             if (gClock.rVMinute == 0) {
                 gClock.rVHour = (gClock.rVHour + 1) % 13;
-                if (gClock.rVHour == 0)
+                if (gClock.rVHour == 0) {
                     gClock.rVHour++;
-                if (!gClock.rVIsAM) {
-                    gClock.rVDay = (gClock.rVDay + 1) % 31;
-                    if (gClock.rVDay == 0)
-                        gClock.rVDay++;
-                    if (gClock.rVMonth == 0) {
-                        gClock.rVMonth = (gClock.rVMonth + 1) % 13;
-                        if (gClock.rVMonth == 0)
-                            gClock.rVMonth++;
-                        gClock.rVYear++;
+                    if (!gClock.rVIsAM) {
+                        gClock.rVDay = (gClock.rVDay + 1) % 31;
+                        if (gClock.rVDay == 0)
+                            gClock.rVDay++;
+                        if (gClock.rVMonth == 0) {
+                            gClock.rVMonth = (gClock.rVMonth + 1) % 13;
+                            if (gClock.rVMonth == 0)
+                                gClock.rVMonth++;
+                            gClock.rVYear++;
+                        }
                     }
+                    gClock.rVIsAM = !gClock.rVIsAM;
                 }
             }
 
-            /*  auto newRoutes = sTotalEmploye.blabla TODO
-              for (auto r: newRoutes) {
-                  uint32_t locId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->locIdNode;
-                  uint16_t blocId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->rBlock;
-                  gLayerRoads[r.c_RStart.first][r.c_RStart.second]->refCompressed->addNewCar(locId, blocId);
-              }
-              */
-            //  gClock.rVMinute / 5 + gClock.rVHour * 12 + (gClock.rVIsAM ? 0 : 144) PER EL TICK DE sTOTALEMPLOYEE;
+
+            uint32_t tReduced = gClock.rVMinute / 5 + gClock.rVHour * 12 + (gClock.rVIsAM ? 0 : 144);
+            sComp->tick(tReduced);
+            auto newRoutes = sTCivil->getEndStartPoints(tReduced);
+            for (auto r: newRoutes) {
+                uint32_t locId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->locIdNode;
+                uint16_t blocId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->rBlock;
+                gLayerRoads[r.c_RStart.first][r.c_RStart.second]->refCompressed->addNewCar(locId, blocId);
+            }
+            //   PER EL TICK DE sTOTALEMPLOYEE;
             rInteraction->gClock->setClock(gClock);
             gTotalAirPollution->tick(gLayerTypeGen);
         }
@@ -159,19 +168,19 @@ private:
         }
 
         //TEST DAILY COMMUTE:
-        /*
+
         for (int i = 0; i < 10; i++) {
             uint32_t tTime = i;
             uint32_t tTimeEnd = i + 48;
 
-            for (int j = 0; j < 6; j++) {
+            for (int j = 0; j < 3; j++) {
                 int idP1;
                 int idP2;
                 choseFromVector(gTotalNodes.size(), idP1, idP2);
 
                 sTCivil->addRuteCivil({{gTotalNodes[idP1]->rPos, gTotalNodes[idP2]->rPos}, tTime, tTimeEnd});
             }
-        }*/
+        }
     };
     std::list<std::shared_ptr<rRNodeI>> rListRRoads;
     int sizeL;

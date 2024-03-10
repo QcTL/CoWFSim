@@ -32,22 +32,9 @@ int tst_gBasicNewWay(const std::map<std::string, std::string> &mValues) {
 
     sMS->gTotalAirPollution->gLayerAirPollution = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
 
-    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gTotalAirPollution->gLayerAirPollution,
-                                                                       sMS->gLayerCurStruct, sMS->gLayerTransit);
+    sMainContainer sMC(sMS);
 
-    //MENUS
-    std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
-    std::shared_ptr<rBaseMenu> rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->gLayerTypeGen,
-                                                                              sMS->gLayerRoads,
-                                                                              sMS->sComp->gLayerOwnership,
-                                                                              sMS->sComp->sTComp));
-    pPM->addMenuTop(rBasic);
-    rGlobal rG(gSimL, pPM);
-    rG.setUp();
-    while (rG.isOpen) {
-        rG.loop();
-        sMS->tick();
-    }
+    sMC.gameLoop();
     return 0;
 }
 

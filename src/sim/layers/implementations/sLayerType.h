@@ -15,13 +15,24 @@
 #include "../../structure/grids/transformation/gBasicTransformations.h"
 #include "../../structure/grids/transformation/gPointToNearestElem.h"
 
+const uint8_t TypeSoil_Nothing = 0;
+const uint8_t TypeSoil_T1Urban = 1;
+const uint8_t TypeSoil_T2Urban = 2;
+const uint8_t TypeSoil_T3Urban = 3;
+const uint8_t TypeSoil_T1Factory = 4;
+const uint8_t TypeSoil_T2Factory = 5;
+const uint8_t TypeSoil_T1Farm = 6;
+const uint8_t TypeSoil_T1Protected = 7;
+const uint8_t TypeSoil_T1Obstacle = 8;
+const uint8_t TypeSoil_T2Obstacle = 9;
+
 class sLayerType {
 public:
     static std::shared_ptr<gIGrid<uint8_t>> gen(uint32_t lSize, const std::shared_ptr<gIGrid<uint8_t>> &gTypeGen,
                                                 const std::map<std::string, std::string> &mValues) {
         std::shared_ptr<gIGrid<uint8_t>> gLayerTypeSoil =
-                std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
-       std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gLayerTypeSoil->rangeUse();
+                std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, TypeSoil_Nothing));
+        std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gLayerTypeSoil->rangeUse();
 
         float lSizeRiver = 0;
         if (mValues.at("Mida_Simulacio") == "Petita")
@@ -34,38 +45,48 @@ public:
             lSizeRiver = 2.7;
 
         if (mValues.at("Conte_Riu") == "on")
-            gBaseToRiver<uint8_t>::generate(gLayerTypeSoil, 20, lSizeRiver, 5);
+            gBaseToRiver<uint8_t>::generate(gLayerTypeSoil, 20, lSizeRiver, TypeSoil_T1Obstacle);
 
         gBaseClosestToPoint::gen<uint8_t>(gLayerTypeSoil, {
                                                   {{lSize / 2, lSize / 2}, 7},
                                                   {{30,        40},        7}
-                                          }, 1,
-                                          BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {0}));
+                                          }, TypeSoil_T1Urban,
+                                          BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing}));
 
         gBaseClosestToPoint::gen<uint8_t>(gLayerTypeSoil, {
                                                   {{lSize / 2, lSize / 2}, 15},
                                                   {{30,        40},        15}
-                                          }, 2,
-                                          BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {0}));
+                                          }, TypeSoil_T2Urban,
+                                          BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing}));
 
         gBaseClosestToPoint::gen<uint8_t>(gLayerTypeSoil, {
                                                   {{lSize / 2, lSize / 2}, 25},
                                                   {{30,        40},        25}
-                                          }, 3,
-                                          BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {0}));
+                                          }, TypeSoil_T3Urban,
+                                          BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing}));
 
 
-        auto wMask = BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {0});
+        gBaseClosestToPoint::gen<uint8_t>(gLayerTypeSoil, {
+                                                  {{60, 20}, 5},
+                                          }, TypeSoil_T1Factory,
+                                          BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing}));
+
+        gBaseClosestToPoint::gen<uint8_t>(gLayerTypeSoil, {
+                                                  {{60, 20}, 10},
+                                          }, TypeSoil_T2Factory,
+                                          BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing}));
+
+        auto wMask = BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing});
         for (int i = gRange.first.first; i <= gRange.first.second; ++i) {
             for (int j = gRange.second.first; j <= gRange.second.second; ++j) {
                 if (wMask->get(i, j)
-                    && gPointToNearestElem::find<uint8_t>(gLayerTypeSoil, {i, j}, 5, 15).first > 0) {
-                    gLayerTypeSoil->set(i, j, 4);
+                    && gPointToNearestElem::find<uint8_t>(gLayerTypeSoil, {i, j}, TypeSoil_T1Obstacle, 15).first > 0) {
+                    gLayerTypeSoil->set(i, j, TypeSoil_T1Farm);
                 }
             }
         }
         BasicTransformations::copyWhere(gTypeGen, gLayerTypeSoil, {{7, 5},
-                                                                   {4, 4}});
+                                                                   {TypeSoil_T1Farm, 4},});
 
         return gLayerTypeSoil;
     }

@@ -57,6 +57,7 @@ struct objCompany {
         for (const auto &str: selectedStrings)
             nName += str;
         nName[0] = toupper(nName[0]);
+        c_cCode = {13835058055282163712};
     }
 };
 

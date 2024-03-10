@@ -33,6 +33,7 @@ int tst_gWindExpansion() {
 
     sMS->gLayerTypeGen->set(3,3,3);
     sMS->gLayerTypeGen->set(15,15,3);
+    sMS->gLayerTypeGen->set(16,15,3);
     sMS->completedStartGrid();
     //sMS->completedStartCompanies(retCells.gCompanyPositions);
 

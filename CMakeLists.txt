@@ -101,6 +101,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/behaviour/company/employee/sTotalEmployee.h
         src/sim/behaviour/airPollution/gMainAirPollution.h
         src/tests/tst_gWindExpansion.h
+        "src/sim/behaviour/recording/sStorageCivilRoutineState.h"
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

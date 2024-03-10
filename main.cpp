@@ -20,11 +20,12 @@ int main() {
     std::cout << "------" << std::endl;
 
 
-    tst_gWindExpansion();
+    //tst_gBasicNewWay(sMVar);
+    //tst_gWindExpansion();
     //tst_gVeh();
     //tst_gMenus();
     //tst_gBasicNewWay(sMVar);
-    //SimInitialize::givenMap(sMVar);
+    SimInitialize::givenMap(sMVar);
     // 0xFF
     return 0;
 }
