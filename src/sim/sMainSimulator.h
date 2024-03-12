@@ -168,7 +168,7 @@ private:
         }
 
         //TEST DAILY COMMUTE:
-
+        /*
         for (int i = 0; i < 10; i++) {
             uint32_t tTime = i;
             uint32_t tTimeEnd = i + 48;
@@ -180,7 +180,8 @@ private:
 
                 sTCivil->addRuteCivil({{gTotalNodes[idP1]->rPos, gTotalNodes[idP2]->rPos}, tTime, tTimeEnd});
             }
-        }
+        }*/
+        sTCivil->addRuteCivil({{{64,75}, {8,50}}, 5, 250});
     };
     std::list<std::shared_ptr<rRNodeI>> rListRRoads;
     int sizeL;

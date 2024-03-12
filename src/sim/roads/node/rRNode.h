@@ -299,18 +299,12 @@ public:
     int getCapacity() { return nCompressed; }
 
     std::list<uint32_t> getPosRoad(int idRoad) {
+        auto& road = (idRoad == 0) ? dFirst.lOrderedCars : dSecond.lOrderedCars;
         std::list<uint32_t> intList;
-        if (idRoad == 0) {
-            std::transform(dFirst.lOrderedCars.begin(), dFirst.lOrderedCars.end(), std::back_inserter(intList),
-                           [](const std::pair<uint32_t, uint32_t> &p) { return p.first; });
-        } else {
-
-            std::transform(dSecond.lOrderedCars.begin(), dSecond.lOrderedCars.end(), std::back_inserter(intList),
-                           [](const std::pair<uint32_t, uint32_t> &p) { return p.first; });
-        }
+        std::transform(road.begin(), road.end(), std::back_inserter(intList),
+                       [](const std::pair<uint32_t, uint32_t> &p){ return p.second; });
         return intList;
     }
-
 
 private:
 
