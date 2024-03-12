@@ -168,11 +168,11 @@ public:
 
     void addNewCar(uint32_t idDest, uint16_t blockDest) override {}
 
-    float getOccupancy() { return itsEmpty ? 0 : 1.0; }
+    float getOccupancy() override{ return itsEmpty ? 0 : 1.0; }
 
-    int getCapacity() { return 1; }
+    int getCapacity() override{ return 1; }
 
-    std::list<uint32_t> getPosRoad(int idRoad) {
+    std::list<uint32_t> getPosRoad(int idRoad) override{
         if (itsEmpty) return {};
         return {0};
     }
@@ -292,25 +292,19 @@ public:
         updateRefGrid(std::max(dFirst.lOrderedCars.size(), dSecond.lOrderedCars.size()));
     }
 
-    float getOccupancy() {
+    float getOccupancy() override{
         return std::max(dFirst.lOrderedCars.size() / nCompressed, dSecond.lOrderedCars.size() / nCompressed);
     }
 
-    int getCapacity() { return nCompressed; }
+    int getCapacity() override{ return nCompressed; }
 
-    std::list<uint32_t> getPosRoad(int idRoad) {
+    std::list<uint32_t> getPosRoad(int idRoad) override{
+        auto& road = (idRoad == 0) ? dFirst.lOrderedCars : dSecond.lOrderedCars;
         std::list<uint32_t> intList;
-        if (idRoad == 0) {
-            std::transform(dFirst.lOrderedCars.begin(), dFirst.lOrderedCars.end(), std::back_inserter(intList),
-                           [](const std::pair<uint32_t, uint32_t> &p) { return p.first; });
-        } else {
-
-            std::transform(dSecond.lOrderedCars.begin(), dSecond.lOrderedCars.end(), std::back_inserter(intList),
-                           [](const std::pair<uint32_t, uint32_t> &p) { return p.first; });
-        }
+        std::transform(road.begin(), road.end(), std::back_inserter(intList),
+                       [](const std::pair<uint32_t, uint32_t> &p){ return p.second; });
         return intList;
     }
-
 
 private:
 
