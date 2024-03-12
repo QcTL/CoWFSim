@@ -42,11 +42,8 @@ public:
                 {0, data_.size() - 1}};
     }
 
-    bool isInside(std::pair<int, int> p) override {
-        return 0 <= p.first && p.first < data_.size() && 0 <= p.second && p.second < data_[0].size();
-    }
 
-    bool isInside(int pX, int pY) override {
+    bool isInside(const int& pX,const int& pY) override {
         return 0 <= pX && pX < data_.size() && 0 <= pY && pY < data_[0].size();
     }
 

@@ -12,7 +12,7 @@
 #include "src/sim/structure/grids/transformation/gBasicTransformations.h"
 #include "src/display/layers/implementation/gLayerCity.h"
 #include "src/display/layers/implementation/gLayerAirPollution.h"
-#include "src/display/layers/gSimLayers.h"
+#include "src/display/layers/gDispLayers.h"
 #include "src/display/rPileMenus.h"
 #include "src/display/rGlobal.h"
 
@@ -104,7 +104,7 @@ public:
         gLAP->setTransformation({0, 1, 2, 3, 4, 5});
 
         //std::shared_ptr<gLayerCity> gLC = std::make_shared<gLayerCity>(gLayerCity(gB));
-        std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(gLAP, nullptr, gB->rangeUse());
+        std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(gLAP, nullptr, gB->rangeUse());
         gSimL->switchActual(gSimLayersTypes::G_AIRPOLLUTION);
 
 

@@ -79,13 +79,13 @@ public:
         rW.draw(dInfo, &tsTex.tsTex);
     }
 
-    void setResponse(int v) override {}
+    void setResponse(int v, uint16_t lID) override {}
 
     bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override {
         switch (event.type) {
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::Escape) {
-                    parentMenu->setResponse(0);
+                    parentMenu->setResponse(-1,2);
                 }
                 break;
             default:
@@ -96,7 +96,7 @@ public:
     }
 
     void pressedCell(std::pair<int, int> cPressed) {
-        parentMenu->setResponse(0);
+        parentMenu->setResponse(-1,2);
     }
 
 private:
@@ -172,7 +172,7 @@ private:
 
     void setRoadsCars(const std::list<uint32_t> &rListPosTop, const std::list<uint32_t> &rListPosBottom) {
         //1rst clear all the lines that could be had cars from the last one;
-        for (int i = 3; i < 33; i++) {
+        for (int i = 3; i < 32; i++) {
             sf::Vertex *quadTop = &dInfo[(2 * gWidth + i) * 4];
             sf::Vertex *quadBottom = &dInfo[(8 * gWidth + i) * 4];
             for (int k = 0; k < 4; k++) {

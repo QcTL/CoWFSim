@@ -1,12 +1,13 @@
-
-
-
 #include <filesystem>
-#include "src/common/RelPath.h"
+#include <iostream>
 #include "src/IO/ReaderParameters.h"
-#include "src/tests/tst_gERCComm.h"
-#include "src/tests/tst_gVeh.h"
+#include "src/common/RelPath.h"
 #include "SimInitialize.h"
+#include "src/tests/tst_gExtractRoadsCompressed.h"
+#include "src/tests/tst_gMenus.h"
+#include "src/tests/tst_gBasicNewWay.h"
+#include "src/tests/tst_gVeh.h"
+#include "src/tests/tst_gWindExpansion.h"
 
 int main() {
     RelPath::selRelPath(std::filesystem::current_path().parent_path());
@@ -18,12 +19,13 @@ int main() {
     }
     std::cout << "------" << std::endl;
 
-    tst_gVeh();
-    //SimInitialize::givenMap(sMVar);
-    //tst_gBasicPattern();
-    //tst_gMenus();
-    //SimInitialize::givenMap(sMVar);
-    //SimInitializePreb::givenMap(sMVar);
 
+    //tst_gBasicNewWay(sMVar);
+    //tst_gWindExpansion();
+    //tst_gVeh();
+    //tst_gMenus();
+    //tst_gBasicNewWay(sMVar);
+    SimInitialize::givenMap(sMVar);
+    // 0xFF
     return 0;
 }

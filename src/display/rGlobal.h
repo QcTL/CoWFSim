@@ -11,12 +11,13 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include "rPileMenus.h"
-#include "layers/gSimLayers.h"
+#include "layers/gDispLayers.h"
 #include "CameraControls.h"
 
 class rGlobal {
 public:
-    explicit rGlobal(std::shared_ptr<gSimLayers> gInfoL, std::shared_ptr<rPileMenus> rPMenu);
+    explicit rGlobal(const std::shared_ptr<gDispLayers> &gInfoL, const std::shared_ptr<rPileMenus> &rPMenu);
+    rGlobal();
 
     void setUp();
 
@@ -28,7 +29,7 @@ public:
 
 private:
     std::shared_ptr<rPileMenus> rPMenu;
-    std::shared_ptr<gSimLayers> gSimL;
+    std::shared_ptr<gDispLayers> gSimL;
     sf::RenderWindow rWindow;
     sf::View rView;
 
@@ -36,9 +37,10 @@ private:
     sf::VertexArray verSelector;
     CameraControls rCC;
 
-    std::pair<int , int> rPosCursor;
+    std::pair<int, int> rPosCursor;
 
     void reloadCellValues();
+
     void reloadSelValue();
 };
 

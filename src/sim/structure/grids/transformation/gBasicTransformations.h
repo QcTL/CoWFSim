@@ -92,18 +92,30 @@ public:
     }
 
     template<typename T>
-    static std::shared_ptr<gIGrid<T>> replaceValues(std::shared_ptr<gIGrid<T>> grid, const std::map<T, T>& repValues ){
+    static void replaceValues(const std::shared_ptr<gIGrid<T>> &grid, const std::map<T, T> &repValues) {
         auto gRange = grid->rangeUse();
         for (int i = gRange.second.first; i <= gRange.second.second; i++) {
             for (int j = gRange.first.first; j <= gRange.first.second; j++) {
-                if (repValues.find(grid->get(i,j)) != repValues.end()) {
-                    grid->set(i, j, repValues.at(grid->get(i,j)));
+                if (repValues.find(grid->get(i, j)) != repValues.end()) {
+                    grid->set(i, j, repValues.at(grid->get(i, j)));
                 }
             }
         }
-        return grid;
     }
 
+    template<typename T, typename Q>
+    static void copyWhere(const std::shared_ptr<gIGrid<T>> &gridExit,
+                          const std::shared_ptr<gIGrid<Q>> &gridEnter,
+                          const std::map<Q, T> &repValues) {
+        auto gRange = gridEnter->rangeUse();
+        for (int i = gRange.second.first; i <= gRange.second.second; i++) {
+            for (int j = gRange.first.first; j <= gRange.first.second; j++) {
+                if (repValues.find(gridEnter->get(i, j)) != repValues.end()) {
+                    gridExit->set(i, j, repValues.at(gridEnter->get(i, j)));
+                }
+            }
+        }
+    }
 };
 
 #endif //CITYOFWEIRDFISHES_GBASICTRANSFORMATIONS_H

@@ -7,37 +7,46 @@
 
 #include "../display/layers/implementation/gLayerAirPollution.h"
 #include "../sim/structure/grids/gBasicGrid.h"
-#include "../display/layers/gSimLayers.h"
+#include "../display/layers/gDispLayers.h"
 #include "../display/rGlobal.h"
 #include "../sim/structure/grids/transformation/gBaseToGradientMinimum.h"
+#include "../sim/sMainSimulator.h"
+#include "../sim/structure/grids/transformation/sGridToSimulator.h"
+#include "../display/menus/implementation/rBaseMenu.h"
+#include "../sim/structure/grids/transformation/gBasicTransformations.h"
 
 int tst_gBasicDisplay() {
 
-
-    std::shared_ptr<gIGrid<int>> gB =std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(30, 30, -1));
+    std::shared_ptr<gIGrid<uint8_t>> gB =std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(30, 30, 255));
+    std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(30);
 
     std::vector<gtmElement> vElem = {
             gtmElement(0.0, 0, 0.0, 0),
             gtmElement(0.5, 0, 0.05, 0),
             gtmElement(0.15, 0, 0.3, 0),};
 
-    gBaseToGradientMinimum gBGM(vElem, {15, 15}, gB); // Pass ptr by reference
+    gBaseToGradientMinimum<uint8_t> gBGM(vElem, {15, 15}, gB, 255); // Pass ptr by reference
     gBGM.generateV2();
 
-    std::cout << *dynamic_cast<gBasicGrid<int> *>(gB.get()) << std::endl;
+    std::cout << *dynamic_cast<gBasicGrid<uint8_t> *>(gB.get()) << std::endl;
     std::cout << "------------" << std::endl;
 
+    sMS->gLayerAirPollution = gB;
 
+    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gLayerAirPollution,
+                                                                       sMS->gLayerCurStruct, sMS->gLayerTransit);
 
-    std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gB));
-    gLAP->setTransformation({0,1,2,3,4,5});
-    std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(gSimLayers(gLAP));
-
-    std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>();
+    //MENUS
+    std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
+    std::shared_ptr<rBaseMenu> rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->gLayerTypeGen,
+                                                                              sMS->gLayerRoads,
+                                                                              sMS->sComp->gLayerOwnership, sMS->sComp->sTComp));
+    pPM->addMenuTop(rBasic);
     rGlobal rG(gSimL, pPM);
     rG.setUp();
-    while(rG.isOpen) {
+    while (rG.isOpen) {
         rG.loop();
+        sMS->tick();
     }
     return 0;
 }

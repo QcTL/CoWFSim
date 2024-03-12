@@ -42,7 +42,7 @@ void rSelOptMenu::setNewSel(int v) {
     cCurrenSel = v;
 }
 
-void rSelOptMenu::setResponse(int v) {}
+void rSelOptMenu::setResponse(int v, uint16_t lID) {}
 
 bool rSelOptMenu::interact(const sf::Event &event, const sf::RenderWindow &rWindow) {
     switch (event.type) {
@@ -54,14 +54,15 @@ bool rSelOptMenu::interact(const sf::Event &event, const sf::RenderWindow &rWind
                     sf::Vector2<unsigned int> absPos = getAbsPos(rWindow, gHeight * 16, gWidth * 16, pMouse);
                     for (int i = 0; i < pElemSelAbs.size(); i++) {
                         if (pElemSelAbs[i].first * 16 < absPos.y && pElemSelAbs[i].first * 16 + 16 >= absPos.y) {
-                            parentMenu->setResponse(i);
+                            parentMenu->setResponse(i, 3);
                         }
                     }
+                    return true;
                 }
-                return true;
             }
             break;
         default:
             return false;
     }
+    return false;
 }

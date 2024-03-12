@@ -9,81 +9,50 @@
 #include "../sim/structure/grids/gBasicGrid.h"
 #include "../sim/structure/grids/transformation/gBaseToPattern.h"
 #include "../display/layers/implementation/gLayerAirPollution.h"
-#include "../display/layers/gSimLayers.h"
+#include "../display/layers/gDispLayers.h"
 #include "../display/rGlobal.h"
 #include "../sim/roads/rNodeFromGrid.h"
-#include "../sim/roads/rTransRNodeToRRNode.h"
+#include "../display/menus/implementation/rBaseMenu.h"
+#include "../sim/layers/implementations/sLayerType.h"
+#include "../common/sMainContainer.h"
+
 
 int tst_gVeh() {
-    std::shared_ptr<gIGrid<int>> gB = std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(10, 10, 0));
-    std::shared_ptr<gIGrid<int>> gTransit = std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(10, 10, 0));
+    std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(100);
 
-    gB->set(0,2, 1);
-    gB->set(1,0, 1);
-    gB->set(1,1, 1);
-    gB->set(1,2, 1);
-    gB->set(1,3, 1);
-    gB->set(2,2, 1);
+    std::shared_ptr<gIGrid<uint8_t>> gB = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(100, 100, 0));
+    std::shared_ptr<gIGrid<uint8_t>> gTransit = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(100, 100, 0));
 
+    /*
+    gB->set(0, 2, 2);
+    gB->set(1, 0, 2);
+    gB->set(1, 1, 2);
+    gB->set(1, 2, 2);
+    gB->set(1, 3, 2);
+    gB->set(2, 2, 2);
+*/
 
+    gBaseToPattern<uint8_t> gBP(gB,
+                                gBaseToPattern<uint8_t>::gPatternType::gBPBlobSquares,
+                                gBaseToPattern<uint8_t>::gPatternParameters(4, 4, 25, 25),
+                                2);
 
-    std::vector<rNode*> r = rNodeFromGrid<int>::givenGrid(gB, 1);
-    rNode * rOne = r[0];
-    std::list<std::shared_ptr<rRNodeI>> rLL = rTransRNodeToRRNode::conversion(rOne, 5, 10, gTransit);
-
-    rInfoDist::initializeMatrix(10/5*10/5,5*5, rLL.size());
-
-    //TODO tambe falta lo important que es tenir la matriu de la grid sapiguent a quin node estan "compactat".
-
-    for (const std::shared_ptr<rRNodeI>& node : rLL) {
-        node->sendInformationStart();
-    }
-
-    for(int i = 0; i < 3; i++) {
-        for (const std::shared_ptr<rRNodeI>& node: rLL) {
-            node->sendNewInformation();
-        }
-    }
+    sMS->gLayerTypeGen = gB;
+    sMS->gTotalAirPollution->gLayerAirPollution  = gB;
+    sMS->completedStartGrid();
 
 
-    auto it = std::next(rLL.begin(), 2); // Iterator to the second element
-    it->get()->addNewCar(1,0);
-
-    auto it2 = std::next(rLL.begin(), 3); // Iterator to the second element
-    it2->get()->addNewCar(1,0);
+    sMS->gLayerRoads[0][0]->refCompressed->addNewCar(sMS->gLayerRoads[75][75]->refCompressed->locIdNode,
+                                                     sMS->gLayerRoads[75][75]->refCompressed->rBlock);
 
 
-    rInfoDist::seeMatrix();
-    std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gB));
-    gLAP->setTransformation({0, 1, 2, 3, 4, 5});
+    //START TRANSIT;
+    // uint32_t p1 = sMS->gLayerRoads[22][51]->refCompressed->locIdNode;
+    // uint32_t b1 = sMS->gLayerRoads[22][51]->refCompressed->rBlock;
+    // sMS->gLayerRoads[43][39]->refCompressed->addNewCar(p1, b1);
+    sMainContainer sMC(sMS);
 
-    std::shared_ptr<gLayerTransit> gT = std::make_shared<gLayerTransit>(gLayerTransit(gTransit));
-    gT->setTransformation({0, 1, 2, 3, 4, 5});
-
-
-    std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(gLAP, nullptr, gT, gB->rangeUse());
-    gSimL->switchActual(gSimLayersTypes::G_TRANSIT);
-
-    std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
-    std::shared_ptr<rBaseMenu> rBasic = std::make_shared<rBaseMenu>(
-            pPM, rIMenu::rRelativePos::pBottomRight);
-    pPM->addMenuTop(rBasic);
-    rGlobal rG(gSimL,pPM);
-    rG.setUp();
-    int p = 0;
-
-    while (rG.isOpen) {
-        if( p > 2000) {
-            for (const std::shared_ptr<rRNodeI> &node: rLL) {
-                node->tick();
-            }
-            p = 0;
-        }else{
-            p += 1;
-        }
-        rG.loop();
-    }
-
+    sMC.gameLoop();
     return 0;
 }
 

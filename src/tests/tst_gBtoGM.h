@@ -16,7 +16,7 @@ int tst_gBtoGM() {
             gtmElement(0.1, 0, 0.15, 0),
             gtmElement(0.15, 0, 0.03, 0),};
 
-    gBaseToGradientMinimum gBGM(vElem, {15, 15}, ptr, 35); // Pass ptr by reference
+    gBaseToGradientMinimum<float> gBGM(vElem, {15, 15}, ptr, -1); // Pass ptr by reference
     gBGM.generateV1();
 
     std::cout << *dynamic_cast<gBasicGrid<float> *>(ptr.get()) << std::endl;

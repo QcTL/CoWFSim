@@ -7,27 +7,33 @@
 
 #include "../display/layers/implementation/gLayerAirPollution.h"
 #include "../sim/structure/grids/gBasicGrid.h"
-#include "../display/layers/gSimLayers.h"
+#include "../display/layers/gDispLayers.h"
 #include "../display/rGlobal.h"
 #include "../sim/structure/grids/transformation/gBaseToGradientMinimum.h"
 #include "../sim/structure/grids/transformation/gBaseToRiver.h"
+#include "../sim/sMainSimulator.h"
+#include "../display/menus/implementation/rBaseMenu.h"
 
 int tst_gBasicRiver() {
+    std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(105);
+    std::shared_ptr<gIGrid<uint8_t>> gB =std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(105, 105, 3));
+    gBaseToRiver<uint8_t> gBTR(gB,20,1.6, 100);
 
+    sMS->gLayerAirPollution = gB;
 
-    std::shared_ptr<gIGrid<int>> gB =std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(105, 105, 3));
-
-    gBaseToRiver<int> gBTR(gB,20,1.6, 100);
-
-    std::shared_ptr<gLayerAirPollution> gLAP = std::make_shared<gLayerAirPollution>(gLayerAirPollution(gB));
-    gLAP->setTransformation({0,1,2,3,4,5});
-    std::shared_ptr<gSimLayers> gSimL = std::make_shared<gSimLayers>(gSimLayers(gLAP));
-
-    std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>();
+    std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gLayerAirPollution,
+                                                                       sMS->gLayerCurStruct, sMS->gLayerTransit);
+    //MENUS
+    std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
+    std::shared_ptr<rBaseMenu> rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->gLayerTypeGen,
+                                                                              sMS->gLayerRoads,
+                                                                              sMS->sComp->gLayerOwnership, sMS->sComp->sTComp));
+    pPM->addMenuTop(rBasic);
     rGlobal rG(gSimL, pPM);
     rG.setUp();
-    while(rG.isOpen) {
+    while (rG.isOpen) {
         rG.loop();
+        sMS->tick();
     }
     return 0;
 }

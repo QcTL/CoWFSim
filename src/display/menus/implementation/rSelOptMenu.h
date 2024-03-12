@@ -22,7 +22,7 @@ public:
 
     void draw(sf::RenderWindow &rW) override;
 
-    void setResponse(int v) override;
+    void setResponse(int v, uint16_t lID) override;
 
     bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override;
 
