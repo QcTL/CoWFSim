@@ -1,0 +1,2 @@
+type:mRoadCrossing
+src:mRoadsViewCrossing.txt

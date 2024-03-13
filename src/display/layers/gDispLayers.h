@@ -26,7 +26,7 @@ public:
                          const std::shared_ptr<gIGrid<uint8_t>> &gSimT)
             : gSL_AP(gTransSimToDisp::gToLayerAirPollution(gSimAP)),
               gSL_C(gTransSimToDisp::gToLayerCity(gSimC)),
-              gSL_T(gTransSimToDisp::gToLayerTransit(gSimT)),
+              gSL_T(gTransSimToDisp::gToLayerTransit(gSimT, gSimC)),
               gRangeUse(gSimAP->rangeUse()) {
         gSLActual = gSL_C;
     }

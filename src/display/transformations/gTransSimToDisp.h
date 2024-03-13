@@ -24,8 +24,8 @@ public:
         return std::make_shared<gLayerCity>(gLayerCity(gSim));
     }
 
-    static std::shared_ptr<gLayerTransit> gToLayerTransit(const std::shared_ptr<gIGrid<uint8_t>> &gSim) {
-        return std::make_shared<gLayerTransit>(gLayerTransit(gSim));
+    static std::shared_ptr<gLayerTransit> gToLayerTransit(const std::shared_ptr<gIGrid<uint8_t>> &gSim, const std::shared_ptr<gIGrid<uint32_t>> &gCitySim) {
+        return std::make_shared<gLayerTransit>(gLayerTransit(gSim, gCitySim));
     }
 };
 

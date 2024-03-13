@@ -8,6 +8,8 @@
 #include "src/tests/tst_gBasicNewWay.h"
 #include "src/tests/tst_gVeh.h"
 #include "src/tests/tst_gWindExpansion.h"
+#include "src/tests/tst_gNewVisualitzation.h"
+#include "src/common/r2BitDirection.h"
 
 int main() {
     RelPath::selRelPath(std::filesystem::current_path().parent_path());
@@ -25,7 +27,10 @@ int main() {
     //tst_gVeh();
     //tst_gMenus();
     //tst_gBasicNewWay(sMVar);
-    SimInitialize::givenMap(sMVar);
+    //SimInitialize::givenMap(sMVar);
     // 0xFF
+
+    r2BitDirection::loadPossibleRoads("FRoadValid.txt");
+    tst_gNewVisualization(sMVar);
     return 0;
 }

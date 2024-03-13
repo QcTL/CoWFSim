@@ -48,6 +48,13 @@ public:
 
     virtual std::list<uint32_t> getPosRoad(int idRoad) = 0;
 
+    virtual bool isCrossing() = 0;
+
+    virtual std::pair<std::pair<int, int>, std::pair<int, int>> getSizesNeighbor() {
+        return {{rTop == nullptr ? -1 : 1,  rBottom == nullptr ? -1 : 1},
+                {rLeft == nullptr ? -1 : 1, rRight == nullptr ? -1 : 1}};
+    }
+
     std::shared_ptr<rRNodeI> rLeft;
     std::shared_ptr<rRNodeI> rRight;
     std::shared_ptr<rRNodeI> rTop;
@@ -121,6 +128,8 @@ class rRNodeC : public rRNodeI {
 public:
     explicit rRNodeC(uint16_t rBlock) : rRNodeI(rBlock), itsEmpty(true) {}
 
+    bool isCrossing() override{return true;}
+
     void receive(const rRMail &r, const uint8_t &dir) override {
         rMailBox.rMB.emplace(r, dir);
     }
@@ -168,11 +177,11 @@ public:
 
     void addNewCar(uint32_t idDest, uint16_t blockDest) override {}
 
-    float getOccupancy() override{ return itsEmpty ? 0 : 1.0; }
+    float getOccupancy() override { return itsEmpty ? 0 : 1.0; }
 
-    int getCapacity() override{ return 1; }
+    int getCapacity() override { return 1; }
 
-    std::list<uint32_t> getPosRoad(int idRoad) override{
+    std::list<uint32_t> getPosRoad(int idRoad) override {
         if (itsEmpty) return {};
         return {0};
     }
@@ -206,6 +215,8 @@ public:
             rRNodeI(rBlock), nCompressed(nCompressed), dFirst(nCompressed), dSecond(nCompressed) {
         std::vector<bool> elements(10, true);
     }
+
+    bool isCrossing() override{return false;}
 
     void receive(const rRMail &r, const uint8_t &dir) override {
         std::pair<uint8_t, std::shared_ptr<rRNodeI>> sec = otherDir(dir);
@@ -292,17 +303,17 @@ public:
         updateRefGrid(std::max(dFirst.lOrderedCars.size(), dSecond.lOrderedCars.size()));
     }
 
-    float getOccupancy() override{
+    float getOccupancy() override {
         return std::max(dFirst.lOrderedCars.size() / nCompressed, dSecond.lOrderedCars.size() / nCompressed);
     }
 
-    int getCapacity() override{ return nCompressed; }
+    int getCapacity() override { return nCompressed; }
 
-    std::list<uint32_t> getPosRoad(int idRoad) override{
-        auto& road = (idRoad == 0) ? dFirst.lOrderedCars : dSecond.lOrderedCars;
+    std::list<uint32_t> getPosRoad(int idRoad) override {
+        auto &road = (idRoad == 0) ? dFirst.lOrderedCars : dSecond.lOrderedCars;
         std::list<uint32_t> intList;
         std::transform(road.begin(), road.end(), std::back_inserter(intList),
-                       [](const std::pair<uint32_t, uint32_t> &p){ return p.second; });
+                       [](const std::pair<uint32_t, uint32_t> &p) { return p.second; });
         return intList;
     }
 

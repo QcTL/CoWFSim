@@ -63,16 +63,21 @@ public:
                            (((uint32_t) (uint8_t) strtol("110000", nullptr, 2)) << 24) + p);
             }
         }
-        //ROADS:
 
+        //ROADS:
         //INTRACITY;
-        uint32_t idTypeRoadIntra = (((uint32_t) (uint8_t) strtol("100001", nullptr, 2)) << 24);
-        uint32_t idTypeRoadOuter = (((uint32_t) (uint8_t) strtol("100000", nullptr, 2)) << 24);
+        uint32_t idTypeRoadBig = (((uint32_t) (uint8_t) strtol("100001", nullptr, 2)) << 24);
+        uint32_t idTypeRoadSmall = (((uint32_t) (uint8_t) strtol("100000", nullptr, 2)) << 24);
+
+
+        BasicTransformations::copyWhere(gCell, gTypeGen, {{5, idTypeRoadBig},
+                                                          {6, idTypeRoadSmall}});
+        /*
         if (mValues.at("Estructura_Ciutat") == "Graella") {
             gBaseToPattern<uint32_t> gBP(gCell,
                                          gBaseToPattern<uint32_t>::gPatternType::gBPBlobSquares,
                                          gBaseToPattern<uint32_t>::gPatternParameters(5, 5, 20, 20),
-                                         idTypeRoadIntra,
+                                         idTypeRoadBig,
                                          BasicTransformations::genMaskFromGrid(gTypeSoil,
                                                                                {TypeSoil_T1Urban, TypeSoil_T2Urban,
                                                                                 TypeSoil_T3Urban, TypeSoil_T1Factory,
@@ -82,16 +87,16 @@ public:
             gBaseToPattern<uint32_t> gBP(gCell,
                                          gBaseToPattern<uint32_t>::gPatternType::gBPSquares,
                                          gBaseToPattern<uint32_t>::gPatternParameters(5, 5, 20, 20),
-                                         idTypeRoadIntra,
+                                         idTypeRoadBig,
                                          BasicTransformations::genMaskFromGrid(gTypeSoil,
                                                                                {TypeSoil_T1Urban, TypeSoil_T2Urban,
                                                                                 TypeSoil_T3Urban, TypeSoil_T1Factory,
                                                                                 TypeSoil_T2Factory}));
         }
 
-        BasicTransformations::copyWhere(gTypeGen, gCell, {{idTypeRoadIntra, 5},
-                                                          {idTypeRoadOuter, 5}});
-
+        BasicTransformations::copyWhere(gTypeGen, gCell, {{idTypeRoadBig,   5},
+                                                          {idTypeRoadSmall, 5}});
+        */
         //HOUSES:
         gBaseToStartBuildings::gen(gCell, gTypeSoil, gTypeGen,
                                    {TypeSoil_T1Urban, TypeSoil_T2Urban, TypeSoil_T3Urban,
@@ -106,36 +111,50 @@ public:
                 if ((vDist == 6 || vDist == 5 || vDist == 4) &&
                     (gTypeSoil->get(i, j) == TypeSoil_Nothing || gTypeSoil->get(i, j) == TypeSoil_T1Farm ||
                      gTypeSoil->get(i, j) == 4)) {
-                    gCell->set(i, j, idTypeRoadOuter);
+                    gCell->set(i, j, idTypeRoadSmall);
                 }
             }
         }
 
-        BasicTransformations::copyWhere(gTypeGen, gCell, {{idTypeRoadIntra, 2},
-                                                          {idTypeRoadOuter, 2}});
+        BasicTransformations::copyWhere(gTypeGen, gCell, {{idTypeRoadBig,   5},
+                                                          {idTypeRoadSmall, 6}});
 
+        /*
         gBaseToIRF::gen<uint32_t>(gCell, gTypeGen, {50, 0},
-                                  {0, 1}, {idTypeRoadIntra, idTypeRoadOuter}, 20, 1);
+                                  {0, 1}, {idTypeRoadBig, idTypeRoadSmall}, 20, 1);
+        */
 
-        std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint8_t>>> p =
-                gBaseToBorderDetection::generate(gCell, {gBorderType::gBNonConnex, gBorderOutside::gIsNotGroup},
-                                                 {idTypeRoadOuter, idTypeRoadIntra},
-                                                 BasicTransformations::genMaskFromGrid(gCell, {idTypeRoadOuter,
-                                                                                               idTypeRoadIntra}));
+
+        std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint16_t>>> p =
+                gBaseToBorderDetection::generateByTwoBits(gCell,
+                                                          {gBorderType::gBNonConnex, gBorderOutside::gIsNotGroup},
+                                                          {idTypeRoadSmall, idTypeRoadBig},
+                                                          BasicTransformations::genMaskFromGrid(gCell, {idTypeRoadBig,
+                                                                                                        idTypeRoadSmall}));
 
         for (const auto &map_element: p) {
             for (const auto &elm: map_element.second) {
                 //8 code to 4:
-                uint8_t p = ((elm.second & (1 << 1)) != 0) << 3
-                            | ((elm.second & (1 << 4)) != 0) << 2
-                            | ((elm.second & (1 << 6)) != 0) << 1
-                            | ((elm.second & (1 << 3)) != 0);
-                gCell->set({elm.first.second, elm.first.first}, gCell->get({elm.first.second, elm.first.first}) + p);
+                uint8_t pVal2Bits = ((elm.second & (3 << 1 * 2)) >> 1 * 2) << 3 * 2
+                                    | ((elm.second & (3 << 4 * 2)) >> 4 * 2) << 2 * 2
+                                    | ((elm.second & (3 << 6 * 2)) >> 6 * 2) << 1 * 2
+                                    | ((elm.second & (3 << 3 * 2)) >> 3 * 2);
+                uint32_t typeActRoad = gCell->get({elm.first.second, elm.first.first});
+                uint8_t typeCenter = 0;
+                if (gTypeGen->get({elm.first.second, elm.first.first}) == 6)
+                    typeCenter = 1;
+                else
+                    typeCenter = 2;
+
+
+                gCell->set({elm.first.second, elm.first.first},
+                           typeActRoad +
+                           r2BitDirection::getIdBy8Code(pVal2Bits, typeCenter));
             }
         }
 
         //FIELDS:
-        gBaseToField<uint32_t> gBFields(gCell, 0, BasicTransformations::genMaskFromGrid(gTypeSoil, {TypeSoil_T1Farm}));
+        // gBaseToField<uint32_t> gBFields(gCell, 0, BasicTransformations::genMaskFromGrid(gTypeSoil, {TypeSoil_T1Farm}));
         /*
         BasicTransformations::replaceValues(gCell,
                                             {{2, ((uint32_t) (uint8_t) strtol("00010000", nullptr, 2)) << 24}});
@@ -143,7 +162,7 @@ public:
                                             {{1, ((uint32_t) (uint8_t) strtol("00010001", nullptr, 2)) << 24}});
         */
 
-        return {gCell, gBFields.genCollectivePositions()};
+        return {gCell, {}};
     }
 
 };
