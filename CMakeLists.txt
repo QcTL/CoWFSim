@@ -50,7 +50,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/display/menus/implementation/rBaseMenu.h
         src/display/layers/implementation/gLayerTransit.h
         src/display/rRemoteUpdateGrid.h
-        src/display/menus/implementation/rRoadViewMenu.h
+        src/display/menus/implementation/rRoadView/rRoadViewMenu.h
         src/display/menus/implementation/rCellViewMenu.h
         src/sim/structure/obj/sCommon.h
         src/sim/sMainSimulator.h
@@ -102,6 +102,11 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/behaviour/airPollution/gMainAirPollution.h
         src/tests/tst_gWindExpansion.h
         "src/sim/behaviour/recording/sStorageCivilRoutineState.h"
+        src/tests/tst_gNewVisualitzation.h
+        src/common/r2BitDirection.h
+        src/common/gCSVLoader.h
+        src/display/menus/implementation/rRoadView/rRoadCrossView.h
+        src/display/menus/implementation/rRoadView/rRoadLineView.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

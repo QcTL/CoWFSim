@@ -48,7 +48,8 @@ public:
     //VAL 2: FACTORY BUILDING;
     //VAL 3: HEAVY FACTORY BUILDING;
     //VAL 4: FIELDS;
-    //VAL 5: ROADS;
+    //VAL 5: ROADS BIG;
+    //VAL 6: ROADS SMALL;
 
     std::shared_ptr<gIGrid<uint8_t>> gLayerTypeSoil;
     // NOTHING
@@ -148,7 +149,7 @@ public:
 private:
     void extractRoadsFromLayer() {
         std::pair<std::vector<rNode *>, std::vector<std::vector<rNode *>>> r = rNodeFromGrid<uint8_t>::givenGrid(
-                gLayerTypeGen, 2);
+                gLayerTypeGen, {5, 6});
         gLayerRoads = r.second;
         std::cout << r.first.size() << std::endl;
         for (const auto &rNode: r.first) {
@@ -168,7 +169,7 @@ private:
         }
 
         //TEST DAILY COMMUTE:
-        /*
+
         for (int i = 0; i < 10; i++) {
             uint32_t tTime = i;
             uint32_t tTimeEnd = i + 48;
@@ -180,8 +181,8 @@ private:
 
                 sTCivil->addRuteCivil({{gTotalNodes[idP1]->rPos, gTotalNodes[idP2]->rPos}, tTime, tTimeEnd});
             }
-        }*/
-        sTCivil->addRuteCivil({{{64,75}, {8,50}}, 5, 250});
+        }
+        //sTCivil->addRuteCivil({{{0, 0}, {4, 2}}, 5, 250});
     };
     std::list<std::shared_ptr<rRNodeI>> rListRRoads;
     int sizeL;

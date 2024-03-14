@@ -3,14 +3,11 @@
 #include "src/IO/ReaderParameters.h"
 #include "src/common/RelPath.h"
 #include "SimInitialize.h"
-#include "src/tests/tst_gExtractRoadsCompressed.h"
-#include "src/tests/tst_gMenus.h"
-#include "src/tests/tst_gBasicNewWay.h"
-#include "src/tests/tst_gVeh.h"
-#include "src/tests/tst_gWindExpansion.h"
+#include "src/common/r2BitDirection.h"
 
 int main() {
     RelPath::selRelPath(std::filesystem::current_path().parent_path());
+    r2BitDirection::loadPossibleRoads("FRoadValid.txt");
 
     std::map<std::string, std::string> sMVar = ReaderParameters::readFile(
             (RelPath::relPath / "files" / "import" / "impFile.txt").string());
@@ -19,13 +16,6 @@ int main() {
     }
     std::cout << "------" << std::endl;
 
-
-    //tst_gBasicNewWay(sMVar);
-    //tst_gWindExpansion();
-    //tst_gVeh();
-    //tst_gMenus();
-    //tst_gBasicNewWay(sMVar);
     SimInitialize::givenMap(sMVar);
-    // 0xFF
     return 0;
 }

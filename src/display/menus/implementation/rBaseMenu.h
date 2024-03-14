@@ -10,8 +10,10 @@
 #include "../rIMenu.h"
 #include "../../rPileMenus.h"
 #include "rSelOptMenu.h"
-#include "rRoadViewMenu.h"
+#include "rRoadView/rRoadViewMenu.h"
 #include "rCellViewMenu.h"
+#include "rRoadView/rRoadLineView.h"
+#include "rRoadView/rRoadCrossView.h"
 
 class rBaseMenu : public rIMenu {
 public:
@@ -70,10 +72,6 @@ public:
                             refPile->vTopActiveMenu, lstValueLayer, "d_mSelectLayer",
                             rIMenu::rRelativePos::pBottomRight);
                     refPile->addMenuTop(rSom);
-                } else if (event.key.code == sf::Keyboard::S) {
-                    std::shared_ptr<rRoadViewMenu> rRoad = std::make_shared<rRoadViewMenu>(
-                            refPile->vTopActiveMenu, nullptr, "d_mRoadsViewLayer", rIMenu::rRelativePos::pBottomLeft);
-                    refPile->addMenuTop(rRoad);
                 }
             default:
                 break;
@@ -85,6 +83,8 @@ public:
         std::cout << cPressed.first << ":" << cPressed.second << std::endl;
         switch (refLTypes->get(cPressed)) {
             case 1:
+            case 2:
+            case 3:
             case 4:{
                 if (!refLBuild->get(cPressed).empty()) {
                     if (refLBuild->get(cPressed).size() == 1) {
@@ -105,12 +105,20 @@ public:
                 }
             }
                 break;
-            case 2:
+            case 5:
+            case 6:
                 if (refLRoads[cPressed.first][cPressed.second] != nullptr) {
-                    std::shared_ptr<rRoadViewMenu> rRoad = std::make_shared<rRoadViewMenu>(
-                            refPile->vTopActiveMenu, refLRoads[cPressed.first][cPressed.second]->refCompressed,
-                            "d_mRoadsViewLayer", rIMenu::rRelativePos::pBottomLeft);
-                    refPile->addMenuTop(rRoad);
+                    if(refLRoads[cPressed.first][cPressed.second]->refCompressed->isCrossing()) {
+                        std::shared_ptr<rRoadViewMenu> rRoad = std::make_shared<rRoadCrossView>(
+                                refPile->vTopActiveMenu, refLRoads[cPressed.first][cPressed.second]->refCompressed,
+                                rIMenu::rRelativePos::pBottomLeft);
+                        refPile->addMenuTop(rRoad);
+                    }else{
+                        std::shared_ptr<rRoadViewMenu> rRoad = std::make_shared<rRoadLineView>(
+                                refPile->vTopActiveMenu, refLRoads[cPressed.first][cPressed.second]->refCompressed,
+                                rIMenu::rRelativePos::pBottomLeft);
+                        refPile->addMenuTop(rRoad);
+                    }
                 }
                 break;
         }

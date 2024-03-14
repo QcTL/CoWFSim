@@ -1,0 +1,20 @@
+1,0000, // Nothing
+1,1000, // Final
+1,1010, // Recta
+1,1100, // Gir
+1,0111, // decisio Parcial
+1,1111, // Decisio Complerta
+2,0000, // Nothing
+2,2000, // Final
+2,2020, // Recta
+2,2200, // Gir
+2,2220, // decisio Parcial
+2,2222, // Decisio Complerta
+1,2010, // Recta creixament
+2,2010, // Recta creixament
+2,2201, // Gir amb sortida petita
+2,2210, // Gir amb sortida petita 2
+2,2120, // Recta amb sortida petita
+2,2121, // Recta amb 2 decision petites
+2,1210, // Final amb 2 decision petites
+2,2211, // Gir amb 2 decision petites

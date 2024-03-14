@@ -35,46 +35,25 @@ public:
         std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gLayerTypeSoil->rangeUse();
 
         float lSizeRiver = 0;
-        if (mValues.at("Mida_Simulacio") == "Petita")
-            lSizeRiver = 1;
-        else if (mValues.at("Mida_Simulacio") == "Mitjana")
-            lSizeRiver = 1.5;
-        else if (mValues.at("Mida_Simulacio") == "Gran")
+        if (mValues.at("Mida_Riu") == "Petita")
             lSizeRiver = 2;
-        else if (mValues.at("Mida_Simulacio") == "Molt_Gran")
-            lSizeRiver = 2.7;
+        else if (mValues.at("Mida_Riu") == "Mitjana")
+            lSizeRiver = 2.25;
+        else if (mValues.at("Mida_Riu") == "Gran")
+            lSizeRiver = 2.5;
+        else if (mValues.at("Mida_Riu") == "Molt_Gran")
+            lSizeRiver = 2.75;
 
         if (mValues.at("Conte_Riu") == "on")
             gBaseToRiver<uint8_t>::generate(gLayerTypeSoil, 20, lSizeRiver, TypeSoil_T1Obstacle);
 
-        gBaseClosestToPoint::gen<uint8_t>(gLayerTypeSoil, {
-                                                  {{lSize / 2, lSize / 2}, 7},
-                                                  {{30,        40},        7}
-                                          }, TypeSoil_T1Urban,
-                                          BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing}));
-
-        gBaseClosestToPoint::gen<uint8_t>(gLayerTypeSoil, {
-                                                  {{lSize / 2, lSize / 2}, 15},
-                                                  {{30,        40},        15}
-                                          }, TypeSoil_T2Urban,
-                                          BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing}));
-
-        gBaseClosestToPoint::gen<uint8_t>(gLayerTypeSoil, {
-                                                  {{lSize / 2, lSize / 2}, 25},
-                                                  {{30,        40},        25}
-                                          }, TypeSoil_T3Urban,
-                                          BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing}));
-
-
-        gBaseClosestToPoint::gen<uint8_t>(gLayerTypeSoil, {
-                                                  {{60, 20}, 5},
-                                          }, TypeSoil_T1Factory,
-                                          BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing}));
-
-        gBaseClosestToPoint::gen<uint8_t>(gLayerTypeSoil, {
-                                                  {{60, 20}, 10},
-                                          }, TypeSoil_T2Factory,
-                                          BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing}));
+        std::srand(static_cast<unsigned>(std::time(nullptr)));
+        for (int i = 0; i < 5; i++) {
+            genClusterTypeSoil({std::rand() % (lSize + 1), std::rand() % (lSize + 1)}, 6, 9, 13, gLayerTypeSoil);
+        }
+        for (int i = 0; i < 3; i++) {
+            genClusterTypeIndustry({std::rand() % (lSize + 1), std::rand() % (lSize + 1)}, 3, 8, gLayerTypeSoil);
+        }
 
         auto wMask = BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing});
         for (int i = gRange.first.first; i <= gRange.first.second; ++i) {
@@ -85,10 +64,49 @@ public:
                 }
             }
         }
-        BasicTransformations::copyWhere(gTypeGen, gLayerTypeSoil, {{7, 5},
-                                                                   {TypeSoil_T1Farm, 4},});
+        BasicTransformations::copyWhere(gTypeGen, gLayerTypeSoil,
+                                        {{7,               5},
+                                         {TypeSoil_T1Farm, 4}});
 
         return gLayerTypeSoil;
+    }
+
+private:
+    static void genClusterTypeSoil(const std::pair<int, int> &pCenter,
+                                   const uint32_t pRadiusC, const uint32_t pRadiusE, const uint32_t pRadiusQ,
+                                   const std::shared_ptr<gIGrid<uint8_t>> &gLayerTypeSoil) {
+
+        gBaseClosestToPoint::gen<uint8_t>(gLayerTypeSoil, {
+                                                  {pCenter, pRadiusC},
+                                          }, TypeSoil_T1Urban,
+                                          BasicTransformations::genMaskFromGrid(gLayerTypeSoil,
+                                                                                {TypeSoil_Nothing}));
+
+        gBaseClosestToPoint::gen<uint8_t>(gLayerTypeSoil, {
+                                                  {pCenter, pRadiusE},
+                                          }, TypeSoil_T2Urban,
+                                          BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing}));
+
+        gBaseClosestToPoint::gen<uint8_t>(gLayerTypeSoil, {
+                                                  {pCenter, pRadiusQ},
+                                          }, TypeSoil_T3Urban,
+                                          BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing}));
+    }
+
+    static void
+    genClusterTypeIndustry(const std::pair<int, int> &pCenter,
+                           const uint32_t pRadiusC, const uint32_t pRadiusE,
+                           const std::shared_ptr<gIGrid<uint8_t>> &gLayerTypeSoil) {
+
+        gBaseClosestToPoint::gen<uint8_t>(gLayerTypeSoil, {
+                                                  {pCenter, pRadiusC},
+                                          }, TypeSoil_T1Factory,
+                                          BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing}));
+
+        gBaseClosestToPoint::gen<uint8_t>(gLayerTypeSoil, {
+                                                  {pCenter, pRadiusE},
+                                          }, TypeSoil_T2Factory,
+                                          BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing}));
     }
 
 };

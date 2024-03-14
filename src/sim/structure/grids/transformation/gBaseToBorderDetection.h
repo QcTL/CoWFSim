@@ -82,6 +82,59 @@ public:
         }
         return ret;
     }
+
+
+    template<typename T>
+    static std::map<T, std::vector<std::pair<std::pair<int, int>, uint16_t>>>
+    generateByTwoBits(const std::shared_ptr<gIGrid<T>> &gGrid, gObjectBorderDet gOBD,
+                      std::vector<T> groupConnect = std::vector<T>(),
+                      const std::shared_ptr<gIGrid<bool>> &pMask = nullptr) {
+
+        bool hasMask = pMask != nullptr;
+        bool hasDiffGroup = !groupConnect.empty();
+        std::unordered_set<int> setGroup(groupConnect.begin(), groupConnect.end());
+
+        std::map<T, std::vector<std::pair<std::pair<int, int>, uint16_t>>> ret;
+        std::pair<std::pair<int, int>, std::pair<int, int>> range = gGrid->rangeUse();
+
+        switch (gOBD.gBT) {
+            case gBConnex:
+                break;
+            case gBNonConnex:
+                for (int i = range.second.first; i < (range.second.second + 1); i++) {
+                    for (int j = range.first.first; j < (range.first.second + 1); j++) {
+                        T vToSearch = gGrid->get(j, i);
+                        if (!hasMask || pMask->get(j, i)) {
+                            std::vector<std::pair<int, int>> dOffsets =
+                                    {{i - 1, j + 1},
+                                     {i,     j + 1},
+                                     {i + 1, j + 1},
+                                     {i - 1, j},
+                                     {i + 1, j},
+                                     {i - 1, j - 1},
+                                     {i,     j - 1},
+                                     {i + 1, j - 1}};
+                            uint16_t vRes = 0;
+
+                            for (int k = 0; k < dOffsets.size(); k++) {
+                                if (gGrid->isInside(dOffsets[k].second, dOffsets[k].first)) {
+                                    T valNext = gGrid->get(dOffsets[k].second, dOffsets[k].first);
+
+                                    if ((!hasMask || pMask->get(dOffsets[k].second, dOffsets[k].first)) &&
+                                        (valNext == vToSearch ||
+                                         (hasDiffGroup && setGroup.find(valNext) != setGroup.end())))
+                                        vRes |= (valNext == 553648128 ? 2 : 1) << k * 2;
+                                } else if (gOBD.gBO == gBorderOutside::gIsGroup)
+                                    vRes |= (vToSearch == 553648128 ? 2 : 1) << k * 2;
+                            }
+                            ret[vToSearch].push_back({{i, j}, vRes});
+                        }
+                    }
+                }
+                break;
+        }
+        return ret;
+    }
 };
 
 #endif //CITYOFWEIRDFISHES_GBASETOBORDERDETECTION_H

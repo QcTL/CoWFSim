@@ -92,38 +92,10 @@ public:
 
     void pressedCell(std::pair<int, int> cPressed) override {}
 private:
-    sf::VertexArray dInfo;
-    int gWidth = 0;
-    int gHeight = 0;
 
     std::vector<std::pair<int, int>> pElemSel;
     std::vector<std::pair<int, int>> pElemSelAbs;
     int cCurrenSel = -1;
-
-    struct defTxtCompany {
-        std::pair<uint32_t, uint32_t> pStartText;
-        uint8_t pLength;
-    };
-    std::vector<defTxtCompany> comV;
-
-    void setText(const uint8_t tVal, const std::string &cText) {
-        for (int i = 0; i < comV[tVal].pLength; i++) {
-            sf::Vertex *quad = &dInfo[
-                    (comV[tVal].pStartText.second + i + comV[tVal].pStartText.first * gWidth) * 4];
-            for (int k = 0; k < 4; k++) {
-                if (i >= cText.size())
-                    quad[k].texCoords = lRefTiles[32][k];
-                else if (cText[i] >= 'a' && cText[i] <= 'z')
-                    quad[k].texCoords = lRefTiles[(cText[i] - 'a') + 1][k];
-                else if (cText[i] >= 'A' && cText[i] <= 'Z')
-                    quad[k].texCoords = lRefTiles[(cText[i] - 'A') + 65][k];
-                else if (cText[i] >= '0' && cText[i] <= '9')
-                    quad[k].texCoords = lRefTiles[(cText[i] - '0') + 48][k];
-                else if(cText[i] == '.')
-                    quad[k].texCoords = lRefTiles[46][k];
-            }
-        }
-    }
 };
 
 #endif //CITYOFWEIRDFISHES_RCOMPVIEWLAYER_H

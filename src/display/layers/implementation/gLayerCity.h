@@ -9,11 +9,12 @@
 #include <map>
 
 #include "../gILayer.h"
+#include "../../../common/r2BitDirection.h"
 
 class gLayerCity : public gILayer {
 public:
     explicit gLayerCity(const std::shared_ptr<gIGrid<uint32_t>> &gGrid)
-            : gILayer(gTileset("ts_city16.png", 16, 10, 12)), lGrid(gGrid) {
+            : gILayer(gTileset("ts_city16.png", 16, 10, 19)), lGrid(gGrid) {
         getInfoBlocks();
     }
 
@@ -29,58 +30,55 @@ private:
     std::shared_ptr<gIGrid<uint32_t>> lGrid;
 
     void getInfoBlocks() {
-        // Define the positions for each sprite
-        int carreteres[] = {22, 39, 38, 35, 29, 23, 25, 37, 28, 34, 33, 36, 24, 27, 26, 32};
-
         // Empty
-        addToMapSprites(0, getByPosTopLeft(lTs.getPos(9)));
+        addToMapSprites(0, getByPosTopLeft(lTs.getPos(42)));
 
         // Houses
-        addToMapSprites(16, getByPosTopLeft(lTs.getPos(0)));
-        addToMapSprites(16, getByPosTopLeft(lTs.getPos(1)));
-        addToMapSprites(16, getByPosTopLeft(lTs.getPos(2)));
-        addToMapSprites(16, getByPosTopLeft(lTs.getPos(3)));
-        addToMapSprites(16, getByPosTopLeft(lTs.getPos(4)));
-        addToMapSprites(17, getByPosTopLeft(lTs.getPos(10)));
-        addToMapSprites(17, getByPosTopLeft(lTs.getPos(11)));
-        addToMapSprites(18, getByPosTopLeft(lTs.getPos(20)));
-        addToMapSprites(18, getByPosTopLeft(lTs.getPos(21)));
-        addToMapSprites(18, getByPosTopLeft(lTs.getPos(22)));
-        addToMapSprites(19, getByPosTopLeft(lTs.getPos(30)));
-        addToMapSprites(19, getByPosTopLeft(lTs.getPos(31)));
-        addToMapSprites(20, getByPosTopLeft(lTs.getPos(40)));
-        addToMapSprites(20, getByPosTopLeft(lTs.getPos(41)));
-        addToMapSprites(21, getByPosTopLeft(lTs.getPos(5)));
-        addToMapSprites(21, getByPosTopLeft(lTs.getPos(6)));
-        addToMapSprites(21, getByPosTopLeft(lTs.getPos(7)));
+        int sHType1[] = {130, 131, 132, 133};
+        int sHType2[] = {140, 141,142};
+        int sHType3[] = {150, 151, 152, 153};
+        int sHType4[] = {160, 161};
+        int sHType5[] = {170, 171, 172};
 
+        for (const int t: sHType1)
+            addToMapSprites(16, getByPosTopLeft(lTs.getPos(t)));
+        for (const int t: sHType2)
+            addToMapSprites(17, getByPosTopLeft(lTs.getPos(t)));
+        for (const int t: sHType3)
+            addToMapSprites(18, getByPosTopLeft(lTs.getPos(t)));
+        for (const int t: sHType4)
+            addToMapSprites(19, getByPosTopLeft(lTs.getPos(t)));
+        for (const int t: sHType5)
+            addToMapSprites(21, getByPosTopLeft(lTs.getPos(t)));
         // Carreteres
-        for (int i = 0; i < sizeof(carreteres) / sizeof(carreteres[0]); i++) {
-            addToMapSprites(32, getByPosTopLeft(lTs.getPos(carreteres[i])));
-        }
+        addRoadToMapSprites();
 
-        for (int i = 0; i < sizeof(carreteres) / sizeof(carreteres[0]); i++) {
-            addToMapSprites(33, getByPosTopLeft(lTs.getPos(carreteres[i] + 20)));
-        }
         // Fields:
-        for (int i = 0; i < sizeof(carreteres) / sizeof(carreteres[0]); i++) {
-            addToMapSprites(64, getByPosTopLeft(lTs.getPos(carreteres[i] + 80)));
-        }
+        int s4Way[] = {22, 39, 38, 35, 29, 23, 25, 37, 28, 34, 33, 36, 24, 27, 26, 32};
+
+        for (const int t: s4Way)
+            addToMapSprites(64, getByPosTopLeft(lTs.getPos(t + 80)));
 
         //Water:
-        addToMapSprites(48, getByPosTopLeft(lTs.getPos(85)));
-        addToMapSprites(48, getByPosTopLeft(lTs.getPos(75)));
-        addToMapSprites(48, getByPosTopLeft(lTs.getPos(95)));
-        addToMapSprites(48, getByPosTopLeft(lTs.getPos(84)));
-        addToMapSprites(48, getByPosTopLeft(lTs.getPos(86)));
-        addToMapSprites(48, getByPosTopLeft(lTs.getPos(74)));
-        addToMapSprites(48, getByPosTopLeft(lTs.getPos(94)));
-        addToMapSprites(48, getByPosTopLeft(lTs.getPos(96)));
-        addToMapSprites(48, getByPosTopLeft(lTs.getPos(76)));
-        addToMapSprites(48, getByPosTopLeft(lTs.getPos(83)));
-        addToMapSprites(48, getByPosTopLeft(lTs.getPos(82)));
-        addToMapSprites(48, getByPosTopLeft(lTs.getPos(72)));
-        addToMapSprites(48, getByPosTopLeft(lTs.getPos(73)));
+        int wTiles[] = {85, 75, 95, 84, 86, 74, 94, 96, 76, 83, 82, 72, 73};
+
+        for (const int t: wTiles)
+            addToMapSprites(48, getByPosTopLeft(lTs.getPos(t + 30)));
+
+    }
+
+    void addRoadToMapSprites() {
+        int rRotate[] = {11,1,0,10};
+        std::vector<int> rTopLeftPos = {66, 46, 26, 8, 28, 64, 60, 40, 20, 0, 6, 62, 48, 48, 04, 02, 22, 24, 44,80};
+
+        for (uint32_t i = 0; i < rTopLeftPos.size(); i++) {
+            uint32_t cTypeRoad = r2BitDirection::getTypeRoadById(i);
+
+            for (int j: rRotate) { // per cada rotacio clar
+                addToMapSprites(cTypeRoad == 1 ? 32 : 33,
+                                getByPosTopLeft(lTs.getPos(rTopLeftPos[i] + j)));
+            }
+        }
     }
 
     void addToMapSprites(const uint8_t &n, const std::vector<sf::Vector2f> &v) {
