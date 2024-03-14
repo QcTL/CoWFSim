@@ -14,26 +14,35 @@
 class gBaseToIRF {
 
 public:
-    template<typename T>
-    static void
-    gen(const std::shared_ptr<gIGrid<T>> gOutput, const std::shared_ptr<gIGrid<uint8_t>> &gType,
-        std::pair<int, int> pStart, std::pair<double, double> vStart,
-        std::vector<T> valueEnd, uint8_t fDispersion, uint8_t maxDepthFractal, int seed = -1) {
 
+    struct gPositionEscape {
+        std::pair<double, double> pPerpOrigin;
+        std::pair<double, double> pPerpStart;
+    };
+
+    template<typename T>
+    static std::vector<gPositionEscape>
+    gen(const std::shared_ptr<gIGrid<T>> gOutput, const std::shared_ptr<gIGrid<uint8_t>> &gType,
+        std::pair<int, int> pStart, std::pair<double, double> vStart, T valueEnd, uint8_t valueTypeSoil,
+        uint8_t fDispersion, int seed = -1) {
+
+        std::vector<gPositionEscape> ret;
         std::pair<double, double> vUnitInertia = vStart;
         std::pair<int, int> pActive = pStart;
 
-        double deviation = 6.0;
+        double deviation = 4.0;
         int tToDisp = fDispersion;
 
         std::default_random_engine re(seed == -1 ? std::random_device{}() : seed);
         std::uniform_real_distribution<double> unif(-deviation, deviation);
 
-        while (gType->isInside(pActive) and gType->get(pActive) != 5) {
-            gOutput->set(pActive, valueEnd[maxDepthFractal]);
-            gType->set(pActive, 2);
+        while (gType->isInside(pActive)) {
+            if (gType->get(pActive) != 5 && getSurroundRoads(gType, pActive, valueTypeSoil) <= 2) {
+                gOutput->set(pActive, valueEnd);
+                gType->set(pActive, valueTypeSoil);
+            }
 
-            if (tToDisp <= 0 and maxDepthFractal > 0) {
+            if (tToDisp <= 0) {
                 std::pair<double, double> perUnitInertia = generateRandomPerpendicular(vUnitInertia);
                 std::pair<double, double> perStart;
                 if (std::abs(perUnitInertia.first) > std::abs(perUnitInertia.second)) {
@@ -41,8 +50,10 @@ public:
                 } else {
                     perStart = {pActive.first, pActive.second + (1 * (perUnitInertia.second > 0 ? 1 : -1))};
                 }
-                gen(gOutput, gType, perStart, perUnitInertia, valueEnd, fDispersion, maxDepthFractal - 1);
-                tToDisp = fDispersion * 1.5;
+                ret.push_back({{-perUnitInertia.second, perUnitInertia.first}, perStart});
+                ret.push_back({{perUnitInertia.second, -perUnitInertia.first}, perStart});
+
+                tToDisp = fDispersion;
             }
 
             uint8_t rDir = getRandomNumberProportionalToVector(vUnitInertia);
@@ -62,9 +73,26 @@ public:
 
             tToDisp--;
         }
+
+        return ret;
     }
 
 private:
+    static int getSurroundRoads(const std::shared_ptr<gIGrid<uint8_t>> &gType, const std::pair<int, int> gPosition,
+                                const uint8_t cCommon) {
+        std::vector<std::pair<int, int>> vNear = {{0,  1},
+                                                  {0,  -1},
+                                                  {1,  0},
+                                                  {-1, 0}};
+        uint8_t numNear = 0;
+        for (const std::pair<int, int> &gPos: vNear) {
+            if (gType->isInside(gPosition.first + gPos.first, gPosition.second + gPos.second) &&
+                gType->get(gPosition.first + gPos.first, gPosition.second + gPos.second) == cCommon)
+                numNear++;
+        }
+        return numNear;
+    }
+
     static int getRandomNumberProportionalToVector(const std::pair<double, double> &vector) {
         double magnitude = std::sqrt(vector.first * vector.first + vector.second * vector.second);
         double probX = std::abs(vector.first) / magnitude;

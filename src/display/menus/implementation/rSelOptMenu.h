@@ -33,10 +33,7 @@ private:
 
     std::vector<std::pair<int, int>> pElemSel;
     std::vector<std::pair<int, int>> pElemSelAbs;
-    sf::VertexArray dInfo;
     int cCurrenSel = 0;
-    int gWidth = 0;
-    int gHeight = 0;
 };
 
 

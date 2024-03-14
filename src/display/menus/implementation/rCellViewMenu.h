@@ -56,7 +56,7 @@ public:
         int index = 0;
         for (const auto &it: rShow) {
             if (index < 3)
-                setText(0, it.nName, "100k");
+                setTextCompany(0, it.nName, "100k");
             index++;
         }
     }
@@ -107,10 +107,6 @@ public:
 
 private:
 
-    sf::VertexArray dInfo;
-    int gWidth = 0;
-    int gHeight = 0;
-
     std::vector<std::pair<int, int>> pElemSel;
     std::vector<std::pair<int, int>> pElemSelAbs;
     int cCurrenSel = -1;
@@ -145,7 +141,7 @@ private:
         cCurrenSel = v;
     }
 
-    void setText(const uint8_t tVal, const std::string &cName, const std::string &cValue) {
+    void setTextCompany(const uint8_t tVal, const std::string &cName, const std::string &cValue) {
         for (int i = 0; i < comV[tVal].nNameCom.pLength; i++) {
             sf::Vertex *quad = &dInfo[
                     (comV[tVal].nNameCom.pStartText.second + i + comV[tVal].nNameCom.pStartText.first * gWidth) * 4];
@@ -178,7 +174,6 @@ private:
             }
         }
     }
-
 };
 
 #endif //CITYOFWEIRDFISHES_RCELLVIEWMENU_H

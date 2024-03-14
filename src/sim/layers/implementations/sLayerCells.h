@@ -72,12 +72,15 @@ public:
 
         BasicTransformations::copyWhere(gCell, gTypeGen, {{5, idTypeRoadBig},
                                                           {6, idTypeRoadSmall}});
-        /*
+
+        std::vector<gBaseToIRF::gPositionEscape> rNext = gBaseToIRF::gen<uint32_t>(gCell, gTypeGen, {lSize / 2, 0},
+                                                                                   {0, 1}, idTypeRoadBig, 5, 30);
+
         if (mValues.at("Estructura_Ciutat") == "Graella") {
             gBaseToPattern<uint32_t> gBP(gCell,
                                          gBaseToPattern<uint32_t>::gPatternType::gBPBlobSquares,
-                                         gBaseToPattern<uint32_t>::gPatternParameters(5, 5, 20, 20),
-                                         idTypeRoadBig,
+                                         gBaseToPattern<uint32_t>::gPatternParameters(4, 6, 40, 40),
+                                         idTypeRoadSmall,
                                          BasicTransformations::genMaskFromGrid(gTypeSoil,
                                                                                {TypeSoil_T1Urban, TypeSoil_T2Urban,
                                                                                 TypeSoil_T3Urban, TypeSoil_T1Factory,
@@ -86,8 +89,8 @@ public:
         } else if (mValues.at("Estructura_Ciutat") == "Radial") {
             gBaseToPattern<uint32_t> gBP(gCell,
                                          gBaseToPattern<uint32_t>::gPatternType::gBPSquares,
-                                         gBaseToPattern<uint32_t>::gPatternParameters(5, 5, 20, 20),
-                                         idTypeRoadBig,
+                                         gBaseToPattern<uint32_t>::gPatternParameters(4, 6, 40, 40),
+                                         idTypeRoadSmall,
                                          BasicTransformations::genMaskFromGrid(gTypeSoil,
                                                                                {TypeSoil_T1Urban, TypeSoil_T2Urban,
                                                                                 TypeSoil_T3Urban, TypeSoil_T1Factory,
@@ -95,8 +98,13 @@ public:
         }
 
         BasicTransformations::copyWhere(gTypeGen, gCell, {{idTypeRoadBig,   5},
-                                                          {idTypeRoadSmall, 5}});
-        */
+                                                          {idTypeRoadSmall, 6}});
+
+        for (const gBaseToIRF::gPositionEscape rPerp: rNext) {
+            gBaseToIRF::gen<uint32_t>(gCell, gTypeGen, rPerp.pPerpStart,
+                                      rPerp.pPerpOrigin, idTypeRoadSmall, 6, 100);
+        }
+
         //HOUSES:
         gBaseToStartBuildings::gen(gCell, gTypeSoil, gTypeGen,
                                    {TypeSoil_T1Urban, TypeSoil_T2Urban, TypeSoil_T3Urban,
@@ -109,8 +117,7 @@ public:
             for (int j = gRange.second.first; j <= gRange.second.second; ++j) {
                 int vDist = gPointToNearestElem::find<uint8_t>(gTypeSoil, {i, j}, TypeSoil_T1Obstacle, 8).first;
                 if ((vDist == 6 || vDist == 5 || vDist == 4) &&
-                    (gTypeSoil->get(i, j) == TypeSoil_Nothing || gTypeSoil->get(i, j) == TypeSoil_T1Farm ||
-                     gTypeSoil->get(i, j) == 4)) {
+                    gCell->get(i, j) != idTypeRoadBig) {
                     gCell->set(i, j, idTypeRoadSmall);
                 }
             }
@@ -118,11 +125,6 @@ public:
 
         BasicTransformations::copyWhere(gTypeGen, gCell, {{idTypeRoadBig,   5},
                                                           {idTypeRoadSmall, 6}});
-
-        /*
-        gBaseToIRF::gen<uint32_t>(gCell, gTypeGen, {50, 0},
-                                  {0, 1}, {idTypeRoadBig, idTypeRoadSmall}, 20, 1);
-        */
 
 
         std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint16_t>>> p =
@@ -140,12 +142,7 @@ public:
                                     | ((elm.second & (3 << 6 * 2)) >> 6 * 2) << 1 * 2
                                     | ((elm.second & (3 << 3 * 2)) >> 3 * 2);
                 uint32_t typeActRoad = gCell->get({elm.first.second, elm.first.first});
-                uint8_t typeCenter = 0;
-                if (gTypeGen->get({elm.first.second, elm.first.first}) == 6)
-                    typeCenter = 1;
-                else
-                    typeCenter = 2;
-
+                uint8_t typeCenter = gTypeGen->get({elm.first.second, elm.first.first}) == 6 ? 1 : 2;
 
                 gCell->set({elm.first.second, elm.first.first},
                            typeActRoad +

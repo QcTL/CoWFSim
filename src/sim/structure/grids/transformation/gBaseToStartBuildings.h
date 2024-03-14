@@ -33,17 +33,17 @@ public:
                     switch (tSoil->get(i, j)) {
                         case TypeSoil_T1Urban:
                             tOutput->set(i, j, (((uint32_t) (uint8_t) strtol("00010000", nullptr, 2)) << 24) +
-                                               rand() % (4 + 1));
+                                               rand() % (3 + 1));
                             tType->set(i, j, 1);
                             break;
                         case TypeSoil_T2Urban:
                             tOutput->set(i, j, (((uint32_t) (uint8_t) strtol("00010001", nullptr, 2)) << 24) +
-                                               rand() % (1 + 1));
+                                               rand() % (2 + 1));
                             tType->set(i, j, 1);
                             break;
                         case TypeSoil_T3Urban:
                             tOutput->set(i, j, (((uint32_t) (uint8_t) strtol("00010010", nullptr, 2)) << 24) +
-                                               rand() % (1 + 1));
+                                               rand() % (3 + 1));
                             tType->set(i, j, 1);
                             break;
                         case TypeSoil_T1Factory:

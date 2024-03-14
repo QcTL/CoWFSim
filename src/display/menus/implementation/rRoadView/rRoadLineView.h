@@ -59,7 +59,6 @@ public:
     }
 
 private:
-
     std::vector<std::pair<int, int>> pElemOcc;
     std::vector<std::pair<int, int>> pElemNumSize;
 
@@ -136,13 +135,13 @@ private:
 
         //Check the position relative and put it in the corresponding position;
         for (const auto &p: rListPosTop) {
-            sf::Vertex *quad = &dInfo[(2 * gWidth + 3 + (int) (((float) p / rSelRoad->getCapacity()) * (32 - 3))) * 4];
+            sf::Vertex *quad = &dInfo[(2 * gWidth + 3 + (int) (((float) p / (float)rSelRoad->getCapacity()) * (32 - 3))) * 4];
             for (int k = 0; k < 4; k++) {
                 quad[k].texCoords = lRefTiles[48][k];
             }
         }
         for (const auto &p: rListPosBottom) {
-            sf::Vertex *quad = &dInfo[(8 * gWidth + 3 + (int) (((float) p / rSelRoad->getCapacity()) * (32 - 3))) * 4];
+            sf::Vertex *quad = &dInfo[(8 * gWidth + 3 + (int) (((float) p / (float)rSelRoad->getCapacity()) * (32 - 3))) * 4];
             for (int k = 0; k < 4; k++) {
                 quad[k].texCoords = lRefTiles[48][k];
             }

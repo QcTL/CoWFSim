@@ -35,7 +35,7 @@ public:
         std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(lSizeGrid);
 
         sMS->gLayerTypeSoil = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
-        //sMS->gLayerAirPollution = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
+        sMS->gTotalAirPollution->gLayerAirPollution = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
 
         sLayerCells::retObjSLayerCells retCells =
                 sLayerCells::gen(lSizeGrid, sMS->gLayerTypeSoil, sMS->gLayerTypeGen, mValues);
@@ -43,7 +43,7 @@ public:
 
 
         sMS->completedStartGrid();
-        sMS->completedStartCompanies(retCells.gCompanyPositions);
+        sMS->completedStartCompanies({});
 
         sMainContainer sMC(sMS);
 

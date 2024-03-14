@@ -34,12 +34,11 @@ private:
         addToMapSprites(0, getByPosTopLeft(lTs.getPos(42)));
 
         // Houses
-        int sHType1[] = {0, 1, 2, 3, 4};
-        int sHType2[] = {10, 11};
-        int sHType3[] = {20, 21, 22};
-        int sHType4[] = {30, 31};
-        int sHType5[] = {40, 41};
-        int sHType6[] = {5, 6, 7};
+        int sHType1[] = {130, 131, 132, 133};
+        int sHType2[] = {140, 141,142};
+        int sHType3[] = {150, 151, 152, 153};
+        int sHType4[] = {160, 161};
+        int sHType5[] = {170, 171, 172};
 
         for (const int t: sHType1)
             addToMapSprites(16, getByPosTopLeft(lTs.getPos(t)));
@@ -50,10 +49,7 @@ private:
         for (const int t: sHType4)
             addToMapSprites(19, getByPosTopLeft(lTs.getPos(t)));
         for (const int t: sHType5)
-            addToMapSprites(20, getByPosTopLeft(lTs.getPos(t)));
-        for (const int t: sHType6)
             addToMapSprites(21, getByPosTopLeft(lTs.getPos(t)));
-
         // Carreteres
         addRoadToMapSprites();
 
@@ -67,7 +63,7 @@ private:
         int wTiles[] = {85, 75, 95, 84, 86, 74, 94, 96, 76, 83, 82, 72, 73};
 
         for (const int t: wTiles)
-            addToMapSprites(48, getByPosTopLeft(lTs.getPos(t)));
+            addToMapSprites(48, getByPosTopLeft(lTs.getPos(t + 30)));
 
     }
 

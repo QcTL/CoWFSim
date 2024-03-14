@@ -59,11 +59,6 @@ public:
     }
 
 protected:
-    sf::VertexArray dInfo;
-    int gWidth = 0;
-    int gHeight = 0;
-    std::vector<std::vector<int>> dExtracted;
-
     std::shared_ptr<rRNodeI> rSelRoad;
 };
 
