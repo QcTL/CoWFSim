@@ -10,9 +10,7 @@
 #include "../layers/implementation/gLayerAirPollution.h"
 #include "../layers/implementation/gLayerCity.h"
 #include "../layers/implementation/gLayerTransit.h"
-
-
-struct cellInf;
+#include "../layers/implementation/gLayerUnderground.h"
 
 class gTransSimToDisp {
 public:
@@ -24,8 +22,13 @@ public:
         return std::make_shared<gLayerCity>(gLayerCity(gSim));
     }
 
-    static std::shared_ptr<gLayerTransit> gToLayerTransit(const std::shared_ptr<gIGrid<uint8_t>> &gSim, const std::shared_ptr<gIGrid<uint32_t>> &gCitySim) {
+    static std::shared_ptr<gLayerTransit>
+    gToLayerTransit(const std::shared_ptr<gIGrid<uint8_t>> &gSim, const std::shared_ptr<gIGrid<uint32_t>> &gCitySim) {
         return std::make_shared<gLayerTransit>(gLayerTransit(gSim, gCitySim));
+    }
+
+    static std::shared_ptr<gLayerUnderground> gToLayerUnderground(const std::shared_ptr<gIGrid<uint8_t>> &gSim) {
+        return std::make_shared<gLayerUnderground>(gLayerUnderground(gSim));
     }
 };
 

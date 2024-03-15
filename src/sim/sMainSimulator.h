@@ -20,6 +20,7 @@
 #include "structure/obj/sTotalRoutes.h"
 #include "behaviour/company/sMCompany.h"
 #include "behaviour/airPollution/gMainAirPollution.h"
+#include "behaviour/metro/gMainUnderground.h"
 
 class sMainSimulator {
 
@@ -31,6 +32,7 @@ public:
         gLayerTransit = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
         gLayerNextRoad = std::make_shared<gBasicGrid<rNode *>>(gBasicGrid<rNode *>(lSize, lSize, nullptr));
         gTotalAirPollution = std::make_shared<gMainAirPollution>(lSize);
+        gTotalUnderground = std::make_shared<gMainUnderground>(lSize);
 
         sComp = std::make_shared<sMCompany>(lSize,
                                             gLayerTypeGen,
@@ -68,6 +70,9 @@ public:
 
     //AIR POLLUTION
     std::shared_ptr<gMainAirPollution> gTotalAirPollution;
+
+    //UNDERGROUND
+    std::shared_ptr<gMainUnderground> gTotalUnderground;
 
     //ROADS
     std::vector<std::vector<rNode *>> gLayerRoads;
