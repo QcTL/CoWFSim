@@ -74,12 +74,5 @@ struct objRoadTravel {
     std::pair<int, int> c_REnd;
 };
 
-struct objCivil {
-    objRoadTravel c_Travel;
-
-    uint32_t c_TBegin;
-    uint32_t c_TEnd;
-};
-
 
 #endif //CITYOFWEIRDFISHES_SCOMMON_H

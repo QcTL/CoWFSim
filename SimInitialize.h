@@ -42,6 +42,8 @@ public:
                 sLayerCells::gen(lSizeGrid, sMS->gLayerTypeSoil, sMS->gLayerTypeGen, tReturn.centerClusters, mValues);
         sMS->gLayerCurStruct = retCells.gMatrix;
         sMS->gTotalUnderground->gLayerUnderground = retCells.gUnderground;
+        sMS->gTotalUnderground->setPointsTransit(retCells.routesMetro);
+
 
         sMS->completedStartGrid();
         sMS->completedStartCompanies({});

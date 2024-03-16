@@ -10,6 +10,7 @@
 #include <vector>
 #include <bits/shared_ptr.h>
 #include "sCommon.h"
+#include "elements/objCivil.h"
 
 class sTotalRoutes {
 
@@ -29,20 +30,31 @@ public:
         return {mExitTimesCivil[oC.c_TBegin].rbegin().base(), mExitTimesCivil[oC.c_TEnd].rbegin().base()};
     }
 
-    std::vector<objRoadTravel> getEndStartPoints(uint32_t cTime) {
-        std::vector<objRoadTravel> rRet;
+    std::vector<objCivil::objRoadTravel> getRoutesCarByTime(uint32_t cTime) {
+        std::vector<objCivil::objRoadTravel> rRet;
         if (mExitTimesCivil[cTime].empty())
             return {};
-
         for (const auto &civ: mExitTimesCivil.at(cTime)) {
-            if (civ.c_TBegin == cTime)
-                rRet.push_back(civ.c_Travel);
-            else
-                rRet.push_back({civ.c_Travel.c_REnd, civ.c_Travel.c_RStart});
+            if (civ.c_TRS == objCivil::typeRouteSystem::OC_TRS_CAR)
+                rRet.push_back(civ.c_TBegin == cTime ? civ.c_Travel : objCivil::objRoadTravel(civ.c_Travel.c_REnd,
+                                                                                              civ.c_Travel.c_RStart));
         }
-
         return rRet;
     };
+
+    std::vector<objCivil::objRoadTravel> getRoutesCarByTrain(uint32_t cTime) {
+        std::vector<objCivil::objRoadTravel> rRet;
+        if (mExitTimesCivil[cTime].empty())
+            return {};
+        for (const auto &civ: mExitTimesCivil.at(cTime)) {
+            if (civ.c_TRS == objCivil::typeRouteSystem::OC_TRS_TRAIN)
+                rRet.push_back(civ.c_TBegin == cTime ? civ.c_Travel : objCivil::objRoadTravel(civ.c_Travel.c_REnd,
+                                                                                              civ.c_Travel.c_RStart));
+            //cRSTART i CREND es la dels trens, la que a ells els hi va be
+        }
+        return rRet;
+    };
+
 private:
     std::vector<std::shared_ptr<objCivil>> vUniqueCivil;
     std::vector<std::list<objCivil>> mExitTimesCivil;

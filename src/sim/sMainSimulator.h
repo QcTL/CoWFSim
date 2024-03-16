@@ -112,7 +112,7 @@ public:
 
             uint32_t tReduced = gClock.rVMinute / 5 + gClock.rVHour * 12 + (gClock.rVIsAM ? 0 : 144);
             sComp->tick(tReduced);
-            auto newRoutes = sTCivil->getEndStartPoints(tReduced);
+            auto newRoutes = sTCivil->getRoutesCarByTime(tReduced);
             for (auto r: newRoutes) {
                 uint32_t locId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->locIdNode;
                 uint16_t blocId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->rBlock;
@@ -121,6 +121,7 @@ public:
             //   PER EL TICK DE sTOTALEMPLOYEE;
             rInteraction->gClock->setClock(gClock);
             gTotalAirPollution->tick(gLayerTypeGen);
+            gTotalUnderground->tick(tReduced);
         }
 
 
@@ -174,7 +175,7 @@ private:
         }
 
         //TEST DAILY COMMUTE:
-
+        /*
         for (int i = 0; i < 10; i++) {
             uint32_t tTime = i;
             uint32_t tTimeEnd = i + 48;
@@ -186,7 +187,7 @@ private:
 
                 sTCivil->addRuteCivil({{gTotalNodes[idP1]->rPos, gTotalNodes[idP2]->rPos}, tTime, tTimeEnd});
             }
-        }
+        }*/
         //sTCivil->addRuteCivil({{{0, 0}, {4, 2}}, 5, 250});
     };
     std::list<std::shared_ptr<rRNodeI>> rListRRoads;

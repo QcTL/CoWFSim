@@ -11,11 +11,13 @@
 #include "../../structure/obj/sTotalCompany.h"
 #include "../../structure/grids/gIGrid.h"
 #include "../../structure/grids/gBasicGrid.h"
+#include "employee/sTotalEmployee.h"
 
 class sMCompany {
 public:
 
-    explicit sMCompany(uint32_t lSize, const std::shared_ptr<gIGrid<uint8_t>> &gTypeRef,
+    explicit sMCompany(uint32_t lSize,
+                       const std::shared_ptr<gIGrid<uint8_t>> &gTypeRef,
                        const std::shared_ptr<gIGrid<uint8_t>> &gTypeSoil,
                        const std::shared_ptr<gIGrid<uint8_t>> &gTypeAir)
             : sCompRecipes(std::make_shared<sTotalRecipes>("FObjProduced.csv")),
@@ -24,14 +26,14 @@ public:
         sCompT = std::make_shared<sCompanyTimer>();
         gLayerOwnership = std::make_shared<gBasicGrid<std::list<uint32_t>>>
                 (gBasicGrid<std::list<uint32_t>>(lSize, lSize, {}));
-        sCompA = std::make_shared<sCompanyActions>(*sCompRecipes, gTypeRef, sCompT); //TODO TYPE
+        sCompA = std::make_shared<sCompanyActions>(*sCompRecipes, gTypeRef, sCompT);
     }
 
     void tick(uint32_t tTime) {
         if (sCompT->hasToChange(tTime)) // Aixi no hem de crear un vector vuit cada frame.
             for (std::pair<uint32_t, uint32_t> &t: sCompT->checkForTime(tTime))
                 sCompA->gCompletedProduct(sTComp->getCompanyByUUID(t.second), t.first);
-        std::cout<< tTime << std::endl;
+        std::cout << tTime << std::endl;
         if (tTime % (12 * 3) == 0) { //ONCE EVERY 3 HOURS
             for (sCompanyCompiler::sCCIntentions sCCI: sTComp->getTotalIntentions()) {
                 sCompA->gTryIntention(sCCI, sM_AirCondition, sM_TSoil, tTime);
@@ -57,6 +59,7 @@ private:
     std::shared_ptr<sCompanyTimer> sCompT;
     std::shared_ptr<sCompanyActions> sCompA;
     std::shared_ptr<sTotalRecipes> sCompRecipes;
+    sTotalEmployee sCompEmployee;
 };
 
 #endif //CITYOFWEIRDFISHES_SMCOMPANY_H

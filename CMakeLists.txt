@@ -109,6 +109,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/display/menus/implementation/rRoadView/rRoadLineView.h
         src/display/layers/implementation/gLayerUnderground.h
         src/sim/behaviour/metro/gMainUnderground.h
+        src/sim/structure/obj/elements/objCivil.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

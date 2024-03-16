@@ -28,6 +28,7 @@ public:
         std::shared_ptr<gIGrid<uint32_t>> gMatrix;
         std::shared_ptr<gIGrid<uint8_t>> gUnderground;
         std::vector<std::vector<std::pair<int, int>>> gCompanyPositions;
+        std::vector<std::vector<std::pair<int, int>>> routesMetro;
     };
 
     static retObjSLayerCells gen(
@@ -157,10 +158,12 @@ public:
             }
         }
 
-
+        std::vector<std::vector<std::pair<int, int>>> rMetro;
         for (int i = 0; i < cClusters.size(); i++) {
-            gBaseToLineRoads::givenTwoPoints<uint8_t>(gUnderground, cClusters[i], cClusters[(i + 1) % cClusters.size()],
-                                                      1);
+            rMetro.push_back(
+                    gBaseToLineRoads::givenTwoPoints<uint8_t>(gUnderground,
+                                                              cClusters[i], cClusters[(i + 1) % cClusters.size()],
+                                                              1));
             gUnderground->set(cClusters[i], 2);
         }
         //gUnderground->set({0, 0}, 1);
@@ -194,7 +197,7 @@ public:
                                             {{1, ((uint32_t) (uint8_t) strtol("00010001", nullptr, 2)) << 24}});
         */
 
-        return {gCell, gUnderground, {}};
+        return {gCell, gUnderground, {}, rMetro};
     }
 
 };

@@ -39,12 +39,14 @@ public:
     }
 
     template<typename T>
-    static void givenTwoPoints(std::shared_ptr<gIGrid<T>> gGrid,
-                               std::pair<int, int> pStart, std::pair<int, int> pEnd,
-                               T endValue,
-                               std::shared_ptr<gIGrid<bool>> gMask = nullptr) {
+    static std::vector<std::pair<int, int>> givenTwoPoints(std::shared_ptr<gIGrid<T>> gGrid,
+                                                           std::pair<int, int> pStart, std::pair<int, int> pEnd,
+                                                           T endValue,
+                                                           std::shared_ptr<gIGrid<bool>> gMask = nullptr) {
         hasMask = gMask != nullptr;
+        std::vector<std::pair<int, int>> retRoute;
 
+        retRoute.push_back(pStart);
         double dSteep =
                 (pEnd.first - pStart.first) != 0 ? (pEnd.second - pStart.second + 0.0) /
                                                    (pEnd.first - pStart.first)
@@ -59,15 +61,25 @@ public:
             int yPost = std::round(dSteep * (j + 1) + dHeight);
             int mMax = std::max(yPre, yPost);
             int mMin = std::min(yPre, yPost);
-
+            std::vector<std::pair<int, int>> eachLine;
             for (int k = mMin; k <= mMax; k++) {
-                if (gGrid->isInside(j, k) && (!hasMask || gMask->get(j, k)))
+                if (gGrid->isInside(j, k) && (!hasMask || gMask->get(j, k))) {
                     gGrid->set(j, k, endValue);
+                    eachLine.emplace_back(j, k);
+                }
             }
+            if (pStart.second < pEnd.second)
+                retRoute.insert(retRoute.end(), eachLine.begin(), eachLine.end());
+            else
+                retRoute.insert(retRoute.end(), eachLine.rbegin(), eachLine.rend());
+
         }
+        retRoute.push_back(pEnd);
 
         gGrid->set(pStart, endValue);
         gGrid->set(pEnd, endValue);
+
+        return retRoute;
     }
 
     template<typename T>
