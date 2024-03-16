@@ -21,7 +21,8 @@ public:
                     const std::shared_ptr<sCompanyTimer> &gCTimer)
             : sCA_CTR(sTR), sCA_gTimer(gCTimer), sCA_gType(gType) {}
 
-    bool gTryIntention(sCompanyCompiler::sCCIntentions &sCCI, const std::shared_ptr<gIGrid<uint8_t>> &gAirPollution,
+    bool gTryIntention(sCompanyCompiler::sCCIntentions &sCCI,
+                       const std::shared_ptr<gIGrid<uint8_t>> &gAirPollution,
                        const std::shared_ptr<gIGrid<uint8_t>> &gTypeSoil, uint32_t actTimer) {
         switch (sCCI.scc_type) {
             case sCompanyCompiler::sCCIntentions::CELL_Buy: {

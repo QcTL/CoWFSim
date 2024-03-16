@@ -10,6 +10,8 @@
 #include "../display/layers/gDispLayers.h"
 #include "../display/rGlobal.h"
 #include "../sim/structure/grids/transformation/gBaseToGradientMinimum.h"
+#include "../display/menus/implementation/rBaseMenu.h"
+#include "../sim/sMainSimulator.h"
 
 int tst_gBasicDisplayGround() {
 

@@ -34,12 +34,15 @@ public:
 
         std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(lSizeGrid);
 
-        sMS->gLayerTypeSoil = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
-        sMS->gTotalAirPollution->gLayerAirPollution = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
+        sLayerType::returnLayerType tReturn = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
+        sMS->gLayerTypeSoil = tReturn.genTypeSoil;
+        //sMS->gTotalAirPollution->gLayerAirPollution = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
 
         sLayerCells::retObjSLayerCells retCells =
-                sLayerCells::gen(lSizeGrid, sMS->gLayerTypeSoil, sMS->gLayerTypeGen, mValues);
+                sLayerCells::gen(lSizeGrid, sMS->gLayerTypeSoil, sMS->gLayerTypeGen, tReturn.centerClusters, mValues);
         sMS->gLayerCurStruct = retCells.gMatrix;
+        sMS->gTotalUnderground->gLayerUnderground = retCells.gUnderground;
+        sMS->gTotalUnderground->setPointsTransit(retCells.routesMetro);
 
 
         sMS->completedStartGrid();

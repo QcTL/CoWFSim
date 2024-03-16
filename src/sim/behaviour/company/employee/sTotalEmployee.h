@@ -15,7 +15,23 @@ class sTotalEmployee {
 public:
 
     void addEmployeeToCompany(const objCompany &oC) {
-        auto r = sTotalR->addRuteCivil({{oC.c_cOwn[0], {3, 3}}, oC.c_StrEndTime.first, oC.c_StrEndTime.second});
+        std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator> r;
+        std::pair<int, int> rPosHome = {3, 3}; // TODO CHOSE A DINAMIC ONE;
+
+        /*lowestViableRoute lVRMetro = gMainUnderground.getLowestDistanceCommute(oC.c_cOwn[0], rPosHome);
+        if (lVRMetro.totalDistance < someNumber)
+            r = sTotalR->addRuteCivil(
+                    objCivil(objCivil::typeRouteSystem::OC_TRS_TRAIN,
+                             {oC.c_cOwn[0], rPosHome},
+                             oC.c_StrEndTime.first, oC.c_StrEndTime.second));
+        else*/
+            r = sTotalR->addRuteCivil(
+                    objCivil(objCivil::typeRouteSystem::OC_TRS_CAR,
+                             {oC.c_cOwn[0], rPosHome},
+                             oC.c_StrEndTime.first, oC.c_StrEndTime.second));
+
+
+
         if (vTotalCivil.find(oC.c_uuid) != vTotalCivil.end()) {
             vTotalCivil[oC.c_uuid].push_back(r.first);
             vTotalCivil[oC.c_uuid].push_back(r.second);
@@ -24,7 +40,7 @@ public:
     }
 
     std::vector<objRoadTravel> tick(uint32_t tTime){
-        auto newRoutes = sTotalR->getEndStartPoints(tTime);
+        auto newRoutes = sTotalR->getRoutesCarByTime(tTime);
     }
 
 private:

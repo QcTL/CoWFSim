@@ -19,21 +19,29 @@
 #include "../../structure/grids/transformation/gBaseToStartBuildings.h"
 #include "../../structure/grids/transformation/gBaseToInertiaRoads.h"
 #include "../../structure/grids/transformation/gBaseToIRF.h"
-
+#include "../../structure/grids/transformation/gPointToNearestElem.h"
+#include "../../../common/r2BitDirection.h"
 
 class sLayerCells {
 public:
     struct retObjSLayerCells {
         std::shared_ptr<gIGrid<uint32_t>> gMatrix;
+        std::shared_ptr<gIGrid<uint8_t>> gUnderground;
         std::vector<std::vector<std::pair<int, int>>> gCompanyPositions;
+        std::vector<std::vector<std::pair<int, int>>> routesMetro;
     };
 
     static retObjSLayerCells gen(
             uint32_t lSize, const std::shared_ptr<gIGrid<uint8_t>> &gTypeSoil,
             const std::shared_ptr<gIGrid<uint8_t>> &gTypeGen,
+            const std::vector<std::pair<int, int>> &cClusters,
             const std::map<std::string, std::string> &mValues) {
+
         std::shared_ptr<gIGrid<uint32_t>> gCell =
                 std::make_shared<gBasicGrid<uint32_t>>(gBasicGrid<uint32_t>(lSize, lSize, 0));
+
+        std::shared_ptr<gIGrid<uint8_t>> gUnderground =
+                std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
 
         //RIVER:
         std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint8_t>>> pRiver = gBaseToBorderDetection::generate<uint32_t>(
@@ -150,6 +158,36 @@ public:
             }
         }
 
+        std::vector<std::vector<std::pair<int, int>>> rMetro;
+        for (int i = 0; i < cClusters.size(); i++) {
+            rMetro.push_back(
+                    gBaseToLineRoads::givenTwoPoints<uint8_t>(gUnderground,
+                                                              cClusters[i], cClusters[(i + 1) % cClusters.size()],
+                                                              1));
+            gUnderground->set(cClusters[i], 2);
+        }
+        //gUnderground->set({0, 0}, 1);
+        //gUnderground->set({1, 0}, 1);
+        //gUnderground->set({1, 1}, 1);
+        //gUnderground->set({0, 1}, 1);
+
+        std::map<uint8_t, std::vector<std::pair<std::pair<int, int>, uint8_t>>> pUnderground =
+                gBaseToBorderDetection::generate<uint8_t>(gUnderground,
+                                                          {gBorderType::gBNonConnex, gBorderOutside::gIsNotGroup},
+                                                          {1, 2},
+                                                          BasicTransformations::genMaskFromGrid(gUnderground, {1, 2}));
+        for (const auto &map_element: pUnderground) {
+            for (const auto &elm: map_element.second) {
+                //8 code to 4:
+                uint8_t pVal2Bits = ((elm.second & (1 << 1)) >> 1) << 3
+                                    | ((elm.second & (1 << 4)) >> 4) << 2
+                                    | ((elm.second & (1 << 6)) >> 6) << 1
+                                    | ((elm.second & (1 << 3)) >> 3);
+                if (gUnderground->get({elm.first.second, elm.first.first}) == 2) { pVal2Bits |= 1 >> 4; }
+                gUnderground->set({elm.first.second, elm.first.first}, pVal2Bits);
+            }
+        }
+
         //FIELDS:
         // gBaseToField<uint32_t> gBFields(gCell, 0, BasicTransformations::genMaskFromGrid(gTypeSoil, {TypeSoil_T1Farm}));
         /*
@@ -159,7 +197,7 @@ public:
                                             {{1, ((uint32_t) (uint8_t) strtol("00010001", nullptr, 2)) << 24}});
         */
 
-        return {gCell, {}};
+        return {gCell, gUnderground, {}, rMetro};
     }
 
 };

@@ -46,6 +46,16 @@ public:
         return &lTs.tsTex;
     }
 
+    std::vector<sf::Vector2f> getByPosTopLeft(const std::pair<int, int> posTopLeft) {
+        int tSize = lTs.getTileSize();
+        return std::vector<sf::Vector2f>{
+                sf::Vector2f(posTopLeft.first * tSize, posTopLeft.second * tSize),
+                sf::Vector2f((posTopLeft.first + 1) * tSize, posTopLeft.second * tSize),
+                sf::Vector2f((posTopLeft.first + 1) * tSize, (posTopLeft.second + 1) * tSize),
+                sf::Vector2f(posTopLeft.first * tSize, (posTopLeft.second + 1) * tSize)
+        };
+    }
+
 protected:
     gTileset lTs;
     std::vector<std::vector<sf::Vector2f>> lRefTiles;

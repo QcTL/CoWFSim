@@ -88,18 +88,7 @@ private:
         mTypeSprites[n].push_back(v);
     }
 
-    std::vector<sf::Vector2f> getByPosTopLeft(const std::pair<int, int> posTopLeft) {
-        int tSize = lTs.getTileSize();
-        return std::vector<sf::Vector2f>{
-                sf::Vector2f(posTopLeft.first * tSize, posTopLeft.second * tSize),
-                sf::Vector2f((posTopLeft.first + 1) * tSize, posTopLeft.second * tSize),
-                sf::Vector2f((posTopLeft.first + 1) * tSize, (posTopLeft.second + 1) * tSize),
-                sf::Vector2f(posTopLeft.first * tSize, (posTopLeft.second + 1) * tSize)
-        };
-    }
-
     std::map<uint8_t, std::vector<std::vector<sf::Vector2f>>> mTypeSprites;
-
 };
 
 #endif //CITYOFWEIRDFISHES_GLAYERCITY_H

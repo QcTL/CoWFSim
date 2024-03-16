@@ -28,7 +28,12 @@ const uint8_t TypeSoil_T2Obstacle = 9;
 
 class sLayerType {
 public:
-    static std::shared_ptr<gIGrid<uint8_t>> gen(uint32_t lSize, const std::shared_ptr<gIGrid<uint8_t>> &gTypeGen,
+    struct returnLayerType{
+        std::shared_ptr<gIGrid<uint8_t>> genTypeSoil;
+        std::vector<std::pair<int, int>> centerClusters;
+    };
+
+    static returnLayerType gen(uint32_t lSize, const std::shared_ptr<gIGrid<uint8_t>> &gTypeGen,
                                                 const std::map<std::string, std::string> &mValues) {
         std::shared_ptr<gIGrid<uint8_t>> gLayerTypeSoil =
                 std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, TypeSoil_Nothing));
@@ -48,11 +53,16 @@ public:
             gBaseToRiver<uint8_t>::generate(gLayerTypeSoil, 20, lSizeRiver, TypeSoil_T1Obstacle);
 
         std::srand(static_cast<unsigned>(std::time(nullptr)));
-        for (int i = 0; i < 5; i++) {
-            genClusterTypeSoil({std::rand() % (lSize + 1), std::rand() % (lSize + 1)}, 6, 9, 13, gLayerTypeSoil);
+        std::vector<std::pair<int, int>> gCenterCoreUrban(3);
+        for (auto& gCenter : gCenterCoreUrban) {
+            gCenter = {std::rand() % (lSize + 1), std::rand() % (lSize + 1)};
+            genClusterTypeSoil(gCenter, 6, 9, 13, gLayerTypeSoil);
         }
-        for (int i = 0; i < 3; i++) {
-            genClusterTypeIndustry({std::rand() % (lSize + 1), std::rand() % (lSize + 1)}, 3, 8, gLayerTypeSoil);
+
+        std::vector<std::pair<int, int>> gCenterCoreIndustrial(2);
+        for (auto& gCenter : gCenterCoreIndustrial) {
+            gCenter = {std::rand() % (lSize + 1), std::rand() % (lSize + 1)};
+            genClusterTypeIndustry(gCenter, 3, 8, gLayerTypeSoil);
         }
 
         auto wMask = BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing});
@@ -68,7 +78,9 @@ public:
                                         {{7,               5},
                                          {TypeSoil_T1Farm, 4}});
 
-        return gLayerTypeSoil;
+
+        gCenterCoreUrban.insert(gCenterCoreUrban.end(), gCenterCoreIndustrial.begin(), gCenterCoreIndustrial.end());
+        return {gLayerTypeSoil, gCenterCoreUrban};
     }
 
 private:

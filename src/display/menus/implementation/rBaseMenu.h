@@ -38,6 +38,9 @@ public:
                 case 1:
                     refPile->inSim->switchActual(gSimLayersTypes::G_CITY);
                     break;
+                case 2:
+                    refPile->inSim->switchActual(gSimLayersTypes::G_UNDERGROUND);
+                    break;
                 case 3:
                     refPile->inSim->switchActual(gSimLayersTypes::G_TRANSIT);
                     break;
