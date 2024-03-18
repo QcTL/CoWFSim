@@ -21,49 +21,28 @@
 #include "behaviour/company/sMCompany.h"
 #include "behaviour/airPollution/gMainAirPollution.h"
 #include "behaviour/metro/gMainUnderground.h"
+#include "behaviour/gTerrainGrid.h"
 
 class sMainSimulator {
 
 public:
     explicit sMainSimulator(int lSize) : sizeL(lSize) {
-        gLayerTypeSoil = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
-        gLayerTypeGen = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
+        gMainTerrain = std::make_shared<gTerrainGrid>(lSize);
         gLayerCurStruct = std::make_shared<gBasicGrid<uint32_t>>(gBasicGrid<uint32_t>(lSize, lSize, 0));
         gLayerTransit = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
         gLayerNextRoad = std::make_shared<gBasicGrid<rNode *>>(gBasicGrid<rNode *>(lSize, lSize, nullptr));
         gTotalAirPollution = std::make_shared<gMainAirPollution>(lSize);
         gTotalUnderground = std::make_shared<gMainUnderground>(lSize);
-
         sComp = std::make_shared<sMCompany>(lSize,
-                                            gLayerTypeGen,
-                                            gLayerTypeSoil,
+                                            gMainTerrain,
                                             gTotalAirPollution->gLayerAirPollution);
 
         gClock = {0, 0, true, 1, 1, 0};
 
     }
 
-    //CITY
-    std::shared_ptr<gIGrid<uint8_t>> gLayerTypeGen;
-    //VAL 0: NOTHING;
-    //VAL 1: CIVIL BUILDING;
-    //VAL 2: FACTORY BUILDING;
-    //VAL 3: HEAVY FACTORY BUILDING;
-    //VAL 4: FIELDS;
-    //VAL 5: ROADS BIG;
-    //VAL 6: ROADS SMALL;
-
-    std::shared_ptr<gIGrid<uint8_t>> gLayerTypeSoil;
-    // NOTHING
-    // TYPE 1 Mixed
-    // TYPE 2 Mixed
-    // TYPE 3 Mixed
-    // TYPE 1 Industrial
-    // TYPE 2 Industrial
-    // TYPE 1 Farm
-    // TYPE 1 Protected
-    // TYPE 1 Obstacle, can be circumvented
-    // TYPE 2 Obstacle, solid
+    //TERRAIN BASIC;
+    std::shared_ptr<gTerrainGrid> gMainTerrain;
 
     std::shared_ptr<gIGrid<uint32_t>> gLayerCurStruct;
     std::shared_ptr<gIGrid<rNode *>> gLayerNextRoad;
@@ -111,7 +90,7 @@ public:
 
 
             uint32_t tReduced = gClock.rVMinute / 5 + gClock.rVHour * 12 + (gClock.rVIsAM ? 0 : 144);
-            sComp->tick(tReduced);
+
             auto newRoutes = sTCivil->getRoutesCarByTime(tReduced);
             for (auto r: newRoutes) {
                 uint32_t locId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->locIdNode;
@@ -119,8 +98,9 @@ public:
                 gLayerRoads[r.c_RStart.first][r.c_RStart.second]->refCompressed->addNewCar(locId, blocId);
             }
             //   PER EL TICK DE sTOTALEMPLOYEE;
+            sComp->tick(tReduced);
             rInteraction->gClock->setClock(gClock);
-            gTotalAirPollution->tick(gLayerTypeGen);
+            gTotalAirPollution->tick(gMainTerrain->gTG_TypeGen);
             gTotalUnderground->tick(tReduced);
         }
 
@@ -155,7 +135,7 @@ public:
 private:
     void extractRoadsFromLayer() {
         std::pair<std::vector<rNode *>, std::vector<std::vector<rNode *>>> r = rNodeFromGrid<uint8_t>::givenGrid(
-                gLayerTypeGen, {5, 6});
+                gMainTerrain->gTG_TypeGen, {5, 6});
         gLayerRoads = r.second;
         std::cout << r.first.size() << std::endl;
         for (const auto &rNode: r.first) {
@@ -163,7 +143,7 @@ private:
             rInfoDist::initializeMatrix(sizeL / sqrt(sizeL) * sizeL / sqrt(sizeL), sizeL, rListRRoads.size());
         }
 
-        gBaseToNearestRoad::givenMatRef(gLayerNextRoad, gLayerRoads, gLayerTypeGen);
+        gBaseToNearestRoad::givenMatRef(gLayerNextRoad, gLayerRoads, gMainTerrain->gTG_TypeGen);
 
         for (uint32_t i = 0; i < r.second.size(); ++i) {
             for (uint32_t j = 0; j < r.second[i].size(); ++j) {

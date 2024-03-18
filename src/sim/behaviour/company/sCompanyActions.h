@@ -11,7 +11,8 @@
 #include "production/sTotalRecipes.h"
 #include "../../structure/grids/gIGrid.h"
 #include "sCompanyTimer.h"
-#include "../market/sMarketListing.h"
+#include "../market/sMarketBazaar.h"
+#include "../gTerrainGrid.h"
 
 class sCompanyActions {
 public:
@@ -23,22 +24,35 @@ public:
 
     bool gTryIntention(sCompanyCompiler::sCCIntentions &sCCI,
                        const std::shared_ptr<gIGrid<uint8_t>> &gAirPollution,
-                       const std::shared_ptr<gIGrid<uint8_t>> &gTypeSoil, uint32_t actTimer) {
+                       const std::shared_ptr<gTerrainGrid> &gTerrain, uint32_t actTimer) {
         switch (sCCI.scc_type) {
             case sCompanyCompiler::sCCIntentions::CELL_Buy: {
-                sMarketListing::sMOffering sMOff = sCA_MarketListing->getOfferingByType(sCCI.scc_addIdInfo, sCA_gType);
+                sLBuyCell::sMFilter sMF(sCCI.scc_addIdInfo, sCA_gType);
+                std::shared_ptr<sLBuyCell::sMOffering> sMOff = sCA_MarketListing->getListOfOffering(sMF);
                 //TODO some evaluation and add the element; and remove it from the owner;
-                sCA_MarketListing->buyOffering(sMOff);
+                sCA_MarketListing->removeCompleteProcess(sMOff);
             }
                 break;
-            case sCompanyCompiler::sCCIntentions::CELL_GiveRent:
+            case sCompanyCompiler::sCCIntentions::CELL_GiveRent: {
+                std::shared_ptr<sLRentCell::sMOffering> sMO =
+                        std::make_shared<sLRentCell::sMOffering>
+                                (sCCI.scc_objCompany->c_cOwn[sCCI.scc_addIdInfo], 0, 0,
+                                 con_rentCell::TypePayment::LC_PAY_MONTH);
+                sCA_MarketListing->addListing(sMO);
+            }
                 break;
-            case sCompanyCompiler::sCCIntentions::CELL_GainRent:
+            case sCompanyCompiler::sCCIntentions::CELL_GainRent:{
+                sLRentCell::sMFilter sMF(sCCI.scc_addIdInfo, sCA_gType);
+                std::shared_ptr<sLRentCell::sMOffering> sMOff = sCA_MarketListing->getListOfOffering(sMF);
+                //TODO some evaluation and add the element; and remove it from the owner;
+                sCA_MarketListing->removeCompleteProcess(sMOff);
+            }
                 break;
-            case sCompanyCompiler::sCCIntentions::CELL_Sell:
-                sCA_MarketListing->addListing(
-                        {sCCI.scc_objCompany->c_cOwn[sCCI.scc_addIdInfo % sCCI.scc_objCompany->c_cOwn.size()],
-                         0, 0});
+            case sCompanyCompiler::sCCIntentions::CELL_Sell: {
+                std::shared_ptr<sLBuyCell::sMOffering> sMO =
+                        std::make_shared<sLBuyCell::sMOffering>(sCCI.scc_objCompany->c_cOwn[sCCI.scc_addIdInfo], 0, 0);
+                sCA_MarketListing->addListing(sMO);
+            }
                 break;
             case sCompanyCompiler::sCCIntentions::OBJ_Produce:
                 gProduceProduct(sCCI.scc_objCompany, sCCI.scc_addIdInfo, actTimer);
@@ -98,7 +112,7 @@ private:
     sTotalRecipes sCA_CTR;
     std::shared_ptr<gIGrid<uint8_t>> sCA_gType;
     std::shared_ptr<sCompanyTimer> sCA_gTimer;
-    std::shared_ptr<sMarketListing> sCA_MarketListing;
+    std::shared_ptr<sMarketBazaar> sCA_MarketListing;
 };
 
 #endif //CITYOFWEIRDFISHES_SCOMPANYACTIONS_H

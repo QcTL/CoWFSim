@@ -14,18 +14,7 @@
 #include <string>
 #include <algorithm>
 #include <random>
-
-
-struct ctrct_leaseCell {
-    enum TypePayment {
-        LC_PAY_MONTH, LC_PAY_YEAR, LC_PAY_ONCE
-    };
-    uint32_t ct_strDate;
-    uint32_t ct_endDate;
-    TypePayment ct_typePayment;
-    uint32_t ct_totalCost;
-    std::vector<std::pair<uint32_t, uint32_t>> ct_lCells;
-};
+#include "elements/contracts/cObjContracts.h"
 
 std::vector<std::string> vSyllablesP = {"am", "ca", "mi", "o", "ul", "er", "es", "pin", "tu", "ra", "ta", "la", "dro",
                                         "me", "dia", "mart", "sen", "ti", "ments", "tran", "qui", "li", "tat", "pen",
@@ -38,15 +27,14 @@ struct objCompany {
     uint32_t c_uuid{};
     std::string nName;
     std::vector<std::pair<int, int>> c_cOwn;
-    std::list<uint32_t> c_cRentedSelf;
-    std::list<ctrct_leaseCell> c_cRentedOther;
+    std::list<uint32_t> c_lUuidRentedSelf;
+    std::list<uint32_t> c_lUuidRentedOther;
     std::map<uint32_t, int> c_pOwn;
 
     std::pair<uint32_t, uint32_t> c_StrEndTime;
     std::vector<uint64_t> c_cCode;
 
     objCompany() = default;
-
     explicit objCompany(uint32_t cUuid, const std::vector<std::pair<int, int>> &ownStart) : c_uuid(cUuid),
                                                                                             c_cOwn(ownStart) {
         int numStrings = numStringsDist(gen);
@@ -68,11 +56,5 @@ struct objProdRecipe {
     std::vector<std::uint32_t> pr_reqProdId;
     std::uint32_t pr_reqTime;
 };
-
-struct objRoadTravel {
-    std::pair<int, int> c_RStart;
-    std::pair<int, int> c_REnd;
-};
-
 
 #endif //CITYOFWEIRDFISHES_SCOMMON_H

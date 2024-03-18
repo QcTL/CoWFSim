@@ -43,8 +43,8 @@ public:
         std::vector<sCompanyCompiler::sCCIntentions> ret;
         for (auto &i: tVecComp) {
             if (i.second != nullptr) {
-                std::vector<sCompanyCompiler::sCCIntentions> rComp = sCompanyCompiler::givenCode(i.second->c_cCode,
-                                                                                                 i.second);
+                std::vector<sCompanyCompiler::sCCIntentions> rComp =
+                        sCompanyCompiler::givenCode(i.second->c_cCode, i.second);
                 ret.insert(ret.end(), rComp.begin(), rComp.end());
             }
         }
