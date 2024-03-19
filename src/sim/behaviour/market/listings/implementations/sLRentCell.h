@@ -5,6 +5,7 @@
 #ifndef CITYOFWEIRDFISHES_SLRENTCELL_H
 #define CITYOFWEIRDFISHES_SLRENTCELL_H
 
+
 #include "../sIListing.h"
 #include "../../../../structure/grids/gIGrid.h"
 #include "../../../../structure/grids/gBasicGrid.h"
@@ -14,10 +15,10 @@ class sLRentCell : public sIListing {
 public:
     class sMOffering : public sIListing::sMOffering {
     public:
-        sMOffering(const std::pair<int, int> &pos, uint16_t quality, uint32_t totalPrice,
-                   con_TypePaymentFreq typePayment)
+        sMOffering(const std::shared_ptr<objCompany> &givingCompany, const std::pair<int, int> &pos, uint16_t quality,
+                   uint32_t totalPrice, con_TypePaymentFreq typePayment)
                 : sMO_pos(pos), sMO_quality(quality), sMO_totalPrice(totalPrice),
-                  sMO_typePayment(typePayment) {}
+                  sMO_typePayment(typePayment), sMO_givingCompany(givingCompany) {}
 
         bool operator==(const sIListing::sMOffering &other) const override {
             const auto *otherOffering = dynamic_cast<const sLRentCell::sMOffering *>(&other);
@@ -29,6 +30,7 @@ public:
         std::pair<int, int> sMO_pos;
         uint16_t sMO_quality;
         uint32_t sMO_totalPrice;
+        std::shared_ptr<objCompany> sMO_givingCompany;
         con_TypePaymentFreq sMO_typePayment;
     };
 

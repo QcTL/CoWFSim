@@ -12,12 +12,20 @@ enum con_TypePaymentFreq {
     LC_PAY_MONTH, LC_PAY_YEAR, LC_PAY_FORTNIGHT
 };
 
-struct con_rentCell {
-    uint64_t ct_uuid; //TODO
-    uint32_t ct_uuidCompanyReceiving;
+class con_b {
+public:
+    uint64_t ct_uuid;
     uint32_t ct_uuidCompanyGiving;
-
     uint32_t ct_strDate;
+
+    con_b(uint32_t ctUuidCompanyGiving, uint32_t ctStrDate) : ct_strDate(ctStrDate),
+                                                              ct_uuidCompanyGiving(ctUuidCompanyGiving) {}
+};
+
+class con_rentCell : public con_b {
+public:
+    uint32_t ct_uuidCompanyReceiving;
+
     uint32_t ct_endDate;
     con_TypePaymentFreq ct_typePayment;
     uint32_t ct_recurrentCost;
@@ -26,8 +34,8 @@ struct con_rentCell {
 
     con_rentCell(uint32_t ctUuidCompanyReceiving, uint32_t ctUuidCompanyGiving, uint32_t ctStrDate, uint32_t ctEndDate,
                  con_TypePaymentFreq ctTypePayment, uint32_t ctRecurrentCost, uint32_t ctTotalCost,
-                 const std::list<std::pair<int, int>> &ctLCells) : ct_uuidCompanyReceiving(
-            ctUuidCompanyReceiving), ct_uuidCompanyGiving(ctUuidCompanyGiving), ct_strDate(ctStrDate),
+                 const std::list<std::pair<int, int>> &ctLCells) : con_b(ctUuidCompanyGiving, ctStrDate),
+                                                                   ct_uuidCompanyReceiving(ctUuidCompanyReceiving),
                                                                    ct_endDate(ctEndDate),
                                                                    ct_typePayment(ctTypePayment),
                                                                    ct_recurrentCost(ctRecurrentCost),
@@ -36,11 +44,9 @@ struct con_rentCell {
 };
 
 
-struct con_buyCell {
-    uint64_t ct_uuid; //TODO
+class con_buyCell : public con_b {
+public:
     uint32_t ct_uuidCompanyReceiving;
-    uint32_t ct_uuidCompanyGiving;
-    uint32_t ct_strDate;
 
     con_TypePaymentFreq ct_typePayment;
     uint32_t ct_recurrentCost;
@@ -49,32 +55,47 @@ struct con_buyCell {
 
     con_buyCell(uint32_t ctUuidCompanyReceiving, uint32_t ctUuidCompanyGiving, uint32_t ctStrDate,
                 con_TypePaymentFreq ctTypePayment, uint32_t ctRecurrentCost, uint32_t ctTotalCost,
-                const std::list<std::pair<int, int>> &ctLCells) : ct_uuidCompanyReceiving(ctUuidCompanyReceiving),
-                                                                  ct_uuidCompanyGiving(ctUuidCompanyGiving),
-                                                                  ct_strDate(ctStrDate), ct_typePayment(ctTypePayment),
+                const std::list<std::pair<int, int>> &ctLCells) : con_b(ctUuidCompanyGiving, ctStrDate),
+                                                                  ct_uuidCompanyReceiving(ctUuidCompanyReceiving),
+                                                                  ct_typePayment(ctTypePayment),
                                                                   ct_recurrentCost(ctRecurrentCost),
                                                                   ct_totalCost(ctTotalCost), ct_lCells(ctLCells) {}
 };
 
-struct con_loanInteraction {
-    uint64_t ct_uuid; //TODO
+class con_loanInteraction : public con_b {
+public:
     uint32_t ct_uuidCompanyReceiving;
-    uint32_t ct_uuidCompanyGiving;
 
     con_TypePaymentFreq ct_typePayment;
 
     uint32_t ct_askedStart;
     uint32_t ct_recurrentCostReturn;
     uint32_t ct_totalCostReturn;
+
+    con_loanInteraction(uint32_t ctUuidCompanyReceiving, uint32_t ctUuidCompanyGiving, uint32_t ctStrDate,
+                        con_TypePaymentFreq ctTypePayment, uint32_t askedStart, uint32_t ctRecurrentCost,
+                        uint32_t ctTotalCost)
+            : con_b(ctUuidCompanyGiving, ctStrDate),
+              ct_uuidCompanyReceiving(ctUuidCompanyReceiving),
+              ct_typePayment(ctTypePayment),
+              ct_recurrentCostReturn(ctRecurrentCost),
+              ct_totalCostReturn(ctTotalCost),
+              ct_askedStart(askedStart) {}
 };
 
-struct con_stockInteraction {
-    uint64_t ct_uuid; //TODO
+class con_stockInteraction : public con_b {
+public:
     uint32_t ct_uuidCompanyReceiving;
-    uint32_t ct_uuidCompanyGiving;
 
     uint32_t ct_boughtStock;
     double ct_relativeTotalStock;
+
+    con_stockInteraction(uint32_t ctUuidCompanyReceiving, uint32_t ctUuidCompanyGiving, uint32_t ctStrDate,
+                         uint32_t boughtStock, double relativeTotalStock)
+            : con_b(ctUuidCompanyGiving, ctStrDate),
+              ct_uuidCompanyReceiving(ctUuidCompanyReceiving),
+              ct_boughtStock(boughtStock),
+              ct_relativeTotalStock(relativeTotalStock) {}
 };
 
 

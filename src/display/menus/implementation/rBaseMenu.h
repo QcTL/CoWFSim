@@ -100,7 +100,7 @@ public:
                     } else {
                         std::shared_ptr<rCellViewMenu> rComp = std::make_shared<rCellViewMenu>(
                                 rCellViewMenu(refPile->vTopActiveMenu,
-                                              refSComp->getVectCompByUUID(refLBuild->get(cPressed)),
+                                              refSComp->getVecCompByUUID(refLBuild->get(cPressed)),
                                               "d_mCellViewLayer", refPile));
 
                         refPile->addMenuTop(rComp);

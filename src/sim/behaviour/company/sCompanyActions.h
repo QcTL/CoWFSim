@@ -7,50 +7,58 @@
 
 #include <set>
 #include <unordered_set>
-#include "../../structure/obj/sCommon.h"
 #include "production/sTotalRecipes.h"
 #include "../../structure/grids/gIGrid.h"
 #include "sCompanyTimer.h"
 #include "../market/sMarketBazaar.h"
 #include "../gTerrainGrid.h"
+#include "contract/sMainContractor.h"
+#include "sCompanyCompiler.h"
 
 class sCompanyActions {
 public:
-
     sCompanyActions(sTotalRecipes &sTR,
                     const std::shared_ptr<gIGrid<uint8_t>> &gType,
                     const std::shared_ptr<sCompanyTimer> &gCTimer)
             : sCA_CTR(sTR), sCA_gTimer(gCTimer), sCA_gType(gType) {}
 
-    bool gTryIntention(sCompanyCompiler::sCCIntentions &sCCI,
-                       const std::shared_ptr<gIGrid<uint8_t>> &gAirPollution,
-                       const std::shared_ptr<gTerrainGrid> &gTerrain, uint32_t actTimer) {
+    bool gTryIntention(sCompanyCompiler::sCCIntentions &sCCI, uint32_t actTimer) {
         switch (sCCI.scc_type) {
             case sCompanyCompiler::sCCIntentions::CELL_Buy: {
                 sLBuyCell::sMFilter sMF(sCCI.scc_addIdInfo, sCA_gType);
                 std::shared_ptr<sLBuyCell::sMOffering> sMOff = sCA_MarketListing->getListOfOffering(sMF);
-                //TODO some evaluation and add the element; and remove it from the owner;
+
+                //Creation of Contract:
+                sCA_MainContractor->addContractToCompany(sCCI.scc_objCompany, sMOff->sMO_givingCompany, *sMOff,
+                                                         actTimer);
                 sCA_MarketListing->removeCompleteProcess(sMOff);
             }
                 break;
             case sCompanyCompiler::sCCIntentions::CELL_GiveRent: {
                 std::shared_ptr<sLRentCell::sMOffering> sMO =
-                        std::make_shared<sLRentCell::sMOffering>
-                                (sCCI.scc_objCompany->c_cOwn[sCCI.scc_addIdInfo], 0, 0,
-                                 con_rentCell::TypePayment::LC_PAY_MONTH);
+                        std::make_shared<sLRentCell::sMOffering>(sCCI.scc_objCompany,
+                                                                 sCCI.scc_objCompany->getOwnedByIndex(
+                                                                         sCCI.scc_addIdInfo),
+                                                                 (uint16_t) 0, (uint32_t) 0,
+                                                                 con_TypePaymentFreq::LC_PAY_MONTH);
                 sCA_MarketListing->addListing(sMO);
             }
                 break;
-            case sCompanyCompiler::sCCIntentions::CELL_GainRent:{
+            case sCompanyCompiler::sCCIntentions::CELL_GainRent: {
                 sLRentCell::sMFilter sMF(sCCI.scc_addIdInfo, sCA_gType);
                 std::shared_ptr<sLRentCell::sMOffering> sMOff = sCA_MarketListing->getListOfOffering(sMF);
-                //TODO some evaluation and add the element; and remove it from the owner;
+
+                sCA_MainContractor->addContractToCompany(sCCI.scc_objCompany, sMOff->sMO_givingCompany, *sMOff,
+                                                         actTimer);
                 sCA_MarketListing->removeCompleteProcess(sMOff);
             }
                 break;
             case sCompanyCompiler::sCCIntentions::CELL_Sell: {
                 std::shared_ptr<sLBuyCell::sMOffering> sMO =
-                        std::make_shared<sLBuyCell::sMOffering>(sCCI.scc_objCompany->c_cOwn[sCCI.scc_addIdInfo], 0, 0);
+                        std::make_shared<sLBuyCell::sMOffering>(sCCI.scc_objCompany,
+                                                                sCCI.scc_objCompany->getOwnedByIndex(
+                                                                        sCCI.scc_addIdInfo),
+                                                                0, 0);
                 sCA_MarketListing->addListing(sMO);
             }
                 break;
@@ -82,11 +90,11 @@ private:
     }
 
     //ELEMENTS VALIDATIONS;
-    bool hasTypeOwn(objCompany &oC, uint32_t gItemGen, sTotalRecipes &sTR,
+    static bool hasTypeOwn(objCompany &oC, uint32_t gItemGen, sTotalRecipes &sTR,
                     const std::shared_ptr<gIGrid<uint8_t>> &gType) {
         std::unordered_set<uint8_t> companyOwnTypes;
 
-        for (const auto &p: oC.c_cOwn)
+        for (const auto &p: oC.c_cActiveLocations)
             companyOwnTypes.insert(gType->get(p));
 
         for (const auto &n: sTR.getById(gItemGen).pr_reqBuilding)
@@ -96,7 +104,7 @@ private:
         return false;
     }
 
-    bool hasResources(objCompany &oC, uint32_t gItemGen, sTotalRecipes &sTR) {
+    static bool hasResources(objCompany &oC, uint32_t gItemGen, sTotalRecipes &sTR) {
         std::map<uint32_t, uint8_t> gQuant;
         objProdRecipe oPR = sTR.getById(gItemGen);
         for (const auto &nObj: oPR.pr_reqProdId)
@@ -113,6 +121,7 @@ private:
     std::shared_ptr<gIGrid<uint8_t>> sCA_gType;
     std::shared_ptr<sCompanyTimer> sCA_gTimer;
     std::shared_ptr<sMarketBazaar> sCA_MarketListing;
+    std::shared_ptr<sMainContractor> sCA_MainContractor;
 };
 
 #endif //CITYOFWEIRDFISHES_SCOMPANYACTIONS_H

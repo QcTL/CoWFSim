@@ -60,7 +60,7 @@ public:
 
     std::shared_ptr<rPileMenus> rInteraction;
 
-    rGUIClock::objClockValues gClock;
+    rGUIClock::objClockValues gClock{};
     uint8_t pTickMinute = 0;
 
     void tick() {
@@ -172,15 +172,6 @@ private:
     };
     std::list<std::shared_ptr<rRNodeI>> rListRRoads;
     int sizeL;
-
-    void choseFromVector(const int size, int &first, int &second) {
-        first = rand() % size;
-        second = rand() % (size - 1);
-
-        if (second >= first) {
-            ++second;
-        }
-    }
 };
 
 #endif //CITYOFWEIRDFISHES_SMAINSIMULATOR_H

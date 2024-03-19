@@ -13,9 +13,14 @@
 #include "../../structure/grids/gBasicGrid.h"
 #include "employee/sTotalEmployee.h"
 #include "../gTerrainGrid.h"
+#include "code/sCodeStoratge.h"
 
 class sMCompany {
 public:
+
+    enum sMComp_TypeCompany {
+        SMComp_Office = 0, SMComp_Factory = 1, SMComp_Field = 2
+    };
 
     explicit sMCompany(uint32_t lSize,
                        const std::shared_ptr<gTerrainGrid> &gTerrainGrid,
@@ -35,26 +40,33 @@ public:
                 sCompA->gCompletedProduct(sTComp->getCompanyByUUID(t.second), t.first);
         std::cout << tTime << std::endl;
         if (tTime % (12 * 3) == 0) { //ONCE EVERY 3 HOURS
-            for (sCompanyCompiler::sCCIntentions sCCI: sTComp->getTotalIntentions()) {
-                sCompA->gTryIntention(sCCI, sM_AirCondition, sM_gMainTerrain, tTime);
-                //TODO restar score si ho fa malament; sumar una mica si ho fa be
+            for (sCompanyCompiler::sCCIntentions sCCI: sTComp->getTotalIntentions(sSCode)) {
+                sCompA->gTryIntention(sCCI, tTime);
+                sSCode->updateScoreCode(sCCI.scc_objCompany->c_uuid, -10);
             }
         }
     }
 
     void completedStartCompanies(const std::vector<std::vector<std::pair<int, int>>> &gPosCompanies) {
         for (const auto &posNewComp: gPosCompanies)
-            sTComp->addCompanyAtPosition(gLayerOwnership, posNewComp);
+            sTComp->addCompanyAtPosition(gLayerOwnership,
+                                         std::list<std::pair<int, int>>(posNewComp.begin(), posNewComp.end()));
     }
 
-    void addNewCompany() {
-        auto itNewPos = sM_gMainTerrain->getEmptyPositionByType(1);
+    void addNewCompany(sMComp_TypeCompany cCompanyCreation) {
+        std::vector<uint8_t> gTypeGivenTC = {1, 2, 4};
+        uint8_t gTypeCompany = gTypeGivenTC[cCompanyCreation];
+
+        auto itNewPos = sM_gMainTerrain->getEmptyPositionByType(gTypeCompany);
         sTComp->addCompanyAtPosition(gLayerOwnership, {*itNewPos});
-        sM_gMainTerrain->removeEmptyPositionByIterator(1, itNewPos);
+        sM_gMainTerrain->removeEmptyPositionByIterator(gTypeCompany, itNewPos);
     }
 
+    //STORAGE
     std::shared_ptr<gIGrid<std::list<uint32_t>>> gLayerOwnership;
     std::shared_ptr<sTotalCompany> sTComp = std::make_shared<sTotalCompany>(1000);
+    std::shared_ptr<sCodeStorage> sSCode = std::make_shared<sCodeStorage>();
+
 private:
     std::shared_ptr<gTerrainGrid> sM_gMainTerrain;
     std::shared_ptr<gIGrid<uint8_t>> sM_AirCondition;

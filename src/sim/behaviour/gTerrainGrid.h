@@ -45,7 +45,7 @@ public:
         std::random_device rd;
         std::mt19937 gen(rd());
         std::list<std::pair<int, int>>::iterator it;
-        uint32_t rIndex;
+        uint32_t rIndex = 0;
 
         if (gType == 1 || gType == 2 || gType == 3) {
             std::uniform_int_distribution<> dist(0, gTG_CivilEmptyCell.size() - 1);

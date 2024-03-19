@@ -16,7 +16,6 @@
 #include <random>
 #include <stdexcept>
 #include <unordered_set>
-#include "contracts/cObjContracts.h"
 
 std::vector<std::string> vSyllablesP = {"am", "ca", "mi", "o", "ul", "er", "es", "pin", "tu", "ra", "ta", "la", "dro",
                                         "me", "dia", "mart", "sen", "ti", "ments", "tran", "qui", "li", "tat", "pen",
@@ -94,7 +93,7 @@ public:
         addPropertyContract(buyCell.ct_typePayment, buyCell.ct_recurrentCost, true);
     }
 
-    void removeAsReceiving(con_rentCell &rentCell){
+    void removeAsReceiving(con_rentCell &rentCell) {
         con_lRentC.remove(rentCell);
         for (const auto &item: rentCell.ct_lCells) {
             c_cActiveLocations.erase(std::remove(c_cActiveLocations.begin(), c_cActiveLocations.end(), item),
@@ -103,14 +102,14 @@ public:
         addPropertyContract(rentCell.ct_typePayment, rentCell.ct_recurrentCost, true);
     }
 
-    void removeAsGiving(con_rentCell &rentCell){
+    void removeAsGiving(con_rentCell &rentCell) {
         con_lRentC.remove(rentCell);
         c_cActiveLocations.insert(c_cActiveLocations.end(), rentCell.ct_lCells.begin(), rentCell.ct_lCells.end());
         //Negative workflow timer
         addPropertyContract(rentCell.ct_typePayment, rentCell.ct_recurrentCost, false);
     }
 
-    void removeAsReceiving(con_buyCell &buyCell){
+    void removeAsReceiving(con_buyCell &buyCell) {
         con_lBuyC.remove(buyCell);
         for (const auto &item: buyCell.ct_lCells) {
             c_cActiveLocations.erase(std::remove(c_cActiveLocations.begin(), c_cActiveLocations.end(), item),
@@ -119,7 +118,7 @@ public:
         addPropertyContract(buyCell.ct_typePayment, buyCell.ct_recurrentCost, true);
     }
 
-    void removeAsGiving(con_buyCell &buyCell){
+    void removeAsGiving(con_buyCell &buyCell) {
         con_lBuyC.remove(buyCell);
         c_cActiveLocations.insert(c_cActiveLocations.end(), buyCell.ct_lCells.begin(), buyCell.ct_lCells.end());
         //Negative workflow timer
@@ -129,10 +128,18 @@ public:
     uint32_t c_uuid{};
     std::string nName;
 
-protected:
-    //Easy Look-ups
-    std::list<std::pair<int, int>> c_cActiveLocations;
+    std::pair<int, int> getOwnedByIndex(uint32_t lIndex) {
+        return *std::next(c_cActiveLocations.begin(),
+                          lIndex % c_cActiveLocations.size()); // Advance iterator by 2 positions
+    }
+
+
     std::map<uint32_t, int> c_pOwn;
+    std::list<std::pair<int, int>> c_cActiveLocations;
+
+protected:
+
+    //Easy Look-ups
     objComp_activeDates c_activeDates;
     uint32_t c_objFortnight = 0;
     uint32_t c_objYear = 0;
@@ -143,9 +150,6 @@ protected:
     std::list<con_buyCell> con_lBuyC;
     std::list<con_loanInteraction> con_lLoanI;
     std::list<con_stockInteraction> con_lStockI;
-
-    std::vector<uint64_t> c_cCode;
-
 
     void addPropertyContract(con_TypePaymentFreq c_TPF, uint32_t ct_recurrentCost, bool isGaining) {
         switch (c_TPF) {
@@ -160,14 +164,6 @@ protected:
                 break;
         }
     }
-};
-
-
-struct objProdRecipe {
-    std::uint32_t pr_idObjEnd;
-    std::vector<std::uint16_t> pr_reqBuilding;
-    std::vector<std::uint32_t> pr_reqProdId;
-    std::uint32_t pr_reqTime;
 };
 
 #endif //CITYOFWEIRDFISHES_OBJCOMPANY_H

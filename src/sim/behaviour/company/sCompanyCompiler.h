@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <cstdint>
-#include "../../structure/obj/sCommon.h"
+#include "../../structure/obj/elements/objCompany.h"
 
 class sCompanyCompiler {
 public:
@@ -32,9 +32,10 @@ public:
             case 1:
                 return {sCCIntentions::CELL_Buy, static_cast<uint32_t>((cVal & 0xFFFFFFFF % 4) + 1), objC};
             case 2:
-                return {sCCIntentions::CELL_Sell, static_cast<uint32_t>(cVal & 0xFFFFFFFF % objC->c_cOwn.size()), objC};
+                return {sCCIntentions::CELL_Sell, static_cast<uint32_t>(cVal & 0xFFFFFFFF), objC};
             case 3:
-                return {sCCIntentions::CELL_GiveRent, static_cast<uint32_t>(cVal & 0xFFFFFFFF % objC->c_cOwn.size()), objC};
+                return {sCCIntentions::CELL_GiveRent, static_cast<uint32_t>(cVal & 0xFFFFFFFF),
+                        objC};
             case 4:
                 return {sCCIntentions::CELL_GainRent, static_cast<uint32_t>((cVal & 0xFFFFFFFF % 4) + 1), objC};
             default:

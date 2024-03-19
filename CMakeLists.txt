@@ -117,6 +117,8 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/structure/obj/elements/objCompany.h
         src/sim/behaviour/company/contract/sMainContractor.h
         src/sim/behaviour/company/contract/sContractorTimer.h
+        src/sim/behaviour/company/code/sCodeStoratge.h
+        src/sim/behaviour/company/contract/sContractorStorage.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

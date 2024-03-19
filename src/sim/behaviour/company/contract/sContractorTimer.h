@@ -11,11 +11,12 @@
 #include <algorithm>
 #include <memory>
 #include "../../../structure/obj/elements/objCompany.h"
+#include "sContractorStorage.h"
 
 class sContractorTimer {
 public:
 
-    sContractorTimer() = default;
+    explicit sContractorTimer(const std::shared_ptr<sContractorStorage>& conStorage) :sStorageCon(conStorage)  {};
 
     void addTimer(uint64_t uuidContract, uint32_t gTimer,
                   const std::shared_ptr<objCompany> &givingCompany,
@@ -34,8 +35,9 @@ public:
 
     void callToProcessEndedContracts(uint32_t gTimer) {
         while (gListTimers.front().sOT_Timer < gTimer) {
-            gListTimers.front().sOT_GivingCompany->removeAsGiving(SOMEFUCKIINGWAYOFGETTINGCONTRACTSBYUIDDANDCASTIT(gListTimers.front().sOT_uuidContract));
-            gListTimers.front().sOT_ReceivingCompany->removeAsReceiving(SOMEFUCKIINGWAYOFGETTINGCONTRACTSBYUIDDANDCASTIT(gListTimers.front().sOT_uuidContract));
+            gListTimers.front().sOT_GivingCompany->removeAsGiving(sStorageCon->getConByUuid(gListTimers.front().sOT_uuidContract));
+            gListTimers.front().sOT_ReceivingCompany->removeAsReceiving(sStorageCon->getConByUuid(gListTimers.front().sOT_uuidContract));
+            //Saber de quin tipos son i poder-ho concretar, no se si fer que getConByUuid necessits saber quin tius es abans per fer el casting correctament.
             gListTimers.pop_front();
         }
     }
@@ -47,7 +49,7 @@ private:
         std::shared_ptr<objCompany> sOT_GivingCompany;
         std::shared_ptr<objCompany> sOT_ReceivingCompany;
     };
-
+    std::shared_ptr<sContractorStorage> sStorageCon;
     std::list<sObjContractTimer> gListTimers;
 };
 

@@ -10,6 +10,7 @@
 #include "sCommon.h"
 #include "../grids/gIGrid.h"
 #include "../../behaviour/company/sCompanyCompiler.h"
+#include "../../behaviour/company/code/sCodeStoratge.h"
 
 class rVectorCompanies {
 public:
@@ -27,10 +28,15 @@ public:
         return tVecComp[rCar].second;
     }
 
-    uint32_t addComp(const std::vector<std::pair<int, int>> &sTilesStart) {
+    uint32_t addComp(const std::list<std::pair<int, int>> &sTilesStart) {
         uint32_t prevFEmpty = fEmpty;
         fEmpty = tVecComp[fEmpty].first;
-        tVecComp[prevFEmpty] = {0, std::make_shared<objCompany>(prevFEmpty, sTilesStart)};
+        tVecComp[prevFEmpty] = {0,
+                                std::make_shared<objCompany>(
+                                        prevFEmpty, sTilesStart,
+                                        objCompany::objComp_activeDates(
+                                                {true, true, true, true, true, false, false},
+                                                {0, 122}))}; //TODO REAL DAILY
         return prevFEmpty;
     }
 
@@ -39,12 +45,12 @@ public:
         fEmpty = rCar;
     }
 
-    std::vector<sCompanyCompiler::sCCIntentions> getTotalIntentions() {
+    std::vector<sCompanyCompiler::sCCIntentions> getTotalIntentions(const std::shared_ptr<sCodeStorage>& sSCode) {
         std::vector<sCompanyCompiler::sCCIntentions> ret;
         for (auto &i: tVecComp) {
             if (i.second != nullptr) {
                 std::vector<sCompanyCompiler::sCCIntentions> rComp =
-                        sCompanyCompiler::givenCode(i.second->c_cCode, i.second);
+                        sCompanyCompiler::givenCode(sSCode->getCodeByUuid(i.second->c_uuid).sCO_Code, i.second);
                 ret.insert(ret.end(), rComp.begin(), rComp.end());
             }
         }
@@ -61,7 +67,7 @@ public:
     explicit sTotalCompany(uint32_t maxComp) : vTotalComp(maxComp) {}
 
     void addCompanyAtPosition(const std::shared_ptr<gIGrid<std::list<uint32_t>>> &gLayer,
-                              const std::vector<std::pair<int, int>> &vecNPos) {
+                              const std::list<std::pair<int, int>> &vecNPos) {
         uint32_t idNewComp = vTotalComp.addComp(vecNPos);
         for (const auto &nPos: vecNPos) {
             auto p = gLayer->get({nPos.second, nPos.first});
@@ -74,7 +80,7 @@ public:
         return vTotalComp.getDestByComp(index);
     }
 
-    std::vector<objCompany> getVectCompByUUID(const std::list<uint32_t> &tList) {
+    std::vector<objCompany> getVecCompByUUID(const std::list<uint32_t> &tList) {
         std::vector<objCompany> r;
         for (const uint32_t l: tList) {
             r.push_back(*getCompanyByUUID(l));
@@ -82,7 +88,7 @@ public:
         return r;
     }
 
-    std::vector<sCompanyCompiler::sCCIntentions> getTotalIntentions() { return vTotalComp.getTotalIntentions(); }
+    std::vector<sCompanyCompiler::sCCIntentions> getTotalIntentions(const std::shared_ptr<sCodeStorage>& sSCode) { return vTotalComp.getTotalIntentions(sSCode); }
 
 private:
     rVectorCompanies vTotalComp;

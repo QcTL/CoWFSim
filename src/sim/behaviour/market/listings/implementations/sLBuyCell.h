@@ -14,8 +14,9 @@ class sLBuyCell : public sIListing {
 public:
     class sMOffering : public sIListing::sMOffering {
     public:
-        sMOffering(const std::pair<int, int> &pos, uint16_t quality, uint32_t totalPrice)
-                : sMO_pos(pos), sMO_quality(quality), sMO_totalPrice(totalPrice) {}
+        sMOffering(const std::shared_ptr<objCompany> &givingCompany, const std::pair<int, int> &pos, uint16_t quality,
+                   uint32_t totalPrice)
+                : sMO_pos(pos), sMO_quality(quality), sMO_totalPrice(totalPrice), sMO_givingCompany(givingCompany) {}
 
         bool operator==(const sIListing::sMOffering &other) const override {
             const auto *otherOffering = dynamic_cast<const sLBuyCell::sMOffering *>(&other);
@@ -27,7 +28,8 @@ public:
         std::pair<int, int> sMO_pos;
         uint16_t sMO_quality;
         uint32_t sMO_totalPrice;
-        con_buyCell::TypePayment sMO_typePayment;
+        std::shared_ptr<objCompany> sMO_givingCompany;
+        con_TypePaymentFreq sMO_typePayment;
     };
 
     class sMFilter : public sIListing::sMFilter {
