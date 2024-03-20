@@ -27,17 +27,17 @@ public:
     }
 
     void addListing(const std::shared_ptr<sLRentCell::sMOffering> &sMO) {
-        sListingBuy.addListing(sMO);
+        sListingRent.addListing(sMO);
     }
 
     std::shared_ptr<sLBuyCell::sMOffering>
     getListOfOffering(const sLBuyCell::sMFilter &filter) {
-        sListingBuy.getOfferingByFilter(filter);
+        return sListingBuy.getOfferingByFilter(filter);
     }
 
     std::shared_ptr<sLRentCell::sMOffering>
     getListOfOffering(const sLRentCell::sMFilter &filter) {
-        sListingRent.getOfferingByFilter(filter);
+        return sListingRent.getOfferingByFilter(filter);
     }
 
     void removeCompleteProcess(const std::shared_ptr<sLBuyCell::sMOffering> &lCompleted) {
@@ -49,8 +49,8 @@ public:
     }
 
 private:
-    sIListing sListingBuy;
-    sIListing sListingRent;
+    sIListingObj<sLBuyCell> sListingBuy;
+    sIListingObj<sLRentCell> sListingRent;
 };
 
 #endif //CITYOFWEIRDFISHES_SMARKETBAZAAR_H

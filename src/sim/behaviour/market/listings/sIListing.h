@@ -22,12 +22,20 @@ public:
 
     class sMFilter {
     public:
-        virtual bool doesComply(const sMOffering &offer) const = 0;
+        [[nodiscard]] virtual bool doesComply(const sMOffering &offer) const = 0;
 
         virtual ~sMFilter() = default;
     };
+};
 
-    bool addListing(std::shared_ptr<sIListing::sMOffering> offer) {
+
+template<typename ListingType>
+class sIListingObj {
+public:
+
+    template<typename U = ListingType, typename = std::enable_if_t<std::is_base_of_v<sIListing, U>>>
+
+    bool addListing(std::shared_ptr<typename ListingType::sMOffering> offer) {
         auto insertPosition = std::find_if(sMListings.begin(), sMListings.end(), [&](const auto &item) {
             return item->operator==(*offer);
         });
@@ -40,22 +48,20 @@ public:
         return true;
     }
 
-    std::shared_ptr<sIListing::sMOffering>
-    getOfferingByFilter(const sIListing::sMFilter &filter) {
+    std::shared_ptr<typename ListingType::sMOffering> getOfferingByFilter(const typename ListingType::sMFilter &filter) {
         return *std::find_if(sMListings.begin(), sMListings.end(), [&](const auto &item) {
             return filter.doesComply(*item);
         });
     }
 
-    void removeByIterator(const std::shared_ptr<sIListing::sMOffering> &element) {
+    void removeByIterator(const std::shared_ptr<typename ListingType::sMOffering> &element) {
         sMListings.remove(element);
     }
 
-
-    virtual ~sIListing() = default;
+    virtual ~sIListingObj() = default;
 
 protected:
-    std::list<std::shared_ptr<sMOffering>> sMListings;
+    std::list<std::shared_ptr<typename ListingType::sMOffering>> sMListings;
 };
 
 

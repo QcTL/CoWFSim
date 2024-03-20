@@ -16,7 +16,7 @@
 class sContractorTimer {
 public:
 
-    explicit sContractorTimer(const std::shared_ptr<sContractorStorage>& conStorage) :sStorageCon(conStorage)  {};
+    explicit sContractorTimer(const std::shared_ptr<sContractorStorage> &conStorage) : sStorageCon(conStorage) {};
 
     void addTimer(uint64_t uuidContract, uint32_t gTimer,
                   const std::shared_ptr<objCompany> &givingCompany,
@@ -35,9 +35,10 @@ public:
 
     void callToProcessEndedContracts(uint32_t gTimer) {
         while (gListTimers.front().sOT_Timer < gTimer) {
-            gListTimers.front().sOT_GivingCompany->removeAsGiving(sStorageCon->getConByUuid(gListTimers.front().sOT_uuidContract));
-            gListTimers.front().sOT_ReceivingCompany->removeAsReceiving(sStorageCon->getConByUuid(gListTimers.front().sOT_uuidContract));
-            //Saber de quin tipos son i poder-ho concretar, no se si fer que getConByUuid necessits saber quin tius es abans per fer el casting correctament.
+
+            std::shared_ptr<con_b>  r_B = sStorageCon->getConByUuid(gListTimers.front().sOT_uuidContract);
+            r_B->removeAsGiving(gListTimers.front().sOT_GivingCompany);
+            r_B->removeAsGiving(gListTimers.front().sOT_ReceivingCompany);
             gListTimers.pop_front();
         }
     }

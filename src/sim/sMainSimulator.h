@@ -90,15 +90,15 @@ public:
 
 
             uint32_t tReduced = gClock.rVMinute / 5 + gClock.rVHour * 12 + (gClock.rVIsAM ? 0 : 144);
-
-            auto newRoutes = sTCivil->getRoutesCarByTime(tReduced);
+            uint32_t tDate = packDateInfo(gClock.rVDay % 7, gClock.rVDay / 7, gClock.rVMonth, gClock.rVYear);
+            auto newRoutes = sTCivil->getRoutesCarByTime(tReduced, tDate);
             for (auto r: newRoutes) {
                 uint32_t locId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->locIdNode;
                 uint16_t blocId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->rBlock;
                 gLayerRoads[r.c_RStart.first][r.c_RStart.second]->refCompressed->addNewCar(locId, blocId);
             }
             //   PER EL TICK DE sTOTALEMPLOYEE;
-            sComp->tick(tReduced);
+            sComp->tick(tReduced, tDate);
             rInteraction->gClock->setClock(gClock);
             gTotalAirPollution->tick(gMainTerrain->gTG_TypeGen);
             gTotalUnderground->tick(tReduced);
@@ -133,6 +133,19 @@ public:
     std::shared_ptr<sTotalRoutes> sTCivil = std::make_shared<sTotalRoutes>();
 
 private:
+
+    static uint32_t packDateInfo(uint8_t weekday, uint8_t weekNumber, uint8_t month, uint16_t year) {
+        weekday &= 0b111;
+        weekNumber &= 0b11;
+        month &= 0b1111;
+        uint32_t packedDate = 0;
+        packedDate |= weekday;
+        packedDate |= (uint32_t) (weekNumber) << 3;
+        packedDate |= (uint32_t) (month) << 5;
+        packedDate |= (uint32_t) (year) << 9;
+        return packedDate;
+    }
+
     void extractRoadsFromLayer() {
         std::pair<std::vector<rNode *>, std::vector<std::vector<rNode *>>> r = rNodeFromGrid<uint8_t>::givenGrid(
                 gMainTerrain->gTG_TypeGen, {5, 6});

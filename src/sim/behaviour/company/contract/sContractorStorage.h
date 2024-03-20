@@ -35,7 +35,7 @@ public:
         con->ct_uuid = gTypeAndIndex.size();
     }
 
-    std::shared_ptr<con_b> getConByUuid(uint64_t uuidCon){
+    std::shared_ptr<con_b> getConByUuid(uint64_t uuidCon) {
         switch (gTypeAndIndex[uuidCon].first) {
             case 0:
                 return gVecConRent[gTypeAndIndex[uuidCon].second];
@@ -48,8 +48,23 @@ public:
             default:
                 return nullptr;
         }
-
     }
+
+    uint8_t getTypeByUuid(uint64_t uuidCon) {
+        return gTypeAndIndex[uuidCon].first;
+    }
+
+    con_rentCell getRentCellByUuid(
+            uint64_t uuidCon) { return reinterpret_cast<con_rentCell &&>(gVecConRent[gTypeAndIndex[uuidCon].second]); }
+
+    con_buyCell getBuyCellByUuid(
+            uint64_t uuidCon) { return reinterpret_cast<con_buyCell &&>(gVecConBuy[gTypeAndIndex[uuidCon].second]); }
+
+    con_loanInteraction getLoanCellByUuid(
+            uint64_t uuidCon) { return reinterpret_cast<con_loanInteraction &&>(gVecConLoan[gTypeAndIndex[uuidCon].second]); }
+
+    con_stockInteraction getStockCellByUuid(
+            uint64_t uuidCon) { return reinterpret_cast<con_stockInteraction &&>(gVecConStock[gTypeAndIndex[uuidCon].second]); }
 
 private:
     std::vector<std::pair<uint8_t, uint32_t>> gTypeAndIndex;

@@ -22,15 +22,14 @@ public:
                     const std::shared_ptr<sCompanyTimer> &gCTimer)
             : sCA_CTR(sTR), sCA_gTimer(gCTimer), sCA_gType(gType) {}
 
-    bool gTryIntention(sCompanyCompiler::sCCIntentions &sCCI, uint32_t actTimer) {
+    bool gTryIntention(sCompanyCompiler::sCCIntentions &sCCI, uint32_t actTimer, const uint32_t cDate) {
         switch (sCCI.scc_type) {
             case sCompanyCompiler::sCCIntentions::CELL_Buy: {
                 sLBuyCell::sMFilter sMF(sCCI.scc_addIdInfo, sCA_gType);
                 std::shared_ptr<sLBuyCell::sMOffering> sMOff = sCA_MarketListing->getListOfOffering(sMF);
 
                 //Creation of Contract:
-                sCA_MainContractor->addContractToCompany(sCCI.scc_objCompany, sMOff->sMO_givingCompany, *sMOff,
-                                                         actTimer);
+                sCA_MainContractor->addContractToCompany(sCCI.scc_objCompany, sMOff->sMO_givingCompany, *sMOff, cDate);
                 sCA_MarketListing->removeCompleteProcess(sMOff);
             }
                 break;
@@ -48,8 +47,7 @@ public:
                 sLRentCell::sMFilter sMF(sCCI.scc_addIdInfo, sCA_gType);
                 std::shared_ptr<sLRentCell::sMOffering> sMOff = sCA_MarketListing->getListOfOffering(sMF);
 
-                sCA_MainContractor->addContractToCompany(sCCI.scc_objCompany, sMOff->sMO_givingCompany, *sMOff,
-                                                         actTimer);
+                sCA_MainContractor->addContractToCompany(sCCI.scc_objCompany, sMOff->sMO_givingCompany, *sMOff, cDate);
                 sCA_MarketListing->removeCompleteProcess(sMOff);
             }
                 break;
@@ -91,7 +89,7 @@ private:
 
     //ELEMENTS VALIDATIONS;
     static bool hasTypeOwn(objCompany &oC, uint32_t gItemGen, sTotalRecipes &sTR,
-                    const std::shared_ptr<gIGrid<uint8_t>> &gType) {
+                           const std::shared_ptr<gIGrid<uint8_t>> &gType) {
         std::unordered_set<uint8_t> companyOwnTypes;
 
         for (const auto &p: oC.c_cActiveLocations)

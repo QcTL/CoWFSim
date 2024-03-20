@@ -74,16 +74,16 @@ public:
                             cV1 = objC->c_uuid;
                             break;
                         case 1:
-                            cV1 = objC->c_cOwn.size();
+                            cV1 = objC->c_cActiveLocations.size();
                             break;
                         case 2:
                             cV1 = objC->c_pOwn.size();
                             break;
                         case 3:
-                            cV1 = objC->c_lUuidRentedSelf.size();
+                            //cV1 = objC->c_lUuidRentedSelf.size();
                             break;
                         case 4:
-                            cV1 = objC->c_lUuidRentedOther.size();
+                            //cV1 = objC->c_lUuidRentedOther.size(); //TODO, aixo sembla ser una estructura de total Contracts
                             break;
                         case 5:
                             if (objC->c_pOwn.find(static_cast<uint32_t>(cCode[cPC] & 0xFFFFFFFF)) != objC->c_pOwn.end())

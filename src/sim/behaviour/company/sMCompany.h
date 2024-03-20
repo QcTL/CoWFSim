@@ -34,17 +34,29 @@ public:
         sCompA = std::make_shared<sCompanyActions>(*sCompRecipes, sM_gMainTerrain->gTG_TypeGen, sCompT);
     }
 
-    void tick(uint32_t tTime) {
-        if (sCompT->hasToChange(tTime)) // Aixi no hem de crear un vector vuit cada frame.
-            for (std::pair<uint32_t, uint32_t> &t: sCompT->checkForTime(tTime))
+    void tick(const uint32_t tTime, const uint32_t cDate) {
+        if (sCompT->hasToChange(cDate)) // Aixi no hem de crear un vector vuit cada frame.
+            for (std::pair<uint32_t, uint32_t> &t: sCompT->checkForTime(cDate))
                 sCompA->gCompletedProduct(sTComp->getCompanyByUUID(t.second), t.first);
         std::cout << tTime << std::endl;
         if (tTime % (12 * 3) == 0) { //ONCE EVERY 3 HOURS
             for (sCompanyCompiler::sCCIntentions sCCI: sTComp->getTotalIntentions(sSCode)) {
-                sCompA->gTryIntention(sCCI, tTime);
+                sCompA->gTryIntention(sCCI, tTime, cDate);
                 sSCode->updateScoreCode(sCCI.scc_objCompany->c_uuid, -10);
             }
         }
+
+        if (tTime == 0 && (cDate % 1 << 9) == 0) {
+            sTComp->applyEcoWeek();
+            sTComp->applyEcoMonth();
+            sTComp->applyEcoYear();
+        } else if (tTime == 0 && (cDate % 1 << 5) == 0) {
+            sTComp->applyEcoWeek();
+            sTComp->applyEcoMonth();
+        } else if (tTime == 0 && (cDate % 1 << 3) == 0) {
+            sTComp->applyEcoWeek();
+        }
+
     }
 
     void completedStartCompanies(const std::vector<std::vector<std::pair<int, int>>> &gPosCompanies) {
