@@ -38,7 +38,7 @@ int tst_gExtractRoadsCompressed() {
     gB->set(6,3, 1);
 
     sMS->gTotalAirPollution->gLayerAirPollution = gB;
-    sMS->completedStartGrid();
+    sMS->completedSetupStage();
 
 
     std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gTotalAirPollution->gLayerAirPollution ,

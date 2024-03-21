@@ -47,7 +47,7 @@ int tst_gNewVisualization(const std::map<std::string, std::string> &mValues) {
     sMS->gLayerCurStruct = retCells.gMatrix;
 
 
-    sMS->completedStartGrid();
+    sMS->completedSetupStage();
     sMS->completedStartCompanies(retCells.gCompanyPositions);
 
     sMainContainer sMC(sMS);

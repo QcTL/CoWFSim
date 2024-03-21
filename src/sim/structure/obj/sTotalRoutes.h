@@ -20,14 +20,13 @@ public:
         mExitTimesCivil = std::vector<std::list<objCivil>>(288);
     };
 
-    std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator> addRuteCivil(const objCivil &oC) {
-        auto p = std::make_shared<objCivil>(oC);
-        vUniqueCivil.push_back(p);
+    std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator> addRuteCivil(const std::shared_ptr<objCivil> &oC) {
+        vUniqueCivil.push_back(oC);
 
-        mExitTimesCivil[oC.c_TBegin].push_back(oC);
-        mExitTimesCivil[oC.c_TEnd].push_back(oC);
+        mExitTimesCivil[oC->c_TBegin].push_back(*oC);
+        mExitTimesCivil[oC->c_TEnd].push_back(*oC);
 
-        return {mExitTimesCivil[oC.c_TBegin].rbegin().base(), mExitTimesCivil[oC.c_TEnd].rbegin().base()};
+        return {mExitTimesCivil[oC->c_TBegin].rbegin().base(), mExitTimesCivil[oC->c_TEnd].rbegin().base()};
     }
 
     std::vector<objCivil::objRoadTravel> getRoutesCarByTime(uint32_t cTime, uint32_t cDate) {

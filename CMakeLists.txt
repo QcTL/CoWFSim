@@ -97,7 +97,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/behaviour/company/sCompanyTimer.h
         src/sim/behaviour/company/sMCompany.h
         src/sim/behaviour/market/sMarketBazaar.h
-        src/sim/behaviour/company/employee/sTotalEmployee.h
+        src/sim/behaviour/company/employee/sMainCivil.h
         src/sim/behaviour/airPollution/gMainAirPollution.h
         src/tests/tst_gWindExpansion.h
         "src/sim/behaviour/recording/sStorageCivilRoutineState.h"
@@ -119,6 +119,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/behaviour/company/contract/sContractorTimer.h
         src/sim/behaviour/company/code/sCodeStoratge.h
         src/sim/behaviour/company/contract/sContractorStorage.h
+        src/sim/roads/sMainRoads.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

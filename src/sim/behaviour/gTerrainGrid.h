@@ -14,23 +14,34 @@
 
 class gTerrainGrid {
 public:
-    gTerrainGrid(uint32_t lSize) {
+    explicit gTerrainGrid(uint32_t lSize) {
 
         gTG_TypeSoil = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
         gTG_TypeGen = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
 
+
+        std::srand(static_cast<unsigned int>(std::time(nullptr)));
+    }
+
+
+    void setupLists(){
         std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gTG_TypeSoil->rangeUse();
         for (int i = gRange.second.first; i < (gRange.second.second + 1); i++) {
             for (int j = gRange.first.first; j < (gRange.first.second + 1); j++) {
-                if (gTG_TypeGen->get(i, j) == 0)
+                if (gTG_TypeGen->get(i, j) == 0) {
                     if (gTG_TypeSoil->get(i, j) == 1 || gTG_TypeSoil->get(i, j) == 2 || gTG_TypeSoil->get(i, j) == 3)
                         gTG_CivilEmptyCell.emplace_back(i, j);
                     else if (gTG_TypeSoil->get(i, j) == 4 || gTG_TypeSoil->get(i, j) == 5)
                         gTG_FactoryEmptyCell.emplace_back(i, j);
+                }else if(gTG_TypeGen->get(i, j) < 5){
+                    if (gTG_TypeSoil->get(i, j) == 1 || gTG_TypeSoil->get(i, j) == 2 || gTG_TypeSoil->get(i, j) == 3)
+                        gTG_CivilFullCell.emplace_back(i, j);
+                    else if (gTG_TypeSoil->get(i, j) == 4 || gTG_TypeSoil->get(i, j) == 5)
+                        gTG_FactoryFullCell.emplace_back(i, j);
+                }
             }
         }
     }
-
 
     void changeStateSoil(uint8_t newType, std::pair<int, int> gPos) {
         gTG_TypeSoil->set(gPos, newType);
@@ -48,11 +59,11 @@ public:
         uint32_t rIndex = 0;
 
         if (gType == 1 || gType == 2 || gType == 3) {
-            std::uniform_int_distribution<> dist(0, gTG_CivilEmptyCell.size() - 1);
+            std::uniform_int_distribution<> dist(0, (int) gTG_CivilEmptyCell.size() - 1);
             rIndex = dist(gen);
             it = gTG_CivilEmptyCell.begin();
         } else if (gType == 4 || gType == 5) {
-            std::uniform_int_distribution<> dist(0, gTG_FactoryEmptyCell.size() - 1);
+            std::uniform_int_distribution<> dist(0, (int) gTG_FactoryEmptyCell.size() - 1);
             rIndex = dist(gen);
             it = gTG_FactoryEmptyCell.begin();
         }
@@ -65,12 +76,20 @@ public:
         if (gType == 1 || gType == 2 || gType == 3) {
             gTG_TypeGen->set(*itToRemove, 1);
             gTG_CivilEmptyCell.erase(itToRemove);
-        }
-        else if (gType == 4 || gType == 5) {
+        } else if (gType == 4 || gType == 5) {
             gTG_TypeGen->set(*itToRemove, 3); // TODO IT CAN ALSO BE TWO
             gTG_FactoryEmptyCell.erase(itToRemove);
         }
     }
+
+
+    std::pair<int, int> returnRandomFullCivil(){
+        //TODO BASED RANDOM
+        int index = std::rand() % gTG_CivilFullCell.size();
+        auto it = gTG_CivilFullCell.begin();
+        std::advance(it, index);
+        return *it;
+    };
 
     std::shared_ptr<gIGrid<uint8_t>> gTG_TypeSoil;
     // NOTHING
@@ -94,7 +113,9 @@ public:
     //VAL 6: ROADS SMALL;
 private:
     std::list<std::pair<int, int>> gTG_CivilEmptyCell;
+    std::list<std::pair<int, int>> gTG_CivilFullCell;
     std::list<std::pair<int, int>> gTG_FactoryEmptyCell;
+    std::list<std::pair<int, int>> gTG_FactoryFullCell;
 };
 
 #endif //CITYOFWEIRDFISHES_GTERRAINGRID_H
