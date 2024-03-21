@@ -27,7 +27,7 @@ public:
         }
     }
 
-    T get(int row, int col) override {
+    T get(int row, int col) const override {
         if (isInside(row, col)) {
             return data_[row][col];
         } else {
@@ -43,7 +43,7 @@ public:
     }
 
 
-    bool isInside(const int& pX,const int& pY) override {
+    [[nodiscard]] bool isInside(const int& pX,const int& pY) const override {
         return 0 <= pX && pX < data_.size() && 0 <= pY && pY < data_[0].size();
     }
 

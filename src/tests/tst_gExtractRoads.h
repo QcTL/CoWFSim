@@ -29,7 +29,7 @@ int tst_gExtractRoads() {
     rNodeFromGrid<uint8_t>::givenGrid(gB, 1);
 
     sMS->gLayerAirPollution = gB;
-    sMS->completedStartGrid();
+    sMS->completedSetupStage();
 
 
     std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gLayerAirPollution,

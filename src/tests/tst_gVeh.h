@@ -39,7 +39,7 @@ int tst_gVeh() {
 
     sMS->gLayerTypeGen = gB;
     sMS->gTotalAirPollution->gLayerAirPollution  = gB;
-    sMS->completedStartGrid();
+    sMS->completedSetupStage();
 
 
     sMS->gLayerRoads[0][0]->refCompressed->addNewCar(sMS->gLayerRoads[75][75]->refCompressed->locIdNode,

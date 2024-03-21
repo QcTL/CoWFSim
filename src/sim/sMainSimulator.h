@@ -22,20 +22,21 @@
 #include "behaviour/airPollution/gMainAirPollution.h"
 #include "behaviour/metro/gMainUnderground.h"
 #include "behaviour/gTerrainGrid.h"
+#include "roads/sMainRoads.h"
 
 class sMainSimulator {
 
 public:
-    explicit sMainSimulator(int lSize) : sizeL(lSize) {
+    explicit sMainSimulator(int lSize) {
         gMainTerrain = std::make_shared<gTerrainGrid>(lSize);
         gLayerCurStruct = std::make_shared<gBasicGrid<uint32_t>>(gBasicGrid<uint32_t>(lSize, lSize, 0));
-        gLayerTransit = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
         gLayerNextRoad = std::make_shared<gBasicGrid<rNode *>>(gBasicGrid<rNode *>(lSize, lSize, nullptr));
         gTotalAirPollution = std::make_shared<gMainAirPollution>(lSize);
         gTotalUnderground = std::make_shared<gMainUnderground>(lSize);
-        sComp = std::make_shared<sMCompany>(lSize,
-                                            gMainTerrain,
-                                            gTotalAirPollution->gLayerAirPollution);
+
+        gMainRoads = std::make_shared<sMainRoads>(lSize, gMainTerrain);
+        sMCivil = std::make_shared<sMainCivil>(gMainRoads);
+        sComp = std::make_shared<sMCompany>(lSize, sMCivil, gMainTerrain, gTotalAirPollution->gLayerAirPollution);
 
         gClock = {0, 0, true, 1, 1, 0};
 
@@ -54,9 +55,7 @@ public:
     std::shared_ptr<gMainUnderground> gTotalUnderground;
 
     //ROADS
-    std::vector<std::vector<rNode *>> gLayerRoads;
-    std::shared_ptr<gIGrid<uint8_t>> gLayerTransit;
-    std::vector<rNode *> gTotalNodes;
+    std::shared_ptr<sMainRoads> gMainRoads;
 
     std::shared_ptr<rPileMenus> rInteraction;
 
@@ -88,51 +87,39 @@ public:
                 }
             }
 
-
             uint32_t tReduced = gClock.rVMinute / 5 + gClock.rVHour * 12 + (gClock.rVIsAM ? 0 : 144);
             uint32_t tDate = packDateInfo(gClock.rVDay % 7, gClock.rVDay / 7, gClock.rVMonth, gClock.rVYear);
-            auto newRoutes = sTCivil->getRoutesCarByTime(tReduced, tDate);
-            for (auto r: newRoutes) {
-                uint32_t locId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->locIdNode;
-                uint16_t blocId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->rBlock;
-                gLayerRoads[r.c_RStart.first][r.c_RStart.second]->refCompressed->addNewCar(locId, blocId);
-            }
-            //   PER EL TICK DE sTOTALEMPLOYEE;
-            sComp->tick(tReduced, tDate);
+            allTicksReduced(tReduced, tDate);
+
             rInteraction->gClock->setClock(gClock);
-            gTotalAirPollution->tick(gMainTerrain->gTG_TypeGen);
-            gTotalUnderground->tick(tReduced);
         }
-
-
-        for (const std::shared_ptr<rRNodeI> &node: rListRRoads) {
-            node->sendInformationStart();
-            node->tick();
-            node->sendNewInformation();
-        }
+        gMainRoads->tick();
     }
 
-    void completedStartGrid() {
-        extractRoadsFromLayer();
-        for (int i = 0; i < 2000; i++) {
-            for (const std::shared_ptr<rRNodeI> &node: rListRRoads) {
-                node->sendInformationStart();
-                node->sendNewInformation();
-            }
-        }
-        rInfoDist::seeMatrix();
+    void completedSetupStage() {
+        gMainRoads->completedStartGrid(gMainTerrain);
+        gMainTerrain->setupLists();
     }
 
     void completedStartCompanies(const std::vector<std::vector<std::pair<int, int>>> &gPosCompanies) {
         sComp->completedStartCompanies(gPosCompanies);
     }
 
-
     //MEMORY:
+    std::shared_ptr<sMainCivil> sMCivil;
     std::shared_ptr<sMCompany> sComp;
+
     std::shared_ptr<sTotalRoutes> sTCivil = std::make_shared<sTotalRoutes>();
 
 private:
+
+    void allTicksReduced(const uint32_t tReduced, const uint32_t tDate) {
+        gMainRoads->tickReduced(tReduced, tDate);
+        sComp->tickReduced(tReduced, tDate);
+        gTotalAirPollution->tickReduced(gMainTerrain->gTG_TypeGen);
+        gTotalUnderground->tickReduced(tReduced);
+
+    }
 
     static uint32_t packDateInfo(uint8_t weekday, uint8_t weekNumber, uint8_t month, uint16_t year) {
         weekday &= 0b111;
@@ -145,46 +132,6 @@ private:
         packedDate |= (uint32_t) (year) << 9;
         return packedDate;
     }
-
-    void extractRoadsFromLayer() {
-        std::pair<std::vector<rNode *>, std::vector<std::vector<rNode *>>> r = rNodeFromGrid<uint8_t>::givenGrid(
-                gMainTerrain->gTG_TypeGen, {5, 6});
-        gLayerRoads = r.second;
-        std::cout << r.first.size() << std::endl;
-        for (const auto &rNode: r.first) {
-            rListRRoads.merge(rTransRNodeToRRNode().conversion(rNode, sqrt(sizeL), sizeL, gLayerTransit));
-            rInfoDist::initializeMatrix(sizeL / sqrt(sizeL) * sizeL / sqrt(sizeL), sizeL, rListRRoads.size());
-        }
-
-        gBaseToNearestRoad::givenMatRef(gLayerNextRoad, gLayerRoads, gMainTerrain->gTG_TypeGen);
-
-        for (uint32_t i = 0; i < r.second.size(); ++i) {
-            for (uint32_t j = 0; j < r.second[i].size(); ++j) {
-                if (r.second[i][j] != nullptr) {
-                    gLayerTransit->set(i, j, 1);
-                    gTotalNodes.push_back(r.second[i][j]);
-                }
-            }
-        }
-
-        //TEST DAILY COMMUTE:
-        /*
-        for (int i = 0; i < 10; i++) {
-            uint32_t tTime = i;
-            uint32_t tTimeEnd = i + 48;
-
-            for (int j = 0; j < 3; j++) {
-                int idP1;
-                int idP2;
-                choseFromVector(gTotalNodes.size(), idP1, idP2);
-
-                sTCivil->addRuteCivil({{gTotalNodes[idP1]->rPos, gTotalNodes[idP2]->rPos}, tTime, tTimeEnd});
-            }
-        }*/
-        //sTCivil->addRuteCivil({{{0, 0}, {4, 2}}, 5, 250});
-    };
-    std::list<std::shared_ptr<rRNodeI>> rListRRoads;
-    int sizeL;
 };
 
 #endif //CITYOFWEIRDFISHES_SMAINSIMULATOR_H

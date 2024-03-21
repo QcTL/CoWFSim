@@ -17,13 +17,13 @@ public:
             : sMS(sMS) {
 
         gSimL = std::make_shared<gDispLayers>(sMS->gTotalAirPollution->gLayerAirPollution,
-                                              sMS->gLayerCurStruct, sMS->gLayerTransit,
+                                              sMS->gLayerCurStruct, sMS->gMainRoads->gLayerTransit,
                                               sMS->gTotalUnderground->gLayerUnderground);
         pPM = std::make_shared<rPileMenus>(gSimL);
         //MENUS
         sMS->rInteraction = pPM;
         rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->gMainTerrain->gTG_TypeGen,
-                                                       sMS->gLayerRoads,
+                                                       sMS->gMainRoads->gLayerRoads,
                                                        sMS->sComp->gLayerOwnership, sMS->sComp->sTComp));
         pPM->addMenuTop(rBasic);
 
@@ -38,9 +38,9 @@ public:
         double lastTickTimeMs = 0.0;
 
         //LOC VAR
-        double currentTimeMs = 0;
-        double elapsedLoopTimeMs = 0;
-        double elapsedTickTimeMs = 0;
+        double currentTimeMs;
+        double elapsedLoopTimeMs;
+        double elapsedTickTimeMs;
 
         while (rG->isOpen) {
             currentTimeMs = getCurrentTimeInMilliseconds(); // Implement this function to get the current time
@@ -52,7 +52,7 @@ public:
                 lastLoopTimeMs = currentTimeMs;
             }
 
-            // Run sMS->tick() at a different frequency
+            // Run sMS->tickReduced() at a different frequency
             elapsedTickTimeMs = currentTimeMs - lastTickTimeMs;
             if (sMS->rInteraction->rInteractionGameVel != 0 &&
                 elapsedTickTimeMs >= sMS->rInteraction->rInteractionGameVel) {
@@ -65,7 +65,7 @@ public:
     static double getCurrentTimeInMilliseconds() {
         auto currentTime = std::chrono::high_resolution_clock::now();
         auto duration = currentTime.time_since_epoch();
-        return std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+        return (double) std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
     }
 
 private:

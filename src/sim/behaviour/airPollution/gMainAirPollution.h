@@ -19,7 +19,7 @@ public:
         recomputeWindMat({-0.75, 0.5});
     }
 
-    void tick(std::shared_ptr<gIGrid<uint8_t>> &gBasicType) {
+    void tickReduced(std::shared_ptr<gIGrid<uint8_t>> &gBasicType) {
 
         BasicTransformations::copyWhere(gLayerAirPollution, gBasicType, {{3, 8}});
 

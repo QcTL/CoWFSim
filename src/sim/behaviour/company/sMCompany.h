@@ -11,7 +11,7 @@
 #include "../../structure/obj/sTotalCompany.h"
 #include "../../structure/grids/gIGrid.h"
 #include "../../structure/grids/gBasicGrid.h"
-#include "employee/sTotalEmployee.h"
+#include "employee/sMainCivil.h"
 #include "../gTerrainGrid.h"
 #include "code/sCodeStoratge.h"
 
@@ -23,10 +23,11 @@ public:
     };
 
     explicit sMCompany(uint32_t lSize,
+                       const std::shared_ptr<sMainCivil> &sMainCivil,
                        const std::shared_ptr<gTerrainGrid> &gTerrainGrid,
                        const std::shared_ptr<gIGrid<uint8_t>> &gTypeAir)
             : sCompRecipes(std::make_shared<sTotalRecipes>("FObjProduced.csv")),
-              sM_gMainTerrain(gTerrainGrid), sM_AirCondition(gTypeAir) {
+              sM_gMainTerrain(gTerrainGrid), sM_AirCondition(gTypeAir), sM_sCompEmployee(sMainCivil) {
 
         sCompT = std::make_shared<sCompanyTimer>();
         gLayerOwnership = std::make_shared<gBasicGrid<std::list<uint32_t>>>
@@ -34,7 +35,7 @@ public:
         sCompA = std::make_shared<sCompanyActions>(*sCompRecipes, sM_gMainTerrain, sCompT);
     }
 
-    void tick(const uint32_t tTime, const uint32_t cDate) {
+    void tickReduced(const uint32_t tTime, const uint32_t cDate) {
         if (sCompT->hasToChange(cDate)) // Aixi no hem de crear un vector vuit cada frame.
             for (std::pair<uint32_t, uint32_t> &t: sCompT->checkForTime(cDate))
                 sCompA->gCompletedProduct(sTComp->getCompanyByUUID(t.second), t.first);
@@ -86,7 +87,7 @@ private:
     std::shared_ptr<sCompanyTimer> sCompT;
     std::shared_ptr<sCompanyActions> sCompA;
     std::shared_ptr<sTotalRecipes> sCompRecipes;
-    sTotalEmployee sCompEmployee;
+    std::shared_ptr<sMainCivil> sM_sCompEmployee;
 };
 
 #endif //CITYOFWEIRDFISHES_SMCOMPANY_H
