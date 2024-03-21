@@ -80,30 +80,26 @@ public:
     uint32_t ct_recurrentCost;
     uint32_t ct_totalCost;
     std::list<std::pair<int, int>> ct_lCells;
+    uint8_t ct_typeCell;
 
     con_rentCell(uint32_t ctUuidCompanyReceiving, uint32_t ctUuidCompanyGiving, uint32_t ctStrDate, uint32_t ctEndDate,
                  con_TypePaymentFreq ctTypePayment, uint32_t ctRecurrentCost, uint32_t ctTotalCost,
-                 const std::list<std::pair<int, int>> &ctLCells) : con_b(ctUuidCompanyGiving, ctUuidCompanyReceiving,
+                 const std::list<std::pair<int, int>> &ctLCells,uint8_t typeCell) : con_b(ctUuidCompanyGiving, ctUuidCompanyReceiving,
                                                                          ctStrDate, ctEndDate),
                                                                    ct_typePayment(ctTypePayment),
                                                                    ct_recurrentCost(ctRecurrentCost),
                                                                    ct_totalCost(ctTotalCost),
-                                                                   ct_lCells(ctLCells) {}
+                                                                   ct_lCells(ctLCells), ct_typeCell(typeCell) {}
     //TODO AFEGIR CANVIS A C_RENTEDlOCATIONS
     void
     addAsReceiving(std::shared_ptr<objCompany> &objCom) override {
-        objCom->c_cActiveLocations.insert(
-                objCom->c_cActiveLocations.end(), ct_lCells.begin(), ct_lCells.end());
+        objCom->addAvailableLocation(ct_lCells, ct_typeCell);
         addPropertyContract(objCom, ct_typePayment, ct_recurrentCost, false);
     };
 
     void
     addAsGiving(std::shared_ptr<objCompany> &objCom) override {
-        for (const auto &item: ct_lCells) {
-            objCom->c_cActiveLocations.erase(
-                    std::remove(objCom->c_cActiveLocations.begin(), objCom->c_cActiveLocations.end(), item),
-                    objCom->c_cActiveLocations.end());
-        }
+        objCom->removeAvailableLocation(ct_lCells, ct_typeCell);
         addPropertyContract(objCom, ct_typePayment, ct_recurrentCost, true);
     };
 
@@ -125,29 +121,25 @@ public:
     uint32_t ct_recurrentCost;
     uint32_t ct_totalCost;
     std::list<std::pair<int, int>> ct_lCells;
+    uint8_t ct_typeCell;
 
     con_buyCell(uint32_t ctUuidCompanyReceiving, uint32_t ctUuidCompanyGiving, uint32_t ctStrDate,
                 con_TypePaymentFreq ctTypePayment, uint32_t ctRecurrentCost, uint32_t ctTotalCost,
-                const std::list<std::pair<int, int>> &ctLCells)
+                const std::list<std::pair<int, int>> &ctLCells,uint8_t typeCell)
             : con_b(ctUuidCompanyGiving, ctUuidCompanyReceiving, ctStrDate),
               ct_typePayment(ctTypePayment),
               ct_recurrentCost(ctRecurrentCost),
-              ct_totalCost(ctTotalCost), ct_lCells(ctLCells) {}
+              ct_totalCost(ctTotalCost), ct_lCells(ctLCells), ct_typeCell(typeCell) {}
 
     void
     addAsReceiving(std::shared_ptr<objCompany> &objCom) override {
-        objCom->c_cActiveLocations.insert(
-                objCom->c_cActiveLocations.end(), ct_lCells.begin(), ct_lCells.end());
+        objCom->addAvailableLocation(ct_lCells, ct_typeCell);
         addPropertyContract(objCom, ct_typePayment, ct_recurrentCost, false);
     };
 
     void
     addAsGiving(std::shared_ptr<objCompany> &objCom) override {
-        for (const auto &item: ct_lCells) {
-            objCom->c_cActiveLocations.erase(
-                    std::remove(objCom->c_cActiveLocations.begin(), objCom->c_cActiveLocations.end(), item),
-                    objCom->c_cActiveLocations.end());
-        }
+        objCom->removeAvailableLocation(ct_lCells, ct_typeCell);
         addPropertyContract(objCom, ct_typePayment, ct_recurrentCost, true);
     };
 

@@ -31,7 +31,7 @@ public:
         sCompT = std::make_shared<sCompanyTimer>();
         gLayerOwnership = std::make_shared<gBasicGrid<std::list<uint32_t>>>
                 (gBasicGrid<std::list<uint32_t>>(lSize, lSize, {}));
-        sCompA = std::make_shared<sCompanyActions>(*sCompRecipes, sM_gMainTerrain->gTG_TypeGen, sCompT);
+        sCompA = std::make_shared<sCompanyActions>(*sCompRecipes, sM_gMainTerrain, sCompT);
     }
 
     void tick(const uint32_t tTime, const uint32_t cDate) {
@@ -41,8 +41,8 @@ public:
         std::cout << tTime << std::endl;
         if (tTime % (12 * 3) == 0) { //ONCE EVERY 3 HOURS
             for (sCompanyCompiler::sCCIntentions sCCI: sTComp->getTotalIntentions(sSCode)) {
-                sCompA->gTryIntention(sCCI, tTime, cDate);
-                sSCode->updateScoreCode(sCCI.scc_objCompany->c_uuid, -10);
+                sCompA->gTryIntention(sCCI, sSCode, cDate);
+                sSCode->updateScoreCode(sCCI.scc_objCompany->c_uuid, -1);
             }
         }
 

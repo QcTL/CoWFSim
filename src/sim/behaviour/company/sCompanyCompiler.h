@@ -17,7 +17,8 @@ public:
             CELL_GiveRent,
             CELL_GainRent,
             CELL_Sell,
-            OBJ_Produce
+            OBJ_Produce,
+            OBJ_Buy
         };
 
         sCCEnumIntentions scc_type;
@@ -80,7 +81,7 @@ public:
                             cV1 = objC->c_pOwn.size();
                             break;
                         case 3:
-                            //cV1 = objC->c_lUuidRentedSelf.size();
+                            cV1 = objC->c_cRentedLocations.size();
                             break;
                         case 4:
                             //cV1 = objC->c_lUuidRentedOther.size(); //TODO, aixo sembla ser una estructura de total Contracts

@@ -56,6 +56,26 @@ public:
         nName[0] = toupper(nName[0]);
     }
 
+
+    void addAvailableLocation(const std::list<std::pair<int, int>> &ctLCells, uint8_t typeCell) {
+        c_cActiveLocations.insert(
+                c_cActiveLocations.end(), ctLCells.begin(), ctLCells.end());
+        if (c_cAvailableByType.find(typeCell) != c_cAvailableByType.end())
+            c_cAvailableByType[typeCell] += 1;
+        else
+            c_cAvailableByType[typeCell] = 1;
+    }
+
+
+    void removeAvailableLocation(const std::list<std::pair<int, int>> &ctLCells, uint8_t typeCell) {
+        for (const auto &item: ctLCells) {
+            c_cActiveLocations.erase(
+                    std::remove(c_cActiveLocations.begin(), c_cActiveLocations.end(), item),
+                    c_cActiveLocations.end());
+        }
+        c_cAvailableByType[typeCell] -= 1;
+    }
+
     uint32_t c_uuid{};
     std::string nName;
 
@@ -66,7 +86,8 @@ public:
 
     std::map<uint32_t, int> c_pOwn;
     std::list<std::pair<int, int>> c_cActiveLocations;
-    std::list<std::pair<int, int>>  c_cRentedLocations;
+    std::map<uint8_t, int> c_cAvailableByType;
+    std::list<std::pair<int, int>> c_cRentedLocations;
     objComp_activeDates c_activeDates;
 
     double c_cActiveFunds = 0;

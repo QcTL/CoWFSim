@@ -15,9 +15,10 @@ class sLRentCell : public sIListing {
 public:
     class sMOffering : public sIListing::sMOffering {
     public:
-        sMOffering(const std::shared_ptr<objCompany> &givingCompany, const std::pair<int, int> &pos, uint16_t quality,
+        sMOffering(const std::shared_ptr<objCompany> &givingCompany, const std::pair<int, int> &pos, uint8_t typePos,
+                   uint16_t quality,
                    uint32_t totalPrice, con_TypePaymentFreq typePayment)
-                : sMO_pos(pos), sMO_quality(quality), sMO_totalPrice(totalPrice),
+                : sMO_pos(pos), sMO_quality(quality), sMO_totalPrice(totalPrice), sMO_typePos(typePos),
                   sMO_typePayment(typePayment), sMO_givingCompany(givingCompany) {}
 
         bool operator==(const sIListing::sMOffering &other) const override {
@@ -28,6 +29,7 @@ public:
         }
 
         std::pair<int, int> sMO_pos;
+        uint8_t sMO_typePos;
         uint16_t sMO_quality;
         uint32_t sMO_totalPrice;
         std::shared_ptr<objCompany> sMO_givingCompany;
@@ -36,19 +38,18 @@ public:
 
     class sMFilter : public sIListing::sMFilter {
     public:
-        explicit sMFilter(uint8_t typeBuild, const std::shared_ptr<gIGrid<uint8_t>> &gTypeGen)
-                : typeBuild(typeBuild), gTypeGen(gTypeGen) {}
+        explicit sMFilter(uint8_t typeBuild)
+                : typeBuild(typeBuild) {}
 
         [[nodiscard]] bool doesComply(const sIListing::sMOffering &offer) const override {
             const auto *tOffer = dynamic_cast<const sLRentCell::sMOffering *>(&offer);
             if (!tOffer)
                 return false;
-            return typeBuild == gTypeGen->get(tOffer->sMO_pos);
+            return typeBuild == tOffer->sMO_typePos;
         }
 
     private:
         uint8_t typeBuild;
-        std::shared_ptr<gIGrid<uint8_t>> gTypeGen;
     };
 };
 

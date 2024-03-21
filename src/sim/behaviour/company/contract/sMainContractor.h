@@ -39,7 +39,8 @@ public:
         std::shared_ptr<con_rentCell> rentCell = std::make_shared<con_rentCell>(
                 con_rentCell(objComReceiving->c_uuid, objComGiving->c_uuid,
                              cDate, 0, //TODO DATES;
-                             sMRentOffer.sMO_typePayment, cRecu, cTotal, {sMRentOffer.sMO_pos}));
+                             sMRentOffer.sMO_typePayment, cRecu, cTotal,
+                             {sMRentOffer.sMO_pos}, sMRentOffer.sMO_typePos));
         sStorageCon->addCon(rentCell);
         rentCell->addAsReceiving(objComReceiving);
         rentCell->addAsGiving(objComGiving);
@@ -69,7 +70,7 @@ public:
                 = std::make_shared<con_buyCell>(con_buyCell(objComReceiving->c_uuid,
                                                             objComGiving->c_uuid, cDate,
                                                             sMBuyOffer.sMO_typePayment, cRecu, cTotal,
-                                                            {sMBuyOffer.sMO_pos}));
+                                                            {sMBuyOffer.sMO_pos}, sMBuyOffer.sMO_typePos));
         sStorageCon->addCon(buyCell);
         buyCell->addAsReceiving(objComReceiving);
         buyCell->addAsGiving(objComGiving);
