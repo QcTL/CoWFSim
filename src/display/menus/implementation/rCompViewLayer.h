@@ -18,7 +18,7 @@ public:
 
         comV = std::vector<defTxtCompany>(9, {{0, 0}});
 
-        std::vector<uint8_t> sLengths = {11,5,5,13,6, 9,4,9,4,9,4};
+        std::vector<uint8_t> sLengths = {11, 5, 5, 13, 6, 9, 4, 9, 4, 9, 4};
 
         for (int i = 0; i < data.size(); ++i) {
             for (int j = 0; j < data[i].size(); ++j) {
@@ -47,10 +47,10 @@ public:
         gHeight = (int) data.size();
 
 
-        setText(0,rShow.nName);
-        setText(1, oCommonMenus::getCompNumber(rShow.c_cOwn.size()));
-        setText(2, oCommonMenus::getCompNumber(rShow.c_cRentedOther.size()));
-        setText(3, "1023450");
+        setText(0, rShow.nName);
+        setText(1, oCommonMenus::getCompNumber(rShow.c_cActiveLocations.size()));
+        setText(2, oCommonMenus::getCompNumber(rShow.c_cRentedLocations.size()));
+        setText(3, getFloatToString2Decimal(rShow.c_cActiveFunds));
         setText(4, "25.34");
 
 
@@ -60,10 +60,10 @@ public:
         setText(7, "");
         setText(8, "");
 
-        if(rShow.c_pOwn.begin() != rShow.c_pOwn.end()) {
+        if (rShow.c_pOwn.begin() != rShow.c_pOwn.end()) {
             setText(5, std::to_string(rShow.c_pOwn.begin()->first));
             setText(6, oCommonMenus::getCompNumber(rShow.c_pOwn.begin()->second));
-        }else{
+        } else {
             setText(5, "");
             setText(6, "");
         }
@@ -79,7 +79,7 @@ public:
         switch (event.type) {
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::Escape)
-                    parentMenu->setResponse(-1,1);
+                    parentMenu->setResponse(-1, 1);
                 break;
             case sf::Event::MouseButtonPressed:
                 //parentMenu->setResponse(-1,1);
@@ -91,7 +91,14 @@ public:
     }
 
     void pressedCell(std::pair<int, int> cPressed) override {}
+
 private:
+
+    static std::string getFloatToString2Decimal(const float nUsed) {
+        std::stringstream ss;
+        ss << std::fixed << std::setprecision(2) << nUsed;
+        return ss.str();
+    }
 
     std::vector<std::pair<int, int>> pElemSel;
     std::vector<std::pair<int, int>> pElemSelAbs;

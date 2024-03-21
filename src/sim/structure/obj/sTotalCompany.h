@@ -10,6 +10,7 @@
 #include "sCommon.h"
 #include "../grids/gIGrid.h"
 #include "../../behaviour/company/sCompanyCompiler.h"
+#include "../../behaviour/company/code/sCodeStoratge.h"
 
 class rVectorCompanies {
 public:
@@ -27,10 +28,17 @@ public:
         return tVecComp[rCar].second;
     }
 
-    uint32_t addComp(const std::vector<std::pair<int, int>> &sTilesStart) {
+    uint32_t
+    addComp(const std::list<std::pair<int, int>> &sTilesStart, const objCompany::objComp_activeDates &cActiveDates) {
         uint32_t prevFEmpty = fEmpty;
         fEmpty = tVecComp[fEmpty].first;
-        tVecComp[prevFEmpty] = {0, std::make_shared<objCompany>(prevFEmpty, sTilesStart)};
+        tVecComp[prevFEmpty] = {0,
+                                std::make_shared<objCompany>(
+                                        prevFEmpty, sTilesStart,
+                                        cActiveDates)};/*
+                                        objCompany::objComp_activeDates(
+                                                {true, true, true, true, true, false, false},
+                                                {0, 122}))}; //TODO REAL DAILY*/
         return prevFEmpty;
     }
 
@@ -39,16 +47,34 @@ public:
         fEmpty = rCar;
     }
 
-    std::vector<sCompanyCompiler::sCCIntentions> getTotalIntentions() {
+    std::vector<sCompanyCompiler::sCCIntentions> getTotalIntentions(const std::shared_ptr<sCodeStorage> &sSCode) {
         std::vector<sCompanyCompiler::sCCIntentions> ret;
         for (auto &i: tVecComp) {
             if (i.second != nullptr) {
-                std::vector<sCompanyCompiler::sCCIntentions> rComp = sCompanyCompiler::givenCode(i.second->c_cCode,
-                                                                                                 i.second);
+                std::vector<sCompanyCompiler::sCCIntentions> rComp =
+                        sCompanyCompiler::givenCode(sSCode->getCodeByUuid(i.second->c_uuid).sCO_Code, i.second);
                 ret.insert(ret.end(), rComp.begin(), rComp.end());
             }
         }
         return ret;
+    }
+
+    void applyEcoWeek() {
+        for (auto &i: tVecComp)
+            if (i.second != nullptr)
+                i.second->c_cActiveFunds -= i.second->c_objFortnight;
+    }
+
+    void applyEcoMonth() {
+        for (auto &i: tVecComp)
+            if (i.second != nullptr)
+                i.second->c_cActiveFunds -= i.second->c_objMonth;
+    }
+
+    void applyEcoYear() {
+        for (auto &i: tVecComp)
+            if (i.second != nullptr)
+                i.second->c_cActiveFunds -= i.second->c_objYear;
     }
 
 private:
@@ -61,8 +87,17 @@ public:
     explicit sTotalCompany(uint32_t maxComp) : vTotalComp(maxComp) {}
 
     void addCompanyAtPosition(const std::shared_ptr<gIGrid<std::list<uint32_t>>> &gLayer,
-                              const std::vector<std::pair<int, int>> &vecNPos) {
-        uint32_t idNewComp = vTotalComp.addComp(vecNPos);
+                              const std::list<std::pair<int, int>> &vecNPos) {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        // TODO BASSAT EN LA MATEIX LLAVOR;
+        std::uniform_int_distribution<> disDay(0, (int) vActiveDaysValid.size() - 1);
+        std::uniform_int_distribution<> disHour(0, (int) vActiveHoursValid.size() - 1);
+        int randomIndexDay = disDay(gen);
+        int randomIndexHour = disHour(gen);
+
+        uint32_t idNewComp = vTotalComp.addComp(vecNPos,
+                                                {vActiveDaysValid[randomIndexDay], vActiveHoursValid[randomIndexHour]});
         for (const auto &nPos: vecNPos) {
             auto p = gLayer->get({nPos.second, nPos.first});
             p.push_front(idNewComp); //AAAAAAAAAAAAAAAAAAAAAA
@@ -74,7 +109,7 @@ public:
         return vTotalComp.getDestByComp(index);
     }
 
-    std::vector<objCompany> getVectCompByUUID(const std::list<uint32_t> &tList) {
+    std::vector<objCompany> getVecCompByUUID(const std::list<uint32_t> &tList) {
         std::vector<objCompany> r;
         for (const uint32_t l: tList) {
             r.push_back(*getCompanyByUUID(l));
@@ -82,10 +117,31 @@ public:
         return r;
     }
 
-    std::vector<sCompanyCompiler::sCCIntentions> getTotalIntentions() { return vTotalComp.getTotalIntentions(); }
+    void applyEcoWeek() {
+        vTotalComp.applyEcoWeek();
+    }
+
+    void applyEcoMonth() {
+        vTotalComp.applyEcoMonth();
+    }
+
+    void applyEcoYear() {
+        vTotalComp.applyEcoYear();
+    }
+
+    std::vector<sCompanyCompiler::sCCIntentions>
+    getTotalIntentions(const std::shared_ptr<sCodeStorage> &sSCode) { return vTotalComp.getTotalIntentions(sSCode); }
 
 private:
     rVectorCompanies vTotalComp;
+
+    std::vector<std::vector<bool>> vActiveDaysValid = {{true,  true,  true,  true,  true, false, false},
+                                                       {true,  true,  true,  true,  true, true,  false},
+                                                       {false, false, false, false, true, true,  true}};
+    std::vector<std::pair<uint32_t, uint32_t>> vActiveHoursValid = {{108, 204},
+                                                                    {96,  192},
+                                                                    {120, 216},
+                                                                    {216, 276}};
 };
 
 

@@ -25,12 +25,11 @@ public:
                              {oC.c_cOwn[0], rPosHome},
                              oC.c_StrEndTime.first, oC.c_StrEndTime.second));
         else*/
-            r = sTotalR->addRuteCivil(
-                    objCivil(objCivil::typeRouteSystem::OC_TRS_CAR,
-                             {oC.c_cOwn[0], rPosHome},
-                             oC.c_StrEndTime.first, oC.c_StrEndTime.second));
-
-
+        r = sTotalR->addRuteCivil(
+                objCivil(objCivil::typeRouteSystem::OC_TRS_CAR,
+                         {oC.c_cActiveLocations.front(), rPosHome},
+                         oC.c_activeDates.c_StrEndTime.first, oC.c_activeDates.c_StrEndTime.second,
+                         oC.c_activeDates.cAD_jobWeek));
 
         if (vTotalCivil.find(oC.c_uuid) != vTotalCivil.end()) {
             vTotalCivil[oC.c_uuid].push_back(r.first);
@@ -39,8 +38,8 @@ public:
             vTotalCivil[oC.c_uuid] = {r.first, r.second};
     }
 
-    std::vector<objRoadTravel> tick(uint32_t tTime){
-        auto newRoutes = sTotalR->getRoutesCarByTime(tTime);
+    std::vector<objCivil::objRoadTravel> tick(uint32_t tTime) {
+        return {};
     }
 
 private:

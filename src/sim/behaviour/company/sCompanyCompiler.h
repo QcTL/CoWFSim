@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <cstdint>
-#include "../../structure/obj/sCommon.h"
+#include "../../structure/obj/elements/objCompany.h"
 
 class sCompanyCompiler {
 public:
@@ -17,7 +17,8 @@ public:
             CELL_GiveRent,
             CELL_GainRent,
             CELL_Sell,
-            OBJ_Produce
+            OBJ_Produce,
+            OBJ_Buy
         };
 
         sCCEnumIntentions scc_type;
@@ -26,18 +27,18 @@ public:
     };
 
     static sCCIntentions intentionsFromLong(const uint64_t &cVal, const std::shared_ptr<objCompany> &objC) {
-
         switch (cVal >> 53 & 0xFF) { //TODO CREC QUE ESTA MALAMENT
             case 0:
                 return {sCCIntentions::OBJ_Produce, static_cast<uint32_t>(cVal & 0xFFFFFFFF), objC};
             case 1:
-                return {sCCIntentions::CELL_Buy, 0, objC}; //TODO GET TYPE OF PROJECT;
+                return {sCCIntentions::CELL_Buy, static_cast<uint32_t>((cVal & 0xFFFFFFFF % 4) + 1), objC};
             case 2:
-                return {sCCIntentions::CELL_Sell, 0, objC}; //TODO GET TYPE OF PROJECT;
+                return {sCCIntentions::CELL_Sell, static_cast<uint32_t>(cVal & 0xFFFFFFFF), objC};
             case 3:
-                return {sCCIntentions::CELL_GiveRent, 0, objC}; //TODO GET TYPE OF PROJECT;
+                return {sCCIntentions::CELL_GiveRent, static_cast<uint32_t>(cVal & 0xFFFFFFFF),
+                        objC};
             case 4:
-                return {sCCIntentions::CELL_GainRent, 0, objC}; //TODO GET TYPE OF PROJECT;
+                return {sCCIntentions::CELL_GainRent, static_cast<uint32_t>((cVal & 0xFFFFFFFF % 4) + 1), objC};
             default:
                 return {};
         }
@@ -74,16 +75,16 @@ public:
                             cV1 = objC->c_uuid;
                             break;
                         case 1:
-                            cV1 = objC->c_cOwn.size();
+                            cV1 = objC->c_cActiveLocations.size();
                             break;
                         case 2:
                             cV1 = objC->c_pOwn.size();
                             break;
                         case 3:
-                            cV1 = objC->c_cRentedOther.size();
+                            cV1 = objC->c_cRentedLocations.size();
                             break;
                         case 4:
-                            cV1 = objC->c_cRentedSelf.size();
+                            //cV1 = objC->c_lUuidRentedOther.size(); //TODO, aixo sembla ser una estructura de total Contracts
                             break;
                         case 5:
                             if (objC->c_pOwn.find(static_cast<uint32_t>(cCode[cPC] & 0xFFFFFFFF)) != objC->c_pOwn.end())
