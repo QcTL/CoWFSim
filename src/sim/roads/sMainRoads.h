@@ -100,22 +100,6 @@ private:
                 }
             }
         }
-
-        //TEST DAILY COMMUTE:
-        /*
-        for (int i = 0; i < 10; i++) {
-            uint32_t tTime = i;
-            uint32_t tTimeEnd = i + 48;
-
-            for (int j = 0; j < 3; j++) {
-                int idP1;
-                int idP2;
-                choseFromVector(gTotalNodes.size(), idP1, idP2);
-
-                sTCivil->addRuteCivil({{gTotalNodes[idP1]->rPos, gTotalNodes[idP2]->rPos}, tTime, tTimeEnd});
-            }
-        }*/
-        //sTCivil->addRuteCivil({{{0, 0}, {4, 2}}, 5, 250});
     };
     std::list<std::shared_ptr<rRNodeI>> rListRRoads;
 
