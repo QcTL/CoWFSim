@@ -14,6 +14,7 @@
 #include "employee/sMainCivil.h"
 #include "../gTerrainGrid.h"
 #include "code/sCodeStoratge.h"
+#include "../market/sMainEvaluator.h"
 
 class sMCompany {
 public:
@@ -25,14 +26,14 @@ public:
     explicit sMCompany(uint32_t lSize,
                        const std::shared_ptr<sMainCivil> &sMainCivil,
                        const std::shared_ptr<gTerrainGrid> &gTerrainGrid,
-                       const std::shared_ptr<gIGrid<uint8_t>> &gTypeAir)
-            : sCompRecipes(std::make_shared<sTotalRecipes>("FObjProduced.csv")),
-              sM_gMainTerrain(gTerrainGrid), sM_AirCondition(gTypeAir), sM_sCompEmployee(sMainCivil) {
+                       const std::shared_ptr<gIGrid<uint8_t>> &gTypeAir,
+                       const std::shared_ptr<sMainEvaluator> &sMEvaluator)
+            : sM_gMainTerrain(gTerrainGrid), sM_AirCondition(gTypeAir), sM_sCompEmployee(sMainCivil) {
 
         sCompT = std::make_shared<sCompanyTimer>();
         gLayerOwnership = std::make_shared<gBasicGrid<std::list<uint32_t>>>
                 (gBasicGrid<std::list<uint32_t>>(lSize, lSize, {}));
-        sCompA = std::make_shared<sCompanyActions>(*sCompRecipes, sM_gMainTerrain, sCompT);
+        sCompA = std::make_shared<sCompanyActions>(sM_gMainTerrain, sCompT, sMEvaluator);
     }
 
     void tickReduced(const uint32_t tTime, const uint32_t cDate) {
@@ -86,7 +87,6 @@ private:
 
     std::shared_ptr<sCompanyTimer> sCompT;
     std::shared_ptr<sCompanyActions> sCompA;
-    std::shared_ptr<sTotalRecipes> sCompRecipes;
     std::shared_ptr<sMainCivil> sM_sCompEmployee;
 };
 

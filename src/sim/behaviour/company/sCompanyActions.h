@@ -14,13 +14,14 @@
 #include "../gTerrainGrid.h"
 #include "contract/sMainContractor.h"
 #include "sCompanyCompiler.h"
+#include "../market/sMainEvaluator.h"
 
 class sCompanyActions {
 public:
-    sCompanyActions(sTotalRecipes &sTR,
-                    const std::shared_ptr<gTerrainGrid> &gType,
-                    const std::shared_ptr<sCompanyTimer> &gCTimer)
-            : sCA_CTR(sTR), sCA_gTimer(gCTimer), sCA_gType(gType) {}
+    sCompanyActions(const std::shared_ptr<gTerrainGrid> &gType,
+                    const std::shared_ptr<sCompanyTimer> &gCTimer,
+                    const std::shared_ptr<sMainEvaluator> &sMEvaluator)
+            : sCA_gTimer(gCTimer), sCA_gType(gType), sMEvaluator(sMEvaluator) {}
 
     bool
     gTryIntention(sCompanyCompiler::sCCIntentions &sCCI, std::shared_ptr<sCodeStorage> &sCodeStorage,
@@ -63,11 +64,16 @@ public:
             }
                 break;
             case sCompanyCompiler::sCCIntentions::OBJ_Produce:
-                if (!gProduceProduct(sCCI.scc_objCompany, sCCI.scc_addIdInfo, sCodeStorage, cDate))
+                if (gProduceProduct(sCCI.scc_objCompany, sCCI.scc_addIdInfo, sCodeStorage, cDate))
+                    sMEvaluator->addCreatedElement(sCCI.scc_addIdInfo);
+                else
                     sCodeStorage->updateScoreCode(sCCI.scc_objCompany->c_uuid, -10);
                 break;
             case sCompanyCompiler::sCCIntentions::OBJ_Buy:
+                sMEvaluator->addBoughtElement(sCCI.scc_addIdInfo);
 
+                //TODO Restar el preu i afegir-lo
+                //TODO Restar de algu que el tingui en el seu inventari, li farem yoink
                 break;
         }
         return true;
@@ -78,9 +84,8 @@ public:
             oC->c_pOwn[gItemGen] = 1; //TO IMPROVE, potser fer-ne mes de un... cada cop
         else
             oC->c_pOwn[gItemGen] += 1;
-
-        for (const auto &bRequired: sCA_CTR.getById(gItemGen).pr_reqBuilding)
-            oC->c_cAvailableByType[bRequired] += 1;
+        sMEvaluator->addCreatedElement(gItemGen);
+        oC->c_cAvailableByType[sMEvaluator->getById(gItemGen).sMEE_iReqTypeBuild] += 1;
     }
 
 private:
@@ -88,45 +93,38 @@ private:
     bool
     gProduceProduct(std::shared_ptr<objCompany> &oC, uint32_t gItemGen, std::shared_ptr<sCodeStorage> &sCodeStorage,
                     uint32_t cDate) {
-        if (!hasTypeOwn(oC, gItemGen, sCA_CTR))
+        if (!hasTypeOwn(oC, gItemGen))
             return false;
-        if (!hasResources(*oC, gItemGen, sCA_CTR)) {
-            for (uint32_t mLack: sCA_CTR.getById(gItemGen).pr_reqProdId) {
+        if (!hasResources(*oC, gItemGen)) {
+            for (uint32_t mLack: sMEvaluator->getById(gItemGen).sMEE_iCElem) {
                 sCompanyCompiler::sCCIntentions buyItems = {
                         sCompanyCompiler::sCCIntentions::sCCEnumIntentions::OBJ_Buy, mLack, oC};
                 gTryIntention(buyItems, sCodeStorage, cDate);
             }
         }
 
-        for (const auto &gElem: sCA_CTR.getById(gItemGen).pr_reqProdId)
+        for (const auto &gElem: sMEvaluator->getById(gItemGen).sMEE_iCElem)
             oC->c_pOwn[gElem] -= 1;
 
-        for (const auto &bRequired: sCA_CTR.getById(gItemGen).pr_reqBuilding)
-            oC->c_cAvailableByType[bRequired] -= 1;
+        oC->c_cAvailableByType[sMEvaluator->getById(gItemGen).sMEE_iReqTypeBuild] -= 1;
 
-        sCA_gTimer->addTimer(gItemGen, sCA_CTR.getById(gItemGen).pr_reqTime + cDate, oC->c_uuid);
+        sCA_gTimer->addTimer(gItemGen, sMEvaluator->getById(gItemGen).sMEE_iTime + cDate, oC->c_uuid);
         return true;
     }
 
     //ELEMENTS VALIDATIONS;
-    static bool hasTypeOwn(std::shared_ptr<objCompany> &oC, uint32_t gItemGen, sTotalRecipes &sTR) {
+    bool hasTypeOwn(std::shared_ptr<objCompany> &oC, uint32_t gItemGen) {
         std::map<uint32_t, uint8_t> gQuant; //TO IMPROVE;
-        objProdRecipe oPR = sTR.getById(gItemGen);
-        for (const auto &nObj: oPR.pr_reqBuilding)
-            gQuant[nObj]++;
-
-        for (const auto &bRequired: gQuant)
-            if (oC->c_cAvailableByType.find(bRequired.first) == oC->c_cAvailableByType.end() ||
-                oC->c_cAvailableByType[bRequired.first] < bRequired.second)
-                return false;
-
+        sTotalElements::sME_Element oPR = sMEvaluator->getById(gItemGen);
+        if (oC->c_cAvailableByType.find(oPR.sMEE_iReqTypeBuild) == oC->c_cAvailableByType.end())
+            return false;
         return true;
     }
 
-    static bool hasResources(objCompany &oC, uint32_t gItemGen, sTotalRecipes &sTR) {
+    bool hasResources(objCompany &oC, uint32_t gItemGen) {
         std::map<uint32_t, uint8_t> gQuant; //TO IMPROVE;
-        objProdRecipe oPR = sTR.getById(gItemGen);
-        for (const auto &nObj: oPR.pr_reqProdId)
+        sTotalElements::sME_Element oPR = sMEvaluator->getById(gItemGen);
+        for (const auto &nObj: oPR.sMEE_iCElem)
             gQuant[nObj]++;
 
         for (const auto &pair: gQuant) {
@@ -136,7 +134,7 @@ private:
         return true;
     }
 
-    sTotalRecipes sCA_CTR;
+    std::shared_ptr<sMainEvaluator> sMEvaluator;
     std::shared_ptr<gTerrainGrid> sCA_gType;
     std::shared_ptr<sCompanyTimer> sCA_gTimer;
     std::shared_ptr<sMarketBazaar> sCA_MarketListing;

@@ -23,6 +23,7 @@
 #include "behaviour/metro/gMainUnderground.h"
 #include "behaviour/gTerrainGrid.h"
 #include "roads/sMainRoads.h"
+#include "behaviour/market/sMainEvaluator.h"
 
 class sMainSimulator {
 
@@ -34,6 +35,7 @@ public:
         gTotalAirPollution = std::make_shared<gMainAirPollution>(lSize);
         gTotalUnderground = std::make_shared<gMainUnderground>(lSize);
 
+        rMEvaluator = std::make_shared<sMainEvaluator>();
         gMainRoads = std::make_shared<sMainRoads>(lSize, gMainTerrain);
         sMCivil = std::make_shared<sMainCivil>(gMainRoads);
         sComp = std::make_shared<sMCompany>(lSize, sMCivil, gMainTerrain, gTotalAirPollution->gLayerAirPollution);
@@ -58,6 +60,9 @@ public:
     std::shared_ptr<sMainRoads> gMainRoads;
 
     std::shared_ptr<rPileMenus> rInteraction;
+
+    std::shared_ptr<sMainEvaluator> rMEvaluator;
+
 
     rGUIClock::objClockValues gClock{};
     uint8_t pTickMinute = 0;
