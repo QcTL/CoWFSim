@@ -30,7 +30,7 @@ private:
 
 
     std::shared_ptr<rRNodeI>
-    rConversation(const std::shared_ptr<rRNodeI> &prevAR, int dirFromPrev, int prevDirMajor, rNode *aR, uint8_t nCons,
+    rConversation(const std::shared_ptr<rRNodeI> &prevAR, int dirFromPrev, int prevDirMajor, rNode *aR, double nCons,
                   const std::shared_ptr<gIGrid<uint8_t>> &tTransit) {
         //Dir 0 top, 1 right, 2 bottom, 3 left , -1 Començant
         if (aR->refCompressed != nullptr)
@@ -49,7 +49,8 @@ private:
                 } else {
                     newAR = std::make_shared<rRNodeL>(
                             rRNodeL((uint16_t) pComp.first / rSizeBlocs * (rSizeGrid / rSizeBlocs) +
-                                    pComp.second / rSizeBlocs, nCons, 2)); //TODO, change it for a dinamic one;
+                                    pComp.second / rSizeBlocs, static_cast<uint8_t>(std::round(nCons)),
+                                    2)); //TODO, change it for a dinamic one;
                 }
                 newAR->tTransit = tTransit;
                 llNodes.push_back(newAR);
@@ -90,7 +91,12 @@ private:
 
             return newAR;
         } else if ((nFollow(aR) == 1 && dirFromPrev == -1) || nFollow(aR) == 2) {
-            std::shared_ptr<rRNodeI> r = rConversation(prevAR, nextDir, prevDirMajor, aFollow, ++nCons, tTransit);
+            if (aR->rBottom != nullptr && aR->rTop != nullptr || aR->rRight != nullptr && aR->rLeft != nullptr)
+                nCons += 1;
+            else
+                nCons += 0.71;
+
+            std::shared_ptr<rRNodeI> r = rConversation(prevAR, nextDir, prevDirMajor, aFollow, nCons, tTransit);
             aR->refCompressed = aFollow->refCompressed;
             aR->refCompressed->addRefPos(aR->rPos);
             return r;
