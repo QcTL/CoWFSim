@@ -38,7 +38,11 @@ public:
         rMEvaluator = std::make_shared<sMainEvaluator>();
         gMainRoads = std::make_shared<sMainRoads>(lSize, gMainTerrain);
         sMCivil = std::make_shared<sMainCivil>(gMainRoads);
-        sComp = std::make_shared<sMCompany>(lSize, sMCivil, gMainTerrain, gTotalAirPollution->gLayerAirPollution);
+        sMEvaluator = std::make_shared<sMainEvaluator>();
+        sComp = std::make_shared<sMCompany>(lSize, sMCivil,
+                                            gMainTerrain,
+                                            gTotalAirPollution->gLayerAirPollution,
+                                            sMEvaluator);
 
         gClock = {0, 0, true, 1, 1, 0};
 
@@ -49,6 +53,9 @@ public:
 
     std::shared_ptr<gIGrid<uint32_t>> gLayerCurStruct;
     std::shared_ptr<gIGrid<rNode *>> gLayerNextRoad;
+
+    std::shared_ptr<sMainEvaluator> sMEvaluator;
+
 
     //AIR POLLUTION
     std::shared_ptr<gMainAirPollution> gTotalAirPollution;
@@ -123,7 +130,7 @@ private:
         sComp->tickReduced(tReduced, tDate);
         gTotalAirPollution->tickReduced(gMainTerrain->gTG_TypeGen);
         gTotalUnderground->tickReduced(tReduced);
-
+        sMEvaluator->tickReduced(tReduced, tDate);
     }
 
     static uint32_t packDateInfo(uint8_t weekday, uint8_t weekNumber, uint8_t month, uint16_t year) {

@@ -17,32 +17,62 @@
 
 class sMainEvaluator {
 public:
-    sMainEvaluator(){
+    sMainEvaluator() {
         sME_totalElements = std::make_shared<sTotalElements>("FObjProduced.csv");
-        sME_gBasicPrices = std::vector<uint32_t>(sME_totalElements->nElements(),10);
-        sME_vLastTransactions = std::vector<sRollingListsEvaluator>(sME_totalElements->nElements(),sRollingListsEvaluator(5));
+        sME_gBasicPrices = std::vector<uint32_t>(sME_totalElements->nElements(), 10);
+        sME_vLastTransactions = std::vector<sRollingListsEvaluator>(sME_totalElements->nElements(),
+                                                                    sRollingListsEvaluator(5));
     };
 
-    void addCreatedElement(uint64_t uuidElement) {
-        sME_gAvailableItems[uuidElement] += 1;
-        sME_vLastTransactions[uuidElement].addLastCreate();
+
+    void tickReduced(uint32_t tReduced, uint32_t tDate) {
+        if (tReduced == 0)
+            updateStaticElements();
     }
 
-    void addBoughtElement(uint64_t uuidElement) {
+    void computeCreatedElement(uint64_t uuidElement, const std::shared_ptr<objCompany> &objAction) {
         sME_gAvailableItems[uuidElement] += 1;
+        sME_vLastTransactions[uuidElement].addLastCreate();
+
+        addElementCompany(uuidElement, 1, objAction);
+        sME_companyHasItem[uuidElement].push_back(objAction);
+    }
+
+    void computeBoughtElement(uint64_t uuidElement, const std::shared_ptr<objCompany> &objAction) {
+        uint32_t pItem = getPriceItemActual(uuidElement);
+
+        sME_gAvailableItems[uuidElement] -= 1;
         sME_vLastTransactions[uuidElement].addLastBought();
+
+        if (sME_gAvailableItems[uuidElement] > 0) {
+            sME_companyHasItem[uuidElement].front()->c_pOwn[uuidElement] -= 1;
+            if (sME_companyHasItem[uuidElement].front()->c_pOwn[uuidElement] <= 0)
+                sME_companyHasItem[uuidElement].pop_front();
+        }
+
+        addElementCompany(uuidElement, 1, objAction);
+        objAction->c_cActiveFunds -= pItem;
+    }
+
+    sTotalElements::sME_Element getById(uint64_t uuidElement) { return sME_totalElements->getById(uuidElement); }
+
+private:
+
+    static void
+    addElementCompany(uint64_t uuidElement, uint8_t nElements, const std::shared_ptr<objCompany> &objAction) {
+        if (objAction->c_pOwn.find(uuidElement) == objAction->c_pOwn.end())
+            objAction->c_pOwn[uuidElement] = nElements; //TO IMPROVE, potser fer-ne mes de un... cada cop
+        else
+            objAction->c_pOwn[uuidElement] += nElements;
     }
 
     uint32_t getPriceItemActual(uint64_t uuidElement) {
         if (sME_gAvailableItems[uuidElement] > 0)
-            return 1.1 * sME_totalElements->getById(uuidElement).getPrice(
-                    sME_vLastTransactions[uuidElement].getDesirability(), sME_gBasicPrices);
+            return (uint32_t) (1.1 * sME_totalElements->getById(uuidElement).getPrice(
+                    sME_vLastTransactions[uuidElement].getDesirability(), sME_gBasicPrices));
         return sME_totalElements->getById(uuidElement).getPrice(
                 sME_vLastTransactions[uuidElement].getDesirability(), sME_gBasicPrices);
     }
-
-    sTotalElements::sME_Element getById(uint64_t uuidElement){return sME_totalElements->getById(uuidElement);}
-private:
 
     void updateStaticElements() {
         //They are update only for the information that the falled window of rolling proportions us.
@@ -53,13 +83,13 @@ private:
     std::shared_ptr<sTotalElements> sME_totalElements;
 
     std::vector<uint32_t> sME_gBasicPrices; // Updated once a day;
-    std::vector<sRollingListsEvaluator> sME_vLastTransactions; // Updated once a day;
+    std::vector<sRollingListsEvaluator> sME_vLastTransactions;
 
     std::map<std::string, uint32_t> sME_gItemUuidByName;
     std::map<uint64_t, uint32_t> sME_gAvailableItems;
 
-    uint32_t sMe_premiumValued = 12;
-    uint32_t sME_premiumImport = 20;
+    std::vector<std::list<std::shared_ptr<objCompany>>> sME_companyHasItem;
+
 };
 
 #endif //CITYOFWEIRDFISHES_SMAINEVALUATOR_H

@@ -7,7 +7,6 @@
 
 #include <set>
 #include <unordered_set>
-#include "production/sTotalRecipes.h"
 #include "../../structure/grids/gIGrid.h"
 #include "sCompanyTimer.h"
 #include "../market/sMarketBazaar.h"
@@ -64,27 +63,18 @@ public:
             }
                 break;
             case sCompanyCompiler::sCCIntentions::OBJ_Produce:
-                if (gProduceProduct(sCCI.scc_objCompany, sCCI.scc_addIdInfo, sCodeStorage, cDate))
-                    sMEvaluator->addCreatedElement(sCCI.scc_addIdInfo);
-                else
+                if (!gProduceProduct(sCCI.scc_objCompany, sCCI.scc_addIdInfo, sCodeStorage, cDate))
                     sCodeStorage->updateScoreCode(sCCI.scc_objCompany->c_uuid, -10);
                 break;
             case sCompanyCompiler::sCCIntentions::OBJ_Buy:
-                sMEvaluator->addBoughtElement(sCCI.scc_addIdInfo);
-
-                //TODO Restar el preu i afegir-lo
-                //TODO Restar de algu que el tingui en el seu inventari, li farem yoink
+                sMEvaluator->computeBoughtElement(sCCI.scc_addIdInfo, sCCI.scc_objCompany);
                 break;
         }
         return true;
     }
 
     void gCompletedProduct(const std::shared_ptr<objCompany> &oC, uint32_t gItemGen) {
-        if (oC->c_pOwn.find(gItemGen) == oC->c_pOwn.end())
-            oC->c_pOwn[gItemGen] = 1; //TO IMPROVE, potser fer-ne mes de un... cada cop
-        else
-            oC->c_pOwn[gItemGen] += 1;
-        sMEvaluator->addCreatedElement(gItemGen);
+        sMEvaluator->computeCreatedElement(gItemGen, oC);
         oC->c_cAvailableByType[sMEvaluator->getById(gItemGen).sMEE_iReqTypeBuild] += 1;
     }
 
@@ -105,9 +95,7 @@ private:
 
         for (const auto &gElem: sMEvaluator->getById(gItemGen).sMEE_iCElem)
             oC->c_pOwn[gElem] -= 1;
-
         oC->c_cAvailableByType[sMEvaluator->getById(gItemGen).sMEE_iReqTypeBuild] -= 1;
-
         sCA_gTimer->addTimer(gItemGen, sMEvaluator->getById(gItemGen).sMEE_iTime + cDate, oC->c_uuid);
         return true;
     }
