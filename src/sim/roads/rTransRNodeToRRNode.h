@@ -49,7 +49,7 @@ private:
                 } else {
                     newAR = std::make_shared<rRNodeL>(
                             rRNodeL((uint16_t) pComp.first / rSizeBlocs * (rSizeGrid / rSizeBlocs) +
-                                    pComp.second / rSizeBlocs, nCons));
+                                    pComp.second / rSizeBlocs, nCons, 2)); //TODO, change it for a dinamic one;
                 }
                 newAR->tTransit = tTransit;
                 llNodes.push_back(newAR);

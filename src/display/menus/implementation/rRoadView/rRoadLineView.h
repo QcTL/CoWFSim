@@ -19,6 +19,9 @@ public:
                              {}};
         pElemNumSize = {};
 
+        gHeightsTop = {2,4,6};
+        gHeightsBottom = {8,12,10};
+
         for (int i = 0; i < dExtracted.size(); ++i) {
             for (int j = 0; j < dExtracted[i].size(); ++j) {
                 auto row = (rPos == pBottomLeft || rPos == pBottomRight) ? dExtracted.size() - 1 - i : i;
@@ -39,13 +42,6 @@ public:
         setNewOcc(refView->getOccupancy());
         setNumberComp(refView->getCapacity());
 
-        int gDiff = 30 / (refView->getCapacity() + 1);
-        for (int i = 0; i < refView->getCapacity(); i++) {
-            pPosCarTop.emplace_back(2, (i + 1) * gDiff);
-            pPosCarBottom.emplace_back(8, (i + 1) * gDiff);
-        }
-
-
         setSizeRoads(1, true);
         setSizeRoads(1, false);
 
@@ -63,10 +59,10 @@ private:
     std::vector<std::pair<int, int>> pElemNumSize;
 
     std::vector<std::vector<std::pair<int, int>>> pElemNRoadsTop;
-    std::vector<std::pair<int, int>> pPosCarTop;
-
     std::vector<std::vector<std::pair<int, int>>> pElemNRoadsBottom;
-    std::vector<std::pair<int, int>> pPosCarBottom;
+
+    std::vector<uint8_t> gHeightsTop;
+    std::vector<uint8_t> gHeightsBottom;
 
     void setNewOcc(const float fRate) {
         if (fRate < 0 || fRate > 1)
@@ -122,7 +118,8 @@ private:
         }
     }
 
-    void setRoadsCars(const std::list<uint32_t> &rListPosTop, const std::list<uint32_t> &rListPosBottom) {
+    void setRoadsCars(const std::vector<std::list<uint32_t>> &rListPosTop,
+                      const std::vector<std::list<uint32_t>> &rListPosBottom) {
         //1rst clear all the lines that could be had cars from the last one;
         for (int i = 3; i < 32; i++) {
             sf::Vertex *quadTop = &dInfo[(2 * gWidth + i) * 4];
@@ -134,16 +131,22 @@ private:
         }
 
         //Check the position relative and put it in the corresponding position;
-        for (const auto &p: rListPosTop) {
-            sf::Vertex *quad = &dInfo[(2 * gWidth + 3 + (int) (((float) p / (float)rSelRoad->getCapacity()) * (32 - 3))) * 4];
-            for (int k = 0; k < 4; k++) {
-                quad[k].texCoords = lRefTiles[48][k];
+        for (int i = 0; i < rListPosTop.size(); i++) {
+            for (const auto &p: rListPosTop[i]) {
+                sf::Vertex *quad = &dInfo[
+                        (gHeightsTop[i] * gWidth + 3 + (int) (((float) p / (float) rSelRoad->getCapacity()) * (32 - 3))) * 4];
+                for (int k = 0; k < 4; k++) {
+                    quad[k].texCoords = lRefTiles[48][k];
+                }
             }
         }
-        for (const auto &p: rListPosBottom) {
-            sf::Vertex *quad = &dInfo[(8 * gWidth + 3 + (int) (((float) p / (float)rSelRoad->getCapacity()) * (32 - 3))) * 4];
-            for (int k = 0; k < 4; k++) {
-                quad[k].texCoords = lRefTiles[48][k];
+        for (int i = 0; i < rListPosBottom.size(); i++) {
+            for (const auto &p: rListPosBottom[i]) {
+                sf::Vertex *quad = &dInfo[
+                        (gHeightsBottom[i] * gWidth + 3 + (int) (((float) p / (float) rSelRoad->getCapacity()) * (32 - 3))) * 4];
+                for (int k = 0; k < 4; k++) {
+                    quad[k].texCoords = lRefTiles[48][k];
+                }
             }
         }
     }

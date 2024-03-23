@@ -54,8 +54,7 @@ public:
     void updateClock(const std::shared_ptr<rPileMenus> &rPile) { rPile->gClock->setClock(gClock); }
 
 private:
-
-
+    
     static uint32_t packDateInfo(uint8_t weekday, uint8_t weekNumber, uint8_t month, uint16_t year) {
         weekday &= 0b111;
         weekNumber &= 0b11;

@@ -71,6 +71,13 @@ public:
 
     std::shared_ptr<sMainClock> sMClock;
 
+
+    //MEMORY:
+    std::shared_ptr<sMainCivil> sMCivil;
+    std::shared_ptr<sMCompany> sComp;
+
+    std::shared_ptr<sTotalRoutes> sTCivil = std::make_shared<sTotalRoutes>();
+
     void tick() {
         sMClock->tick();
         if (sMClock->isReducedTick()) {
@@ -89,12 +96,6 @@ public:
     void completedStartCompanies(const std::vector<std::vector<std::pair<int, int>>> &gPosCompanies) {
         sComp->completedStartCompanies(gPosCompanies);
     }
-
-    //MEMORY:
-    std::shared_ptr<sMainCivil> sMCivil;
-    std::shared_ptr<sMCompany> sComp;
-
-    std::shared_ptr<sTotalRoutes> sTCivil = std::make_shared<sTotalRoutes>();
 
 private:
 
