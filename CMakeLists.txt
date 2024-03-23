@@ -93,7 +93,6 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/structure/grids/transformation/gBaseToIRF.h
         src/sim/structure/obj/sTotalRoutes.h
         src/sim/behaviour/company/sCompanyActions.h
-        src/sim/behaviour/company/production/sTotalRecipes.h
         src/sim/behaviour/company/sCompanyTimer.h
         src/sim/behaviour/company/sMCompany.h
         src/sim/behaviour/market/sMarketBazaar.h
@@ -123,6 +122,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/behaviour/market/sMainEvaluator.h
         src/sim/behaviour/market/items/sRollingListsEvaluator.h
         src/sim/behaviour/market/items/sTotalElements.h
+        src/sim/behaviour/clock/sMainClock.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)
