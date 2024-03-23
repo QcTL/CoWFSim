@@ -24,6 +24,7 @@
 #include "behaviour/gTerrainGrid.h"
 #include "roads/sMainRoads.h"
 #include "behaviour/market/sMainEvaluator.h"
+#include "behaviour/clock/sMainClock.h"
 
 class sMainSimulator {
 
@@ -43,9 +44,7 @@ public:
                                             gMainTerrain,
                                             gTotalAirPollution->gLayerAirPollution,
                                             sMEvaluator);
-
-        gClock = {0, 0, true, 1, 1, 0};
-
+        sMClock = std::make_shared<sMainClock>();
     }
 
     //TERRAIN BASIC;
@@ -70,41 +69,15 @@ public:
 
     std::shared_ptr<sMainEvaluator> rMEvaluator;
 
-
-    rGUIClock::objClockValues gClock{};
-    uint8_t pTickMinute = 0;
+    std::shared_ptr<sMainClock> sMClock;
 
     void tick() {
-
-        pTickMinute++;
-        if (pTickMinute > 5) {
-            pTickMinute = 0;
-            gClock.rVMinute = (gClock.rVMinute + 5) % 60;
-            if (gClock.rVMinute == 0) {
-                gClock.rVHour = (gClock.rVHour + 1) % 13;
-                if (gClock.rVHour == 0) {
-                    gClock.rVHour++;
-                    if (!gClock.rVIsAM) {
-                        gClock.rVDay = (gClock.rVDay + 1) % 31;
-                        if (gClock.rVDay == 0)
-                            gClock.rVDay++;
-                        if (gClock.rVMonth == 0) {
-                            gClock.rVMonth = (gClock.rVMonth + 1) % 13;
-                            if (gClock.rVMonth == 0)
-                                gClock.rVMonth++;
-                            gClock.rVYear++;
-                        }
-                    }
-                    gClock.rVIsAM = !gClock.rVIsAM;
-                }
-            }
-
-            uint32_t tReduced = gClock.rVMinute / 5 + gClock.rVHour * 12 + (gClock.rVIsAM ? 0 : 144);
-            uint32_t tDate = packDateInfo(gClock.rVDay % 7, gClock.rVDay / 7, gClock.rVMonth, gClock.rVYear);
-            allTicksReduced(tReduced, tDate);
-
-            rInteraction->gClock->setClock(gClock);
+        sMClock->tick();
+        if (sMClock->isReducedTick()) {
+            allTicksReduced(sMClock->getReduced(), sMClock->getDate());
+            sMClock->updateClock(rInteraction);
         }
+
         gMainRoads->tick();
     }
 
@@ -131,18 +104,6 @@ private:
         gTotalAirPollution->tickReduced(gMainTerrain->gTG_TypeGen);
         gTotalUnderground->tickReduced(tReduced);
         sMEvaluator->tickReduced(tReduced, tDate);
-    }
-
-    static uint32_t packDateInfo(uint8_t weekday, uint8_t weekNumber, uint8_t month, uint16_t year) {
-        weekday &= 0b111;
-        weekNumber &= 0b11;
-        month &= 0b1111;
-        uint32_t packedDate = 0;
-        packedDate |= weekday;
-        packedDate |= (uint32_t) (weekNumber) << 3;
-        packedDate |= (uint32_t) (month) << 5;
-        packedDate |= (uint32_t) (year) << 9;
-        return packedDate;
     }
 };
 
