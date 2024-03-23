@@ -120,6 +120,9 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/behaviour/company/code/sCodeStoratge.h
         src/sim/behaviour/company/contract/sContractorStorage.h
         src/sim/roads/sMainRoads.h
+        src/sim/behaviour/market/sMainEvaluator.h
+        src/sim/behaviour/market/items/sRollingListsEvaluator.h
+        src/sim/behaviour/market/items/sTotalElements.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)
