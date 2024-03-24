@@ -50,7 +50,7 @@ private:
                     newAR = std::make_shared<rRNodeL>(
                             rRNodeL((uint16_t) pComp.first / rSizeBlocs * (rSizeGrid / rSizeBlocs) +
                                     pComp.second / rSizeBlocs, static_cast<uint8_t>(std::round(nCons)),
-                                    2)); //TODO, change it for a dinamic one;
+                                    gGenGrid->get(pComp) == 5 ? 2 : 1));
                 }
                 newAR->tTransit = tTransit;
                 llNodes.push_back(newAR);
@@ -108,12 +108,15 @@ private:
     uint16_t rSizeBlocs;
     uint16_t rSizeGrid;
     std::list<std::shared_ptr<rRNodeI>> llNodes;
+    std::shared_ptr<gIGrid<uint8_t>> gGenGrid;
 public:
     std::list<std::shared_ptr<rRNodeI>>
-    conversion(rNode *rRoot, uint16_t rSizeB, uint16_t rSizeG, const std::shared_ptr<gIGrid<uint8_t>> &tTransit) {
+    conversion(rNode *rRoot, uint16_t rSizeB, uint16_t rSizeG, const std::shared_ptr<gIGrid<uint8_t>> &gGenType,
+               const std::shared_ptr<gIGrid<uint8_t>> &tTransit) {
         rSizeBlocs = rSizeB;
         rSizeGrid = rSizeG;
         llNodes.clear();
+        gGenGrid = gGenType;
         rConversation(nullptr, -1, -1, rRoot, 1, tTransit);
         return llNodes;
     }

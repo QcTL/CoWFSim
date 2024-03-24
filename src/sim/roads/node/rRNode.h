@@ -64,6 +64,8 @@ public:
         rRefPos.push_back(pNew);
     }
 
+    virtual uint8_t getSizeRoad() const = 0;
+
     std::shared_ptr<gIGrid<uint8_t>> tTransit;
     uint32_t locIdNode;
     uint32_t globIdNode;
@@ -186,6 +188,11 @@ public:
         return {{0}};
     }
 
+
+    uint8_t getSizeRoad() const override{
+        return 1;
+    }
+
 private:
     void enterCar(const uint8_t &dDir, const uint8_t &nLine) override {
         /*
@@ -262,7 +269,7 @@ public:
                             ++it;
                         }
                     } else {
-                        uint8_t nToMove = c.second % (c.first & 0xF) == 0 ? 2 : 1;
+                        uint8_t nToMove = c.second % ((c.first & 0xF) + 3) == 0 ? 2 : 1;
                         if (dVecAct[i].pState.size() > c.second + nToMove) {
                             if (i > 0 && !dVecAct[i - 1].pState[c.second + nToMove]) {
                                 dVecAct[i].pState[c.second] = false;
@@ -301,6 +308,10 @@ public:
             hasChanged = false;
             updateRefGrid(getMaxTotalCarsRoad());
         }
+    }
+
+    uint8_t getSizeRoad() const override{
+        return nLines;
     }
 
     void addNewCar(uint32_t idDest, uint16_t blockDest) override {
