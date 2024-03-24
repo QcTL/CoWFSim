@@ -32,7 +32,7 @@ public:
 
     virtual void tick() = 0;
 
-    virtual std::pair<uint32_t, uint32_t> takeCarPrep(const uint8_t &dDir) = 0;
+    virtual std::pair<uint32_t, uint32_t> takeCarPrep(const uint8_t &dDir, const uint8_t &nLine) = 0;
 
     virtual void addNewCar(uint32_t idDest, uint16_t blockDest) = 0;
 
@@ -42,11 +42,11 @@ public:
         sendToNext(eN);
     }
 
-    virtual float getOccupancy() = 0;
+    [[nodiscard]] virtual float getOccupancy() const = 0;
 
     virtual int getCapacity() = 0;
 
-    virtual std::list<uint32_t> getPosRoad(int idRoad) = 0;
+    [[nodiscard]] virtual std::vector<std::list<uint32_t>> getPosRoad(int idRoad) const = 0;
 
     virtual bool isCrossing() = 0;
 
@@ -64,13 +64,15 @@ public:
         rRefPos.push_back(pNew);
     }
 
+    virtual uint8_t getSizeRoad() const = 0;
+
     std::shared_ptr<gIGrid<uint8_t>> tTransit;
     uint32_t locIdNode;
     uint32_t globIdNode;
     uint16_t rBlock;
 protected:
 
-    virtual void enterCar(const uint8_t &dDir) = 0;
+    virtual void enterCar(const uint8_t &dDir, const uint8_t &nLine) = 0;
 
     void sendToNext(const rRMail &m) {
         for (int dir = 0; dir < 4; ++dir) {
@@ -105,11 +107,11 @@ protected:
         }
     }
 
-    void notifyEnterNext(const uint8_t &dDir, const std::pair<uint32_t, uint32_t> &cNext) {
+    void notifyEnterNext(const uint8_t &dDir, const std::pair<uint32_t, uint32_t> &cNext, uint8_t nLine) {
         uint8_t lastTwoBits = dDir & 0b11;
         std::shared_ptr<rRNodeI> direction = getByDir(lastTwoBits);
         if (direction != nullptr)
-            direction->enterCar(dDir ^ 0x02);
+            direction->enterCar(dDir ^ 0x02, nLine);
     }
 
     void updateRefGrid(uint8_t nValue) {
@@ -128,7 +130,7 @@ class rRNodeC : public rRNodeI {
 public:
     explicit rRNodeC(uint16_t rBlock) : rRNodeI(rBlock), itsEmpty(true) {}
 
-    bool isCrossing() override{return true;}
+    bool isCrossing() override { return true; }
 
     void receive(const rRMail &r, const uint8_t &dir) override {
         rMailBox.rMB.emplace(r, dir);
@@ -156,20 +158,20 @@ public:
                         rInfoDist::returnDirToDist(
                                 rActiveVehicle::getDestByCar(carActInside.first).first,
                                 rActiveVehicle::getDestByCar(carActInside.first).second,
-                                rBlock, globIdNode), carActInside);
+                                rBlock, globIdNode), carActInside, 0);
             }
 
         } else if (!reqTakeCar.empty()) {
-            uint8_t dToTake = reqTakeCar.front();
+            uint8_t dToTake = reqTakeCar.front().first;
+            carActInside = getByDir(dToTake)->takeCarPrep(dToTake ^ 0x02, reqTakeCar.front().second);
             reqTakeCar.pop_front();
-            carActInside = getByDir(dToTake)->takeCarPrep(dToTake ^ 0x02);
             itsEmpty = false;
             updateRefGrid(true);
         }
 
     }
 
-    std::pair<uint32_t, uint32_t> takeCarPrep(const uint8_t &dDir) override {
+    std::pair<uint32_t, uint32_t> takeCarPrep(const uint8_t &dDir, const uint8_t &nLine) override {
         itsEmpty = true;
         updateRefGrid(false);
         return carActInside;
@@ -177,17 +179,22 @@ public:
 
     void addNewCar(uint32_t idDest, uint16_t blockDest) override {}
 
-    float getOccupancy() override { return itsEmpty ? 0 : 1.0; }
+    [[nodiscard]] float getOccupancy() const override { return itsEmpty ? 0 : 1.0; }
 
     int getCapacity() override { return 1; }
 
-    std::list<uint32_t> getPosRoad(int idRoad) override {
-        if (itsEmpty) return {};
-        return {0};
+    [[nodiscard]] std::vector<std::list<uint32_t>> getPosRoad(int idRoad) const override {
+        if (itsEmpty) return {{}};
+        return {{0}};
+    }
+
+
+    uint8_t getSizeRoad() const override{
+        return 1;
     }
 
 private:
-    void enterCar(const uint8_t &dDir) override {
+    void enterCar(const uint8_t &dDir, const uint8_t &nLine) override {
         /*
         if (itsEmpty) {
             carActInside = getByDir(dDir)->takeCarPrep(dDir ^ 0x02);
@@ -198,10 +205,11 @@ private:
                             rActiveVehicle::getDestByCar(carActInside.first).second,
                             rBlock, locIdNode), carActInside);
         } else*/
-        reqTakeCar.push_back(dDir);
+        reqTakeCar.emplace_back(dDir, nLine);
     }
 
-    std::list<uint8_t> reqTakeCar;
+    //Direcction, line
+    std::list<std::pair<uint8_t, uint8_t>> reqTakeCar;
 
     std::pair<uint32_t, uint32_t> carActInside;
     bool itsEmpty;
@@ -211,12 +219,13 @@ private:
 class rRNodeL : public rRNodeI {
     //LINE
 public:
-    rRNodeL(uint16_t rBlock, uint8_t nCompressed) :
-            rRNodeI(rBlock), nCompressed(nCompressed), dFirst(nCompressed), dSecond(nCompressed) {
-        std::vector<bool> elements(10, true);
+    rRNodeL(uint16_t rBlock, uint8_t nCompressed, uint8_t nLines) :
+            rRNodeI(rBlock), nCompressed(nCompressed), nLines(nLines) {
+        dVecFirst = std::vector<rRoad>(nLines, rRoad(nCompressed));
+        dVecSecond = std::vector<rRoad>(nLines, rRoad(nCompressed));
     }
 
-    bool isCrossing() override{return false;}
+    bool isCrossing() override { return false; }
 
     void receive(const rRMail &r, const uint8_t &dir) override {
         std::pair<uint8_t, std::shared_ptr<rRNodeI>> sec = otherDir(dir);
@@ -235,154 +244,182 @@ public:
     bool hasChanged = false;
 
     void tick() override {
-        for (auto it = dFirst.lOrderedCars.begin(); it != dFirst.lOrderedCars.end();) {
-            auto &c = *it;
-            if (c.second + 1 >= nCompressed) {
-                if (rActiveVehicle::getDestByCar(c.first).first == locIdNode &&
-                    rActiveVehicle::getDestByCar(c.first).second == rBlock) {
-                    dFirst.pState[c.second] = false;
-                    it = dFirst.lOrderedCars.erase(it);
-                    hasChanged = true;
-                    std::cout << "DESTINATION" << std::endl;
-                } else if (!hasRequestedFirst) {
-                    hasRequestedFirst = true;
-                    notifyEnterNext(dEndFirst, c);
-                    ++it;
-                } else if (hasRequestedFirst) {
-                    ++it;
+        std::vector<std::vector<rRoad>> vTwoDirections = {dVecFirst, dVecSecond};
+
+        for (auto &dVecAct: vTwoDirections) {
+            for (int i = 0; i < nLines; i++) {
+                for (auto it = dVecAct[i].lOrderedCars.begin(); it != dVecAct[i].lOrderedCars.end();) {
+                    auto &c = *it;
+                    if (c.second + 1 >= nCompressed) {
+                        //Si el seguent ja es l'ultim
+                        if (rActiveVehicle::getDestByCar(c.first).first == locIdNode &&
+                            rActiveVehicle::getDestByCar(c.first).second == rBlock) {
+                            //Si ha arribat a la seva destinacio
+                            dVecAct[i].pState[c.second] = false;
+                            it = dVecAct[i].lOrderedCars.erase(it);
+                            hasChanged = true;
+                            std::cout << "DESTINATION" << std::endl;
+                        } else if (!dVecAct[i].hasRequestedNext) {
+                            //Demana si s'ha fet una peticio al seguent;
+                            dVecAct[i].hasRequestedNext = true;
+                            notifyEnterNext(dEndFirst, c, i);
+                            ++it;
+                        } else if (!dVecAct[i].hasRequestedNext) {
+                            //Si ho ha fet no fara res
+                            ++it;
+                        }
+                    } else {
+                        uint8_t nToMove = c.second % ((c.first & 0xF) + 3) == 0 ? 2 : 1;
+                        if (dVecAct[i].pState.size() > c.second + nToMove) {
+                            if (i > 0 && !dVecAct[i - 1].pState[c.second + nToMove]) {
+                                dVecAct[i].pState[c.second] = false;
+                                dVecAct[i - 1].pState[c.second + nToMove] = true;
+                                ++c.second;
+                                ++it;
+                            } else if (!dVecAct[i].pState[c.second + nToMove]) {
+                                dVecAct[i].pState[c.second] = false;
+                                dVecAct[i].pState[c.second + nToMove] = true;
+                                ++c.second;
+                                ++it;
+                            } else if (nToMove == 2 && !dVecAct[i].pState[c.second + nToMove]) {
+                                dVecAct[i].pState[c.second] = false;
+                                dVecAct[i].pState[c.second + 1] = true;
+                                ++c.second;
+                                ++it;
+                            } else {
+                                ++it;
+                            }
+                        } else if (nToMove == 2 && dVecAct[i].pState.size() > c.second + 1) {
+                            if (!dVecAct[i].pState[c.second + 1]) {
+                                dVecAct[i].pState[c.second] = false;
+                                dVecAct[i].pState[c.second + 1] = true;
+                                ++c.second;
+                                ++it;
+                            }
+                        } else {
+                            ++it;
+                        }
+                    }
                 }
-            } else if (!dFirst.pState[c.second + 1]) {
-                // Update state
-                dFirst.pState[c.second] = false;
-                dFirst.pState[c.second + 1] = true;
-                ++c.second;
-                ++it;
-            } else {
-                ++it;
             }
         }
 
-        for (auto it = dSecond.lOrderedCars.begin(); it != dSecond.lOrderedCars.end();) {
-            auto &c = *it;
-            if (c.second + 1 >= nCompressed) {
-                if (rActiveVehicle::getDestByCar(c.first).first == locIdNode &&
-                    rActiveVehicle::getDestByCar(c.first).second == rBlock) {
-                    dSecond.pState[c.second] = false;
-                    it = dSecond.lOrderedCars.erase(it);
-                    hasChanged = true;
-                    std::cout << "DESTINATION" << std::endl;
-                } else if (!hasRequestedSecond) {
-                    hasRequestedSecond = true;
-                    notifyEnterNext(dEndSecond, c);
-                    ++it;
-                } else if (hasRequestedSecond) {
-                    ++it;
-                }
-            } else if (!dSecond.pState[c.second + 1]) {
-                // Update state
-                dSecond.pState[c.second] = false;
-                dSecond.pState[c.second + 1] = true;
-                ++c.second;
-                ++it;
-            } else {
-                ++it;
-            }
-        }
         if (hasChanged) {
             hasChanged = false;
-            updateRefGrid(std::max(dFirst.lOrderedCars.size(), dSecond.lOrderedCars.size()));
+            updateRefGrid(getMaxTotalCarsRoad());
         }
+    }
+
+    uint8_t getSizeRoad() const override{
+        return nLines;
     }
 
     void addNewCar(uint32_t idDest, uint16_t blockDest) override {
         std::pair<uint32_t, uint32_t> newCar = {rActiveVehicle::addCar(idDest, blockDest), 0};
-        //TODO CONTROLAR LA DIRECCIO INICIAL;
-        dFirst.pState[0] = true;
-        dFirst.lOrderedCars.push_back(newCar);
+        //Afegir en la primera carretera:
+        dVecFirst[0].pState[0] = true;
+        dVecFirst[0].lOrderedCars.push_back(newCar);
         hasChanged = true;
-        updateRefGrid(std::max(dFirst.lOrderedCars.size(), dSecond.lOrderedCars.size()));
+        updateRefGrid(getMaxTotalCarsRoad());
     }
 
-    float getOccupancy() override {
-        return std::max(dFirst.lOrderedCars.size() / nCompressed, dSecond.lOrderedCars.size() / nCompressed);
+    [[nodiscard]] uint8_t getMaxTotalCarsRoad() const {
+        uint32_t sOccFirst = 0;
+        uint32_t sOccSecond = 0;
+        for (int i = 0; i < nLines; i++) {
+            sOccFirst += dVecFirst[i].lOrderedCars.size();
+            sOccSecond += dVecSecond[i].lOrderedCars.size();
+        }
+        return std::max(sOccFirst, sOccSecond);
+    }
+
+    [[nodiscard]] float getOccupancy() const override {
+        uint32_t sOccMax = getMaxTotalCarsRoad();
+        return (float) sOccMax / (float) nCompressed;
     }
 
     int getCapacity() override { return nCompressed; }
 
-    std::list<uint32_t> getPosRoad(int idRoad) override {
-        auto &road = (idRoad == 0) ? dFirst.lOrderedCars : dSecond.lOrderedCars;
-        std::list<uint32_t> intList;
-        std::transform(road.begin(), road.end(), std::back_inserter(intList),
-                       [](const std::pair<uint32_t, uint32_t> &p) { return p.second; });
+    [[nodiscard]] std::vector<std::list<uint32_t>> getPosRoad(int idRoad) const override {
+        auto &road = (idRoad == 0) ? dVecFirst : dVecSecond;
+        std::vector<std::list<uint32_t>> intList = std::vector<std::list<uint32_t>>(nLines);
+        for (int i = 0; i < nLines; ++i)
+            std::transform(road[i].lOrderedCars.begin(), road[i].lOrderedCars.end(),
+                           std::back_inserter(intList[i]),
+                           [](const auto &c) { return c.second; });
         return intList;
     }
 
 private:
 
-    std::pair<uint32_t, uint32_t> takeCarPrep(const uint8_t &dDir) override {
+    std::pair<uint32_t, uint32_t> takeCarPrep(const uint8_t &dDir, const uint8_t &nLine) override {
         std::pair<uint32_t, uint32_t> cRet;
         // Remove from the appropriate data structure based on dDir
         if (dDir == dEndFirst) {
             // Remove from first
-            if (!dFirst.lOrderedCars.empty()) {
-                dFirst.pState[dFirst.pState.size() - 1] = false;
-                cRet = dFirst.lOrderedCars.front();
-                dFirst.lOrderedCars.pop_front();
+            if (!dVecFirst[nLine].lOrderedCars.empty()) {
+                dVecFirst[nLine].pState[dVecFirst[nLine].pState.size() - 1] = false;
+                cRet = dVecFirst[nLine].lOrderedCars.front();
+                dVecFirst[nLine].lOrderedCars.pop_front();
                 cRet.second = 0;
-                hasRequestedFirst = false;
+                dVecFirst[nLine].hasRequestedNext = false;
                 hasChanged = true;
             }
         } else if (dDir == dEndSecond) {
             // Remove from second
-            if (!dSecond.lOrderedCars.empty()) {
-                dSecond.pState[dSecond.pState.size() - 1] = false;
-                cRet = dSecond.lOrderedCars.front();
-                dSecond.lOrderedCars.pop_front();
+            if (!dVecSecond[nLine].lOrderedCars.empty()) {
+                dVecSecond[nLine].pState[dVecSecond[nLine].pState.size() - 1] = false;
+                cRet = dVecSecond[nLine].lOrderedCars.front();
+                dVecSecond[nLine].lOrderedCars.pop_front();
                 cRet.second = 0;
-                hasRequestedSecond = false;
+                dVecSecond[nLine].hasRequestedNext = false;
                 hasChanged = true;
             }
         }
         if (hasChanged) {
             hasChanged = false;
-            updateRefGrid(std::max(dFirst.lOrderedCars.size(), dSecond.lOrderedCars.size()));
+            updateRefGrid(getMaxTotalCarsRoad());
         }
         return cRet;
     }
 
-    void enterCar(const uint8_t &dDir) override {
-        std::pair<uint32_t, uint32_t> cNext = getByDir(dDir)->takeCarPrep(dDir ^ 0x02);
-        if (dEndFirst != dDir && !dFirst.pState[0]) {
-            dFirst.pState[0] = true;
-            dFirst.lOrderedCars.push_back(cNext);
+    void enterCar(const uint8_t &dDir, const uint8_t &nLine) override {
+        std::pair<uint32_t, uint32_t> cNext = getByDir(dDir)->takeCarPrep(dDir ^ 0x02, 0);
+        if (dEndFirst != dDir && !dVecFirst[0].pState[0]) {
+            dVecFirst[0].pState[0] = true;
+            dVecFirst[0].lOrderedCars.push_back(cNext);
             hasChanged = true;
-        } else if (!dSecond.pState[0]) {
-            dSecond.pState[0] = true;
-            dSecond.lOrderedCars.push_back(cNext);
+        } else if (!dVecSecond[0].pState[0]) {
+            dVecSecond[0].pState[0] = true;
+            dVecSecond[0].lOrderedCars.push_back(cNext);
             hasChanged = true;
         }
+
         if (hasChanged) {
             hasChanged = false;
-            updateRefGrid(std::max(dFirst.lOrderedCars.size(), dSecond.lOrderedCars.size()));
+            updateRefGrid(getMaxTotalCarsRoad());
         }
     }
 
     uint8_t nCompressed;
+    uint8_t nLines;
 
     struct rRoad {
         explicit rRoad(uint8_t nCompressed) : pState(nCompressed, false) {}
 
         std::vector<bool> pState;
         std::list<std::pair<uint32_t, uint32_t>> lOrderedCars;
+        bool hasRequestedNext = false;
     };
 
-    rRoad dFirst;
+    std::vector<rRoad> dVecFirst;
     uint8_t dEndFirst;
-    bool hasRequestedFirst = false;
+    //bool hasRequestedFirst = false;
 
-    rRoad dSecond;
+    //rRoad dSecond;
+    std::vector<rRoad> dVecSecond;
     uint8_t dEndSecond;
-    bool hasRequestedSecond = false;
+    //bool hasRequestedSecond = false;
 
     std::pair<uint8_t, uint8_t> getDirEntrances() {
         std::vector<int> sVec;

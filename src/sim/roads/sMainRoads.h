@@ -32,7 +32,7 @@ public:
 
         if (tReduced % 24 == 0) {
             //Maybe add between two random points based on a distribution;
-            for (int i = 0; i < gVecFreqGhostRiders[tReduced / 24]*3; i++) {
+            for (int i = 0; i < gVecFreqGhostRiders[tReduced / 24] * 3; i++) {
                 std::pair<int, int> gPointStart = getClosestRoadToBuilding(sMR_gTerrainGrid->returnRandomFullCivil());
                 std::pair<int, int> gPointEnd = getClosestRoadToBuilding(sMR_gTerrainGrid->returnRandomFullCivil());
                 std::cout << gPointStart.first << "-" << gPointStart.second << "   <>    " << gPointEnd.first << "-"
@@ -86,7 +86,8 @@ private:
         gLayerRoads = r.second;
         std::cout << r.first.size() << std::endl;
         for (const auto &rNode: r.first) {
-            rListRRoads.merge(rTransRNodeToRRNode().conversion(rNode, sqrt(sizeL), sizeL, gLayerTransit));
+            rListRRoads.merge(rTransRNodeToRRNode().conversion(rNode, sqrt(sizeL), sizeL, sMR_gTerrainGrid->gTG_TypeGen,
+                                                               gLayerTransit));
             rInfoDist::initializeMatrix(sizeL / sqrt(sizeL) * sizeL / sqrt(sizeL), sizeL, rListRRoads.size());
         }
 

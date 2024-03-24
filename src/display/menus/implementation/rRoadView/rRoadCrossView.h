@@ -69,8 +69,8 @@ public:
         }
     }
 
-    void setRoadsCars(const std::list<uint32_t> &rEleDins) {
-        setPositionValue(rCenter, rEleDins.empty()? 32 : 272);
+    void setRoadsCars(const std::vector<std::list<uint32_t>> &rEleDins) {
+        setPositionValue(rCenter, rEleDins[0].empty()? 32 : 272);
     }
 
 private:
