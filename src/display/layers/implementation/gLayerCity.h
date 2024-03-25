@@ -20,9 +20,8 @@ public:
 
     std::vector<sf::Vector2f> getTexPos(int x, int y) override {
         uint32_t v = lGrid->get(x, y);
-        uint8_t vType = static_cast<uint8_t>(v >> 24);
+        auto vType = static_cast<uint8_t>(v >> 24);
         uint8_t vSpec = v & 0xFF;
-        //return mTypeSprites.at(vType)[(x+y + x*2+y/3)% mTypeSprites.at(vType).size()];
         return mTypeSprites.at(vType)[vSpec];
     }
 
@@ -50,6 +49,7 @@ private:
             addToMapSprites(19, getByPosTopLeft(lTs.getPos(t)));
         for (const int t: sHType5)
             addToMapSprites(21, getByPosTopLeft(lTs.getPos(t)));
+
         // Carreteres
         addRoadToMapSprites();
 

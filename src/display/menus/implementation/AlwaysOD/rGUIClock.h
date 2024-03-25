@@ -50,7 +50,7 @@ public:
             }
         }
         setVelocity(0);
-        setClock({12, 59, true, 12, 9, 2023});
+        setClock({0, 0, true, 0, 0, 0});
     }
 
     //TODO ha de poder cridar al pare per poder canviar la velocitat de reproduccio de la simulacio
@@ -60,7 +60,6 @@ public:
     // de venir de algun altre lloc.
 
     void setClock(const objClockValues &vNew) {
-
         std::string gHour = std::to_string(vNew.rVHour % 13);
         std::string gMinutes = std::to_string(vNew.rVMinute % 60);
         setText(0, (vNew.rVHour < 10 ? "0" : "") + gHour +

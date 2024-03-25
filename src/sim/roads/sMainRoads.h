@@ -16,8 +16,8 @@
 class sMainRoads {
 public:
 
-    sMainRoads(uint32_t lSize, const std::shared_ptr<gTerrainGrid> &gTerrainGrid) : sizeL(lSize),
-                                                                                    sMR_gTerrainGrid(gTerrainGrid) {
+    sMainRoads(uint32_t lSize, const std::shared_ptr<gTerrainGrid> &gTerrainGrid)
+            : sizeL(lSize), sMR_gTerrainGrid(gTerrainGrid) {
         gLayerTransit = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, 0));
         gLayerNextRoad = std::make_shared<gBasicGrid<rNode *>>(gBasicGrid<rNode *>(lSize, lSize, nullptr));
     }
@@ -32,7 +32,7 @@ public:
 
         if (tReduced % 24 == 0) {
             //Maybe add between two random points based on a distribution;
-             for (int i = 0; i < gVecFreqGhostRiders[tReduced / 24] * 3; i++) {
+            for (int i = 0; i < gVecFreqGhostRiders[tReduced / 24] * 3; i++) {
                 std::pair<int, int> gPointStart = getClosestRoadToBuilding(sMR_gTerrainGrid->returnRandomFullCivil());
                 std::pair<int, int> gPointEnd = getClosestRoadToBuilding(sMR_gTerrainGrid->returnRandomFullCivil());
                 std::cout << gPointStart.first << "-" << gPointStart.second << "   <>    " << gPointEnd.first << "-"

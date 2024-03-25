@@ -92,7 +92,6 @@ private:
         }
     }
 
-
 };
 
 #endif //CITYOFWEIRDFISHES_RNODEFROMGRID_H

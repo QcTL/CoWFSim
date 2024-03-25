@@ -69,7 +69,6 @@ public:
     }
 
 private:
-
     std::shared_ptr<rGlobal> rG;
     std::shared_ptr<rPileMenus> pPM;
     std::shared_ptr<rBaseMenu> rBasic;

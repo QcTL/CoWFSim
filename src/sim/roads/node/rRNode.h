@@ -50,9 +50,9 @@ public:
 
     virtual bool isCrossing() = 0;
 
-    virtual std::pair<std::pair<int, int>, std::pair<int, int>> getSizesNeighbor() {
-        return {{rTop == nullptr ? -1 : 1,  rBottom == nullptr ? -1 : 1},
-                {rLeft == nullptr ? -1 : 1, rRight == nullptr ? -1 : 1}};
+    virtual std::vector<int> getSizesNeighbor() {
+        return {rTop == nullptr ? -1 : rTop->nLines, rBottom == nullptr ? -1 : rBottom->nLines,
+                rLeft == nullptr ? -1 : rLeft->nLines, rRight == nullptr ? -1 : rRight->nLines};
     }
 
     std::shared_ptr<rRNodeI> rLeft;
@@ -70,6 +70,8 @@ public:
     uint32_t locIdNode;
     uint32_t globIdNode;
     uint16_t rBlock;
+
+    uint8_t nLines = 1;
 protected:
 
     virtual void enterCar(const uint8_t &dDir, const uint8_t &nLine) = 0;
@@ -218,8 +220,9 @@ private:
 class rRNodeL : public rRNodeI {
     //LINE
 public:
-    rRNodeL(uint16_t rBlock, uint8_t nCompressed, uint8_t nLines) :
-            rRNodeI(rBlock), nCompressed(nCompressed), nLines(nLines) {
+    rRNodeL(uint16_t rBlock, uint8_t nCompressed, uint8_t nLinesIn) :
+            rRNodeI(rBlock), nCompressed(nCompressed) {
+        nLines = nLinesIn;
         dVecFirst = std::vector<rRoad>(nLines, rRoad(nCompressed));
         dVecSecond = std::vector<rRoad>(nLines, rRoad(nCompressed));
     }
@@ -458,7 +461,6 @@ private:
     }
 
     uint8_t nCompressed;
-    uint8_t nLines;
 
     struct rRoad {
         explicit rRoad(uint8_t nCompressed) : pState(nCompressed, false) {}

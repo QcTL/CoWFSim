@@ -37,7 +37,6 @@ add_executable(CityOfWeirdFishes main.cpp
         src/display/menus/implementation/rSelOptMenu.cpp
         src/display/menus/implementation/rSelOptMenu.h
         src/sim/roads/transportation/gUniqueId.h
-        src/sim/roads/transportation/rToFollowDest.h
         src/sim/roads/node/RNodeAttrs/rRMailbox.h
         src/sim/roads/node/rInfoDists.h
         src/display/CameraControls.h
