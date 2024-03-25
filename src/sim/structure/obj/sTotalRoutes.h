@@ -17,7 +17,7 @@ class sTotalRoutes {
 public:
 
     sTotalRoutes() {
-        mExitTimesCivil = std::vector<std::list<objCivil>>(288);
+        mExitTimesCivil = std::vector<std::list<objCivil>>(289);
     };
 
     std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator> addRuteCivil(const std::shared_ptr<objCivil> &oC) {

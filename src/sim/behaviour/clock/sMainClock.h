@@ -69,7 +69,7 @@ private:
 
     rGUIClock::objClockValues gClock{};
     uint8_t pTickMinute = 0;
-    bool isReduced = false;
+    bool isReduced = true;
 };
 
 #endif //CITYOFWEIRDFISHES_SMAINCLOCK_H

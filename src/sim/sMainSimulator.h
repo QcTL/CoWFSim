@@ -63,7 +63,7 @@ public:
     std::shared_ptr<gMainUnderground> gTotalUnderground;
 
     //ROADS
-    std::shared_ptr<sMainRoads> gMainRoads;
+    std::shared_ptr<sMainRoads>  gMainRoads;
 
     std::shared_ptr<rPileMenus> rInteraction;
 
@@ -79,11 +79,11 @@ public:
     std::shared_ptr<sTotalRoutes> sTCivil = std::make_shared<sTotalRoutes>();
 
     void tick() {
-        sMClock->tick();
         if (sMClock->isReducedTick()) {
             allTicksReduced(sMClock->getReduced(), sMClock->getDate());
             sMClock->updateClock(rInteraction);
         }
+        sMClock->tick();
 
         gMainRoads->tick();
     }

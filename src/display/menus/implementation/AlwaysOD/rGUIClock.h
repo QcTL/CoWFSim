@@ -10,12 +10,12 @@
 class rGUIClock : public rIMenu {
 public:
     struct objClockValues {
-        uint8_t rVHour;
-        uint8_t rVMinute;
-        bool rVIsAM;
-        uint8_t rVDay;
-        uint8_t rVMonth;
-        uint16_t rVYear;
+        uint8_t rVHour = 0;
+        uint8_t rVMinute = 0;
+        bool rVIsAM = true;
+        uint8_t rVDay = 0;
+        uint8_t rVMonth = 0;
+        uint16_t rVYear = 0;
     };
 
 

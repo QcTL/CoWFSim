@@ -64,7 +64,7 @@ public:
         rRefPos.push_back(pNew);
     }
 
-    virtual uint8_t getSizeRoad() const = 0;
+    [[nodiscard]] virtual uint8_t getSizeRoad() const = 0;
 
     std::shared_ptr<gIGrid<uint8_t>> tTransit;
     uint32_t locIdNode;
@@ -160,7 +160,6 @@ public:
                                 rActiveVehicle::getDestByCar(carActInside.first).second,
                                 rBlock, globIdNode), carActInside, 0);
             }
-
         } else if (!reqTakeCar.empty()) {
             uint8_t dToTake = reqTakeCar.front().first;
             carActInside = getByDir(dToTake)->takeCarPrep(dToTake ^ 0x02, reqTakeCar.front().second);
@@ -189,7 +188,7 @@ public:
     }
 
 
-    uint8_t getSizeRoad() const override{
+    [[nodiscard]] uint8_t getSizeRoad() const override {
         return 1;
     }
 
@@ -244,61 +243,118 @@ public:
     bool hasChanged = false;
 
     void tick() override {
-        std::vector<std::vector<rRoad>> vTwoDirections = {dVecFirst, dVecSecond};
 
-        for (auto &dVecAct: vTwoDirections) {
-            for (int i = 0; i < nLines; i++) {
-                for (auto it = dVecAct[i].lOrderedCars.begin(); it != dVecAct[i].lOrderedCars.end();) {
-                    auto &c = *it;
-                    if (c.second + 1 >= nCompressed) {
-                        //Si el seguent ja es l'ultim
-                        if (rActiveVehicle::getDestByCar(c.first).first == locIdNode &&
-                            rActiveVehicle::getDestByCar(c.first).second == rBlock) {
-                            //Si ha arribat a la seva destinacio
-                            dVecAct[i].pState[c.second] = false;
-                            it = dVecAct[i].lOrderedCars.erase(it);
-                            hasChanged = true;
-                            std::cout << "DESTINATION" << std::endl;
-                        } else if (!dVecAct[i].hasRequestedNext) {
-                            //Demana si s'ha fet una peticio al seguent;
-                            dVecAct[i].hasRequestedNext = true;
-                            notifyEnterNext(dEndFirst, c, i);
-                            ++it;
-                        } else if (!dVecAct[i].hasRequestedNext) {
-                            //Si ho ha fet no fara res
-                            ++it;
-                        }
+        for (int i = 0; i < nLines; i++) {
+            for (auto it = dVecFirst[i].lOrderedCars.begin(); it != dVecFirst[i].lOrderedCars.end();) {
+                auto &c = *it;
+                if (c.second + 1 >= nCompressed) {
+                    //Si el seguent ja es l'ultim
+                    if (rActiveVehicle::getDestByCar(c.first).first == locIdNode &&
+                        rActiveVehicle::getDestByCar(c.first).second == rBlock) {
+                        //Si ha arribat a la seva destinacio
+                        dVecFirst[i].pState[c.second] = false;
+                        it = dVecFirst[i].lOrderedCars.erase(it);
+                        hasChanged = true;
+                        std::cout << "DESTINATION" << std::endl;
+                    } else if (!dVecFirst[i].hasRequestedNext) {
+                        //Demana si s'ha fet una peticio al seguent;
+                        dVecFirst[i].hasRequestedNext = true;
+                        notifyEnterNext(dEndFirst, c, i);
+                        ++it;
                     } else {
-                        uint8_t nToMove = c.second % ((c.first & 0xF) + 3) == 0 ? 2 : 1;
-                        if (dVecAct[i].pState.size() > c.second + nToMove) {
-                            if (i > 0 && !dVecAct[i - 1].pState[c.second + nToMove]) {
-                                dVecAct[i].pState[c.second] = false;
-                                dVecAct[i - 1].pState[c.second + nToMove] = true;
-                                ++c.second;
-                                ++it;
-                            } else if (!dVecAct[i].pState[c.second + nToMove]) {
-                                dVecAct[i].pState[c.second] = false;
-                                dVecAct[i].pState[c.second + nToMove] = true;
-                                ++c.second;
-                                ++it;
-                            } else if (nToMove == 2 && !dVecAct[i].pState[c.second + nToMove]) {
-                                dVecAct[i].pState[c.second] = false;
-                                dVecAct[i].pState[c.second + 1] = true;
-                                ++c.second;
-                                ++it;
-                            } else {
-                                ++it;
-                            }
-                        } else if (nToMove == 2 && dVecAct[i].pState.size() > c.second + 1) {
-                            if (!dVecAct[i].pState[c.second + 1]) {
-                                dVecAct[i].pState[c.second] = false;
-                                dVecAct[i].pState[c.second + 1] = true;
-                                ++c.second;
-                                ++it;
-                            }
+                        //Si ho ha fet no fara res
+                        ++it;
+                    }
+                } else {
+                    uint8_t nToMove = c.second % ((c.first & 0xF) + 3) == 0 ? 2 : 1;
+                    if (dVecFirst[i].pState.size() > c.second + nToMove) {
+                        if (i > 0 && !dVecFirst[i - 1].pState[c.second + nToMove]) {
+                            dVecFirst[i].pState[c.second] = false;
+                            dVecFirst[i - 1].pState[c.second + nToMove] = true;
+                            c.second += nToMove;
+                            ++it;
+                        } else if (!dVecFirst[i].pState[c.second + nToMove]) {
+                            dVecFirst[i].pState[c.second] = false;
+                            dVecFirst[i].pState[c.second + nToMove] = true;
+                            c.second += nToMove;
+                            ++it;
+                        } else if (nToMove == 2 && !dVecFirst[i].pState[c.second + nToMove]) {
+                            dVecFirst[i].pState[c.second] = false;
+                            dVecFirst[i].pState[c.second + 1] = true;
+                            ++c.second;
+                            ++it;
                         } else {
                             ++it;
                         }
+                    } else if (nToMove == 2 && dVecFirst[i].pState.size() > c.second + 1) {
+                        if (!dVecFirst[i].pState[c.second + 1]) {
+                            dVecFirst[i].pState[c.second] = false;
+                            dVecFirst[i].pState[c.second + 1] = true;
+                            ++c.second;
+                            ++it;
+                        } else {
+                            ++it;
+                        }
+                    } else {
+                        ++it;
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < nLines; i++) {
+            for (auto it = dVecSecond[i].lOrderedCars.begin(); it != dVecSecond[i].lOrderedCars.end();) {
+                auto &c = *it;
+                if (c.second + 1 >= nCompressed) {
+                    //Si el seguent ja es l'ultim
+                    if (rActiveVehicle::getDestByCar(c.first).first == locIdNode &&
+                        rActiveVehicle::getDestByCar(c.first).second == rBlock) {
+                        //Si ha arribat a la seva destinacio
+                        dVecSecond[i].pState[c.second] = false;
+                        it = dVecSecond[i].lOrderedCars.erase(it);
+                        hasChanged = true;
+                        std::cout << "DESTINATION" << std::endl;
+                    } else if (!dVecSecond[i].hasRequestedNext) {
+                        //Demana si s'ha fet una peticio al seguent;
+                        dVecSecond[i].hasRequestedNext = true;
+                        notifyEnterNext(dEndSecond, c, i);
+                        ++it;
+                    } else {
+                        //Si ho ha fet no fara res
+                        ++it;
+                    }
+                } else {
+                    uint8_t nToMove = c.second % ((c.first & 0xF) + 3) == 0 ? 2 : 1;
+                    if (dVecSecond[i].pState.size() > c.second + nToMove) {
+                        if (i > 0 && !dVecSecond[i - 1].pState[c.second + nToMove]) {
+                            dVecSecond[i].pState[c.second] = false;
+                            dVecSecond[i - 1].pState[c.second + nToMove] = true;
+                            c.second += nToMove;
+                            ++it;
+                        } else if (!dVecSecond[i].pState[c.second + nToMove]) {
+                            dVecSecond[i].pState[c.second] = false;
+                            dVecSecond[i].pState[c.second + nToMove] = true;
+                            c.second += nToMove;
+                            ++it;
+                        } else if (nToMove == 2 && !dVecSecond[i].pState[c.second + nToMove]) {
+                            dVecSecond[i].pState[c.second] = false;
+                            dVecSecond[i].pState[c.second + 1] = true;
+                            ++c.second;
+                            ++it;
+                        } else {
+                            ++it;
+                        }
+                    } else if (nToMove == 2 && dVecSecond[i].pState.size() > c.second + 1) {
+                        if (!dVecSecond[i].pState[c.second + 1]) {
+                            dVecSecond[i].pState[c.second] = false;
+                            dVecSecond[i].pState[c.second + 1] = true;
+                            ++c.second;
+                            ++it;
+                        } else {
+                            ++it;
+                        }
+                    } else {
+                        ++it;
                     }
                 }
             }
@@ -310,7 +366,7 @@ public:
         }
     }
 
-    uint8_t getSizeRoad() const override{
+    [[nodiscard]] uint8_t getSizeRoad() const override {
         return nLines;
     }
 
@@ -330,7 +386,7 @@ public:
             sOccFirst += dVecFirst[i].lOrderedCars.size();
             sOccSecond += dVecSecond[i].lOrderedCars.size();
         }
-        return std::max(sOccFirst, sOccSecond);
+        return std::min((uint8_t) std::max(sOccFirst, sOccSecond), (uint8_t) 3);
     }
 
     [[nodiscard]] float getOccupancy() const override {
