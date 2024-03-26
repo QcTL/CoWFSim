@@ -24,7 +24,7 @@ public:
     }
 
 
-    void setupLists(){
+    void setupLists() {
         std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gTG_TypeSoil->rangeUse();
         for (int i = gRange.second.first; i < (gRange.second.second + 1); i++) {
             for (int j = gRange.first.first; j < (gRange.first.second + 1); j++) {
@@ -33,7 +33,7 @@ public:
                         gTG_CivilEmptyCell.emplace_back(i, j);
                     else if (gTG_TypeSoil->get(i, j) == 4 || gTG_TypeSoil->get(i, j) == 5)
                         gTG_FactoryEmptyCell.emplace_back(i, j);
-                }else if(gTG_TypeGen->get(i, j) < 5){
+                } else if (gTG_TypeGen->get(i, j) < 5) {
                     if (gTG_TypeSoil->get(i, j) == 1 || gTG_TypeSoil->get(i, j) == 2 || gTG_TypeSoil->get(i, j) == 3)
                         gTG_CivilFullCell.emplace_back(i, j);
                     else if (gTG_TypeSoil->get(i, j) == 4 || gTG_TypeSoil->get(i, j) == 5)
@@ -58,11 +58,11 @@ public:
         std::list<std::pair<int, int>>::iterator it;
         uint32_t rIndex = 0;
 
-        if (gType == 1 || gType == 2 || gType == 3) {
+        if (gType == 1) {
             std::uniform_int_distribution<> dist(0, (int) gTG_CivilEmptyCell.size() - 1);
             rIndex = dist(gen);
             it = gTG_CivilEmptyCell.begin();
-        } else if (gType == 4 || gType == 5) {
+        } else if (gType == 2 || gType == 3) {
             std::uniform_int_distribution<> dist(0, (int) gTG_FactoryEmptyCell.size() - 1);
             rIndex = dist(gen);
             it = gTG_FactoryEmptyCell.begin();
@@ -83,7 +83,7 @@ public:
     }
 
 
-    std::pair<int, int> returnRandomFullCivil(){
+    std::pair<int, int> returnRandomFullCivil() {
         //TODO BASED RANDOM
         int index = std::rand() % gTG_CivilFullCell.size();
         auto it = gTG_CivilFullCell.begin();

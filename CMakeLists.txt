@@ -56,7 +56,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/display/transformations/gTransSimToDisp.h
         src/sim/structure/grids/transformation/sGridToSimulator.h
         src/sim/structure/obj/sTotalCompany.h
-        src/display/menus/implementation/rCompViewLayer.h
+        src/display/menus/implementation/company/rCompViewLayer.h
         src/display/menus/oCommonMenus.h
         src/tests/tst_gBasicDisplay.h
         src/tests/tst_gBasicDisplayGround.h
@@ -122,6 +122,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/behaviour/market/items/sRollingListsEvaluator.h
         src/sim/behaviour/market/items/sTotalElements.h
         src/sim/behaviour/clock/sMainClock.h
+        src/display/menus/implementation/company/rCompViewMoreLayer.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

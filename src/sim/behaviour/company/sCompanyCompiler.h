@@ -57,16 +57,20 @@ public:
             switch (cCode[cPC] >> 61) {
                 case 0:
                     cPC = cCode[cPC] & 0x1FFFFFFFFFFFFFFF;
-                    break;
+                    continue;
                 case 1:
-                    if (cV1 != 0)
+                    if (cV1 != 0) {
                         cPC = cCode[cPC] & 0x1FFFFFFFFFFFFFFF;
+                        continue;
+                    }
                     break;
                 case 2:
                     cV1 = cV1 > cV2 ? 1 : 0;
+                    cV2 = 0;
                     break;
                 case 3:
                     cV1 = cV1 < cV2 ? 1 : 0;
+                    cV2 = 0;
                     break;
                 case 4:
                     cV2 = cV1;
@@ -84,7 +88,7 @@ public:
                             cV1 = objC->c_cRentedLocations.size();
                             break;
                         case 4:
-                            //cV1 = objC->c_lUuidRentedOther.size(); //TODO, aixo sembla ser una estructura de total Contracts
+                            cV1 = (uint64_t) objC->c_cActiveFunds;
                             break;
                         case 5:
                             if (objC->c_pOwn.find(static_cast<uint32_t>(cCode[cPC] & 0xFFFFFFFF)) != objC->c_pOwn.end())
@@ -105,8 +109,7 @@ public:
                 default:
                     break;
             }
-            if ((cCode[cPC] >> 61) > 1)
-                cPC++;
+            cPC++;
             cIndInst++;
         }
         return cRet;

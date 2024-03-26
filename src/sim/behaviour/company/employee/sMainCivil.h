@@ -16,7 +16,7 @@ public:
 
     explicit sMainCivil(const std::shared_ptr<sMainRoads> &sMainRoads) : sMC_sMainRoads(sMainRoads) {};
 
-    void addEmployeeToCompany(const objCompany &oC) {
+    void addEmployeeToCompany(objCompany &oC) {
         std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator> r;
         std::pair<int, int> rPosCivHome = sMC_sMainRoads->getRandomCivilStartRoad();
 
@@ -40,6 +40,7 @@ public:
             vTotalCivil[oC.c_uuid].push_back(r.second);
         } else
             vTotalCivil[oC.c_uuid] = {r.first, r.second};
+        oC.c_nEmployee += 1;
     }
 
     std::vector<objCivil::objRoadTravel> tick(uint32_t tTime) {

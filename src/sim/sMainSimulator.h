@@ -81,7 +81,7 @@ public:
     void tick() {
         if (sMClock->isReducedTick()) {
             allTicksReduced(sMClock->getReduced(), sMClock->getDate());
-            sMClock->updateClock(rInteraction);
+            rInteraction->gClock->setClock(sMClock->getClock());
         }
         sMClock->tick();
 
@@ -91,10 +91,11 @@ public:
     void completedSetupStage() {
         gMainRoads->completedStartGrid(gMainTerrain);
         gMainTerrain->setupLists();
+        sComp->addNewCompany(sMCompany::sMComp_TypeCompany::SMComp_Factory);
     }
 
     void completedStartCompanies(const std::vector<std::vector<std::pair<int, int>>> &gPosCompanies) {
-        sComp->completedStartCompanies(gPosCompanies);
+        //sComp->completedStartCompanies(gPosCompanies);
     }
 
 private:

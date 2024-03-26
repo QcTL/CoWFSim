@@ -18,13 +18,24 @@ public:
     struct sCodeObj {
         std::vector<uint64_t> sCO_Code;
         uint32_t sCO_Score = 0;
+
+        sCodeObj(const std::vector<uint64_t> &sCoCode, uint32_t sCoScore) : sCO_Code(sCoCode), sCO_Score(sCoScore) {}
     };
 
-    sCodeStorage() {}
+    sCodeStorage() {
+        cSC_aboveThreshold.push_back(std::make_shared<sCodeObj>(sCodeObj(
+                {
+                        (uint64_t) 0b1010000000000000000000000000000000000000000000000000000011001000,
+                        (uint64_t) 0b1000000000000000000000000000000000000000000000000000000000000100,
+                        (uint64_t) 0b0110000000000000000000000000000000000000000000000000000000000000,
+                        (uint64_t) 0b0010000000000000000000000000000000000000000000000000000000000101,
+                        (uint64_t) 0b1100000000000000000000000000000000000000000000000000000000000010,
+                        (uint64_t) 0b1110000000000000000000000000000000000000000000000000000000000000,},
+                1000)));
+    }
 
     void initNewCode(uint32_t uuidNewCompany) {
-        sCS_Map[uuidNewCompany] = std::make_shared<sCodeObj>();
-        sCS_Map[uuidNewCompany]->sCO_Code = getCommonSmartCode();
+        sCS_Map[uuidNewCompany] = getCommonSmartCode();
         sCS_Map[uuidNewCompany]->sCO_Score = 1000;
     };
 
@@ -32,8 +43,12 @@ public:
         return *sCS_Map[uuidCompany];
     }
 
+    std::shared_ptr<sCodeObj> getPointerCodeByUuid(uint32_t uuidCompany) {
+        return sCS_Map[uuidCompany];
+    }
+
     void updateScoreCode(const uint32_t uuidCompany, const int cDiff) {
-        if( sCS_Map[uuidCompany]->sCO_Score <= cDiff)
+        if (sCS_Map[uuidCompany]->sCO_Score <= cDiff)
             sCS_Map[uuidCompany]->sCO_Score = 0;
         else
             sCS_Map[uuidCompany]->sCO_Score += cDiff;
@@ -58,11 +73,11 @@ private:
         return *it;
     }
 
-    std::vector<uint64_t> getCommonSmartCode() {
-        std::vector<uint64_t> rCode = getRandomElement(cSC_aboveThreshold)->sCO_Code;
-        std::vector<uint64_t> rMutatedCode(rCode.begin(), rCode.end());
+    std::shared_ptr<sCodeObj> getCommonSmartCode() {
+        std::shared_ptr<sCodeObj> rCode = getRandomElement(cSC_aboveThreshold);
+        std::vector<uint64_t> rMutatedCode(rCode->sCO_Code.begin(), rCode->sCO_Code.end());
         //TODO Mutate
-        return rMutatedCode;
+        return rCode;
     }
 
     std::list<std::shared_ptr<sCodeObj>> cSC_aboveThreshold;

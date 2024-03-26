@@ -251,21 +251,17 @@ public:
             for (auto it = dVecFirst[i].lOrderedCars.begin(); it != dVecFirst[i].lOrderedCars.end();) {
                 auto &c = *it;
                 if (c.second + 1 >= nCompressed) {
-                    //Si el seguent ja es l'ultim
                     if (rActiveVehicle::getDestByCar(c.first).first == locIdNode &&
                         rActiveVehicle::getDestByCar(c.first).second == rBlock) {
-                        //Si ha arribat a la seva destinacio
                         dVecFirst[i].pState[c.second] = false;
                         it = dVecFirst[i].lOrderedCars.erase(it);
                         hasChanged = true;
                         std::cout << "DESTINATION" << std::endl;
                     } else if (!dVecFirst[i].hasRequestedNext) {
-                        //Demana si s'ha fet una peticio al seguent;
                         dVecFirst[i].hasRequestedNext = true;
                         notifyEnterNext(dEndFirst, c, i);
                         ++it;
                     } else {
-                        //Si ho ha fet no fara res
                         ++it;
                     }
                 } else {
@@ -289,15 +285,12 @@ public:
                         } else {
                             ++it;
                         }
-                    } else if (nToMove == 2 && dVecFirst[i].pState.size() > c.second + 1) {
-                        if (!dVecFirst[i].pState[c.second + 1]) {
-                            dVecFirst[i].pState[c.second] = false;
-                            dVecFirst[i].pState[c.second + 1] = true;
-                            ++c.second;
-                            ++it;
-                        } else {
-                            ++it;
-                        }
+                    } else if (nToMove == 2 && dVecFirst[i].pState.size() > c.second + 1 &&
+                               !dVecFirst[i].pState[c.second + 1]) {
+                        dVecFirst[i].pState[c.second] = false;
+                        dVecFirst[i].pState[c.second + 1] = true;
+                        ++c.second;
+                        ++it;
                     } else {
                         ++it;
                     }
@@ -309,21 +302,16 @@ public:
             for (auto it = dVecSecond[i].lOrderedCars.begin(); it != dVecSecond[i].lOrderedCars.end();) {
                 auto &c = *it;
                 if (c.second + 1 >= nCompressed) {
-                    //Si el seguent ja es l'ultim
                     if (rActiveVehicle::getDestByCar(c.first).first == locIdNode &&
                         rActiveVehicle::getDestByCar(c.first).second == rBlock) {
-                        //Si ha arribat a la seva destinacio
                         dVecSecond[i].pState[c.second] = false;
                         it = dVecSecond[i].lOrderedCars.erase(it);
                         hasChanged = true;
-                        std::cout << "DESTINATION" << std::endl;
                     } else if (!dVecSecond[i].hasRequestedNext) {
-                        //Demana si s'ha fet una peticio al seguent;
                         dVecSecond[i].hasRequestedNext = true;
                         notifyEnterNext(dEndSecond, c, i);
                         ++it;
                     } else {
-                        //Si ho ha fet no fara res
                         ++it;
                     }
                 } else {
@@ -347,15 +335,12 @@ public:
                         } else {
                             ++it;
                         }
-                    } else if (nToMove == 2 && dVecSecond[i].pState.size() > c.second + 1) {
-                        if (!dVecSecond[i].pState[c.second + 1]) {
-                            dVecSecond[i].pState[c.second] = false;
-                            dVecSecond[i].pState[c.second + 1] = true;
-                            ++c.second;
-                            ++it;
-                        } else {
-                            ++it;
-                        }
+                    } else if (nToMove == 2 && dVecSecond[i].pState.size() > c.second + 1 &&
+                               !dVecSecond[i].pState[c.second + 1]) {
+                        dVecSecond[i].pState[c.second] = false;
+                        dVecSecond[i].pState[c.second + 1] = true;
+                        ++c.second;
+                        ++it;
                     } else {
                         ++it;
                     }
@@ -410,6 +395,7 @@ public:
     }
 
 private:
+
 
     std::pair<uint32_t, uint32_t> takeCarPrep(const uint8_t &dDir, const uint8_t &nLine) override {
         std::pair<uint32_t, uint32_t> cRet;
@@ -472,12 +458,9 @@ private:
 
     std::vector<rRoad> dVecFirst;
     uint8_t dEndFirst;
-    //bool hasRequestedFirst = false;
 
-    //rRoad dSecond;
     std::vector<rRoad> dVecSecond;
     uint8_t dEndSecond;
-    //bool hasRequestedSecond = false;
 
     std::pair<uint8_t, uint8_t> getDirEntrances() {
         std::vector<int> sVec;

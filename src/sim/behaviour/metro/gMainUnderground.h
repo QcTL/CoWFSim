@@ -79,6 +79,9 @@ public:
     void tickReduced(const uint32_t tTime) {
         gLayerUnderground->set(pActualP, gLayerUnderground->get(pActualP) - 16);
 
+        if(tTime == 0)
+            tActualStation = 0;
+
         pActualP = getActualPosition(tTime);
         gLayerUnderground->set(pActualP, gLayerUnderground->get(pActualP) + 16);
     }

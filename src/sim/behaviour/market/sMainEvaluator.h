@@ -22,6 +22,8 @@ public:
         sME_gBasicPrices = std::vector<uint32_t>(sME_totalElements->nElements(), 10);
         sME_vLastTransactions = std::vector<sRollingListsEvaluator>(sME_totalElements->nElements(),
                                                                     sRollingListsEvaluator(5));
+        sME_companyHasItem = std::vector<std::list<std::shared_ptr<objCompany>>>(sME_totalElements->nElements(),
+                                                                                 std::list<std::shared_ptr<objCompany>>());
     };
 
 
@@ -40,14 +42,14 @@ public:
 
     void computeBoughtElement(uint64_t uuidElement, const std::shared_ptr<objCompany> &objAction) {
         uint32_t pItem = getPriceItemActual(uuidElement);
-
-        sME_gAvailableItems[uuidElement] -= 1;
         sME_vLastTransactions[uuidElement].addLastBought();
 
-        if (sME_gAvailableItems[uuidElement] > 0) {
+        if (sME_gAvailableItems.find(uuidElement) != sME_gAvailableItems.end() &&
+            sME_gAvailableItems[uuidElement] > 0) {
             sME_companyHasItem[uuidElement].front()->c_pOwn[uuidElement] -= 1;
             if (sME_companyHasItem[uuidElement].front()->c_pOwn[uuidElement] <= 0)
                 sME_companyHasItem[uuidElement].pop_front();
+            sME_gAvailableItems[uuidElement] -= 1;
         }
 
         addElementCompany(uuidElement, 1, objAction);
@@ -67,7 +69,7 @@ private:
     }
 
     uint32_t getPriceItemActual(uint64_t uuidElement) {
-        if (sME_gAvailableItems[uuidElement] > 0)
+        if (sME_gAvailableItems[uuidElement] <= 0)
             return (uint32_t) (1.1 * sME_totalElements->getById(uuidElement).getPrice(
                     sME_vLastTransactions[uuidElement].getDesirability(), sME_gBasicPrices));
         return sME_totalElements->getById(uuidElement).getPrice(

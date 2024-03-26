@@ -6,7 +6,7 @@
 #define CITYOFWEIRDFISHES_RCELLVIEWMENU_H
 
 #include "../rIMenu.h"
-#include "rCompViewLayer.h"
+#include "company/rCompViewLayer.h"
 
 class rCellViewMenu : public rIMenu {
 public:
@@ -87,7 +87,7 @@ public:
                                 std::cout <<"YEP "<< i<<std::endl;
                                 std::shared_ptr<rCompViewLayer> rComp = std::make_shared<rCompViewLayer>(
                                         rCompViewLayer(refPile->vTopActiveMenu, compShow[i],
-                                        "d_mCompViewLayer"));
+                                        "d_mCompViewLayer", refPile));
                                 refPile->addMenuTop(rComp);
                             }
                         }

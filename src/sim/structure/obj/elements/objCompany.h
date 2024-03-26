@@ -17,6 +17,7 @@
 #include <stdexcept>
 #include <unordered_set>
 #include "contracts/cObjContracts.h"
+#include "../../../behaviour/company/code/sCodeStoratge.h"
 
 std::vector<std::string> vSyllablesP = {"am", "ca", "mi", "o", "ul", "er", "es", "pin", "tu", "ra", "ta", "la", "dro",
                                         "me", "dia", "mart", "sen", "ti", "ments", "tran", "qui", "li", "tat", "pen",
@@ -43,9 +44,11 @@ public:
         }
     };
 
-    explicit objCompany(uint32_t cUuid, const std::list<std::pair<int, int>> &ownStart,
+    explicit objCompany(uint32_t cUuid, const std::list<std::pair<int, int>> &ownStart, uint8_t typeCellStart,
                         objComp_activeDates activeDates)
-            : c_uuid(cUuid), c_cActiveLocations(ownStart), c_activeDates(std::move(activeDates)) {
+            : c_uuid(cUuid), c_activeDates(std::move(activeDates)) {
+
+        addAvailableLocation(ownStart, typeCellStart);
         int numStrings = numStringsDist(gen);
         std::vector<std::string> selectedStrings;
         std::sample(vSyllablesP.begin(), vSyllablesP.end(),
@@ -90,10 +93,13 @@ public:
     std::list<std::pair<int, int>> c_cRentedLocations;
     objComp_activeDates c_activeDates;
 
+    uint32_t c_nEmployee = 0;
     double c_cActiveFunds = 0;
     float c_objFortnight = 0;
     float c_objYear = 0;
     float c_objMonth = 0;
+
+    std::shared_ptr<sCodeStorage::sCodeObj> c_cCode;
 };
 
 #endif //CITYOFWEIRDFISHES_OBJCOMPANY_H

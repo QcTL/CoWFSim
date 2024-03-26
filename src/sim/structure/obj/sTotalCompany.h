@@ -29,16 +29,14 @@ public:
     }
 
     uint32_t
-    addComp(const std::list<std::pair<int, int>> &sTilesStart, const objCompany::objComp_activeDates &cActiveDates) {
+    addComp(const std::list<std::pair<int, int>> &sTilesStart, uint8_t typeCompany,
+            const objCompany::objComp_activeDates &cActiveDates) {
         uint32_t prevFEmpty = fEmpty;
         fEmpty = tVecComp[fEmpty].first;
         tVecComp[prevFEmpty] = {0,
                                 std::make_shared<objCompany>(
-                                        prevFEmpty, sTilesStart,
-                                        cActiveDates)};/*
-                                        objCompany::objComp_activeDates(
-                                                {true, true, true, true, true, false, false},
-                                                {0, 122}))}; //TODO REAL DAILY*/
+                                        prevFEmpty, sTilesStart, typeCompany, cActiveDates)};
+        tVecComp[prevFEmpty].second->c_cActiveFunds = 5000.0;
         return prevFEmpty;
     }
 
@@ -47,13 +45,17 @@ public:
         fEmpty = rCar;
     }
 
-    std::vector<sCompanyCompiler::sCCIntentions> getTotalIntentions(const std::shared_ptr<sCodeStorage> &sSCode) {
+    std::vector<sCompanyCompiler::sCCIntentions>
+    getTotalIntentions(const std::shared_ptr<sCodeStorage> &sSCode, uint32_t tTimer) {
         std::vector<sCompanyCompiler::sCCIntentions> ret;
         for (auto &i: tVecComp) {
             if (i.second != nullptr) {
-                std::vector<sCompanyCompiler::sCCIntentions> rComp =
-                        sCompanyCompiler::givenCode(sSCode->getCodeByUuid(i.second->c_uuid).sCO_Code, i.second);
-                ret.insert(ret.end(), rComp.begin(), rComp.end());
+                std::pair<uint32_t, uint32_t> pairTimeActive = i.second->c_activeDates.c_StrEndTime;
+                if (tTimer >= pairTimeActive.first && tTimer <= pairTimeActive.second) {
+                    std::vector<sCompanyCompiler::sCCIntentions> rComp =
+                            sCompanyCompiler::givenCode(sSCode->getCodeByUuid(i.second->c_uuid).sCO_Code, i.second);
+                    ret.insert(ret.end(), rComp.begin(), rComp.end());
+                }
             }
         }
         return ret;
@@ -84,10 +86,11 @@ private:
 
 class sTotalCompany {
 public:
-    explicit sTotalCompany(uint32_t maxComp) : vTotalComp(maxComp) {}
+    explicit sTotalCompany(uint32_t maxComp, const std::shared_ptr<sCodeStorage> &sStorageCode)
+            : vTotalComp(maxComp), sSCode(sStorageCode) {}
 
     void addCompanyAtPosition(const std::shared_ptr<gIGrid<std::list<uint32_t>>> &gLayer,
-                              const std::list<std::pair<int, int>> &vecNPos) {
+                              const std::list<std::pair<int, int>> &vecNPos, uint8_t typeCompany) {
         std::random_device rd;
         std::mt19937 gen(rd());
         // TODO BASSAT EN LA MATEIX LLAVOR;
@@ -96,12 +99,14 @@ public:
         int randomIndexDay = disDay(gen);
         int randomIndexHour = disHour(gen);
 
-        uint32_t idNewComp = vTotalComp.addComp(vecNPos,
+        uint32_t idNewComp = vTotalComp.addComp(vecNPos, typeCompany,
                                                 {vActiveDaysValid[randomIndexDay], vActiveHoursValid[randomIndexHour]});
+        sSCode->initNewCode(idNewComp);
+        getCompanyByUUID(idNewComp)->c_cCode = sSCode->getPointerCodeByUuid(idNewComp);
         for (const auto &nPos: vecNPos) {
-            auto p = gLayer->get({nPos.second, nPos.first});
+            auto p = gLayer->get({nPos.first, nPos.second});
             p.push_front(idNewComp); //AAAAAAAAAAAAAAAAAAAAAA
-            gLayer->set({nPos.second, nPos.first}, p);//TODO no m'agrada que aixo vulgi dir que estem creant una copia.
+            gLayer->set({nPos.first, nPos.second}, p);//TODO no m'agrada que aixo vulgi dir que estem creant una copia.
         }
     }
 
@@ -130,10 +135,11 @@ public:
     }
 
     std::vector<sCompanyCompiler::sCCIntentions>
-    getTotalIntentions(const std::shared_ptr<sCodeStorage> &sSCode) { return vTotalComp.getTotalIntentions(sSCode); }
+    getTotalIntentions(uint32_t gTimer) { return vTotalComp.getTotalIntentions(sSCode, gTimer); }
 
 private:
     rVectorCompanies vTotalComp;
+    std::shared_ptr<sCodeStorage> sSCode;
 
     std::vector<std::vector<bool>> vActiveDaysValid = {{true,  true,  true,  true,  true, false, false},
                                                        {true,  true,  true,  true,  true, true,  false},

@@ -57,7 +57,7 @@ public:
                     refPile->rInteractionGameVel = 1000.0;
                     break;
                 case 2:
-                    refPile->rInteractionGameVel = 100.0;
+                    refPile->rInteractionGameVel = 50.0;
                     break;
                 default:
                     break;
@@ -88,13 +88,13 @@ public:
             case 1:
             case 2:
             case 3:
-            case 4:{
+            case 4: {
                 if (!refLBuild->get(cPressed).empty()) {
                     if (refLBuild->get(cPressed).size() == 1) {
                         std::shared_ptr<rCompViewLayer> rComp = std::make_shared<rCompViewLayer>(
                                 rCompViewLayer(refPile->vTopActiveMenu,
                                                *refSComp->getCompanyByUUID(refLBuild->get(cPressed).front()),
-                                               "d_mCompViewLayer"));
+                                               "d_mCompViewLayer", refPile));
                         refPile->addMenuTop(rComp);
                         std::cout << "YEP" << std::endl;
                     } else {
@@ -111,12 +111,12 @@ public:
             case 5:
             case 6:
                 if (refLRoads[cPressed.first][cPressed.second] != nullptr) {
-                    if(refLRoads[cPressed.first][cPressed.second]->refCompressed->isCrossing()) {
+                    if (refLRoads[cPressed.first][cPressed.second]->refCompressed->isCrossing()) {
                         std::shared_ptr<rRoadViewMenu> rRoad = std::make_shared<rRoadCrossView>(
                                 refPile->vTopActiveMenu, refLRoads[cPressed.first][cPressed.second]->refCompressed,
                                 rIMenu::rRelativePos::pBottomLeft);
                         refPile->addMenuTop(rRoad);
-                    }else{
+                    } else {
                         std::shared_ptr<rRoadViewMenu> rRoad = std::make_shared<rRoadLineView>(
                                 refPile->vTopActiveMenu, refLRoads[cPressed.first][cPressed.second]->refCompressed,
                                 rIMenu::rRelativePos::pBottomLeft);

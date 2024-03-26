@@ -97,16 +97,16 @@ private:
             oC->c_pOwn[gElem] -= 1;
         oC->c_cAvailableByType[sMEvaluator->getById(gItemGen).sMEE_iReqTypeBuild] -= 1;
         sCA_gTimer->addTimer(gItemGen, sMEvaluator->getById(gItemGen).sMEE_iTime + cDate, oC->c_uuid);
+        std::cout << "CREATED PRODUCT" << std::endl;
         return true;
     }
 
     //ELEMENTS VALIDATIONS;
     bool hasTypeOwn(std::shared_ptr<objCompany> &oC, uint32_t gItemGen) {
-        std::map<uint32_t, uint8_t> gQuant; //TO IMPROVE;
         sTotalElements::sME_Element oPR = sMEvaluator->getById(gItemGen);
         if (oC->c_cAvailableByType.find(oPR.sMEE_iReqTypeBuild) == oC->c_cAvailableByType.end())
             return false;
-        return true;
+        return oC->c_cAvailableByType[oPR.sMEE_iReqTypeBuild] > 0;
     }
 
     bool hasResources(objCompany &oC, uint32_t gItemGen) {

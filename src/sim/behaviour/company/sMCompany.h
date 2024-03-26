@@ -40,9 +40,8 @@ public:
         if (sCompT->hasToChange(cDate)) // Aixi no hem de crear un vector vuit cada frame.
             for (std::pair<uint32_t, uint32_t> &t: sCompT->checkForTime(cDate))
                 sCompA->gCompletedProduct(sTComp->getCompanyByUUID(t.second), t.first);
-        std::cout << tTime << std::endl;
         if (tTime % (12 * 3) == 0) { //ONCE EVERY 3 HOURS
-            for (sCompanyCompiler::sCCIntentions sCCI: sTComp->getTotalIntentions(sSCode)) {
+            for (sCompanyCompiler::sCCIntentions sCCI: sTComp->getTotalIntentions(tTime)) {
                 sCompA->gTryIntention(sCCI, sSCode, cDate);
                 sSCode->updateScoreCode(sCCI.scc_objCompany->c_uuid, -1);
             }
@@ -62,25 +61,27 @@ public:
     }
 
     void completedStartCompanies(const std::vector<std::vector<std::pair<int, int>>> &gPosCompanies) {
-        for (const auto &posNewComp: gPosCompanies)
-            sTComp->addCompanyAtPosition(gLayerOwnership,
-                                         std::list<std::pair<int, int>>(posNewComp.begin(), posNewComp.end()));
+        /*     for (const auto &posNewComp: gPosCompanies)
+                 sTComp->addCompanyAtPosition(gLayerOwnership,
+                                              std::list<std::pair<int, int>>(posNewComp.begin(), posNewComp.end()));
+         */
     }
 
     void addNewCompany(sMComp_TypeCompany cCompanyCreation) {
         std::vector<uint8_t> gTypeGivenTC = {1, 2, 4};
         uint8_t gTypeCompany = gTypeGivenTC[cCompanyCreation];
-
         auto itNewPos = sM_gMainTerrain->getEmptyPositionByType(gTypeCompany);
-        sTComp->addCompanyAtPosition(gLayerOwnership, {*itNewPos});
+        std::cout << itNewPos->first << " - " << itNewPos->second << std::endl;
+        sTComp->addCompanyAtPosition(gLayerOwnership, {*itNewPos}, gTypeCompany);
         sM_gMainTerrain->removeEmptyPositionByIterator(gTypeCompany, itNewPos);
+        sM_gMainTerrain->gTG_TypeGen->set(*itNewPos,  gTypeGivenTC[cCompanyCreation]);
     }
 
     //STORAGE
     std::shared_ptr<gIGrid<std::list<uint32_t>>> gLayerOwnership;
-    std::shared_ptr<sTotalCompany> sTComp = std::make_shared<sTotalCompany>(1000);
-    std::shared_ptr<sCodeStorage> sSCode = std::make_shared<sCodeStorage>();
 
+    std::shared_ptr<sCodeStorage> sSCode = std::make_shared<sCodeStorage>();
+    std::shared_ptr<sTotalCompany> sTComp = std::make_shared<sTotalCompany>(1000, sSCode);
 private:
     std::shared_ptr<gTerrainGrid> sM_gMainTerrain;
     std::shared_ptr<gIGrid<uint8_t>> sM_AirCondition;
