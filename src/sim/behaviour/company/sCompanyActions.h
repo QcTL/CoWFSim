@@ -69,6 +69,9 @@ public:
             case sCompanyCompiler::sCCIntentions::OBJ_Buy:
                 sMEvaluator->computeBoughtElement(sCCI.scc_addIdInfo, sCCI.scc_objCompany);
                 break;
+            case sCompanyCompiler::sCCIntentions::OBJ_SellInm:
+                sMEvaluator->computeSellInmElement(sCCI.scc_addIdInfo, sCCI.scc_objCompany);
+                break;
         }
         return true;
     }

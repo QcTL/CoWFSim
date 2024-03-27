@@ -21,8 +21,8 @@ public:
         std::unordered_set<uint8_t> buildingGroup(gTypesBuilding.begin(), gTypesBuilding.end());
 
         std::pair<std::pair<int, int>, std::pair<int, int>> gRange = rGrid->rangeUse();
-        for (int i = gRange.first.first; i <= gRange.first.second; i++) {
-            for (int j = gRange.second.first; j <= gRange.second.second; j++) {
+        for (int i = gRange.second.first; i < (gRange.second.second + 1); i++) {
+            for (int j = gRange.first.first; j < (gRange.first.second + 1); j++) {
                 if (buildingGroup.find(genType->get(i, j)) != buildingGroup.end()) {
                     uint8_t dDist = 1;
                     rNode *nearRoad = nullptr;
@@ -61,6 +61,7 @@ public:
                         }
                         dDist++;
                     }
+                    uint8_t r = genType->get(i, j);
                     rGrid->set(i, j, nearRoad);
                 }
             }

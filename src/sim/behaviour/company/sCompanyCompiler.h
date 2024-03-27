@@ -18,7 +18,8 @@ public:
             CELL_GainRent,
             CELL_Sell,
             OBJ_Produce,
-            OBJ_Buy
+            OBJ_Buy,
+            OBJ_SellInm
         };
 
         sCCEnumIntentions scc_type;
@@ -27,18 +28,22 @@ public:
     };
 
     static sCCIntentions intentionsFromLong(const uint64_t &cVal, const std::shared_ptr<objCompany> &objC) {
+        uint32_t dAddInfo = static_cast<uint32_t>(cVal & 0xFFFFFFFF);
         switch (cVal >> 53 & 0xFF) { //TODO CREC QUE ESTA MALAMENT
             case 0:
-                return {sCCIntentions::OBJ_Produce, static_cast<uint32_t>(cVal & 0xFFFFFFFF), objC};
+                return {sCCIntentions::OBJ_Produce, dAddInfo, objC};
             case 1:
-                return {sCCIntentions::CELL_Buy, static_cast<uint32_t>((cVal & 0xFFFFFFFF % 4) + 1), objC};
+                return {sCCIntentions::OBJ_Buy, dAddInfo, objC};
             case 2:
-                return {sCCIntentions::CELL_Sell, static_cast<uint32_t>(cVal & 0xFFFFFFFF), objC};
+                return {sCCIntentions::OBJ_SellInm, dAddInfo, objC};
             case 3:
-                return {sCCIntentions::CELL_GiveRent, static_cast<uint32_t>(cVal & 0xFFFFFFFF),
-                        objC};
+                return {sCCIntentions::CELL_Buy, dAddInfo, objC};
             case 4:
-                return {sCCIntentions::CELL_GainRent, static_cast<uint32_t>((cVal & 0xFFFFFFFF % 4) + 1), objC};
+                return {sCCIntentions::CELL_Sell, dAddInfo, objC};
+            case 5:
+                return {sCCIntentions::CELL_GiveRent, dAddInfo, objC};
+            case 6:
+                return {sCCIntentions::CELL_GainRent, dAddInfo, objC};
             default:
                 return {};
         }

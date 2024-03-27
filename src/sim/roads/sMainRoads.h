@@ -31,6 +31,7 @@ public:
         }
 
         if (tReduced % 24 == 0) {
+            /*
             //Maybe add between two random points based on a distribution;
             for (int i = 0; i < gVecFreqGhostRiders[tReduced / 24] * 3; i++) {
                 std::pair<int, int> gPointStart = getClosestRoadToBuilding(sMR_gTerrainGrid->returnRandomFullCivil());
@@ -40,7 +41,7 @@ public:
                 uint32_t locId = gLayerRoads[gPointEnd.first][gPointEnd.second]->refCompressed->locIdNode;
                 uint16_t blocId = gLayerRoads[gPointEnd.first][gPointEnd.second]->refCompressed->rBlock;
                 gLayerRoads[gPointStart.first][gPointStart.second]->refCompressed->addNewCar(locId, blocId);
-            }
+            }*/
         }
     }
 

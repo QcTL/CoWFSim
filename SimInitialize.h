@@ -38,15 +38,14 @@ public:
         sMS->gMainTerrain->gTG_TypeSoil = tReturn.genTypeSoil;
         //sMS->gTotalAirPollution->gLayerAirPollution = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
 
-        sLayerCells::retObjSLayerCells retCells =
+        retObjSLayerCells retCells =
                 sLayerCells::gen(lSizeGrid, sMS->gMainTerrain->gTG_TypeSoil , sMS->gMainTerrain->gTG_TypeGen, tReturn.centerClusters, mValues);
         sMS->gLayerCurStruct = retCells.gMatrix;
         sMS->gTotalUnderground->gLayerUnderground = retCells.gUnderground;
         sMS->gTotalUnderground->setPointsTransit(retCells.routesMetro);
 
-
         sMS->completedSetupStage();
-        sMS->completedStartCompanies({});
+        sMS->completedStartCompanies(retCells.gCompanyPositions);
 
         sMainContainer sMC(sMS);
 

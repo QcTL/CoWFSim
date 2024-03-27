@@ -60,11 +60,16 @@ public:
 
     }
 
-    void completedStartCompanies(const std::vector<std::vector<std::pair<int, int>>> &gPosCompanies) {
-        /*     for (const auto &posNewComp: gPosCompanies)
-                 sTComp->addCompanyAtPosition(gLayerOwnership,
-                                              std::list<std::pair<int, int>>(posNewComp.begin(), posNewComp.end()));
-         */
+    void completedStartCompanies(const std::vector<retObjCompany> &gPosCompanies) {
+        for (const auto &posNewComp : gPosCompanies) {
+            uint32_t uuidNew = sTComp->addCompanyAtPosition(gLayerOwnership,
+                                                            std::list<std::pair<int, int>>
+                                                                    (posNewComp.gCompVec.begin(),
+                                                                     posNewComp.gCompVec.end()),
+                                                            posNewComp.gType);
+            for (int i = 0; i < 2; i++)
+                sM_sCompEmployee->addEmployeeToCompany(*sTComp->getCompanyByUUID(uuidNew));
+        }
     }
 
     void addNewCompany(sMComp_TypeCompany cCompanyCreation) {
@@ -72,9 +77,11 @@ public:
         uint8_t gTypeCompany = gTypeGivenTC[cCompanyCreation];
         auto itNewPos = sM_gMainTerrain->getEmptyPositionByType(gTypeCompany);
         std::cout << itNewPos->first << " - " << itNewPos->second << std::endl;
-        sTComp->addCompanyAtPosition(gLayerOwnership, {*itNewPos}, gTypeCompany);
+        uint32_t uuidNew = sTComp->addCompanyAtPosition(gLayerOwnership, {*itNewPos}, gTypeCompany);
         sM_gMainTerrain->removeEmptyPositionByIterator(gTypeCompany, itNewPos);
-        sM_gMainTerrain->gTG_TypeGen->set(*itNewPos,  gTypeGivenTC[cCompanyCreation]);
+        //sM_gMainTerrain->gTG_TypeGen->set(*itNewPos, gTypeGivenTC[cCompanyCreation]);
+        for (int i = 0; i < 2; i++)
+            sM_sCompEmployee->addEmployeeToCompany(*sTComp->getCompanyByUUID(uuidNew));
     }
 
     //STORAGE

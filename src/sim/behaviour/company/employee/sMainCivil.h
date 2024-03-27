@@ -27,11 +27,15 @@ public:
                              {oC.c_cOwn[0], rPosHome},
                              oC.c_StrEndTime.first, oC.c_StrEndTime.second));
         else*/
+
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> distrib(-5, 5); //TODO based on Seed;
         std::shared_ptr<objCivil> oCivil = std::make_shared<objCivil>(
                 objCivil(objCivil::typeRouteSystem::OC_TRS_CAR,
                          {sMC_sMainRoads->getClosestRoadToBuilding(oC.c_cActiveLocations.front()), rPosCivHome},
-                         oC.c_activeDates.c_StrEndTime.first,
-                         oC.c_activeDates.c_StrEndTime.second,
+                         oC.c_activeDates.c_StrEndTime.first + distrib(gen),
+                         oC.c_activeDates.c_StrEndTime.second + distrib(gen),
                          oC.c_activeDates.cAD_jobWeek));
         r = sMC_sMainRoads->addRuteCivil(oCivil);
 

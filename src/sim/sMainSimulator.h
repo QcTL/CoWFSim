@@ -91,11 +91,11 @@ public:
     void completedSetupStage() {
         gMainRoads->completedStartGrid(gMainTerrain);
         gMainTerrain->setupLists();
-        sComp->addNewCompany(sMCompany::sMComp_TypeCompany::SMComp_Factory);
+        //sComp->addNewCompany(sMCompany::sMComp_TypeCompany::SMComp_Factory);
     }
 
-    void completedStartCompanies(const std::vector<std::vector<std::pair<int, int>>> &gPosCompanies) {
-        //sComp->completedStartCompanies(gPosCompanies);
+    void completedStartCompanies(const std::vector<retObjCompany>& gCompPositions) {
+        sComp->completedStartCompanies(gCompPositions);
     }
 
 private:

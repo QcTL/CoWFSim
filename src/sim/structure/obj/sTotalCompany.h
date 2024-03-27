@@ -89,7 +89,7 @@ public:
     explicit sTotalCompany(uint32_t maxComp, const std::shared_ptr<sCodeStorage> &sStorageCode)
             : vTotalComp(maxComp), sSCode(sStorageCode) {}
 
-    void addCompanyAtPosition(const std::shared_ptr<gIGrid<std::list<uint32_t>>> &gLayer,
+    uint32_t addCompanyAtPosition(const std::shared_ptr<gIGrid<std::list<uint32_t>>> &gLayer,
                               const std::list<std::pair<int, int>> &vecNPos, uint8_t typeCompany) {
         std::random_device rd;
         std::mt19937 gen(rd());
@@ -108,6 +108,7 @@ public:
             p.push_front(idNewComp); //AAAAAAAAAAAAAAAAAAAAAA
             gLayer->set({nPos.first, nPos.second}, p);//TODO no m'agrada que aixo vulgi dir que estem creant una copia.
         }
+        return idNewComp;
     }
 
     std::shared_ptr<objCompany> getCompanyByUUID(uint32_t index) {

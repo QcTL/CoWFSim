@@ -24,13 +24,6 @@
 
 class sLayerCells {
 public:
-    struct retObjSLayerCells {
-        std::shared_ptr<gIGrid<uint32_t>> gMatrix;
-        std::shared_ptr<gIGrid<uint8_t>> gUnderground;
-        std::vector<std::vector<std::pair<int, int>>> gCompanyPositions;
-        std::vector<std::vector<std::pair<int, int>>> routesMetro;
-    };
-
     static retObjSLayerCells gen(
             uint32_t lSize, const std::shared_ptr<gIGrid<uint8_t>> &gTypeSoil,
             const std::shared_ptr<gIGrid<uint8_t>> &gTypeGen,
@@ -113,12 +106,6 @@ public:
                                       rPerp.pPerpOrigin, idTypeRoadSmall, 6, 100);
         }
 
-        //HOUSES:
-        gBaseToStartBuildings::gen(gCell, gTypeSoil, gTypeGen,
-                                   {TypeSoil_T1Urban, TypeSoil_T2Urban, TypeSoil_T3Urban,
-                                    TypeSoil_T1Factory, TypeSoil_T2Factory},
-                                   0);
-
 
         std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gCell->rangeUse();
         for (int i = gRange.first.first; i <= gRange.first.second; ++i) {
@@ -133,6 +120,12 @@ public:
 
         BasicTransformations::copyWhere(gTypeGen, gCell, {{idTypeRoadBig,   5},
                                                           {idTypeRoadSmall, 6}});
+
+        //HOUSES:
+        std::vector<retObjCompany> gCompany;
+        gCompany = gBaseToStartBuildings::gen(gCell, gTypeSoil, gTypeGen,
+                                              {TypeSoil_T1Urban, TypeSoil_T2Urban, TypeSoil_T3Urban,
+                                               TypeSoil_T1Factory, TypeSoil_T2Factory}, {5, 6}, 0);
 
 
         std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint16_t>>> p =
@@ -166,10 +159,6 @@ public:
                                                               1));
             gUnderground->set(cClusters[i], 2);
         }
-        //gUnderground->set({0, 0}, 1);
-        //gUnderground->set({1, 0}, 1);
-        //gUnderground->set({1, 1}, 1);
-        //gUnderground->set({0, 1}, 1);
 
         std::map<uint8_t, std::vector<std::pair<std::pair<int, int>, uint8_t>>> pUnderground =
                 gBaseToBorderDetection::generate<uint8_t>(gUnderground,
@@ -197,7 +186,7 @@ public:
                                             {{1, ((uint32_t) (uint8_t) strtol("00010001", nullptr, 2)) << 24}});
         */
 
-        return {gCell, gUnderground, {}, rMetro};
+        return {gCell, gUnderground, gCompany, rMetro};
     }
 
 };

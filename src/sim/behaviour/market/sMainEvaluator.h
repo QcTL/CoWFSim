@@ -46,7 +46,8 @@ public:
 
         if (sME_gAvailableItems.find(uuidElement) != sME_gAvailableItems.end() &&
             sME_gAvailableItems[uuidElement] > 0) {
-            sME_companyHasItem[uuidElement].front()->c_pOwn[uuidElement] -= 1;
+
+            removeElementCompany(uuidElement, 1, sME_companyHasItem[uuidElement].front());
             if (sME_companyHasItem[uuidElement].front()->c_pOwn[uuidElement] <= 0)
                 sME_companyHasItem[uuidElement].pop_front();
             sME_gAvailableItems[uuidElement] -= 1;
@@ -54,6 +55,13 @@ public:
 
         addElementCompany(uuidElement, 1, objAction);
         objAction->c_cActiveFunds -= pItem;
+    }
+
+    void computeSellInmElement(uint64_t uuidElement, const std::shared_ptr<objCompany> &objAction) {
+        uint32_t pItem = getPriceItemActual(uuidElement);
+
+        removeElementCompany(uuidElement, 1, objAction);
+        objAction->c_cActiveFunds += pItem;
     }
 
     sTotalElements::sME_Element getById(uint64_t uuidElement) { return sME_totalElements->getById(uuidElement); }
@@ -66,6 +74,14 @@ private:
             objAction->c_pOwn[uuidElement] = nElements; //TO IMPROVE, potser fer-ne mes de un... cada cop
         else
             objAction->c_pOwn[uuidElement] += nElements;
+    }
+
+    static void
+    removeElementCompany(uint64_t uuidElement, uint8_t nElements, const std::shared_ptr<objCompany> &objAction) {
+        if (objAction->c_pOwn.find(uuidElement) == objAction->c_pOwn.end())
+            objAction->c_pOwn[uuidElement] = 0;// TO IMPROVE, potser fer-ne mes de un... cada cop
+        else
+            objAction->c_pOwn[uuidElement] -= nElements;
     }
 
     uint32_t getPriceItemActual(uint64_t uuidElement) {
