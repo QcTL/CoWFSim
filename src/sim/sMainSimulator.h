@@ -38,7 +38,7 @@ public:
 
         rMEvaluator = std::make_shared<sMainEvaluator>();
         gMainRoads = std::make_shared<sMainRoads>(lSize, gMainTerrain);
-        sMCivil = std::make_shared<sMainCivil>(gMainRoads);
+        sMCivil = std::make_shared<sMainCivil>(gMainRoads, gTotalUnderground);
         sMEvaluator = std::make_shared<sMainEvaluator>();
         sComp = std::make_shared<sMCompany>(lSize, sMCivil,
                                             gMainTerrain,
@@ -63,7 +63,7 @@ public:
     std::shared_ptr<gMainUnderground> gTotalUnderground;
 
     //ROADS
-    std::shared_ptr<sMainRoads>  gMainRoads;
+    std::shared_ptr<sMainRoads> gMainRoads;
 
     std::shared_ptr<rPileMenus> rInteraction;
 
@@ -94,7 +94,7 @@ public:
         //sComp->addNewCompany(sMCompany::sMComp_TypeCompany::SMComp_Factory);
     }
 
-    void completedStartCompanies(const std::vector<retObjCompany>& gCompPositions) {
+    void completedStartCompanies(const std::vector<retObjCompany> &gCompPositions) {
         sComp->completedStartCompanies(gCompPositions);
     }
 

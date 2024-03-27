@@ -16,9 +16,10 @@
 class gMainUnderground {
 public:
 
-    gMainUnderground(uint32_t lSize) {
+    explicit gMainUnderground(uint32_t lSize) {
         gLayerUnderground = std::make_shared<gBasicGrid<uint8_t >>
                 (gBasicGrid<uint8_t>(lSize, lSize, 0));
+        tActualStation = 0;
     }
 
     struct gPosStation {
