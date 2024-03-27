@@ -10,16 +10,16 @@
 #include "../../structure/grids/gIGrid.h"
 #include "sCompanyTimer.h"
 #include "../market/sMarketBazaar.h"
-#include "../gTerrainGrid.h"
-#include "contract/sMainContractor.h"
+#include "../sgTerrain.h"
+#include "contract/sContractorMain.h"
 #include "sCompanyCompiler.h"
-#include "../market/sMainEvaluator.h"
+#include "../market/sEvaluatorMain.h"
 
 class sCompanyActions {
 public:
-    sCompanyActions(const std::shared_ptr<gTerrainGrid> &gType,
+    sCompanyActions(const std::shared_ptr<sgTerrain> &gType,
                     const std::shared_ptr<sCompanyTimer> &gCTimer,
-                    const std::shared_ptr<sMainEvaluator> &sMEvaluator)
+                    const std::shared_ptr<sEvaluatorMain> &sMEvaluator)
             : sCA_gTimer(gCTimer), sCA_gType(gType), sMEvaluator(sMEvaluator) {}
 
     bool
@@ -124,11 +124,11 @@ private:
         return true;
     }
 
-    std::shared_ptr<sMainEvaluator> sMEvaluator;
-    std::shared_ptr<gTerrainGrid> sCA_gType;
+    std::shared_ptr<sEvaluatorMain> sMEvaluator;
+    std::shared_ptr<sgTerrain> sCA_gType;
     std::shared_ptr<sCompanyTimer> sCA_gTimer;
     std::shared_ptr<sMarketBazaar> sCA_MarketListing;
-    std::shared_ptr<sMainContractor> sCA_MainContractor;
+    std::shared_ptr<sContractorMain> sCA_MainContractor;
 };
 
 #endif //CITYOFWEIRDFISHES_SCOMPANYACTIONS_H

@@ -2,8 +2,8 @@
 // Created by Laminar on 06/03/2024.
 //
 
-#ifndef CITYOFWEIRDFISHES_GMAINAIRPOLLUTION_H
-#define CITYOFWEIRDFISHES_GMAINAIRPOLLUTION_H
+#ifndef CITYOFWEIRDFISHES_SGAIRPOLLUTIONMAIN_H
+#define CITYOFWEIRDFISHES_SGAIRPOLLUTIONMAIN_H
 
 #include <memory>
 #include <valarray>
@@ -11,11 +11,11 @@
 #include "../../structure/grids/gBasicGrid.h"
 #include "../../structure/grids/transformation/gBasicTransformations.h"
 
-class gMainAirPollution {
+class sgAirPollutionMain {
 public:
-    explicit gMainAirPollution(int lSize) {
+    explicit sgAirPollutionMain(int inGridSize) {
         gLayerAirPollution = std::make_shared<gBasicGrid<uint8_t >>
-                (gBasicGrid<uint8_t>(lSize, lSize, 0));
+                (gBasicGrid<uint8_t>(inGridSize, inGridSize, 0));
         recomputeWindMat({-0.75, 0.5});
     }
 
@@ -24,11 +24,10 @@ public:
         BasicTransformations::copyWhere(gLayerAirPollution, gBasicType, {{3, 8}});
 
 
-        BasicTransformations::Kernel<double> k(
+        BasicTransformations::Kernel<double> _k(
                 {windMat[0][0], windMat[0][1], windMat[0][2],
                  windMat[1][0], windMat[1][1], windMat[1][2],
                  windMat[2][0], windMat[2][1], windMat[2][2]}, 3, 3);
-
 
         auto range = gLayerAirPollution->rangeUse();
         int width = range.first.second - range.first.first + 1;
@@ -36,10 +35,10 @@ public:
 
         std::vector<std::pair<int, int>> kernelIndices;
         std::vector<double> kernelValues;
-        for (int y = 0; y < k.sY; y++) {
-            for (int x = 0; x < k.sX; x++) {
-                kernelIndices.push_back({x - k.sX / 2, y - k.sY / 2});
-                kernelValues.push_back(k.dValues[y * k.sX + x]);
+        for (int y = 0; y < _k.sY; y++) {
+            for (int x = 0; x < _k.sX; x++) {
+                kernelIndices.push_back({x - _k.sX / 2, y - _k.sY / 2});
+                kernelValues.push_back(_k.dValues[y * _k.sX + x]);
             }
         }
 
@@ -105,4 +104,4 @@ private:
     std::pair<double, double> dUnitWind;
 };
 
-#endif //CITYOFWEIRDFISHES_GMAINAIRPOLLUTION_H
+#endif //CITYOFWEIRDFISHES_SGAIRPOLLUTIONMAIN_H

@@ -12,12 +12,12 @@
 #include "../sim/structure/grids/transformation/gBaseToGradientMinimum.h"
 #include "../sim/structure/grids/transformation/gBasicTransformations.h"
 #include "../sim/structure/grids/transformation/gBaseToWFC.h"
-#include "../sim/sMainSimulator.h"
+#include "../sim/sSimulatorMain.h"
 #include "../display/menus/implementation/rBaseMenu.h"
 
 int tst_gBasicWFC() {
 
-    std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(105);
+    std::shared_ptr<sSimulatorMain> sMS = std::make_shared<sSimulatorMain>(105);
     std::shared_ptr<gIGrid<int>> gB =std::make_shared<gBasicGrid<int>>(gBasicGrid<int>(30, 30, -1));
 
     std::vector<gtmElement> vElem = {

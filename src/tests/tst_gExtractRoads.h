@@ -16,7 +16,7 @@
 
 int tst_gExtractRoads() {
 
-    std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(50);
+    std::shared_ptr<sSimulatorMain> sMS = std::make_shared<sSimulatorMain>(50);
     std::shared_ptr<gIGrid<uint8_t>> gB = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(50, 50, 0));
     gBaseToPattern<uint8_t> gBP(gB,
                        gBaseToPattern<uint8_t>::gPatternType::gBPBlobSquares,

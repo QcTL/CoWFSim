@@ -10,19 +10,19 @@
 #include "../sim/structure/grids/transformation/gBaseToPattern.h"
 #include "../sim/structure/grids/transformation/gBaseToGradientMinimum.h"
 #include "../sim/structure/grids/transformation/gBasicTransformations.h"
-#include "../sim/sMainSimulator.h"
+#include "../sim/sSimulatorMain.h"
 #include "../sim/structure/grids/transformation/sGridToSimulator.h"
 #include "../display/rGlobal.h"
 #include "../display/menus/implementation/rBaseMenu.h"
 #include "../sim/structure/grids/transformation/gBaseToField.h"
 #include "../sim/layers/implementations/sLayerType.h"
 #include "../sim/layers/implementations/sLayerCells.h"
-#include "../common/sMainContainer.h"
+#include "../common/sContainerMain.h"
 
 int tst_gWindExpansion() {
     uint32_t lSizeGrid = 30;
 
-    std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(lSizeGrid);
+    std::shared_ptr<sSimulatorMain> sMS = std::make_shared<sSimulatorMain>(lSizeGrid);
 
     //sMS->gLayerTypeSoil = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
     //sMS->gLayerAirPollution = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
@@ -37,7 +37,7 @@ int tst_gWindExpansion() {
     sMS->completedSetupStage();
     //sMS->completedStartCompanies(retCells.gCompanyPositions);
 
-    sMainContainer sMC(sMS);
+    sContainerMain sMC(sMS);
 
     sMC.gameLoop();
     return 0;

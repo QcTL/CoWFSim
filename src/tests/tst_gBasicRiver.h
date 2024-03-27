@@ -11,11 +11,11 @@
 #include "../display/rGlobal.h"
 #include "../sim/structure/grids/transformation/gBaseToGradientMinimum.h"
 #include "../sim/structure/grids/transformation/gBaseToRiver.h"
-#include "../sim/sMainSimulator.h"
+#include "../sim/sSimulatorMain.h"
 #include "../display/menus/implementation/rBaseMenu.h"
 
 int tst_gBasicRiver() {
-    std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(105);
+    std::shared_ptr<sSimulatorMain> sMS = std::make_shared<sSimulatorMain>(105);
     std::shared_ptr<gIGrid<uint8_t>> gB =std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(105, 105, 3));
     gBaseToRiver<uint8_t> gBTR(gB,20,1.6, 100);
 

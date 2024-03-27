@@ -2,8 +2,8 @@
 // Created by Laminar on 03/03/2024.
 //
 
-#ifndef CITYOFWEIRDFISHES_STOTALROUTES_H
-#define CITYOFWEIRDFISHES_STOTALROUTES_H
+#ifndef CITYOFWEIRDFISHES_SROUTESSTORAGE_H
+#define CITYOFWEIRDFISHES_SROUTESSTORAGE_H
 
 #include <map>
 #include <cstdint>
@@ -12,11 +12,11 @@
 #include "sCommon.h"
 #include "elements/objCivil.h"
 
-class sTotalRoutes {
+class sRoutesStorage {
 
 public:
 
-    sTotalRoutes() {
+    sRoutesStorage() {
         mExitTimesCivil = std::vector<std::list<objCivil>>(289);
     };
 
@@ -57,7 +57,6 @@ public:
 private:
     std::vector<std::shared_ptr<objCivil>> vUniqueCivil;
     std::vector<std::list<objCivil>> mExitTimesCivil;
-
 };
 
-#endif //CITYOFWEIRDFISHES_STOTALROUTES_H
+#endif //CITYOFWEIRDFISHES_SROUTESSTORAGE_H

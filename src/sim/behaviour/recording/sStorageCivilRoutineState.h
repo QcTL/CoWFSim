@@ -11,27 +11,27 @@
 class sStorageCivilRoutineState {
 
     sStorageCivilRoutineState() :
-    sSCProgress(std::vector<std::pair<uint16_t, uint16_t>>(288, {0, 0})),
-    sSCStartHome(0), sSCStartJob(0){}
+            sSCProgress(std::vector<std::pair<uint16_t, uint16_t>>(288, {0, 0})),
+            sSCStartHome(0), sSCStartJob(0) {}
 
-    void tick(uint32_t tTick, uint16_t newHome, uint16_t newJob){
-        sSCProgress[tTick] = {newHome, newJob};
-        if(tTick == 288){ //END OF THE DAY SCENARIO
-            int sumH = 0;
-            int sumJ = 0;
+    void tick(uint32_t inRTime, uint16_t inNewHome, uint16_t inNewJob) {
+        sSCProgress[inRTime] = {inNewHome, inNewJob};
+        if (inRTime == 288) { //END OF THE DAY SCENARIO
+            int _sumH = 0;
+            int _sumJ = 0;
 
-            for (const auto& p : sSCProgress) {
-                sumH += p.first;
-                sumJ += p.second;
+            for (const auto &p: sSCProgress) {
+                _sumH += p.first;
+                _sumJ += p.second;
             }
-            sSCStartHome += sumH - sumJ;
-            sSCStartJob += sumJ - sumH;
+            sSCStartHome += _sumH - _sumJ;
+            sSCStartJob += _sumJ - _sumH;
 
             //TODO STORE;
         }
     }
 
-    void addNCivilian(uint16_t nUser){
+    void addNCivilian(uint16_t nUser) {
         sSCStartHome += nUser;
     }
 

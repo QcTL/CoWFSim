@@ -12,7 +12,7 @@
 #include "../sim/structure/grids/transformation/gBaseToGradientMinimum.h"
 #include "../sim/structure/grids/transformation/gBasicTransformations.h"
 #include "../sim/structure/grids/transformation/gBaseToWFC.h"
-#include "../sim/sMainSimulator.h"
+#include "../sim/sSimulatorMain.h"
 #include "../display/menus/implementation/rBaseMenu.h"
 
 int tst_gBasicWFCBasic() {
@@ -20,7 +20,7 @@ int tst_gBasicWFCBasic() {
 
     int rRows = 100;
     int rCols = 100;
-    std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(rRows);
+    std::shared_ptr<sSimulatorMain> sMS = std::make_shared<sSimulatorMain>(rRows);
     //MASK:
     std::shared_ptr<gIGrid<bool>> b = std::make_shared<gBasicGrid<bool>>(gBasicGrid<bool>(rRows, rCols, -1));
 

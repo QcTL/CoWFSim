@@ -6,7 +6,7 @@
 #define CITYOFWEIRDFISHES_RGUICLOCK_H
 
 #include "../../rIMenu.h"
-#include "../../../../sim/behaviour/clock/sMainClock.h"
+#include "../../../../sim/behaviour/clock/sClockMain.h"
 
 class rGUIClock : public rIMenu {
 public:
@@ -51,16 +51,16 @@ public:
     //Tambe estaria be que el rGUI no comptes res ell i fos cada cop que hagui de canviar un missatge de rPiles que hauria
     // de venir de algun altre lloc.
 
-    void setClock(const sMainClock::objClockValues &vNew) {
-        std::string gHour = std::to_string((vNew.rVHour % 12) == 0 ? 12 : (vNew.rVHour % 12));
-        std::string gMinutes = std::to_string(vNew.rVMinute % 60);
+    void setClock(const sClockMain::sCM_ClockValues &vNew) {
+        std::string gHour = std::to_string((vNew.sCM_rVHour % 12) == 0 ? 12 : (vNew.sCM_rVHour % 12));
+        std::string gMinutes = std::to_string(vNew.sCM_rVMinute % 60);
         setText(0, (gHour.size() == 1 ? "0" : "") + gHour +
                    ":" +
                    (gMinutes.size() == 1 ? "0" : "") + gMinutes +
-                   ((vNew.rVHour < 12) ? "am" : "pm"));
+                   ((vNew.sCM_rVHour < 12) ? "am" : "pm"));
 
-        setText(1, std::to_string(vNew.rVDay % 32) + '/' + std::to_string(vNew.rVMonth % 13));
-        setText(2, std::to_string(vNew.rVYear));
+        setText(1, std::to_string(vNew.sCM_rVDay % 32) + '/' + std::to_string(vNew.sCM_rVMonth % 13));
+        setText(2, std::to_string(vNew.sCM_rVYear));
     }
 
     void setVelocity(const uint8_t &vNew) {

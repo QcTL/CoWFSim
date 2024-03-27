@@ -21,7 +21,7 @@ public:
                        const std::shared_ptr<gIGrid<uint8_t>> &gType,
                        const std::vector<std::vector<rNode *>> &gRoads,
                        const std::shared_ptr<gIGrid<std::list<uint32_t>>> &gLayerOwn,
-                       const std::shared_ptr<sTotalCompany> &sTComp)
+                       const std::shared_ptr<sCompanyTotal> &sTComp)
             : rIMenu(nullptr, rIMenu::rRelativePos::pBottomRight),
               refPile(rPile), lstValueLayer(1),
               refLRoads(gRoads), refLTypes(gType), refLBuild(gLayerOwn), refSComp(sTComp) {
@@ -135,7 +135,7 @@ private:
     std::vector<std::vector<rNode *>> refLRoads;
     std::shared_ptr<gIGrid<uint8_t>> refLTypes;
     std::shared_ptr<gIGrid<std::list<uint32_t>>> refLBuild;
-    std::shared_ptr<sTotalCompany> refSComp;
+    std::shared_ptr<sCompanyTotal> refSComp;
 };
 
 #endif //CITYOFWEIRDFISHES_RBASEMENU_H

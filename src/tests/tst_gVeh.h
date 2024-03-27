@@ -14,11 +14,11 @@
 #include "../sim/roads/rNodeFromGrid.h"
 #include "../display/menus/implementation/rBaseMenu.h"
 #include "../sim/layers/implementations/sLayerType.h"
-#include "../common/sMainContainer.h"
+#include "../common/sContainerMain.h"
 
 
 int tst_gVeh() {
-    std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(100);
+    std::shared_ptr<sSimulatorMain> sMS = std::make_shared<sSimulatorMain>(100);
 
     std::shared_ptr<gIGrid<uint8_t>> gB = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(100, 100, 0));
     std::shared_ptr<gIGrid<uint8_t>> gTransit = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(100, 100, 0));
@@ -48,7 +48,7 @@ int tst_gVeh() {
 */
 
     //START TRANSIT;
-    sMainContainer sMC(sMS);
+    sContainerMain sMC(sMS);
 
     sMC.gameLoop();
     return 0;

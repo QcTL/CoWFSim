@@ -2,15 +2,15 @@
 // Created by Laminar on 27/02/2024.
 //
 
-#ifndef CITYOFWEIRDFISHES_STOTALCOMPANY_H
-#define CITYOFWEIRDFISHES_STOTALCOMPANY_H
+#ifndef CITYOFWEIRDFISHES_SCOMPANYTOTAL_H
+#define CITYOFWEIRDFISHES_SCOMPANYTOTAL_H
 
 #include <vector>
 #include <memory>
-#include "sCommon.h"
-#include "../grids/gIGrid.h"
-#include "../../behaviour/company/sCompanyCompiler.h"
-#include "../../behaviour/company/code/sCodeStoratge.h"
+#include "../../structure/obj/sCommon.h"
+#include "../../structure/grids/gIGrid.h"
+#include "sCompanyCompiler.h"
+#include "code/sCodeStoratge.h"
 
 class rVectorCompanies {
 public:
@@ -84,72 +84,71 @@ private:
     uint32_t fEmpty;
 };
 
-class sTotalCompany {
+class sCompanyTotal {
 public:
-    explicit sTotalCompany(uint32_t maxComp, const std::shared_ptr<sCodeStorage> &sStorageCode)
-            : vTotalComp(maxComp), sSCode(sStorageCode) {}
+    explicit sCompanyTotal(uint32_t maxComp, const std::shared_ptr<sCodeStorage> &sStorageCode)
+            : sCT_vTotalComp(maxComp), sCT_sCodeS(sStorageCode) {}
 
     uint32_t addCompanyAtPosition(const std::shared_ptr<gIGrid<std::list<uint32_t>>> &gLayer,
                               const std::list<std::pair<int, int>> &vecNPos, uint8_t typeCompany) {
         std::random_device rd;
         std::mt19937 gen(rd());
         // TODO BASSAT EN LA MATEIX LLAVOR;
-        std::uniform_int_distribution<> disDay(0, (int) vActiveDaysValid.size() - 1);
-        std::uniform_int_distribution<> disHour(0, (int) vActiveHoursValid.size() - 1);
+        std::uniform_int_distribution<> disDay(0, (int) sCT_vActiveDaysValid.size() - 1);
+        std::uniform_int_distribution<> disHour(0, (int) sCT_vActiveHoursValid.size() - 1);
         int randomIndexDay = disDay(gen);
         int randomIndexHour = disHour(gen);
 
-        uint32_t idNewComp = vTotalComp.addComp(vecNPos, typeCompany,
-                                                {vActiveDaysValid[randomIndexDay], vActiveHoursValid[randomIndexHour]});
-        sSCode->initNewCode(idNewComp);
-        getCompanyByUUID(idNewComp)->c_cCode = sSCode->getPointerCodeByUuid(idNewComp);
+        uint32_t _idNewComp = sCT_vTotalComp.addComp(vecNPos, typeCompany,
+                                                     {sCT_vActiveDaysValid[randomIndexDay], sCT_vActiveHoursValid[randomIndexHour]});
+        sCT_sCodeS->initNewCode(_idNewComp);
+        getCompanyByUUID(_idNewComp)->c_cCode = sCT_sCodeS->getPointerCodeByUuid(_idNewComp);
         for (const auto &nPos: vecNPos) {
             auto p = gLayer->get({nPos.first, nPos.second});
-            p.push_front(idNewComp); //AAAAAAAAAAAAAAAAAAAAAA
+            p.push_front(_idNewComp); //AAAAAAAAAAAAAAAAAAAAAA
             gLayer->set({nPos.first, nPos.second}, p);//TODO no m'agrada que aixo vulgi dir que estem creant una copia.
         }
-        return idNewComp;
+        return _idNewComp;
     }
 
-    std::shared_ptr<objCompany> getCompanyByUUID(uint32_t index) {
-        return vTotalComp.getDestByComp(index);
+    std::shared_ptr<objCompany> getCompanyByUUID(uint32_t inIndex) {
+        return sCT_vTotalComp.getDestByComp(inIndex);
     }
 
-    std::vector<objCompany> getVecCompByUUID(const std::list<uint32_t> &tList) {
+    std::vector<objCompany> getVecCompByUUID(const std::list<uint32_t> &inLUuidComp) {
         std::vector<objCompany> r;
-        for (const uint32_t l: tList) {
+        for (const uint32_t l: inLUuidComp) {
             r.push_back(*getCompanyByUUID(l));
         }
         return r;
     }
 
     void applyEcoWeek() {
-        vTotalComp.applyEcoWeek();
+        sCT_vTotalComp.applyEcoWeek();
     }
 
     void applyEcoMonth() {
-        vTotalComp.applyEcoMonth();
+        sCT_vTotalComp.applyEcoMonth();
     }
 
     void applyEcoYear() {
-        vTotalComp.applyEcoYear();
+        sCT_vTotalComp.applyEcoYear();
     }
 
     std::vector<sCompanyCompiler::sCCIntentions>
-    getTotalIntentions(uint32_t gTimer) { return vTotalComp.getTotalIntentions(sSCode, gTimer); }
+    getTotalIntentions(uint32_t gTimer) { return sCT_vTotalComp.getTotalIntentions(sCT_sCodeS, gTimer); }
 
 private:
-    rVectorCompanies vTotalComp;
-    std::shared_ptr<sCodeStorage> sSCode;
+    rVectorCompanies sCT_vTotalComp;
+    std::shared_ptr<sCodeStorage> sCT_sCodeS;
 
-    std::vector<std::vector<bool>> vActiveDaysValid = {{true,  true,  true,  true,  true, false, false},
-                                                       {true,  true,  true,  true,  true, true,  false},
-                                                       {false, false, false, false, true, true,  true}};
-    std::vector<std::pair<uint32_t, uint32_t>> vActiveHoursValid = {{108, 204},
-                                                                    {96,  192},
-                                                                    {120, 216},
-                                                                    {216, 276}};
+    std::vector<std::vector<bool>> sCT_vActiveDaysValid = {{true,  true,  true,  true,  true, false, false},
+                                                           {true,  true,  true,  true,  true, true,  false},
+                                                           {false, false, false, false, true, true,  true}};
+    std::vector<std::pair<uint32_t, uint32_t>> sCT_vActiveHoursValid = {{108, 204},
+                                                                        {96,  192},
+                                                                        {120, 216},
+                                                                        {216, 276}};
 };
 
-
-#endif //CITYOFWEIRDFISHES_STOTALCOMPANY_H
+#endif //CITYOFWEIRDFISHES_SCOMPANYTOTAL_H
