@@ -19,39 +19,42 @@ public:
                         const std::shared_ptr<gMainUnderground> &sMainUnderground)
             : sMC_sMainRoads(sMainRoads), sMC_sMainUnderground(sMainUnderground) {};
 
-    void addEmployeeToCompany(objCompany &oC) {
+    void addEmployeeToCompany(objCompany &objCompany) {
         std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator> r;
         std::pair<int, int> rPosCivHome = sMC_sMainRoads->getRandomCivilStartRoad();
 
         gMainUnderground::lowestViableRoute lVRMetro = sMC_sMainUnderground->getLowestDistanceCommute(
-                oC.c_cActiveLocations.front(), rPosCivHome);
+                objCompany.c_cActiveLocations.front(), rPosCivHome);
 
-        if (lVRMetro.totalDistance < 1000)
+        if (lVRMetro.totalDistance < 100)
             r = sMC_sMainRoads->addRuteCivil(std::make_shared<objCivil>(
                     objCivil(objCivil::typeRouteSystem::OC_TRS_TRAIN,
-                             {oC.c_cActiveLocations.front(), rPosCivHome},
-                             oC.c_activeDates.c_StrEndTime.first, oC.c_activeDates.c_StrEndTime.second,
-                             oC.c_activeDates.cAD_jobWeek)));
+                             {objCompany.c_cActiveLocations.front(), rPosCivHome},
+                             sMC_sMainUnderground->getClosestTimeForStation(lVRMetro.closestSt1,
+                                                                            objCompany.c_activeDates.c_StrEndTime.first),
+                             sMC_sMainUnderground->getClosestTimeForStation(lVRMetro.closestSt2,
+                                                                            objCompany.c_activeDates.c_StrEndTime.second),
+                             objCompany.c_activeDates.cAD_jobWeek)));
         else {
             std::random_device rd;
             std::mt19937 gen(rd());
             std::uniform_int_distribution<> distrib(-5, 5); //TODO based on Seed;
             std::shared_ptr<objCivil> oCivil = std::make_shared<objCivil>(
                     objCivil(objCivil::typeRouteSystem::OC_TRS_CAR,
-                             {sMC_sMainRoads->getClosestRoadToBuilding(oC.c_cActiveLocations.front()), rPosCivHome},
-                             oC.c_activeDates.c_StrEndTime.first + distrib(gen),
-                             oC.c_activeDates.c_StrEndTime.second + distrib(gen),
-                             oC.c_activeDates.cAD_jobWeek));
+                             {sMC_sMainRoads->getClosestRoadToBuilding(objCompany.c_cActiveLocations.front()), rPosCivHome},
+                             objCompany.c_activeDates.c_StrEndTime.first + distrib(gen),
+                             objCompany.c_activeDates.c_StrEndTime.second + distrib(gen),
+                             objCompany.c_activeDates.cAD_jobWeek));
             r = sMC_sMainRoads->addRuteCivil(oCivil);
         }
 
-        if (vTotalCivil.find(oC.c_uuid) != vTotalCivil.end()) {
-            vTotalCivil[oC.c_uuid].push_back(r.first);
-            vTotalCivil[oC.c_uuid].push_back(r.second);
+        if (vTotalCivil.find(objCompany.c_uuid) != vTotalCivil.end()) {
+            vTotalCivil[objCompany.c_uuid].push_back(r.first);
+            vTotalCivil[objCompany.c_uuid].push_back(r.second);
         } else
-            vTotalCivil[oC.c_uuid] = {r.first, r.second};
+            vTotalCivil[objCompany.c_uuid] = {r.first, r.second};
 
-        oC.c_nEmployee += 1;
+        objCompany.c_nEmployee += 1;
     }
 
     std::vector<objCivil::objRoadTravel> tick(uint32_t tTime) {

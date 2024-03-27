@@ -20,6 +20,7 @@ public:
         gLayerUnderground = std::make_shared<gBasicGrid<uint8_t >>
                 (gBasicGrid<uint8_t>(lSize, lSize, 0));
         tActualStation = 0;
+        tTick = 0;
     }
 
     struct gPosStation {
@@ -77,20 +78,21 @@ public:
     }
 
 
-    void tickReduced(const uint32_t tTime) {
+    void tick() {
         gLayerUnderground->set(pActualP, gLayerUnderground->get(pActualP) - 16);
 
-        if(tTime == 0)
+        if (tTick == 0)
             tActualStation = 0;
 
-        pActualP = getActualPosition(tTime);
+        pActualP = getActualPosition(tTick);
         gLayerUnderground->set(pActualP, gLayerUnderground->get(pActualP) + 16);
+        tTick = tTick + 1 % 1440;
     }
 
-    uint32_t getClosestTimeForStationArriving(const uint16_t nStation, const uint32_t tTime) {
+    uint32_t getClosestTimeForStation(const uint16_t nStation, const uint32_t tTime) {
         for (const uint32_t tArr: sTimeArriving[nStation])
-            if (tArr > tTime)
-                return tArr;
+            if (tArr >= tTime * 5)
+                return tArr/5;
         return 0;
     }
 
@@ -131,6 +133,7 @@ private:
 
     std::vector<std::pair<uint32_t, uint16_t>> gVectorTimeStation;
     uint32_t tActualStation;
+    uint32_t tTick;
     std::pair<int, int> pActualP;
 };
 

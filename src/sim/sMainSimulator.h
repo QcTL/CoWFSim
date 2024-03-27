@@ -84,7 +84,7 @@ public:
             rInteraction->gClock->setClock(sMClock->getClock());
         }
         sMClock->tick();
-
+        gTotalUnderground->tick();
         gMainRoads->tick();
     }
 
@@ -104,7 +104,6 @@ private:
         gMainRoads->tickReduced(tReduced, tDate);
         sComp->tickReduced(tReduced, tDate);
         gTotalAirPollution->tickReduced(gMainTerrain->gTG_TypeGen);
-        gTotalUnderground->tickReduced(tReduced);
         sMEvaluator->tickReduced(tReduced, tDate);
     }
 };

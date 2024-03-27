@@ -88,13 +88,12 @@ private:
                     uint32_t cDate) {
         if (!hasTypeOwn(oC, gItemGen))
             return false;
-        if (!hasResources(*oC, gItemGen)) {
+        if (!hasResources(*oC, gItemGen))
             for (uint32_t mLack: sMEvaluator->getById(gItemGen).sMEE_iCElem) {
                 sCompanyCompiler::sCCIntentions buyItems = {
                         sCompanyCompiler::sCCIntentions::sCCEnumIntentions::OBJ_Buy, mLack, oC};
                 gTryIntention(buyItems, sCodeStorage, cDate);
             }
-        }
 
         for (const auto &gElem: sMEvaluator->getById(gItemGen).sMEE_iCElem)
             oC->c_pOwn[gElem] -= 1;
