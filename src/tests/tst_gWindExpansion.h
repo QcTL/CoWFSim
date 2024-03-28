@@ -24,11 +24,11 @@ int tst_gWindExpansion() {
 
     std::shared_ptr<sSimulatorMain> sMS = std::make_shared<sSimulatorMain>(lSizeGrid);
 
-    //sMS->gLayerTypeSoil = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
-    //sMS->gLayerAirPollution = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
+    //sMS->gLayerTypeSoil = sLayerType::gBTGM_gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
+    //sMS->gLayerAirPollution = sLayerType::gBTGM_gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
 
     //sLayerCells::retObjSLayerCells retCells =
-    //        sLayerCells::gen(lSizeGrid, sMS->gLayerTypeSoil, sMS->gLayerTypeGen, mValues);
+    //        sLayerCells::gBTGM_gen(lSizeGrid, sMS->gLayerTypeSoil, sMS->gLayerTypeGen, mValues);
     //sMS->gLayerCurStruct = retCells.gMatrix;
 
     sMS->gLayerTypeGen->set(3,3,3);

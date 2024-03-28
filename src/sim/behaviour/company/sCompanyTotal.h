@@ -15,7 +15,7 @@
 class rVectorCompanies {
 public:
 
-    rVectorCompanies(uint32_t nMaxCompanies) {
+    explicit rVectorCompanies(uint32_t nMaxCompanies) {
         tVecComp = std::vector<std::pair<uint32_t, std::shared_ptr<objCompany>>>(nMaxCompanies, {-1, nullptr});
         for (int i = 0; i < nMaxCompanies - 1; i++) {
             tVecComp[i] = {i + 1, nullptr};
@@ -100,20 +100,19 @@ private:
 class sCompanyTotal {
 public:
     explicit sCompanyTotal(uint32_t maxComp, const std::shared_ptr<sCodeStorage> &sStorageCode)
-            : sCT_vTotalComp(maxComp), sCT_sCodeS(sStorageCode) {}
+            : sCT_vTotalComp(maxComp), sCT_sCodeS(sStorageCode) {
+        if (snCommonAtr::getFlagAtr("snCA_Seed") != 0)
+            sCT_genRand.seed(snCommonAtr::getFlagAtr("snCA_Seed"));
+        else
+            sCT_genRand.seed(static_cast<unsigned int>(time(nullptr)));
+    }
 
     uint32_t addCompanyAtPosition(const std::shared_ptr<gIGrid<std::list<uint32_t>>> &gLayer,
                                   const std::list<std::pair<int, int>> &vecNPos, uint8_t typeCompany) {
-        std::mt19937 gen;
-        if (snCommonAtr::getFlagAtr("snCA_Seed") != 0)
-            gen.seed(snCommonAtr::getFlagAtr("snCA_Seed"));
-        else
-            gen.seed(static_cast<unsigned int>(time(nullptr)));
-
         std::uniform_int_distribution<> disDay(0, (int) sCT_vActiveDaysValid.size() - 1);
         std::uniform_int_distribution<> disHour(0, (int) sCT_vActiveHoursValid.size() - 1);
-        int randomIndexDay = disDay(gen);
-        int randomIndexHour = disHour(gen);
+        int randomIndexDay = disDay(sCT_genRand);
+        int randomIndexHour = disHour(sCT_genRand);
 
         uint32_t _idNewComp = sCT_vTotalComp.addComp(vecNPos, typeCompany,
                                                      {sCT_vActiveDaysValid[randomIndexDay],
@@ -162,6 +161,7 @@ public:
 private:
     rVectorCompanies sCT_vTotalComp;
     std::shared_ptr<sCodeStorage> sCT_sCodeS;
+    std::mt19937 sCT_genRand;
 
     std::vector<std::vector<bool>> sCT_vActiveDaysValid = {{true,  true,  true,  true,  true, false, false},
                                                            {true,  true,  true,  true,  true, true,  false},

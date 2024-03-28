@@ -22,8 +22,8 @@
 std::vector<std::string> vSyllablesP = {"am", "ca", "mi", "o", "ul", "er", "es", "pin", "tu", "ra", "ta", "la", "dro",
                                         "me", "dia", "mart", "sen", "ti", "ments", "tran", "qui", "li", "tat", "pen",
                                         "sa", "ment", "u", "su", "al", "ment", "ar", "ma", "ri"};
-std::random_device rd;
-std::mt19937 gen(rd());
+std::random_device oC_rd;
+std::mt19937 oC_gen(oC_rd());
 std::uniform_int_distribution<> numStringsDist(2, 4);
 
 class objCompany {
@@ -49,10 +49,10 @@ public:
             : c_uuid(cUuid), c_activeDates(std::move(activeDates)) {
 
         addAvailableLocation(ownStart, typeCellStart);
-        int numStrings = numStringsDist(gen);
+        int numStrings = numStringsDist(oC_gen);
         std::vector<std::string> selectedStrings;
         std::sample(vSyllablesP.begin(), vSyllablesP.end(),
-                    std::back_inserter(selectedStrings), numStrings, gen);
+                    std::back_inserter(selectedStrings), numStrings, oC_gen);
 
         for (const auto &str: selectedStrings)
             nName += str;

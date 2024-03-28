@@ -43,7 +43,10 @@ public:
         gTG_TypeSoil = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(inGridSize, inGridSize, 0));
         gTG_TypeGen = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(inGridSize, inGridSize, 0));
 
-        std::srand(static_cast<unsigned int>(std::time(nullptr)));
+        if (snCommonAtr::getFlagAtr("snCA_Seed") != 0)
+            gTG_genRPos.seed(snCommonAtr::getFlagAtr("snCA_Seed"));
+        else
+            gTG_genRPos.seed(static_cast<unsigned int>(time(nullptr)));
     }
 
 
@@ -95,26 +98,20 @@ public:
     }
 
     std::list<std::pair<int, int>>::iterator getEmptyPositionByType(const sgT_TypeGen inTypeGen) {
-        std::mt19937 gen;
-        if (snCommonAtr::getFlagAtr("snCA_Seed") != 0)
-            gen.seed(snCommonAtr::getFlagAtr("snCA_Seed"));
-        else
-            gen.seed(static_cast<unsigned int>(time(nullptr)));
-
         std::list<std::pair<int, int>>::iterator _it;
         uint32_t _rIndex = 0;
 
         switch (inTypeGen) {
             case sgT_TypeGen::sgT_TG_CivBuilding: {
                 std::uniform_int_distribution<> dist(0, (int) gTG_civilEmptyCell.size() - 1);
-                _rIndex = dist(gen);
+                _rIndex = dist(gTG_genRPos);
                 _it = gTG_civilEmptyCell.begin();
             }
                 break;
             case sgT_TypeGen::sgT_TG_IndBuilding:
             case sgT_TypeGen::sgT_TG_HIndBuilding: {
                 std::uniform_int_distribution<> dist(0, (int) gTG_factoryEmptyCell.size() - 1);
-                _rIndex = dist(gen);
+                _rIndex = dist(gTG_genRPos);
                 _it = gTG_factoryEmptyCell.begin();
             }
                 break;
@@ -144,12 +141,11 @@ public:
     }
 
     std::pair<int, int> returnRandomFullCivil() {
-        if (snCommonAtr::getFlagAtr("snCA_Seed") != 0)
-            std::srand(static_cast<unsigned int>(std::time(nullptr)));
-        else
-            std::srand(snCommonAtr::getFlagAtr("snCA_Seed"));
+        std::uniform_int_distribution<> dist(0, (int) gTG_civilFullCell.size() - 1);
+        int _rIndex = dist(gTG_genRPos);
+
         auto _it = gTG_civilFullCell.begin();
-        std::advance(_it, std::rand() % gTG_civilFullCell.size());
+        std::advance(_it, _rIndex % gTG_civilFullCell.size());
         return *_it;
     };
 
@@ -161,6 +157,8 @@ private:
     std::list<std::pair<int, int>> gTG_civilFullCell;
     std::list<std::pair<int, int>> gTG_factoryEmptyCell;
     std::list<std::pair<int, int>> gTG_factoryFullCell;
+
+    std::mt19937 gTG_genRPos;
 };
 
 #endif //CITYOFWEIRDFISHES_SGTERRAIN_H

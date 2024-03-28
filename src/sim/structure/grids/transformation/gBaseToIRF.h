@@ -36,6 +36,12 @@ public:
         std::default_random_engine re(seed == 0 ? std::random_device{}() : seed);
         std::uniform_real_distribution<double> unif(-deviation, deviation);
 
+        std::mt19937 sCM_genRand;
+        if (snCommonAtr::getFlagAtr("snCA_Seed") != 0)
+            sCM_genRand.seed(snCommonAtr::getFlagAtr("snCA_Seed"));
+        else
+            sCM_genRand.seed(static_cast<unsigned int>(time(nullptr)));
+
         while (gType->isInside(pActive)) {
             if (gType->get(pActive) != 5 && getSurroundRoads(gType, pActive, valueTypeSoil) <= 2) {
                 gOutput->set(pActive, valueEnd);

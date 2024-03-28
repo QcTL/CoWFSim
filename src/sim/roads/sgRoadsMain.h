@@ -49,8 +49,8 @@ public:
     }
 
     void removeRuteCivil(const std::shared_ptr<objCivil> &inObjCivil,
-                         const std::list<objCivil>::iterator& gPBegin,
-                         const std::list<objCivil>::iterator& gPEnd){
+                         const std::list<objCivil>::iterator &gPBegin,
+                         const std::list<objCivil>::iterator &gPEnd) {
         sgRM_sTRoutes->removeRuteCivil(inObjCivil, gPBegin, gPEnd);
     }
 
@@ -71,7 +71,7 @@ public:
     std::shared_ptr<sgTerrain> sgRM_gTerrainGrid;
 private:
 
-    void routeCarsCommute(const uint32_t inRTime,const uint32_t inTDate) {
+    void routeCarsCommute(const uint32_t inRTime, const uint32_t inTDate) {
         auto newRoutes = sgRM_sTRoutes->getRoutesCarByTime(inRTime, inTDate);
         for (auto r: newRoutes) {
             uint32_t locId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->locIdNode;
@@ -98,13 +98,26 @@ private:
         gLayerRoads = r.second;
         std::cout << r.first.size() << std::endl;
         for (const auto &rNode: r.first) {
-            sgRM_listRRoads.merge(rTransRNodeToRRNode().conversion(rNode, sqrt(sgRM_inGridSize), sgRM_inGridSize, sgRM_gTerrainGrid->gTG_TypeGen,
+            sgRM_listRRoads.merge(rTransRNodeToRRNode().conversion(rNode, sqrt(sgRM_inGridSize), sgRM_inGridSize,
+                                                                   sgRM_gTerrainGrid->gTG_TypeGen,
                                                                    gLayerTransit));
-            rInfoDist::initializeMatrix(sgRM_inGridSize / sqrt(sgRM_inGridSize) * sgRM_inGridSize / sqrt(sgRM_inGridSize), sgRM_inGridSize, sgRM_listRRoads.size());
+            rInfoDist::initializeMatrix(
+                    sgRM_inGridSize / sqrt(sgRM_inGridSize) * sgRM_inGridSize / sqrt(sgRM_inGridSize), sgRM_inGridSize,
+                    sgRM_listRRoads.size());
         }
 
-        gBaseToNearestRoad::givenMatRef(sgRM_gNearRoad, gLayerRoads, gMainTerrain->gTG_TypeGen, {5, 6}, {1, 2, 3, 4});
-
+        gBaseToNearestRoad::givenMatRef(sgRM_gNearRoad, gLayerRoads, gMainTerrain->gTG_TypeGen,
+                                        gMainTerrain->gTG_TypeSoil,
+                                        {
+                                                sgTerrain::sgT_TypeGen::sgT_TG_RoadS,
+                                                sgTerrain::sgT_TypeGen::sgT_TG_RoadB},
+                                        {
+                                                sgTerrain::sgT_TypeSoil::sgT_TS_T1Mixed,
+                                                sgTerrain::sgT_TypeSoil::sgT_TS_T2Mixed,
+                                                sgTerrain::sgT_TypeSoil::sgT_TS_T3Mixed,
+                                                sgTerrain::sgT_TypeSoil::sgT_TS_T1Industrial,
+                                                sgTerrain::sgT_TypeSoil::sgT_TS_T2Industrial,
+                                                sgTerrain::sgT_TypeSoil::sgT_TS_T1Farm});
         for (uint32_t i = 0; i < r.second.size(); ++i) {
             for (uint32_t j = 0; j < r.second[i].size(); ++j) {
                 if (r.second[i][j] != nullptr) {

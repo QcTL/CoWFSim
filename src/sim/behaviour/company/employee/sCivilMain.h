@@ -17,7 +17,12 @@ public:
 
     explicit sCivilMain(const std::shared_ptr<sgRoadsMain> &inPsRoadsMain,
                         const std::shared_ptr<sgUndergroundMain> &inPSUndergroundMain)
-            : sCM_sRoadsMain(inPsRoadsMain), sCM_sUndergroundMain(inPSUndergroundMain) {};
+            : sCM_sRoadsMain(inPsRoadsMain), sCM_sUndergroundMain(inPSUndergroundMain) {
+        if (snCommonAtr::getFlagAtr("snCA_Seed") != 0)
+            sCM_genRand.seed(snCommonAtr::getFlagAtr("snCA_Seed"));
+        else
+            sCM_genRand.seed(static_cast<unsigned int>(time(nullptr)));
+    };
 
     void addEmployeeToCompany(objCompany &inObjCompany) {
         std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator> r;
@@ -36,18 +41,13 @@ public:
                                                                             inObjCompany.c_activeDates.c_StrEndTime.second),
                              inObjCompany.c_activeDates.cAD_jobWeek));
         else {
-            std::mt19937 gen;
-            if (snCommonAtr::getFlagAtr("snCA_Seed") != 0)
-                gen.seed(snCommonAtr::getFlagAtr("snCA_Seed"));
-            else
-                gen.seed(static_cast<unsigned int>(time(nullptr)));
             std::uniform_int_distribution<> distrib(-5, 5);
             _oCivil = std::make_shared<objCivil>(
                     objCivil(objCivil::typeRouteSystem::OC_TRS_CAR,
                              {sCM_sRoadsMain->getClosestRoadToBuilding(inObjCompany.c_cActiveLocations.front()),
                               rPosCivHome},
-                             inObjCompany.c_activeDates.c_StrEndTime.first + distrib(gen),
-                             inObjCompany.c_activeDates.c_StrEndTime.second + distrib(gen),
+                             inObjCompany.c_activeDates.c_StrEndTime.first + distrib(sCM_genRand),
+                             inObjCompany.c_activeDates.c_StrEndTime.second + distrib(sCM_genRand),
                              inObjCompany.c_activeDates.cAD_jobWeek));
         }
         r = sCM_sRoadsMain->addRuteCivil(_oCivil);
@@ -80,6 +80,7 @@ private:
         std::list<objCivil>::iterator sCM_cCRUrBegin;
         std::list<objCivil>::iterator sCM_cCRUrEnd;
     };
+    std::mt19937 sCM_genRand;
 
     std::shared_ptr<sgRoadsMain> sCM_sRoadsMain;
     std::shared_ptr<sgUndergroundMain> sCM_sUndergroundMain;

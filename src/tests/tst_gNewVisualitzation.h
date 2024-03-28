@@ -23,7 +23,7 @@ int tst_gNewVisualization(const std::map<std::string, std::string> &mValues) {
 
     std::shared_ptr<sSimulatorMain> sMS = std::make_shared<sSimulatorMain>(lSizeGrid);
 
-    //sMS->gLayerTypeSoil = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
+    //sMS->gLayerTypeSoil = sLayerType::gBTGM_gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
 
     sMS->gLayerTypeGen->set(0, 0, 5);
     sMS->gLayerTypeGen->set(1, 0, 5);
