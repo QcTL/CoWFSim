@@ -48,6 +48,13 @@ public:
         return sgRM_sTRoutes->addRuteCivil(oC);
     }
 
+    void removeRuteCivil(const std::shared_ptr<objCivil> &inObjCivil,
+                         const std::list<objCivil>::iterator& gPBegin,
+                         const std::list<objCivil>::iterator& gPEnd){
+        sgRM_sTRoutes->removeRuteCivil(inObjCivil, gPBegin, gPEnd);
+    }
+
+
     void completedStartGrid(const std::shared_ptr<sgTerrain> &gMainTerrain) {
         extractRoadsFromLayer(gMainTerrain);
         for (int i = 0; i < 2000; i++) {

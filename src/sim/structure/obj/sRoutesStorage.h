@@ -21,13 +21,19 @@ public:
     };
 
     std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator> addRuteCivil(const std::shared_ptr<objCivil> &objCivil) {
-        vUniqueCivil.push_back(objCivil);
-
         mExitTimesCivil[objCivil->c_TBegin].push_back(*objCivil);
         mExitTimesCivil[objCivil->c_TEnd].push_back(*objCivil);
 
         return {mExitTimesCivil[objCivil->c_TBegin].rbegin().base(), mExitTimesCivil[objCivil->c_TEnd].rbegin().base()};
     }
+
+    void removeRuteCivil(const std::shared_ptr<objCivil> &inObjCivil,
+                         const std::list<objCivil>::iterator& gPBegin,
+                         const std::list<objCivil>::iterator& gPEnd) {
+        mExitTimesCivil[inObjCivil->c_TBegin].erase(gPBegin);
+        mExitTimesCivil[inObjCivil->c_TEnd].erase(gPEnd);
+    }
+
 
     std::vector<objCivil::objRoadTravel> getRoutesCarByTime(uint32_t cTime, uint32_t cDate) {
         std::vector<objCivil::objRoadTravel> rRet;
@@ -55,7 +61,6 @@ public:
     };
 
 private:
-    std::vector<std::shared_ptr<objCivil>> vUniqueCivil;
     std::vector<std::list<objCivil>> mExitTimesCivil;
 };
 

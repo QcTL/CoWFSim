@@ -79,6 +79,19 @@ public:
                 i.second->c_cActiveFunds -= i.second->c_objYear;
     }
 
+    std::vector<std::pair<uint32_t, int>> getDiffEmployeesByLocation(uint32_t inRTimer) {
+        std::vector<std::pair<uint32_t, int>> ret;
+        for (auto &i: tVecComp) {
+            if (i.second != nullptr) {
+                std::pair<uint32_t, uint32_t> pairTimeActive = i.second->c_activeDates.c_StrEndTime;
+                if (inRTimer >= pairTimeActive.first && inRTimer <= pairTimeActive.second &&
+                    i.second->c_nEmployee != i.second->c_cActiveLocations.size() * 2)
+                    ret.emplace_back(i.second->c_uuid, i.second->c_cActiveLocations.size() * 2 - i.second->c_nEmployee);
+            }
+        }
+        return ret;
+    }
+
 private:
     std::vector<std::pair<uint32_t, std::shared_ptr<objCompany>>> tVecComp;
     uint32_t fEmpty;
@@ -90,17 +103,21 @@ public:
             : sCT_vTotalComp(maxComp), sCT_sCodeS(sStorageCode) {}
 
     uint32_t addCompanyAtPosition(const std::shared_ptr<gIGrid<std::list<uint32_t>>> &gLayer,
-                              const std::list<std::pair<int, int>> &vecNPos, uint8_t typeCompany) {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        // TODO BASSAT EN LA MATEIX LLAVOR;
+                                  const std::list<std::pair<int, int>> &vecNPos, uint8_t typeCompany) {
+        std::mt19937 gen;
+        if (snCommonAtr::getFlagAtr("snCA_Seed") != 0)
+            gen.seed(snCommonAtr::getFlagAtr("snCA_Seed"));
+        else
+            gen.seed(static_cast<unsigned int>(time(nullptr)));
+
         std::uniform_int_distribution<> disDay(0, (int) sCT_vActiveDaysValid.size() - 1);
         std::uniform_int_distribution<> disHour(0, (int) sCT_vActiveHoursValid.size() - 1);
         int randomIndexDay = disDay(gen);
         int randomIndexHour = disHour(gen);
 
         uint32_t _idNewComp = sCT_vTotalComp.addComp(vecNPos, typeCompany,
-                                                     {sCT_vActiveDaysValid[randomIndexDay], sCT_vActiveHoursValid[randomIndexHour]});
+                                                     {sCT_vActiveDaysValid[randomIndexDay],
+                                                      sCT_vActiveHoursValid[randomIndexHour]});
         sCT_sCodeS->initNewCode(_idNewComp);
         getCompanyByUUID(_idNewComp)->c_cCode = sCT_sCodeS->getPointerCodeByUuid(_idNewComp);
         for (const auto &nPos: vecNPos) {
@@ -137,6 +154,10 @@ public:
 
     std::vector<sCompanyCompiler::sCCIntentions>
     getTotalIntentions(uint32_t gTimer) { return sCT_vTotalComp.getTotalIntentions(sCT_sCodeS, gTimer); }
+
+    std::vector<std::pair<uint32_t, int>>
+    getDiffEmployeesByLocation(uint32_t inRTimer) { return sCT_vTotalComp.getDiffEmployeesByLocation(inRTimer); }
+
 
 private:
     rVectorCompanies sCT_vTotalComp;

@@ -76,7 +76,7 @@ public:
     };
 
     static returnLayerType gen(uint32_t lSize, const std::shared_ptr<gIGrid<uint8_t>> &gTypeGen,
-                               const std::map<std::string, std::string> &mValues) {
+                               const std::map<std::string, std::string> &mValues,const int inSeed = 0 ) {
         std::shared_ptr<gIGrid<uint8_t>> gLayerTypeSoil =
                 std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, TypeSoil_Nothing));
         std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gLayerTypeSoil->rangeUse();
@@ -94,7 +94,11 @@ public:
         if (mValues.at("Conte_Riu") == "on")
             gBaseToRiver<uint8_t>::generate(gLayerTypeSoil, 20, lSizeRiver, TypeSoil_T1Obstacle);
 
-        std::srand(static_cast<unsigned>(std::time(nullptr)));
+        if(inSeed == 0)
+            std::srand(static_cast<unsigned>(std::time(nullptr)));
+        else
+            std::srand(inSeed);
+
         std::vector<std::pair<int, int>> gCenterCoreUrban(3);
         for (auto &gCenter: gCenterCoreUrban) {
             gCenter = {std::rand() % (lSize + 1), std::rand() % (lSize + 1)};

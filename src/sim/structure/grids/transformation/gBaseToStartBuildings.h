@@ -18,13 +18,13 @@ public:
     gen(const std::shared_ptr<gIGrid<T>> &tOutput, const std::shared_ptr<gIGrid<uint8_t>> &tSoil,
         const std::shared_ptr<gIGrid<uint8_t>> &tType, const std::vector<uint8_t> &groupSoil,
         const std::vector<uint8_t> &groupRoads,
-        int seed = -1) {
+        int seed = 0) {
 
         std::vector<retObjCompany> sFactory;
         std::pair<std::pair<int, int>, std::pair<int, int>> gRange = tType->rangeUse();
         std::set<uint8_t> sGroupSoil(groupSoil.begin(), groupSoil.end());
         std::set<uint8_t> sGroupRoads(groupRoads.begin(), groupRoads.end());
-        if (seed == -1)
+        if (seed == 0)
             srand(static_cast<unsigned>(time(nullptr)));
         else
             srand(seed);

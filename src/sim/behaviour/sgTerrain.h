@@ -11,6 +11,7 @@
 #include <random>
 #include "../structure/grids/gIGrid.h"
 #include "../structure/grids/gBasicGrid.h"
+#include "../snCommonAtr.h"
 
 class sgTerrain {
 public:
@@ -94,8 +95,11 @@ public:
     }
 
     std::list<std::pair<int, int>>::iterator getEmptyPositionByType(const sgT_TypeGen inTypeGen) {
-        std::random_device rd; //TODO Random:
-        std::mt19937 gen(rd());
+        std::mt19937 gen;
+        if (snCommonAtr::getFlagAtr("snCA_Seed") != 0)
+            gen.seed(snCommonAtr::getFlagAtr("snCA_Seed"));
+        else
+            gen.seed(static_cast<unsigned int>(time(nullptr)));
 
         std::list<std::pair<int, int>>::iterator _it;
         uint32_t _rIndex = 0;
@@ -140,7 +144,10 @@ public:
     }
 
     std::pair<int, int> returnRandomFullCivil() {
-        //TODO BASED RANDOM
+        if (snCommonAtr::getFlagAtr("snCA_Seed") != 0)
+            std::srand(static_cast<unsigned int>(std::time(nullptr)));
+        else
+            std::srand(snCommonAtr::getFlagAtr("snCA_Seed"));
         auto _it = gTG_civilFullCell.begin();
         std::advance(_it, std::rand() % gTG_civilFullCell.size());
         return *_it;

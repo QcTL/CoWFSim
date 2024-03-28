@@ -123,6 +123,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/behaviour/market/items/sTotalElements.h
         src/sim/behaviour/clock/sClockMain.h
         src/display/menus/implementation/company/rCompViewMoreLayer.h
+        src/sim/snCommonAtr.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

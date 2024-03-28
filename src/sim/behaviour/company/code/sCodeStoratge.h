@@ -12,6 +12,7 @@
 #include <memory>
 #include <cstdlib>
 #include <ctime>
+#include "../../../snCommonAtr.h"
 
 class sCodeStorage {
 public:
@@ -65,7 +66,10 @@ public:
 
 private:
     static std::shared_ptr<sCodeObj> getRandomElement(const std::list<std::shared_ptr<sCodeObj>> &sList) {
-        std::srand(static_cast<unsigned int>(std::time(nullptr))); // TODO que sempre sigui el mateix
+        if (snCommonAtr::getFlagAtr("snCA_Seed") != 0)
+            std::srand(static_cast<unsigned int>(std::time(nullptr)));
+        else
+            std::srand(snCommonAtr::getFlagAtr("snCA_Seed"));
         std::size_t size = sList.size();
         std::size_t index = std::rand() % size;
         auto it = sList.begin();

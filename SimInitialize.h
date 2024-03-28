@@ -18,6 +18,7 @@
 #include "src/sim/layers/implementations/sLayerType.h"
 #include "src/sim/layers/implementations/sLayerCells.h"
 #include "src/common/sContainerMain.h"
+#include "src/sim/snCommonAtr.h"
 
 class SimInitialize {
 public:
@@ -34,12 +35,11 @@ public:
 
         std::shared_ptr<sSimulatorMain> sMS = std::make_shared<sSimulatorMain>(lSizeGrid);
 
-        sLayerType::returnLayerType tReturn = sLayerType::gen(lSizeGrid, sMS->gMainTerrain->gTG_TypeGen, mValues);
+        sLayerType::returnLayerType tReturn = sLayerType::gen(lSizeGrid, sMS->gMainTerrain->gTG_TypeGen, mValues, snCommonAtr::getFlagAtr("snCA_Seed"));
         sMS->gMainTerrain->gTG_TypeSoil = tReturn.genTypeSoil;
-        //sMS->gTotalAirPollution->gLayerAirPollution = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
 
         retObjSLayerCells retCells =
-                sLayerCells::gen(lSizeGrid, sMS->gMainTerrain->gTG_TypeSoil , sMS->gMainTerrain->gTG_TypeGen, tReturn.centerClusters, mValues);
+                sLayerCells::gen(lSizeGrid, sMS->gMainTerrain->gTG_TypeSoil , sMS->gMainTerrain->gTG_TypeGen, tReturn.centerClusters, mValues, snCommonAtr::getFlagAtr("snCA_Seed"));
         sMS->gLayerCurStruct = retCells.gMatrix;
         sMS->gTotalUnderground->gLayerUnderground = retCells.gUnderground;
         sMS->gTotalUnderground->setPointsTransit(retCells.routesMetro);

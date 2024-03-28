@@ -24,7 +24,7 @@ public:
     static std::vector<gPositionEscape>
     gen(const std::shared_ptr<gIGrid<T>> gOutput, const std::shared_ptr<gIGrid<uint8_t>> &gType,
         std::pair<int, int> pStart, std::pair<double, double> vStart, T valueEnd, uint8_t valueTypeSoil,
-        uint8_t fDispersion, int seed = -1) {
+        uint8_t fDispersion, int seed = 0) {
 
         std::vector<gPositionEscape> ret;
         std::pair<double, double> vUnitInertia = vStart;
@@ -33,7 +33,7 @@ public:
         double deviation = 4.0;
         int tToDisp = fDispersion;
 
-        std::default_random_engine re(seed == -1 ? std::random_device{}() : seed);
+        std::default_random_engine re(seed == 0 ? std::random_device{}() : seed);
         std::uniform_real_distribution<double> unif(-deviation, deviation);
 
         while (gType->isInside(pActive)) {

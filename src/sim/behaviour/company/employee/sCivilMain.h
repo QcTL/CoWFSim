@@ -25,36 +25,49 @@ public:
 
         sgUndergroundMain::sgUM_lowestViableRoute lVRMetro = sCM_sUndergroundMain->getLowestDistanceCommute(
                 inObjCompany.c_cActiveLocations.front(), rPosCivHome);
-
+        std::shared_ptr<objCivil> _oCivil;
         if (lVRMetro.totalDistance < 100)
-            r = sCM_sRoadsMain->addRuteCivil(std::make_shared<objCivil>(
+            _oCivil = std::make_shared<objCivil>(
                     objCivil(objCivil::typeRouteSystem::OC_TRS_TRAIN,
                              {inObjCompany.c_cActiveLocations.front(), rPosCivHome},
                              sCM_sUndergroundMain->getClosestTimeForStation(lVRMetro.closestSt1,
                                                                             inObjCompany.c_activeDates.c_StrEndTime.first),
                              sCM_sUndergroundMain->getClosestTimeForStation(lVRMetro.closestSt2,
                                                                             inObjCompany.c_activeDates.c_StrEndTime.second),
-                             inObjCompany.c_activeDates.cAD_jobWeek)));
+                             inObjCompany.c_activeDates.cAD_jobWeek));
         else {
-            std::random_device rd;
-            std::mt19937 gen(rd());
-            std::uniform_int_distribution<> distrib(-5, 5); //TODO based on Seed;
-            std::shared_ptr<objCivil> oCivil = std::make_shared<objCivil>(
+            std::mt19937 gen;
+            if (snCommonAtr::getFlagAtr("snCA_Seed") != 0)
+                gen.seed(snCommonAtr::getFlagAtr("snCA_Seed"));
+            else
+                gen.seed(static_cast<unsigned int>(time(nullptr)));
+            std::uniform_int_distribution<> distrib(-5, 5);
+            _oCivil = std::make_shared<objCivil>(
                     objCivil(objCivil::typeRouteSystem::OC_TRS_CAR,
-                             {sCM_sRoadsMain->getClosestRoadToBuilding(inObjCompany.c_cActiveLocations.front()), rPosCivHome},
+                             {sCM_sRoadsMain->getClosestRoadToBuilding(inObjCompany.c_cActiveLocations.front()),
+                              rPosCivHome},
                              inObjCompany.c_activeDates.c_StrEndTime.first + distrib(gen),
                              inObjCompany.c_activeDates.c_StrEndTime.second + distrib(gen),
                              inObjCompany.c_activeDates.cAD_jobWeek));
-            r = sCM_sRoadsMain->addRuteCivil(oCivil);
         }
+        r = sCM_sRoadsMain->addRuteCivil(_oCivil);
 
-        if (vTotalCivil.find(inObjCompany.c_uuid) != vTotalCivil.end()) {
-            vTotalCivil[inObjCompany.c_uuid].push_back(r.first);
-            vTotalCivil[inObjCompany.c_uuid].push_back(r.second);
-        } else
-            vTotalCivil[inObjCompany.c_uuid] = {r.first, r.second};
+        if (vTotalCivil.find(inObjCompany.c_uuid) != vTotalCivil.end())
+            vTotalCivil[inObjCompany.c_uuid].push_back({_oCivil, r.first, r.second});
+        else
+            vTotalCivil[inObjCompany.c_uuid] = {{_oCivil, r.first, r.second}};
 
         inObjCompany.c_nEmployee += 1;
+    }
+
+    void removeEmployeeToCompany(objCompany &inObjCompany) {
+        //S'ha de obtenir de vTotalCivil i s'ha de treure de sCM_sRoadsMain;
+        if (vTotalCivil[inObjCompany.c_uuid].empty())
+            return;
+
+        sCM_cCivRoute _cRoute = vTotalCivil[inObjCompany.c_uuid].front();
+        vTotalCivil[inObjCompany.c_uuid].pop_front();
+        sCM_sRoadsMain->removeRuteCivil(_cRoute.sCM_cCRCivil, _cRoute.sCM_cCRUrBegin, _cRoute.sCM_cCRUrEnd);
     }
 
     std::vector<objCivil::objRoadTravel> tick(uint32_t inRTime) {
@@ -62,9 +75,15 @@ public:
     }
 
 private:
+    struct sCM_cCivRoute {
+        std::shared_ptr<objCivil> sCM_cCRCivil;
+        std::list<objCivil>::iterator sCM_cCRUrBegin;
+        std::list<objCivil>::iterator sCM_cCRUrEnd;
+    };
+
     std::shared_ptr<sgRoadsMain> sCM_sRoadsMain;
     std::shared_ptr<sgUndergroundMain> sCM_sUndergroundMain;
-    std::map<uint32_t, std::list<std::list<objCivil>::iterator>> vTotalCivil;
+    std::map<uint32_t, std::list<sCM_cCivRoute>> vTotalCivil;
     //Given company id Returns a list of iterators in the sRoutesStorage;
 };
 

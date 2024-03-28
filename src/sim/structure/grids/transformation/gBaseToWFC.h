@@ -12,6 +12,7 @@
 #include <map>
 #include "../gIGrid.h"
 #include "../gBasicGrid.h"
+#include "../../../snCommonAtr.h"
 
 template<typename T>
 class gBaseToWFC {
@@ -39,9 +40,11 @@ private:
             }
         }
 
-        std::random_device rd;
-        //Todo: Dependre de una llavor;
-        std::mt19937 gen(rd());
+        std::mt19937 gen;
+        if (snCommonAtr::getFlagAtr("snCA_Seed") != 0)
+            gen.seed(snCommonAtr::getFlagAtr("snCA_Seed"));
+        else
+            gen.seed(static_cast<unsigned int>(time(nullptr)));
         std::uniform_int_distribution<> dis(0, bitIndices.size() - 1);
 
         int randomIndex = dis(gen);

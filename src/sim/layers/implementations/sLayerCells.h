@@ -28,7 +28,7 @@ public:
             uint32_t lSize, const std::shared_ptr<gIGrid<uint8_t>> &gTypeSoil,
             const std::shared_ptr<gIGrid<uint8_t>> &gTypeGen,
             const std::vector<std::pair<int, int>> &cClusters,
-            const std::map<std::string, std::string> &mValues) {
+            const std::map<std::string, std::string> &mValues, int inSeed = 0) {
 
         std::shared_ptr<gIGrid<uint32_t>> gCell =
                 std::make_shared<gBasicGrid<uint32_t>>(gBasicGrid<uint32_t>(lSize, lSize, 0));
@@ -74,8 +74,9 @@ public:
         BasicTransformations::copyWhere(gCell, gTypeGen, {{5, idTypeRoadBig},
                                                           {6, idTypeRoadSmall}});
 
-        std::vector<gBaseToIRF::gPositionEscape> rNext = gBaseToIRF::gen<uint32_t>(gCell, gTypeGen, {lSize / 2, 0},
-                                                                                   {0, 1}, idTypeRoadBig, 5, 30);
+        std::vector<gBaseToIRF::gPositionEscape> rNext = gBaseToIRF::gen<uint32_t>(gCell, gTypeGen,
+                                                                                   {lSize / 2, 0}, {0, 1},
+                                                                                   idTypeRoadBig, 5, 30, inSeed);
 
         if (mValues.at("Estructura_Ciutat") == "Graella") {
             gBaseToPattern<uint32_t> gBP(gCell,
@@ -85,7 +86,8 @@ public:
                                          BasicTransformations::genMaskFromGrid(gTypeSoil,
                                                                                {TypeSoil_T1Urban, TypeSoil_T2Urban,
                                                                                 TypeSoil_T3Urban, TypeSoil_T1Factory,
-                                                                                TypeSoil_T2Factory}));
+                                                                                TypeSoil_T2Factory}),
+                                         inSeed);
 
         } else if (mValues.at("Estructura_Ciutat") == "Radial") {
             gBaseToPattern<uint32_t> gBP(gCell,
@@ -95,7 +97,8 @@ public:
                                          BasicTransformations::genMaskFromGrid(gTypeSoil,
                                                                                {TypeSoil_T1Urban, TypeSoil_T2Urban,
                                                                                 TypeSoil_T3Urban, TypeSoil_T1Factory,
-                                                                                TypeSoil_T2Factory}));
+                                                                                TypeSoil_T2Factory}),
+                                         inSeed);
         }
 
         BasicTransformations::copyWhere(gTypeGen, gCell, {{idTypeRoadBig,   5},
@@ -103,7 +106,7 @@ public:
 
         for (const gBaseToIRF::gPositionEscape rPerp: rNext) {
             gBaseToIRF::gen<uint32_t>(gCell, gTypeGen, rPerp.pPerpStart,
-                                      rPerp.pPerpOrigin, idTypeRoadSmall, 6, 100);
+                                      rPerp.pPerpOrigin, idTypeRoadSmall, 6, 100, inSeed);
         }
 
 
@@ -125,7 +128,7 @@ public:
         std::vector<retObjCompany> gCompany;
         gCompany = gBaseToStartBuildings::gen(gCell, gTypeSoil, gTypeGen,
                                               {TypeSoil_T1Urban, TypeSoil_T2Urban, TypeSoil_T3Urban,
-                                               TypeSoil_T1Factory, TypeSoil_T2Factory}, {5, 6}, 0);
+                                               TypeSoil_T1Factory, TypeSoil_T2Factory}, {5, 6}, inSeed);
 
 
         std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint16_t>>> p =
@@ -178,7 +181,7 @@ public:
         }
 
         //FIELDS:
-        // gBaseToField<uint32_t> gBFields(gCell, 0, BasicTransformations::genMaskFromGrid(gTypeSoil, {TypeSoil_T1Farm}));
+        // gBaseToField<uint32_t> gBFields(gCell, 0, BasicTransformations::genMaskFromGrid(gTypeSoil, {TypeSoil_T1Farm}), inSeed);
         /*
         BasicTransformations::replaceValues(gCell,
                                             {{2, ((uint32_t) (uint8_t) strtol("00010000", nullptr, 2)) << 24}});

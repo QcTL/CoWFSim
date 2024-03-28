@@ -47,6 +47,16 @@ public:
             }
         }
 
+        std::vector<std::pair<uint32_t, int>> sDiffEmp = sTComp->getDiffEmployeesByLocation(inRTime);
+        for(const std::pair<uint32_t,int> &dEmp : sDiffEmp){
+            if(dEmp.second > 0)
+                for(int i = 0; i < dEmp.second; i++)
+                    sM_sCompEmployee->addEmployeeToCompany(*sTComp->getCompanyByUUID(dEmp.first));
+            else
+                for(int i = 0; i < abs(dEmp.second); i++)
+                    sM_sCompEmployee->removeEmployeeToCompany(*sTComp->getCompanyByUUID(dEmp.first));
+        }
+
         if (inRTime == 0) {
             if ((inTDate % 1 << 9) == 0)
                 sTComp->applyEcoYear();
