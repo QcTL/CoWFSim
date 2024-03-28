@@ -130,7 +130,10 @@ private:
 class rRNodeC : public rRNodeI {
     //CROSSING
 public:
-    explicit rRNodeC(uint16_t rBlock) : rRNodeI(rBlock), itsEmpty(true) {}
+    explicit rRNodeC(uint16_t rBlock) : rRNodeI(rBlock), itsEmpty(true) {
+        sVecCarPos = std::vector<std::list<std::pair<uint32_t, uint32_t>>>
+                (4, std::list<std::pair<uint32_t, uint32_t>>());
+    }
 
     bool isCrossing() override { return true; }
 
@@ -154,13 +157,16 @@ public:
             if (rActiveVehicle::getDestByCar(carActInside.first).second == rBlock &&
                 rActiveVehicle::getDestByCar(carActInside.first).first == locIdNode) {
                 itsEmpty = true;
+                rActiveVehicle::removeCar(carActInside.first);
                 updateRefGrid(false);
             } else {
-                notifyEnterNext(
-                        rInfoDist::returnDirToDist(
-                                rActiveVehicle::getDestByCar(carActInside.first).first,
-                                rActiveVehicle::getDestByCar(carActInside.first).second,
-                                rBlock, globIdNode), carActInside, 0);
+                uint8_t dDir = rInfoDist::returnDirToDist(
+                        rActiveVehicle::getDestByCar(carActInside.first).first,
+                        rActiveVehicle::getDestByCar(carActInside.first).second,
+                        rBlock, globIdNode);
+                sVecCarPos[dDir].push_back(carActInside);
+                notifyEnterNext(dDir, carActInside, 0);
+                itsEmpty = true;
             }
         } else if (!reqTakeCar.empty()) {
             uint8_t dToTake = reqTakeCar.front().first;
@@ -169,13 +175,13 @@ public:
             itsEmpty = false;
             updateRefGrid(true);
         }
-
     }
 
     std::pair<uint32_t, uint32_t> takeCarPrep(const uint8_t &dDir, const uint8_t &nLine) override {
-        itsEmpty = true;
-        updateRefGrid(false);
-        return carActInside;
+        std::pair<uint32_t, uint32_t> retV = sVecCarPos[dDir].front();
+        sVecCarPos[dDir].pop_front();
+        updateRefGrid(!sVecCarPos[0].empty() || !sVecCarPos[1].empty() || !sVecCarPos[2].empty() || !sVecCarPos[3].empty());
+        return retV;
     }
 
     void addNewCar(uint32_t idDest, uint16_t blockDest) override {}
@@ -188,7 +194,6 @@ public:
         if (itsEmpty) return {{}};
         return {{0}};
     }
-
 
     [[nodiscard]] uint8_t getSizeRoad() const override {
         return 1;
@@ -215,6 +220,8 @@ private:
     std::pair<uint32_t, uint32_t> carActInside;
     bool itsEmpty;
     rRMailbox rMailBox;
+
+    std::vector<std::list<std::pair<uint32_t, uint32_t>>> sVecCarPos;
 };
 
 class rRNodeL : public rRNodeI {
@@ -256,7 +263,7 @@ public:
                         dVecFirst[i].pState[c.second] = false;
                         it = dVecFirst[i].lOrderedCars.erase(it);
                         hasChanged = true;
-                        std::cout << "DESTINATION" << std::endl;
+                        rActiveVehicle::removeCar(c.first);
                     } else if (!dVecFirst[i].hasRequestedNext) {
                         dVecFirst[i].hasRequestedNext = true;
                         notifyEnterNext(dEndFirst, c, i);
@@ -307,6 +314,7 @@ public:
                         dVecSecond[i].pState[c.second] = false;
                         it = dVecSecond[i].lOrderedCars.erase(it);
                         hasChanged = true;
+                        rActiveVehicle::removeCar(c.first);
                     } else if (!dVecSecond[i].hasRequestedNext) {
                         dVecSecond[i].hasRequestedNext = true;
                         notifyEnterNext(dEndSecond, c, i);
