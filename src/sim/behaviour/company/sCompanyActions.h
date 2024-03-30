@@ -29,10 +29,14 @@ public:
             case sCompanyCompiler::sCCIntentions::CELL_Buy: {
                 sLBuyCell::sMFilter sMF(sCCI.scc_addIdInfo);
                 std::shared_ptr<sLBuyCell::sMOffering> sMOff = sCA_MarketListing->getListOfOffering(sMF);
-
-                //Creation of Contract:
-                sCA_MainContractor->addContractToCompany(sCCI.scc_objCompany, sMOff->sMO_givingCompany, *sMOff, cDate);
-                sCA_MarketListing->removeCompleteProcess(sMOff);
+                if(sMOff != nullptr) {
+                    //Creation of Contract:
+                    sCA_MainContractor->addContractToCompany(sCCI.scc_objCompany, sMOff->sMO_givingCompany, *sMOff,
+                                                             cDate);
+                    sCA_MarketListing->removeCompleteProcess(sMOff);
+                }else{
+                    //TODO REMOVE POINTS
+                }
             }
                 break;
             case sCompanyCompiler::sCCIntentions::CELL_GiveRent: {

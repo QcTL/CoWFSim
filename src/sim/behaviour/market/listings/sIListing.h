@@ -49,9 +49,10 @@ public:
     }
 
     std::shared_ptr<typename ListingType::sMOffering> getOfferingByFilter(const typename ListingType::sMFilter &filter) {
-        return *std::find_if(sMListings.begin(), sMListings.end(), [&](const auto &item) {
+        auto itRet = std::find_if(sMListings.begin(), sMListings.end(), [&](const auto &item) {
             return filter.doesComply(*item);
         });
+        return itRet == sMListings.end() ? nullptr : *itRet;
     }
 
     void removeByIterator(const std::shared_ptr<typename ListingType::sMOffering> &element) {

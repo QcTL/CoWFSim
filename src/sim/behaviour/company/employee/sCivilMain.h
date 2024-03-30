@@ -24,7 +24,7 @@ public:
             sCM_genRand.seed(static_cast<unsigned int>(time(nullptr)));
     };
 
-    void addEmployeeToCompany(objCompany &inObjCompany) {
+    std::pair<int, int> setRouteToNewEmployee(const objCompany &inObjCompany) {
         std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator> r;
         std::pair<int, int> rPosCivHome = sCM_sRoadsMain->getNewRandomAssignedCivilHome();
 
@@ -33,7 +33,7 @@ public:
         std::shared_ptr<objCivil> _oCivil;
         if (lVRMetro.totalDistance < 100)
             _oCivil = std::make_shared<objCivil>(
-                    objCivil(objCivil::typeRouteSystem::OC_TRS_TRAIN,
+                    objCivil(objCivil::typeRouteSystem::OC_TRS_TRAIN, rPosCivHome,
                              {inObjCompany.c_cActiveLocations.front(), rPosCivHome},
                              sCM_sUndergroundMain->getClosestTimeForStation(lVRMetro.closestSt1,
                                                                             inObjCompany.c_activeDates.c_StrEndTime.first),
@@ -43,7 +43,7 @@ public:
         else {
             std::uniform_int_distribution<> distrib(-5, 5);
             _oCivil = std::make_shared<objCivil>(
-                    objCivil(objCivil::typeRouteSystem::OC_TRS_CAR,
+                    objCivil(objCivil::typeRouteSystem::OC_TRS_CAR, rPosCivHome,
                              {sCM_sRoadsMain->getClosestRoadToBuilding(inObjCompany.c_cActiveLocations.front()),
                               rPosCivHome},
                              inObjCompany.c_activeDates.c_StrEndTime.first + distrib(sCM_genRand),
@@ -57,17 +57,19 @@ public:
         else
             vTotalCivil[inObjCompany.c_uuid] = {{_oCivil, r.first, r.second}};
 
-        inObjCompany.c_nEmployee += 1;
+        return rPosCivHome;
     }
 
-    void removeEmployeeToCompany(objCompany &inObjCompany) {
+    std::pair<int, int> removeEmployeeToCompany(const objCompany &inObjCompany) {
         //S'ha de obtenir de vTotalCivil i s'ha de treure de sCM_sRoadsMain;
         if (vTotalCivil[inObjCompany.c_uuid].empty())
-            return;
+            return {};
 
         sCM_cCivRoute _cRoute = vTotalCivil[inObjCompany.c_uuid].front();
         vTotalCivil[inObjCompany.c_uuid].pop_front();
         sCM_sRoadsMain->removeRuteCivil(_cRoute.sCM_cCRCivil, _cRoute.sCM_cCRUrBegin, _cRoute.sCM_cCRUrEnd);
+
+        return _cRoute.sCM_cCRCivil->c_pHome;
     }
 
     std::vector<objCivil::objRoadTravel> tick(uint32_t inRTime) {

@@ -247,9 +247,10 @@ protected:
     }
 
     void setText(const uint8_t tVal, std::string cText) {
-        if (rPos == rIMenu::rRelativePos::pBottomRight || rPos == rIMenu::rRelativePos::pTopRight)
+        if (rPos == rIMenu::rRelativePos::pBottomRight || rPos == rIMenu::rRelativePos::pTopRight) {
             cText.append(comV[tVal].pLength - cText.size(), ' ');
-        std::reverse(cText.begin(), cText.end());
+            std::reverse(cText.begin(), cText.end());
+        }
 
         for (int i = 0; i < comV[tVal].pLength; i++) {
             sf::Vertex *quad = &dInfo[(comV[tVal].pStartText.second + i + comV[tVal].pStartText.first * gWidth) * 4];
@@ -261,6 +262,7 @@ protected:
             else if (currentChar == '.') charIndex = 46;
             else if (currentChar == ':') charIndex = 58;
             else if (currentChar == '/') charIndex = 47;
+            else if (currentChar == '-') charIndex = 45;
 
             const int defaultCharIndex = 32;
             for (int k = 0; k < 4; k++) {

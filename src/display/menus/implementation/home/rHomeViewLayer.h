@@ -13,7 +13,8 @@
 
 class rHomeViewLayer : public rIMenu {
 public:
-    explicit rHomeViewLayer(const std::shared_ptr<rIMenu> &mParent, const std::shared_ptr<objCompany> &rShow, uint8_t nOccupancy,
+    explicit rHomeViewLayer(const std::shared_ptr<rIMenu> &mParent, const std::shared_ptr<objCompany> &rShow,
+                            uint8_t nOccupancy,
                             uint8_t typeHouse, const std::shared_ptr<rPileMenus> &mPiles)
             : rIMenu(mParent, rIMenu::rRelativePos::pBottomRight), mPiles(mPiles), rCompRef(rShow) {
         std::vector<std::vector<int>> data = extractDataFromFile("d_mHomeViewLayer");
@@ -52,6 +53,8 @@ public:
                 break;
         }
         setText(1, std::to_string(nOccupancy));
+
+        setText(4, rShow != nullptr ? rShow->nName : "");
     }
 
     void draw(sf::RenderWindow &rW) override {
@@ -70,7 +73,7 @@ public:
                 if (event.key.code == sf::Keyboard::C && rCompRef != nullptr) {
                     std::shared_ptr<rCompViewLayer> rComp = std::make_shared<rCompViewLayer>(
                             rCompViewLayer(mPiles->vTopActiveMenu,
-                                           *rCompRef, "d_mCompViewMoreLayer", mPiles));
+                                           *rCompRef, "d_mCompViewLayer", mPiles));
                     mPiles->addMenuTop(rComp);
                 }
                 break;

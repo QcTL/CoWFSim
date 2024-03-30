@@ -124,7 +124,6 @@ public:
 
     void addCivilHomeToPos(std::list<std::pair<int, int>>::iterator inItPosHome) {
         gTG_civilOccupancy->set(*inItPosHome, gTG_civilOccupancy->get(*inItPosHome) + 1);
-
         if (gTG_civilOccupancy->get(*inItPosHome) >= getMaxOccBySoil(gTG_TypeSoil->get(*inItPosHome))) {
             gTG_civilPresentCell.erase(inItPosHome);
             gTG_civilFilledCell.push_back(*inItPosHome);

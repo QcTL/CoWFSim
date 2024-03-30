@@ -52,10 +52,10 @@ public:
         for (const std::pair<uint32_t, int> &dEmp: sDiffEmp) {
             if (dEmp.second > 0)
                 for (int i = 0; i < dEmp.second; i++)
-                    sM_sCompEmployee->addEmployeeToCompany(*sTComp->getCompanyByUUID(dEmp.first));
+                    addEmployee(sTComp->getCompanyByUUID(dEmp.first));
             else
                 for (int i = 0; i < abs(dEmp.second); i++)
-                    sM_sCompEmployee->removeEmployeeToCompany(*sTComp->getCompanyByUUID(dEmp.first));
+                    removeEmployee(sTComp->getCompanyByUUID(dEmp.first));
         }
 
         if (inRTime == 0) {
@@ -76,7 +76,7 @@ public:
                                                                      posNewComp.gCompVec.end()),
                                                             posNewComp.gType);
             for (int i = 0; i < 2; i++)
-                sM_sCompEmployee->addEmployeeToCompany(*sTComp->getCompanyByUUID(uuidNew));
+                addEmployee(sTComp->getCompanyByUUID(uuidNew));
         }
     }
 
@@ -86,13 +86,14 @@ public:
                                                             sgTerrain::sgT_TypeGen::sgT_TG_FieldBuilding};
         sgTerrain::sgT_TypeGen gTypeCompany = gTypeGivenTC[cCompanyCreation];
 
-        std::shared_ptr<sLBuyCell::sMOffering> gOffer = sM_sMarketBazaar->getListOfOffering(sLBuyCell::sMFilter(gTypeCompany));
+        std::shared_ptr<sLBuyCell::sMOffering> gOffer = sM_sMarketBazaar->getListOfOffering(
+                sLBuyCell::sMFilter(gTypeCompany));
         uint32_t uuidNew = sTComp->addCompanyAtPosition(gLayerOwnership, {gOffer->sMO_pos}, gTypeCompany);
         sM_sMarketBazaar->removeCompleteProcess(gOffer);
 
         sM_gMainTerrain->addNewBuilding(gTypeCompany, gOffer->sMO_pos);
         for (int i = 0; i < 2; i++)
-            sM_sCompEmployee->addEmployeeToCompany(*sTComp->getCompanyByUUID(uuidNew));
+            addEmployee(sTComp->getCompanyByUUID(uuidNew));
     }
 
     //STORAGE
@@ -101,6 +102,24 @@ public:
     std::shared_ptr<sCodeStorage> sSCode = std::make_shared<sCodeStorage>();
     std::shared_ptr<sCompanyStorage> sTComp = std::make_shared<sCompanyStorage>(1000, sSCode);
 private:
+
+
+    void addEmployee(const std::shared_ptr<objCompany> &inCompany) {
+        std::pair<int, int> pHouseEmployee = sM_sCompEmployee->setRouteToNewEmployee(*inCompany);
+        inCompany->c_objMonth -= 300; //SALARI
+        inCompany->c_nEmployee += 1;
+        if (!gLayerOwnership->get(pHouseEmployee).empty())
+            sTComp->getCompanyByUUID(gLayerOwnership->get(pHouseEmployee).front())->c_objMonth += 150; //RENT
+    }
+
+    void removeEmployee(const std::shared_ptr<objCompany> &inCompany) {
+        std::pair<int, int> pHouseEmployee =  sM_sCompEmployee->removeEmployeeToCompany(*inCompany);
+        inCompany->c_objMonth += 300; //SALARI
+        inCompany->c_nEmployee -= 1;
+        if (!gLayerOwnership->get(pHouseEmployee).empty())
+            sTComp->getCompanyByUUID(gLayerOwnership->get(pHouseEmployee).front())->c_objMonth -= 150; //RENT
+    }
+
     std::shared_ptr<sgTerrain> sM_gMainTerrain;
     std::shared_ptr<gIGrid<uint8_t>> sM_AirCondition;
 
