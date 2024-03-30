@@ -242,12 +242,15 @@ protected:
 
     void setPositionValue(std::pair<int, int> cPos, uint32_t cValue) {
         sf::Vertex *quad = &dInfo[(cPos.second + cPos.first * gWidth) * 4];
-        for (int k = 0; k < 4; k++) {
+        for (int k = 0; k < 4; k++)
             quad[k].texCoords = lRefTiles[cValue][k];
-        }
     }
 
-    void setText(const uint8_t tVal, const std::string &cText) {
+    void setText(const uint8_t tVal, std::string cText) {
+        if (rPos == rIMenu::rRelativePos::pBottomRight || rPos == rIMenu::rRelativePos::pTopRight)
+            cText.append(comV[tVal].pLength - cText.size(), ' ');
+        std::reverse(cText.begin(), cText.end());
+
         for (int i = 0; i < comV[tVal].pLength; i++) {
             sf::Vertex *quad = &dInfo[(comV[tVal].pStartText.second + i + comV[tVal].pStartText.first * gWidth) * 4];
             char currentChar = (i < cText.size()) ? cText[i] : ' ';

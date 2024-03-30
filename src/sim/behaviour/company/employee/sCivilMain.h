@@ -26,7 +26,7 @@ public:
 
     void addEmployeeToCompany(objCompany &inObjCompany) {
         std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator> r;
-        std::pair<int, int> rPosCivHome = sCM_sRoadsMain->getRandomCivilStartRoad();
+        std::pair<int, int> rPosCivHome = sCM_sRoadsMain->getNewRandomAssignedCivilHome();
 
         sgUndergroundMain::sgUM_lowestViableRoute lVRMetro = sCM_sUndergroundMain->getLowestDistanceCommute(
                 inObjCompany.c_cActiveLocations.front(), rPosCivHome);

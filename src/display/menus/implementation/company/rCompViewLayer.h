@@ -19,7 +19,7 @@ public:
 
         comV = std::vector<defTxtCompany>(11, {{0, 0}});
 
-        std::vector<uint8_t> sLengths = {11, 5, 5, 13, 6, 9, 4, 9, 4, 9, 4};
+        std::vector<uint8_t> sLengths = {11, 3, 3, 4, 6, 9, 4, 9, 4, 9, 4};
         int nSeen = 0;
         for (int i = 0; i < data.size(); ++i) {
             for (int j = 0; j < data[i].size(); ++j) {
@@ -66,7 +66,9 @@ public:
         rW.draw(dInfo, &tsTex.tsTex);
     }
 
-    void setResponse(int v, uint16_t lID) override {}
+    void setResponse(int v, uint16_t lID) override {
+        mPiles->removeTop();
+    }
 
     bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override {
         switch (event.type) {
@@ -100,7 +102,6 @@ private:
     std::vector<std::pair<int, int>> pElemSel;
     std::vector<std::pair<int, int>> pElemSelAbs;
     objCompany rCompRef;
-    int cCurrenSel = -1;
 };
 
 #endif //CITYOFWEIRDFISHES_RCOMPVIEWLAYER_H

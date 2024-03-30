@@ -125,6 +125,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/display/menus/implementation/company/rCompViewMoreLayer.h
         src/sim/snCommonAtr.h
         src/display/rgTerrain.h
+        src/display/menus/implementation/home/rHomeViewLayer.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

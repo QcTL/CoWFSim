@@ -77,7 +77,7 @@ public:
                     switch (tSoil->get(i, j)) {
                         case TypeSoil_T1Urban:
                             tRender->set(i, j, (((uint32_t) (uint8_t) strtol("00010000", nullptr, 2)) << 24) +
-                                               rand() % (3 + 1));
+                                               rand() % (2 + 1));
                             break;
                         case TypeSoil_T2Urban:
                             tRender->set(i, j, (((uint32_t) (uint8_t) strtol("00010001", nullptr, 2)) << 24) +
@@ -85,7 +85,7 @@ public:
                             break;
                         case TypeSoil_T3Urban:
                             tRender->set(i, j, (((uint32_t) (uint8_t) strtol("00010010", nullptr, 2)) << 24) +
-                                               rand() % (3 + 1));
+                                               rand() % (2 + 1));
                             break;
                         case TypeSoil_T1Factory:
                             tRender->set(i, j, (((uint32_t) (uint8_t) strtol("00010101", nullptr, 2)) << 24) +

@@ -14,17 +14,18 @@
 #include "rCellViewMenu.h"
 #include "rRoadView/rRoadLineView.h"
 #include "rRoadView/rRoadCrossView.h"
+#include "home/rHomeViewLayer.h"
 
 class rBaseMenu : public rIMenu {
 public:
     explicit rBaseMenu(const std::shared_ptr<rPileMenus> &rPile,
-                       const std::shared_ptr<gIGrid<uint8_t>> &gType,
+                       const std::shared_ptr<sgTerrain> &sgTerrain,
                        const std::vector<std::vector<rNode *>> &gRoads,
                        const std::shared_ptr<gIGrid<std::list<uint32_t>>> &gLayerOwn,
                        const std::shared_ptr<sCompanyStorage> &sTComp)
             : rIMenu(nullptr, rIMenu::rRelativePos::pBottomRight),
               refPile(rPile), lstValueLayer(1),
-              refLRoads(gRoads), refLTypes(gType), refLBuild(gLayerOwn), refSComp(sTComp) {
+              refLRoads(gRoads), rBM_refTerrain(sgTerrain), refLBuild(gLayerOwn), refSComp(sTComp) {
     }
 
     void draw(sf::RenderWindow &rW) override {}
@@ -84,8 +85,16 @@ public:
 
     void pressedCell(std::pair<int, int> cPressed) override {
         std::cout << cPressed.first << ":" << cPressed.second << std::endl;
-        switch (refLTypes->get(cPressed)) {
-            case 1:
+        switch (rBM_refTerrain->gTG_TypeGen->get(cPressed)) {
+            case 1: {
+                std::shared_ptr<rHomeViewLayer> _rHome = std::make_shared<rHomeViewLayer>(
+                        rHomeViewLayer(refPile->vTopActiveMenu,
+                                       refSComp->getCompanyByUUID(refLBuild->get(cPressed).front()),
+                                       rBM_refTerrain->gTG_civilOccupancy->get(cPressed),
+                                       rBM_refTerrain->gTG_TypeSoil->get(cPressed), refPile));
+                refPile->addMenuTop(_rHome);
+            }
+                break;
             case 2:
             case 3:
             case 4: {
@@ -133,7 +142,7 @@ private:
     int lstValueLayer;
 
     std::vector<std::vector<rNode *>> refLRoads;
-    std::shared_ptr<gIGrid<uint8_t>> refLTypes;
+    std::shared_ptr<sgTerrain> rBM_refTerrain;
     std::shared_ptr<gIGrid<std::list<uint32_t>>> refLBuild;
     std::shared_ptr<sCompanyStorage> refSComp;
 };
