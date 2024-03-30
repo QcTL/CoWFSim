@@ -10,14 +10,14 @@
 #include <vector>
 #include <set>
 #include "../gIGrid.h"
+#include "../../../layers/implementations/sLayerType.h"
 
 class gBaseToStartBuildings {
 public:
-    template<typename T>
+
     static std::vector<retObjCompany>
-    gen(const std::shared_ptr<gIGrid<T>> &tOutput, const std::shared_ptr<gIGrid<uint8_t>> &tSoil,
-        const std::shared_ptr<gIGrid<uint8_t>> &tType, const std::vector<uint8_t> &groupSoil,
-        const std::vector<uint8_t> &groupRoads,
+    gen(const std::shared_ptr<gIGrid<uint8_t>> &tSoil, const std::shared_ptr<gIGrid<uint8_t>> &tType,
+        const std::vector<uint8_t> &groupSoil, const std::vector<uint8_t> &groupRoads,
         int seed = 0) {
 
         std::vector<retObjCompany> sFactory;
@@ -35,39 +35,70 @@ public:
                     rand() % (tSoil->get(i, j)) == 0) {
                     switch (tSoil->get(i, j)) {
                         case TypeSoil_T1Urban:
-                            tOutput->set(i, j, (((uint32_t) (uint8_t) strtol("00010000", nullptr, 2)) << 24) +
-                                               rand() % (3 + 1));
                             tType->set(i, j, 1);
                             sFactory.push_back(retObjCompany({{i, j}}, 1));
                             break;
                         case TypeSoil_T2Urban:
-                            tOutput->set(i, j, (((uint32_t) (uint8_t) strtol("00010001", nullptr, 2)) << 24) +
-                                               rand() % (2 + 1));
                             tType->set(i, j, 1);
                             break;
                         case TypeSoil_T3Urban:
-                            tOutput->set(i, j, (((uint32_t) (uint8_t) strtol("00010010", nullptr, 2)) << 24) +
-                                               rand() % (3 + 1));
                             tType->set(i, j, 1);
                             break;
                         case TypeSoil_T1Factory:
-                            tOutput->set(i, j, (((uint32_t) (uint8_t) strtol("00010101", nullptr, 2)) << 24) +
-                                               rand() % (2 + 1));
                             tType->set(i, j, 3);
                             sFactory.push_back(retObjCompany({{i, j}}, 3));
                             break;
                         case TypeSoil_T2Factory:
-                            tOutput->set(i, j, (((uint32_t) (uint8_t) strtol("00010101", nullptr, 2)) << 24) +
-                                               rand() % (2 + 1));
                             tType->set(i, j, 2);
                             sFactory.push_back(retObjCompany({{i, j}}, 3));
                             break;
-
                     }
                 }
             }
         }
         return sFactory;
+    }
+
+    template<typename T>
+    static void
+    renderBuildingFromType(const std::shared_ptr<gIGrid<T>> &tRender, const std::shared_ptr<gIGrid<uint8_t>> &tType,
+                           const std::shared_ptr<gIGrid<uint8_t>> &tSoil,
+                           int seed = 0) {
+
+        std::pair<std::pair<int, int>, std::pair<int, int>> gRange = tType->rangeUse();
+        if (seed == 0)
+            srand(static_cast<unsigned>(time(nullptr)));
+        else
+            srand(seed);
+
+        for (int i = gRange.first.first; i <= gRange.first.second; ++i) {
+            for (int j = gRange.second.first; j <= gRange.second.second; ++j) {
+                if (tType->get(i, j) != 5 && tType->get(i, j) != 6 && tType->get(i, j) != 0) {
+                    switch (tSoil->get(i, j)) {
+                        case TypeSoil_T1Urban:
+                            tRender->set(i, j, (((uint32_t) (uint8_t) strtol("00010000", nullptr, 2)) << 24) +
+                                               rand() % (3 + 1));
+                            break;
+                        case TypeSoil_T2Urban:
+                            tRender->set(i, j, (((uint32_t) (uint8_t) strtol("00010001", nullptr, 2)) << 24) +
+                                               rand() % (2 + 1));
+                            break;
+                        case TypeSoil_T3Urban:
+                            tRender->set(i, j, (((uint32_t) (uint8_t) strtol("00010010", nullptr, 2)) << 24) +
+                                               rand() % (3 + 1));
+                            break;
+                        case TypeSoil_T1Factory:
+                            tRender->set(i, j, (((uint32_t) (uint8_t) strtol("00010101", nullptr, 2)) << 24) +
+                                               rand() % (2 + 1));
+                            break;
+                        case TypeSoil_T2Factory:
+                            tRender->set(i, j, (((uint32_t) (uint8_t) strtol("00010101", nullptr, 2)) << 24) +
+                                               rand() % (2 + 1));
+                            break;
+                    }
+                }
+            }
+        }
     }
 };
 

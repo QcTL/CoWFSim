@@ -2,8 +2,8 @@
 // Created by Laminar on 27/02/2024.
 //
 
-#ifndef CITYOFWEIRDFISHES_SCOMPANYTOTAL_H
-#define CITYOFWEIRDFISHES_SCOMPANYTOTAL_H
+#ifndef CITYOFWEIRDFISHES_SCOMPANYSTORAGE_H
+#define CITYOFWEIRDFISHES_SCOMPANYSTORAGE_H
 
 #include <vector>
 #include <memory>
@@ -97,9 +97,9 @@ private:
     uint32_t fEmpty;
 };
 
-class sCompanyTotal {
+class sCompanyStorage {
 public:
-    explicit sCompanyTotal(uint32_t maxComp, const std::shared_ptr<sCodeStorage> &sStorageCode)
+    explicit sCompanyStorage(uint32_t maxComp, const std::shared_ptr<sCodeStorage> &sStorageCode)
             : sCT_vTotalComp(maxComp), sCT_sCodeS(sStorageCode) {
         if (snCommonAtr::getFlagAtr("snCA_Seed") != 0)
             sCT_genRand.seed(snCommonAtr::getFlagAtr("snCA_Seed"));
@@ -172,4 +172,4 @@ private:
                                                                         {216, 276}};
 };
 
-#endif //CITYOFWEIRDFISHES_SCOMPANYTOTAL_H
+#endif //CITYOFWEIRDFISHES_SCOMPANYSTORAGE_H

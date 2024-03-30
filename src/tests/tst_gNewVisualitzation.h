@@ -44,7 +44,7 @@ int tst_gNewVisualization(const std::map<std::string, std::string> &mValues) {
 
     sLayerCells::retObjSLayerCells retCells =
             sLayerCells::gen(lSizeGrid, sMS->gLayerTypeSoil, sMS->gLayerTypeGen, mValues);
-    sMS->gLayerCurStruct = retCells.gMatrix;
+    sMS->gMainTerrain->gLayerCurStruct = retCells.gMatrix;
 
 
     sMS->completedSetupStage();

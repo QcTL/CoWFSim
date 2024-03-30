@@ -21,6 +21,7 @@
 class sMarketBazaar {
 public:
 
+    sMarketBazaar() = default;
 
     void addListing(const std::shared_ptr<sLBuyCell::sMOffering> &sMO) {
         sListingBuy.addListing(sMO);

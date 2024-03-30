@@ -31,7 +31,6 @@ struct retObjCompany{
 };
 
 struct retObjSLayerCells {
-    std::shared_ptr<gIGrid<uint32_t>> gMatrix;
     std::shared_ptr<gIGrid<uint8_t>> gUnderground;
     std::vector<retObjCompany> gCompanyPositions;
     std::vector<std::vector<std::pair<int, int>>> routesMetro;

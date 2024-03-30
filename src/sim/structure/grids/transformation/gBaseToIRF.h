@@ -22,8 +22,8 @@ public:
 
     template<typename T>
     static std::vector<gPositionEscape>
-    gen(const std::shared_ptr<gIGrid<T>> gOutput, const std::shared_ptr<gIGrid<uint8_t>> &gType,
-        std::pair<int, int> pStart, std::pair<double, double> vStart, T valueEnd, uint8_t valueTypeSoil,
+    gen(const std::shared_ptr<gIGrid<T>> &gType,
+        std::pair<int, int> pStart, std::pair<double, double> vStart, T valueEnd,
         uint8_t fDispersion, int seed = 0) {
 
         std::vector<gPositionEscape> ret;
@@ -43,9 +43,8 @@ public:
             sCM_genRand.seed(static_cast<unsigned int>(time(nullptr)));
 
         while (gType->isInside(pActive)) {
-            if (gType->get(pActive) != 5 && getSurroundRoads(gType, pActive, valueTypeSoil) <= 2) {
-                gOutput->set(pActive, valueEnd);
-                gType->set(pActive, valueTypeSoil);
+            if (gType->get(pActive) != 5 && getSurroundRoads(gType, pActive, valueEnd) <= 2) {
+                gType->set(pActive, valueEnd);
             }
 
             if (tToDisp <= 0) {

@@ -17,10 +17,10 @@
 
 class sCompanyActions {
 public:
-    sCompanyActions(const std::shared_ptr<sgTerrain> &gType,
+    sCompanyActions(const std::shared_ptr<sgTerrain> &gType, const std::shared_ptr<sMarketBazaar> &inSMarketBazaar,
                     const std::shared_ptr<sCompanyTimer> &gCTimer,
                     const std::shared_ptr<sEvaluatorMain> &sMEvaluator)
-            : sCA_gTimer(gCTimer), sCA_gType(gType), sMEvaluator(sMEvaluator) {}
+            : sCA_gTimer(gCTimer), sCA_gType(gType), sMEvaluator(sMEvaluator), sCA_MarketListing(inSMarketBazaar) {}
 
     bool
     gTryIntention(sCompanyCompiler::sCCIntentions &sCCI, std::shared_ptr<sCodeStorage> &sCodeStorage,

@@ -39,8 +39,8 @@ public:
         sMS->gMainTerrain->gTG_TypeSoil = tReturn.genTypeSoil;
 
         retObjSLayerCells retCells =
-                sLayerCells::gen(lSizeGrid, sMS->gMainTerrain->gTG_TypeSoil , sMS->gMainTerrain->gTG_TypeGen, tReturn.centerClusters, mValues, snCommonAtr::getFlagAtr("snCA_Seed"));
-        sMS->gLayerCurStruct = retCells.gMatrix;
+                sLayerCells::gen(lSizeGrid, sMS->gMainTerrain, tReturn.centerClusters, mValues, snCommonAtr::getFlagAtr("snCA_Seed"));
+
         sMS->gTotalUnderground->gLayerUnderground = retCells.gUnderground;
         sMS->gTotalUnderground->setPointsTransit(retCells.routesMetro);
 

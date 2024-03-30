@@ -14,7 +14,7 @@
 #include "structure/grids/gBasicGrid.h"
 #include "structure/grids/gIGrid.h"
 #include "structure/obj/sCommon.h"
-#include "behaviour/company/sCompanyTotal.h"
+#include "behaviour/company/sCompanyStorage.h"
 #include "structure/grids/transformation/gBaseToNearestRoad.h"
 #include "../display/rPileMenus.h"
 #include "structure/obj/sRoutesStorage.h"
@@ -30,18 +30,19 @@ class sSimulatorMain {
 
 public:
     explicit sSimulatorMain(int lSize) {
-        gMainTerrain = std::make_shared<sgTerrain>(lSize);
-        gLayerCurStruct = std::make_shared<gBasicGrid<uint32_t>>(gBasicGrid<uint32_t>(lSize, lSize, 0));
         gLayerNextRoad = std::make_shared<gBasicGrid<rNode *>>(gBasicGrid<rNode *>(lSize, lSize, nullptr));
         gTotalAirPollution = std::make_shared<sgAirPollutionMain>(lSize);
         gTotalUnderground = std::make_shared<sgUndergroundMain>(lSize);
+        sMainMarketBazaar = std::make_shared<sMarketBazaar>();
 
+
+        gMainTerrain = std::make_shared<sgTerrain>(lSize, sMainMarketBazaar);
         rMEvaluator = std::make_shared<sEvaluatorMain>();
         gMainRoads = std::make_shared<sgRoadsMain>(lSize, gMainTerrain);
         sMCivil = std::make_shared<sCivilMain>(gMainRoads, gTotalUnderground);
         sMEvaluator = std::make_shared<sEvaluatorMain>();
         sComp = std::make_shared<sCompanyMain>(lSize, sMCivil,
-                                               gMainTerrain,
+                                               gMainTerrain, sMainMarketBazaar,
                                                gTotalAirPollution->gLayerAirPollution,
                                                sMEvaluator);
         sMClock = std::make_shared<sClockMain>();
@@ -50,12 +51,12 @@ public:
     //TERRAIN BASIC;
     std::shared_ptr<sgTerrain> gMainTerrain;
 
-    std::shared_ptr<gIGrid<uint32_t>> gLayerCurStruct;
     std::shared_ptr<gIGrid<rNode *>> gLayerNextRoad;
 
     std::shared_ptr<sEvaluatorMain> sMEvaluator;
 
 
+    std::shared_ptr<sMarketBazaar> sMainMarketBazaar;
     //AIR POLLUTION
     std::shared_ptr<sgAirPollutionMain> gTotalAirPollution;
 
@@ -89,9 +90,10 @@ public:
     }
 
     void completedSetupStage() {
+        gMainTerrain->loadUpRender();
         gMainRoads->completedStartGrid(gMainTerrain);
         gMainTerrain->setupLists();
-        //sComp->addNewCompany(sCompanyMain::sCM_strStyleCompany::SCM_strFactory);
+        sComp->addNewCompany(sCompanyMain::sCM_strStyleCompany::SCM_strFactory);
     }
 
     void completedStartCompanies(const std::vector<retObjCompany> &gCompPositions) {

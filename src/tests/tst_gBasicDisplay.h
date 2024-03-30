@@ -34,7 +34,7 @@ int tst_gBasicDisplay() {
     sMS->gLayerAirPollution = gB;
 
     std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gLayerAirPollution,
-                                                                       sMS->gLayerCurStruct, sMS->gLayerTransit);
+                                                                       sMS->gMainTerrain->gLayerCurStruct, sMS->gLayerTransit);
 
     //MENUS
     std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);

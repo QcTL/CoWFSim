@@ -17,7 +17,7 @@ public:
             : sMS(sMS) {
 
         gSimL = std::make_shared<gDispLayers>(sMS->gTotalAirPollution->gLayerAirPollution,
-                                              sMS->gLayerCurStruct, sMS->gMainRoads->gLayerTransit,
+                                              sMS->gMainTerrain->gTG_rLayer->gLayerCurStruct, sMS->gMainRoads->gLayerTransit,
                                               sMS->gTotalUnderground->gLayerUnderground);
         pPM = std::make_shared<rPileMenus>(gSimL);
         //MENUS
