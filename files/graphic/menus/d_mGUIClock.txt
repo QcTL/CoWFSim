@@ -1,2 +1,4 @@
 type:guiClock
 src:mGUIClock.txt
+inSelTex:48
+inLengthTex:9,5,4

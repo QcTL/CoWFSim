@@ -20,11 +20,35 @@ public:
         pBottomLeft, pBottomRight, pTopLeft, pTopRight, pCenter, pCenterBottom, pCenterTop
     };
 
-    rIMenu(const std::shared_ptr<rIMenu> &mParent, rRelativePos rRelativePos) :
+    rIMenu(const std::shared_ptr<rIMenu> &mParent, rRelativePos rRelativePos, const std::string &pthFileD) :
             tsTex(gTileset("ts_menuFont8.png", 8, 40, 10)),
             rPos(rRelativePos),
             parentMenu(mParent) {
         setTransformation();
+
+        if (!pthFileD.empty()) {
+            rIMenu_objFile _dInfoFile = extractDataFromFile(pthFileD);
+            dExtracted= _dInfoFile.of_data;
+            comV = std::vector<defTxtCompany>(_dInfoFile.of_inLengthTex.size(), {{0, 0}});
+
+            std::vector<uint8_t> sLengths = _dInfoFile.of_inLengthTex;
+            int nSeen = 0;
+            for (int i = 0; i < _dInfoFile.of_data.size(); ++i) {
+                for (int j = 0; j < _dInfoFile.of_data[i].size(); ++j) {
+                    auto row = (rPos == pBottomLeft || rPos == pBottomRight) ? _dInfoFile.of_data.size() - 1 - i : i;
+                    auto col = (rPos == pTopRight || rPos == pBottomRight) ? _dInfoFile.of_data[i].size() - 1 - j : j;
+                    if (_dInfoFile.of_data[i][j] == _dInfoFile.of_inSelTex) {
+                        comV[nSeen] = {{row, col}, sLengths[nSeen]};
+                        nSeen++;
+                    }
+                }
+            }
+
+            dInfo = getVertexMenu((int) _dInfoFile.of_data[0].size(), (int) _dInfoFile.of_data.size(),
+                                  _dInfoFile.of_data);
+            gWidth = (int) _dInfoFile.of_data[0].size();
+            gHeight = (int) _dInfoFile.of_data.size();
+        }
     }
 
     virtual void draw(sf::RenderWindow &rW) = 0;
@@ -217,14 +241,27 @@ protected:
     int gHeight = 0;
     std::vector<std::vector<int>> dExtracted;
 
-    static std::vector<std::vector<int>> extractDataFromFile(const std::string &pthFileD) {
+    struct rIMenu_objFile {
+        std::vector<std::vector<int>> of_data;
+        uint32_t of_inSelTex;
+        std::vector<uint8_t> of_inLengthTex;
+        struct of_button {
+            uint32_t ofb_pX;
+            uint32_t ofb_pY;
+            uint32_t ofb_pHeight;
+            uint32_t ofb_pWidth;
+        };
+        std::vector<of_button> of_vecButton;
+    };
+
+    static rIMenu_objFile extractDataFromFile(const std::string &pthFileD) {
         std::map<std::string, std::string> sm = ReaderParameters::readFile(
                 (RelPath::relPath / "files" / "graphic" / "menus" / (pthFileD + R"(.txt)")).string());
 
         std::ifstream file((RelPath::relPath / "files" / "graphic" / "menus" / sm["src"]).string());
 
         std::string line;
-        std::vector<std::vector<int>> data;
+        std::vector<std::vector<int>> _gContentF;
 
         while (std::getline(file, line)) {
             std::vector<int> row;
@@ -233,11 +270,38 @@ protected:
             while (iss >> value) {
                 row.push_back(value);
             }
-            data.push_back(row);
+            _gContentF.push_back(row);
+        }
+        file.close();
+
+        uint32_t _gSelTex = 0;
+        if (sm.find("inSelTex") != sm.end())
+            _gSelTex = std::stoul(sm["inSelTex"]);
+
+        std::vector<uint8_t> _gVecLengthTex = {};
+        if (sm.find("inLengthTex") != sm.end()) {
+            std::istringstream ss(sm["inLengthTex"]);
+            std::string segment;
+            while (std::getline(ss, segment, ','))
+                _gVecLengthTex.push_back(std::stoul(segment));
         }
 
-        file.close();
-        return data;
+        std::vector<rIMenu_objFile::of_button> _gVecPosButtons = {};
+        if (sm.find("inPosButtons") != sm.end()) {
+            std::istringstream ss(sm["inPosButtons"]);
+            std::string segment;
+            while (std::getline(ss, segment, ',')) {
+                std::istringstream ssInside(sm["inPosButtons"]);
+                std::string segmentInside;
+                std::vector<uint32_t> _gVecComponent;
+                while (std::getline(ss, segmentInside, '#'))
+                    _gVecComponent.push_back(std::stoul(segmentInside));
+                if (_gVecComponent.size() == 4)
+                    _gVecPosButtons.push_back(
+                            {_gVecComponent[0], _gVecComponent[1], _gVecComponent[2], _gVecComponent[3]});
+            }
+        }
+        return {_gContentF, _gSelTex, _gVecLengthTex};
     }
 
     void setPositionValue(std::pair<int, int> cPos, uint32_t cValue) {
@@ -269,6 +333,12 @@ protected:
                 quad[k].texCoords = lRefTiles[(charIndex != -1) ? charIndex : defaultCharIndex][k];
             }
         }
+    }
+
+    static std::string getFloatToString2Decimal(const float nUsed) {
+        std::stringstream ss;
+        ss << std::fixed << std::setprecision(2) << nUsed;
+        return ss.str();
     }
 };
 

@@ -23,7 +23,7 @@ public:
                        const std::vector<std::vector<rNode *>> &gRoads,
                        const std::shared_ptr<gIGrid<std::list<uint32_t>>> &gLayerOwn,
                        const std::shared_ptr<sCompanyStorage> &sTComp)
-            : rIMenu(nullptr, rIMenu::rRelativePos::pBottomRight),
+            : rIMenu(nullptr, rIMenu::rRelativePos::pBottomRight, ""),
               refPile(rPile), lstValueLayer(1),
               refLRoads(gRoads), rBM_refTerrain(sgTerrain), refLBuild(gLayerOwn), refSComp(sTComp) {
     }

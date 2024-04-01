@@ -24,13 +24,7 @@ class rRoadViewMenu : public rIMenu {
 public:
     explicit rRoadViewMenu(const std::shared_ptr<rIMenu> &mParent, const std::shared_ptr<rRNodeI> &refView,
                            const std::string &pthFileD, rIMenu::rRelativePos rPos)
-            : rIMenu(mParent, rPos), rSelRoad(refView) {
-
-        dExtracted = extractDataFromFile(pthFileD);
-
-        dInfo = getVertexMenu((int) dExtracted[0].size(), (int) dExtracted.size(), dExtracted);
-        gWidth = (int) dExtracted[0].size();
-        gHeight = (int) dExtracted.size();
+            : rIMenu(mParent, rPos, pthFileD), rSelRoad(refView) {
     }
 
     void update() override {}

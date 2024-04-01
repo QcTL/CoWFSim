@@ -14,31 +14,7 @@ class rCompViewLayer : public rIMenu {
 public:
     explicit rCompViewLayer(const std::shared_ptr<rIMenu> &mParent, const objCompany &rShow,
                             const std::string &pthFileD, const std::shared_ptr<rPileMenus> &mPiles)
-            : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft), mPiles(mPiles), rCompRef(rShow) {
-        std::vector<std::vector<int>> data = extractDataFromFile(pthFileD);
-
-        comV = std::vector<defTxtCompany>(11, {{0, 0}});
-
-        std::vector<uint8_t> sLengths = {11, 3, 3, 4, 6, 9, 4, 9, 4, 9, 4};
-        int nSeen = 0;
-        for (int i = 0; i < data.size(); ++i) {
-            for (int j = 0; j < data[i].size(); ++j) {
-                auto row = (rPos == pBottomLeft || rPos == pBottomRight) ? data.size() - 1 - i : i;
-                auto col = (rPos == pTopRight || rPos == pBottomRight) ? data[i].size() - 1 - j : j;
-                if (data[i][j] == 65 || data[i][j] == 48) {
-                    comV[nSeen] = {{row, col}, sLengths[nSeen]};
-                    nSeen++;
-                } else if (data[i][j] == 304 || data[i][j] == 305) {
-                    pElemSel.emplace_back(row, col);
-                    pElemSelAbs.emplace_back(i, j);
-                }
-            }
-        }
-
-        dInfo = getVertexMenu((int) data[0].size(), (int) data.size(), data);
-        gWidth = (int) data[0].size();
-        gHeight = (int) data.size();
-
+            : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft, pthFileD), mPiles(mPiles), rCompRef(rShow) {
 
         setText(0, rShow.nName);
         setText(1, oCommonMenus::getCompNumber(rShow.c_cActiveLocations.size()));
@@ -93,14 +69,7 @@ public:
 
 private:
 
-    static std::string getFloatToString2Decimal(const float nUsed) {
-        std::stringstream ss;
-        ss << std::fixed << std::setprecision(2) << nUsed;
-        return ss.str();
-    }
     std::shared_ptr<rPileMenus> mPiles;
-    std::vector<std::pair<int, int>> pElemSel;
-    std::vector<std::pair<int, int>> pElemSelAbs;
     objCompany rCompRef;
 };
 

@@ -13,46 +13,7 @@ public:
     explicit rCellViewMenu(const std::shared_ptr<rIMenu> &mParent, const std::vector<objCompany> &rShow,
                            const std::string &pthFileD,
                            const std::shared_ptr<rPileMenus> &mPiles)
-            : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft), refPile(mPiles), compShow(rShow) {
-        std::vector<std::vector<int>> data = extractDataFromFile(pthFileD);
-
-        for (int i = 0; i < data.size(); ++i) {
-            for (int j = 0; j < data[i].size(); ++j) {
-                auto row = (rPos == pBottomLeft || rPos == pBottomRight) ? data.size() - 1 - i : i;
-                auto col = (rPos == pTopRight || rPos == pBottomRight) ? data[i].size() - 1 - j : j;
-                if (data[i][j] == 65) {
-                    for (int t = 0; t < 3; ++t) {
-                        bool condition = comV[t].nNameCom.pLength == 0;
-                        for (int k = 0; k < t; ++k) {
-                            condition = condition && (i != comV[k].nNameCom.pStartText.first);
-                        }
-                        if (condition) {
-                            comV[t].nNameCom = {{row, col}, 11};
-                            break;
-                        }
-                    }
-                } else if (data[i][j] == 48) {
-                    for (int t = 0; t < 3; ++t) {
-                        bool condition = comV[t].nValCom.pLength == 0;
-                        for (int k = 0; k < t; ++k) {
-                            condition = condition && (i != comV[k].nValCom.pStartText.first);
-                        }
-                        if (condition) {
-                            comV[t].nValCom = {{row, col}, 6};
-                            break;
-                        }
-                    }
-                } else if (data[i][j] == 304 || data[i][j] == 305) {
-                    pElemSel.emplace_back(row, col);
-                    pElemSelAbs.emplace_back(i, j);
-                }
-            }
-        }
-
-        dInfo = getVertexMenu((int) data[0].size(), (int) data.size(), data);
-        gWidth = (int) data[0].size();
-        gHeight = (int) data.size();
-
+            : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft, pthFileD), refPile(mPiles), compShow(rShow) {
         int index = 0;
         for (const auto &it: rShow) {
             if (index < 3)

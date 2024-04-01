@@ -1,2 +1,4 @@
 type:mCompViewerMore
 src:mCompViewMoreLayer.txt
+inSelTex:65
+inLengthTex:8,8,7,7,7,7,7,7,7,7,7
