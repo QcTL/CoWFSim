@@ -28,7 +28,7 @@ public:
 
         if (!pthFileD.empty()) {
             rIMenu_objFile _dInfoFile = extractDataFromFile(pthFileD);
-            dExtracted= _dInfoFile.of_data;
+            dExtracted = _dInfoFile.of_data;
             comV = std::vector<defTxtCompany>(_dInfoFile.of_inLengthTex.size(), {{0, 0}});
 
             std::vector<uint8_t> sLengths = _dInfoFile.of_inLengthTex;
@@ -60,7 +60,6 @@ public:
     virtual void pressedCell(std::pair<int, int> cPressed) = 0;
 
     virtual void update() {}
-
 
     void setTransformation() {
         int tSize = tsTex.getTileSize();
@@ -110,79 +109,45 @@ public:
     sf::VertexArray getVertexMenu(int GWidth, int GHeight, std::vector<std::vector<int>> strData) {
         int GTileSize = 16;
         v = sf::VertexArray(sf::Quads, GWidth * GHeight * 4);
-        if (rPos == rIMenu::rRelativePos::pTopLeft) {
-            for (int i = 0; i < GHeight; i++) {
-                for (int j = 0; j < GWidth; j++) {
-                    if (strData[i][j] != 0) {
-                        sf::Vertex *quad = &v[(j + i * GWidth) * 4];
 
-                        quad[0].position = sf::Vector2f(j * GTileSize, i * GTileSize);
-                        quad[1].position = sf::Vector2f((j + 1) * GTileSize, i * GTileSize);
-                        quad[2].position = sf::Vector2f((j + 1) * GTileSize, (i + 1) * GTileSize);
-                        quad[3].position = sf::Vector2f(j * GTileSize, (i + 1) * GTileSize);
-
-                        for (int k = 0; k < 4; k++) {
-                            quad[k].texCoords = lRefTiles[strData[i][j]][k];
-                        }
-                    }
+        for (int i = 0; i < GHeight; i++) {
+            for (int j = 0; j < GWidth; j++) {
+                if (strData[i][j] == 0)
+                    continue;
+                sf::Vertex *quad;
+                int xIndex, yIndex;
+                switch (rPos) {
+                    case rIMenu::rRelativePos::pTopLeft:
+                        xIndex = j;
+                        yIndex = i;
+                        break;
+                    case rIMenu::rRelativePos::pBottomLeft:
+                        xIndex = j;
+                        yIndex = GHeight - 1 - i;
+                        break;
+                    case rIMenu::rRelativePos::pTopRight:
+                        xIndex = GWidth - 1 - j;
+                        yIndex = i;
+                        break;
+                    case rIMenu::rRelativePos::pBottomRight:
+                        xIndex = GWidth - 1 - j;
+                        yIndex = GHeight - 1 - i;
+                        break;
+                    default:
+                        xIndex = yIndex = 0;
                 }
-            }
-        } else if (rPos == rIMenu::rRelativePos::pBottomLeft) {
-            for (int i = GHeight - 1; i >= 0; i--) {
-                for (int j = 0; j < GWidth; j++) {
-                    if (strData[i][j] != 0) {
-                        sf::Vertex *quad = &v[(j + (GHeight - 1 - i) * GWidth) * 4];
+                quad = &v[(xIndex + yIndex * GWidth) * 4];
+                quad[0].position = sf::Vector2f(xIndex * GTileSize, yIndex * GTileSize);
+                quad[1].position = sf::Vector2f((xIndex + 1) * GTileSize, yIndex * GTileSize);
+                quad[2].position = sf::Vector2f((xIndex + 1) * GTileSize, (yIndex + 1) * GTileSize);
+                quad[3].position = sf::Vector2f(xIndex * GTileSize, (yIndex + 1) * GTileSize);
 
-                        quad[0].position = sf::Vector2f(j * GTileSize, (GHeight - 1 - i) * GTileSize);
-                        quad[1].position = sf::Vector2f((j + 1) * GTileSize, (GHeight - 1 - i) * GTileSize);
-                        quad[2].position = sf::Vector2f((j + 1) * GTileSize, (GHeight - i) * GTileSize);
-                        quad[3].position = sf::Vector2f(j * GTileSize, (GHeight - i) * GTileSize);
-
-                        for (int k = 0; k < 4; k++) {
-                            quad[k].texCoords = lRefTiles[strData[i][j]][k];
-                        }
-                    }
-                }
-            }
-        } else if (rPos == rIMenu::rRelativePos::pTopRight) {
-            for (int i = 0; i < GHeight; i++) {
-                for (int j = GWidth - 1; j >= 0; j--) {
-                    if (strData[i][j] != 0) {
-                        sf::Vertex *quad = &v[((GWidth - j - 1) + i * GWidth) * 4];
-
-                        quad[0].position = sf::Vector2f((GWidth - j - 1) * GTileSize, i * GTileSize);
-                        quad[1].position = sf::Vector2f((GWidth - j) * GTileSize, i * GTileSize);
-                        quad[2].position = sf::Vector2f((GWidth - j) * GTileSize, (i + 1) * GTileSize);
-                        quad[3].position = sf::Vector2f((GWidth - j - 1) * GTileSize, (i + 1) * GTileSize);
-
-                        for (int k = 0; k < 4; k++) {
-                            quad[k].texCoords = lRefTiles[strData[i][j]][k];
-                        }
-                    }
-                }
-            }
-        } else if (rPos == rIMenu::rRelativePos::pBottomRight) {
-            for (int i = GHeight - 1; i >= 0; i--) {
-                for (int j = GWidth - 1; j >= 0; j--) {
-                    if (strData[i][j] != 0) {
-                        sf::Vertex *quad = &v[((GWidth - j - 1) + (GHeight - 1 - i) * GWidth) * 4];
-
-                        quad[0].position = sf::Vector2f((GWidth - j - 1) * GTileSize, (GHeight - 1 - i) * GTileSize);
-                        quad[1].position = sf::Vector2f((GWidth - j) * GTileSize, (GHeight - 1 - i) * GTileSize);
-                        quad[2].position = sf::Vector2f((GWidth - j) * GTileSize, (GHeight - i) * GTileSize);
-                        quad[3].position = sf::Vector2f((GWidth - j - 1) * GTileSize, (GHeight - i) * GTileSize);
-
-                        for (int k = 0; k < 4; k++) {
-                            quad[k].texCoords = lRefTiles[strData[i][j]][k];
-                        }
-                    }
-                }
+                for (int k = 0; k < 4; k++)
+                    quad[k].texCoords = lRefTiles[strData[i][j]][k];
             }
         }
-
         return v;
     }
-
 
     rRelativePos getRPos() {
         return rPos;
@@ -200,6 +165,12 @@ public:
                 return {(unsigned int) mouseP.x, (unsigned int) mouseP.y};
             case pTopRight:
                 return {mouseP.x - (wS.x - menuW), (unsigned int) mouseP.y};
+            case pCenter:
+                break;
+            case pCenterBottom:
+                break;
+            case pCenterTop:
+                break;
         }
         return {};
     }
@@ -219,6 +190,12 @@ public:
             case pTopRight:
                 if (mouseP.x >= (wS.x - menuW) && mouseP.x < wS.x && mouseP.y >= 0 && mouseP.y < menuH)
                     return true;
+            case pCenter:
+                break;
+            case pCenterBottom:
+                break;
+            case pCenterTop:
+                break;
         }
         return false;
     }
@@ -262,7 +239,6 @@ protected:
 
         std::string line;
         std::vector<std::vector<int>> _gContentF;
-
         while (std::getline(file, line)) {
             std::vector<int> row;
             std::istringstream iss(line);
