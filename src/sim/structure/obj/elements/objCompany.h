@@ -17,12 +17,13 @@
 #include <stdexcept>
 #include <unordered_set>
 #include "contracts/cObjContracts.h"
+#include "../../../behaviour/company/code/sCodeStoratge.h"
 
 std::vector<std::string> vSyllablesP = {"am", "ca", "mi", "o", "ul", "er", "es", "pin", "tu", "ra", "ta", "la", "dro",
                                         "me", "dia", "mart", "sen", "ti", "ments", "tran", "qui", "li", "tat", "pen",
                                         "sa", "ment", "u", "su", "al", "ment", "ar", "ma", "ri"};
-std::random_device rd;
-std::mt19937 gen(rd());
+std::random_device oC_rd;
+std::mt19937 oC_gen(oC_rd());
 std::uniform_int_distribution<> numStringsDist(2, 4);
 
 class objCompany {
@@ -43,13 +44,15 @@ public:
         }
     };
 
-    explicit objCompany(uint32_t cUuid, const std::list<std::pair<int, int>> &ownStart,
+    explicit objCompany(uint32_t cUuid, const std::list<std::pair<int, int>> &ownStart, uint8_t typeCellStart,
                         objComp_activeDates activeDates)
-            : c_uuid(cUuid), c_cActiveLocations(ownStart), c_activeDates(std::move(activeDates)) {
-        int numStrings = numStringsDist(gen);
+            : c_uuid(cUuid), c_activeDates(std::move(activeDates)) {
+
+        addAvailableLocation(ownStart, typeCellStart);
+        int numStrings = numStringsDist(oC_gen);
         std::vector<std::string> selectedStrings;
         std::sample(vSyllablesP.begin(), vSyllablesP.end(),
-                    std::back_inserter(selectedStrings), numStrings, gen);
+                    std::back_inserter(selectedStrings), numStrings, oC_gen);
 
         for (const auto &str: selectedStrings)
             nName += str;
@@ -90,10 +93,13 @@ public:
     std::list<std::pair<int, int>> c_cRentedLocations;
     objComp_activeDates c_activeDates;
 
+    uint32_t c_nEmployee = 0;
     double c_cActiveFunds = 0;
     float c_objFortnight = 0;
     float c_objYear = 0;
     float c_objMonth = 0;
+
+    std::shared_ptr<sCodeStorage::sCodeObj> c_cCode;
 };
 
 #endif //CITYOFWEIRDFISHES_OBJCOMPANY_H

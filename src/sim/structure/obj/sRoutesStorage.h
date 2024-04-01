@@ -2,8 +2,8 @@
 // Created by Laminar on 03/03/2024.
 //
 
-#ifndef CITYOFWEIRDFISHES_STOTALROUTES_H
-#define CITYOFWEIRDFISHES_STOTALROUTES_H
+#ifndef CITYOFWEIRDFISHES_SROUTESSTORAGE_H
+#define CITYOFWEIRDFISHES_SROUTESSTORAGE_H
 
 #include <map>
 #include <cstdint>
@@ -12,22 +12,28 @@
 #include "sCommon.h"
 #include "elements/objCivil.h"
 
-class sTotalRoutes {
+class sRoutesStorage {
 
 public:
 
-    sTotalRoutes() {
-        mExitTimesCivil = std::vector<std::list<objCivil>>(288);
+    sRoutesStorage() {
+        mExitTimesCivil = std::vector<std::list<objCivil>>(289);
     };
 
-    std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator> addRuteCivil(const std::shared_ptr<objCivil> &oC) {
-        vUniqueCivil.push_back(oC);
+    std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator> addRuteCivil(const std::shared_ptr<objCivil> &objCivil) {
+        mExitTimesCivil[objCivil->c_TBegin].push_back(*objCivil);
+        mExitTimesCivil[objCivil->c_TEnd].push_back(*objCivil);
 
-        mExitTimesCivil[oC->c_TBegin].push_back(*oC);
-        mExitTimesCivil[oC->c_TEnd].push_back(*oC);
-
-        return {mExitTimesCivil[oC->c_TBegin].rbegin().base(), mExitTimesCivil[oC->c_TEnd].rbegin().base()};
+        return {mExitTimesCivil[objCivil->c_TBegin].rbegin().base(), mExitTimesCivil[objCivil->c_TEnd].rbegin().base()};
     }
+
+    void removeRuteCivil(const std::shared_ptr<objCivil> &inObjCivil,
+                         const std::list<objCivil>::iterator& gPBegin,
+                         const std::list<objCivil>::iterator& gPEnd) {
+        mExitTimesCivil[inObjCivil->c_TBegin].erase(gPBegin);
+        mExitTimesCivil[inObjCivil->c_TEnd].erase(gPEnd);
+    }
+
 
     std::vector<objCivil::objRoadTravel> getRoutesCarByTime(uint32_t cTime, uint32_t cDate) {
         std::vector<objCivil::objRoadTravel> rRet;
@@ -55,9 +61,7 @@ public:
     };
 
 private:
-    std::vector<std::shared_ptr<objCivil>> vUniqueCivil;
     std::vector<std::list<objCivil>> mExitTimesCivil;
-
 };
 
-#endif //CITYOFWEIRDFISHES_STOTALROUTES_H
+#endif //CITYOFWEIRDFISHES_SROUTESSTORAGE_H

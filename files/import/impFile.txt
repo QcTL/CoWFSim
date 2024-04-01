@@ -7,3 +7,4 @@ Mida_Simulacio:Petita
 Estructures_Decoratives:off
 Conte_Riu:on
 Mida_Riu:Petita
+Llavor:15

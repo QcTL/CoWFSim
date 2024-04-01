@@ -10,7 +10,7 @@
 #include "../display/layers/gDispLayers.h"
 #include "../display/rGlobal.h"
 #include "../sim/structure/grids/transformation/gBaseToGradientMinimum.h"
-#include "../sim/sMainSimulator.h"
+#include "../sim/sSimulatorMain.h"
 #include "../sim/structure/grids/transformation/sGridToSimulator.h"
 #include "../display/menus/implementation/rBaseMenu.h"
 #include "../sim/structure/grids/transformation/gBasicTransformations.h"
@@ -18,7 +18,7 @@
 int tst_gBasicDisplay() {
 
     std::shared_ptr<gIGrid<uint8_t>> gB =std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(30, 30, 255));
-    std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(30);
+    std::shared_ptr<sSimulatorMain> sMS = std::make_shared<sSimulatorMain>(30);
 
     std::vector<gtmElement> vElem = {
             gtmElement(0.0, 0, 0.0, 0),
@@ -34,7 +34,7 @@ int tst_gBasicDisplay() {
     sMS->gLayerAirPollution = gB;
 
     std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gLayerAirPollution,
-                                                                       sMS->gLayerCurStruct, sMS->gLayerTransit);
+                                                                       sMS->gMainTerrain->gLayerCurStruct, sMS->gLayerTransit);
 
     //MENUS
     std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);

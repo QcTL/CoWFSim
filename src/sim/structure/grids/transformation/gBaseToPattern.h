@@ -96,7 +96,8 @@ private:
     std::uniform_int_distribution<> dis_col;
     std::uniform_int_distribution<> dis_dir;
 
-    void blobRoadsToGrid(std::map<T, std::vector<std::pair<std::pair<int, int>, uint8_t>>> edges, int sSquareWidth, int sSquareHeight) {
+    void blobRoadsToGrid(std::map<T, std::vector<std::pair<std::pair<int, int>, uint8_t>>> edges, int sSquareWidth,
+                         int sSquareHeight) {
         uint32_t bigRoad = (((uint32_t) (uint8_t) strtol("100001", nullptr, 2)) << 24);
         for (const auto &mapElem: edges) {
             for (const auto &vecElem: mapElem.second) {
@@ -109,15 +110,20 @@ private:
                     bool HasRight = ((vecElem.second & (1 << 4)) == 0);
 
                     for (int i = 0; i < sSquareWidth; i++) {
-                        if (HasBttm && gtmGResult->get(pair.first + i, pair.second + sSquareHeight - 1) != bigRoad)
+                        if (HasBttm && gtmGResult->isInside(pair.first + i, pair.second + sSquareHeight - 1) &&
+                            gtmGResult->get(pair.first + i, pair.second + sSquareHeight - 1) != bigRoad)
                             gtmGResult->set(pair.first + i, pair.second + sSquareHeight - 1, gtmEndValue);
-                        if (HasTop && gtmGResult->get(pair.first + i, pair.second) != bigRoad)
+                        if (HasTop && gtmGResult->isInside(pair.first + i, pair.second) &&
+                            gtmGResult->get(pair.first + i, pair.second) != bigRoad)
                             gtmGResult->set(pair.first + i, pair.second, gtmEndValue);
                     }
 
                     for (int i = 0; i < sSquareHeight; i++) {
-                        if (HasLeft && gtmGResult->get(pair.first, pair.second + i) != bigRoad) gtmGResult->set(pair.first, pair.second + i, gtmEndValue);
-                        if (HasRight &&  gtmGResult->get(pair.first + sSquareWidth - 1, pair.second + i) != bigRoad) gtmGResult->set(pair.first + sSquareWidth - 1, pair.second + i, gtmEndValue);
+                        if (HasLeft && gtmGResult->isInside(pair.first, pair.second + i) && gtmGResult->get(pair.first, pair.second + i) != bigRoad)
+                            gtmGResult->set(pair.first, pair.second + i, gtmEndValue);
+                        if (HasRight && gtmGResult->isInside(pair.first + sSquareWidth - 1, pair.second + i) &&
+                            gtmGResult->get(pair.first + sSquareWidth - 1, pair.second + i) != bigRoad)
+                            gtmGResult->set(pair.first + sSquareWidth - 1, pair.second + i, gtmEndValue);
                     }
 
                 }

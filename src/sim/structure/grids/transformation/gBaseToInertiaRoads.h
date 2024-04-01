@@ -21,7 +21,7 @@ public:
         std::pair<double, double> vUnitInertia = vStart;
         std::pair<int, int> pActive = pStart;
 
-        double deviation = 12.0;
+        double deviation = 6.0;
 
         std::default_random_engine re(seed == -1 ? std::random_device{}() : seed);
         std::uniform_real_distribution<double> unif(-deviation, deviation);

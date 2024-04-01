@@ -37,7 +37,6 @@ add_executable(CityOfWeirdFishes main.cpp
         src/display/menus/implementation/rSelOptMenu.cpp
         src/display/menus/implementation/rSelOptMenu.h
         src/sim/roads/transportation/gUniqueId.h
-        src/sim/roads/transportation/rToFollowDest.h
         src/sim/roads/node/RNodeAttrs/rRMailbox.h
         src/sim/roads/node/rInfoDists.h
         src/display/CameraControls.h
@@ -53,11 +52,11 @@ add_executable(CityOfWeirdFishes main.cpp
         src/display/menus/implementation/rRoadView/rRoadViewMenu.h
         src/display/menus/implementation/rCellViewMenu.h
         src/sim/structure/obj/sCommon.h
-        src/sim/sMainSimulator.h
+        src/sim/sSimulatorMain.h
         src/display/transformations/gTransSimToDisp.h
         src/sim/structure/grids/transformation/sGridToSimulator.h
-        src/sim/structure/obj/sTotalCompany.h
-        src/display/menus/implementation/rCompViewLayer.h
+        src/sim/behaviour/company/sCompanyStorage.h
+        src/display/menus/implementation/company/rCompViewLayer.h
         src/display/menus/oCommonMenus.h
         src/tests/tst_gBasicDisplay.h
         src/tests/tst_gBasicDisplayGround.h
@@ -87,17 +86,17 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/layers/implementations/sLayerCells.h
         src/sim/behaviour/company/sCompanyCompiler.h
         src/display/menus/implementation/AlwaysOD/rGUIClock.h
-        src/common/sMainContainer.h
+        src/common/sContainerMain.h
         src/sim/structure/grids/transformation/gBaseToStartBuildings.h
         src/sim/structure/grids/transformation/gBaseToInertiaRoads.h
         src/sim/structure/grids/transformation/gBaseToIRF.h
-        src/sim/structure/obj/sTotalRoutes.h
+        src/sim/structure/obj/sRoutesStorage.h
         src/sim/behaviour/company/sCompanyActions.h
         src/sim/behaviour/company/sCompanyTimer.h
-        src/sim/behaviour/company/sMCompany.h
+        src/sim/behaviour/company/sCompanyMain.h
         src/sim/behaviour/market/sMarketBazaar.h
-        src/sim/behaviour/company/employee/sMainCivil.h
-        src/sim/behaviour/airPollution/gMainAirPollution.h
+        src/sim/behaviour/company/employee/sCivilMain.h
+        src/sim/behaviour/airPollution/sgAirPollutionMain.h
         src/tests/tst_gWindExpansion.h
         "src/sim/behaviour/recording/sStorageCivilRoutineState.h"
         src/tests/tst_gNewVisualitzation.h
@@ -106,23 +105,27 @@ add_executable(CityOfWeirdFishes main.cpp
         src/display/menus/implementation/rRoadView/rRoadCrossView.h
         src/display/menus/implementation/rRoadView/rRoadLineView.h
         src/display/layers/implementation/gLayerUnderground.h
-        src/sim/behaviour/metro/gMainUnderground.h
+        src/sim/behaviour/metro/sgUndergroundMain.h
         src/sim/structure/obj/elements/objCivil.h
-        src/sim/behaviour/gTerrainGrid.h
+        src/sim/behaviour/sgTerrain.h
         src/sim/structure/obj/elements/contracts/cObjContracts.h
         src/sim/behaviour/market/listings/sIListing.h
         src/sim/behaviour/market/listings/implementations/sLBuyCell.h
         src/sim/behaviour/market/listings/implementations/sLRentCell.h
         src/sim/structure/obj/elements/objCompany.h
-        src/sim/behaviour/company/contract/sMainContractor.h
+        src/sim/behaviour/company/contract/sContractorMain.h
         src/sim/behaviour/company/contract/sContractorTimer.h
         src/sim/behaviour/company/code/sCodeStoratge.h
         src/sim/behaviour/company/contract/sContractorStorage.h
-        src/sim/roads/sMainRoads.h
-        src/sim/behaviour/market/sMainEvaluator.h
+        src/sim/roads/sgRoadsMain.h
+        src/sim/behaviour/market/sEvaluatorMain.h
         src/sim/behaviour/market/items/sRollingListsEvaluator.h
         src/sim/behaviour/market/items/sTotalElements.h
-        src/sim/behaviour/clock/sMainClock.h
+        src/sim/behaviour/clock/sClockMain.h
+        src/display/menus/implementation/company/rCompViewMoreLayer.h
+        src/sim/snCommonAtr.h
+        src/display/rgTerrain.h
+        src/display/menus/implementation/home/rHomeViewLayer.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

@@ -36,16 +36,15 @@ public:
                            int rSeed = -1) : gtmGResult(std::move(gResult)),
                                              gtmLElements(lElements),
                                              hasMask(pMask != nullptr),
-                                             gMask(pMask), toRepValue(toRepValue){
+                                             gMask(pMask), toRepValue(toRepValue) {
         gtmToExtend.emplace_back(strBiggestPos, 0);
         gtmGResult->set(strBiggestPos.first, strBiggestPos.second, float(lElements.size() - 1));
 
         if (rSeed == -1) {
             std::random_device rd;
-            gen = std::mt19937(rd());
-        } else {
-            gen.seed(rSeed);
-        }
+            gBTGM_gen = std::mt19937(rd());
+        } else
+            gBTGM_gen.seed(rSeed);
     }
 
 
@@ -69,7 +68,7 @@ public:
                      {newPos.first - 1, newPos.second + 1},
                      {newPos.first - 1, newPos.second},
                      {newPos.first - 1, newPos.second - 1}};
-            for(int i = 0; i < dOffsets.size(); i++) {
+            for (int i = 0; i < dOffsets.size(); i++) {
                 extendValueGridV2(dOffsets[i], 2, i, 0);
                 gtmGResult->set(dOffsets[i].first, dOffsets[i].second, 2);
             }
@@ -87,7 +86,7 @@ private:
 
     std::list<std::pair<std::pair<int, int>, int>> gtmToExtend;
 
-    std::mt19937 gen;
+    std::mt19937 gBTGM_gen;
     std::bernoulli_distribution d;
 
     T toRepValue;
@@ -100,7 +99,8 @@ private:
                  {pAct.first,     pAct.second - 1}};
 
         for (auto &dOffset: dOffsets) {
-            if (gtmGResult->isInside(dOffset) && (!hasMask || gMask->get(dOffset)) && gtmGResult->get(dOffset.first, dOffset.second) == toRepValue) {
+            if (gtmGResult->isInside(dOffset) && (!hasMask || gMask->get(dOffset)) &&
+                gtmGResult->get(dOffset.first, dOffset.second) == toRepValue) {
 
                 gtmElement gtmE = gtmLElements[static_cast<int>(vChoose)];
                 float nValue = randomChoice(gtmE.cGoingDownBase + gtmE.cAddDownForIter * nConcurrent) ? vChoose - 1 :
@@ -125,8 +125,9 @@ private:
                  {{pAct.first - 1, pAct.second - 1}, {pAct.first - 1, pAct.second}},
                  {{pAct.first - 1, pAct.second - 1}, {pAct.first,     pAct.second - 1}}};
 
-        for (int i = 0; i < dOffsets[vDir].size(); i++ ) {
-            if (gtmGResult->isInside(dOffsets[vDir][i]) && (!hasMask || gMask->get(dOffsets[vDir][i])) && gtmGResult->get(dOffsets[vDir][i]) == toRepValue) {
+        for (int i = 0; i < dOffsets[vDir].size(); i++) {
+            if (gtmGResult->isInside(dOffsets[vDir][i]) && (!hasMask || gMask->get(dOffsets[vDir][i])) &&
+                gtmGResult->get(dOffsets[vDir][i]) == toRepValue) {
 
                 gtmElement gtmE = gtmLElements[static_cast<int>(vChoose)];
                 float nValue = randomChoice(gtmE.cGoingDownBase + gtmE.cAddDownForIter * nConcurrent) ? vChoose - 1 :
@@ -136,14 +137,14 @@ private:
 
                 gtmGResult->set(dOffsets[vDir][i], nValue);
                 extendValueGridV2(dOffsets[vDir][i], gtmGResult->get(dOffsets[vDir][i]), vDir,
-                                  nValue == vChoose ? nConcurrent + 2 + (1-i)*0.4 : 0);
+                                  nValue == vChoose ? nConcurrent + 2 + (1 - i) * 0.4 : 0);
             }
         }
     }
 
     bool randomChoice(double p) {
         d = std::bernoulli_distribution(p);
-        return d(gen);
+        return d(gBTGM_gen);
     }
 };
 

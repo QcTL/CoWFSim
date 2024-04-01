@@ -28,13 +28,55 @@ const uint8_t TypeSoil_T2Obstacle = 9;
 
 class sLayerType {
 public:
-    struct returnLayerType{
+
+
+    static double distance(const std::pair<int, int> &p1, const std::pair<int, int> &p2) {
+        return std::sqrt(std::pow(p2.first - p1.first, 2) + std::pow(p2.second - p1.second, 2));
+    }
+
+    static std::vector<std::pair<int, int>> nearestNeighbor(const std::vector<std::pair<int, int>> &points) {
+        std::vector<std::pair<int, int>> result;
+        std::vector<bool> visited(points.size(), false);
+
+        // Start from the first point
+        int current = 0;
+        result.push_back(points[current]);
+        visited[current] = true;
+
+        // Visit nearest neighbors until all points are visited
+        while (result.size() < points.size()) {
+            double minDist = std::numeric_limits<double>::max();
+            int nextIndex = -1;
+
+            // Find the nearest unvisited neighbor
+            for (int i = 0; i < points.size(); ++i) {
+                if (!visited[i]) {
+                    double dist = distance(points[current], points[i]);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        nextIndex = i;
+                    }
+                }
+            }
+
+            // Move to the nearest unvisited neighbor
+            if (nextIndex != -1) {
+                current = nextIndex;
+                result.push_back(points[current]);
+                visited[current] = true;
+            }
+        }
+
+        return result;
+    }
+
+    struct returnLayerType {
         std::shared_ptr<gIGrid<uint8_t>> genTypeSoil;
         std::vector<std::pair<int, int>> centerClusters;
     };
 
     static returnLayerType gen(uint32_t lSize, const std::shared_ptr<gIGrid<uint8_t>> &gTypeGen,
-                                                const std::map<std::string, std::string> &mValues) {
+                               const std::map<std::string, std::string> &mValues,const int inSeed = 0 ) {
         std::shared_ptr<gIGrid<uint8_t>> gLayerTypeSoil =
                 std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, TypeSoil_Nothing));
         std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gLayerTypeSoil->rangeUse();
@@ -52,15 +94,19 @@ public:
         if (mValues.at("Conte_Riu") == "on")
             gBaseToRiver<uint8_t>::generate(gLayerTypeSoil, 20, lSizeRiver, TypeSoil_T1Obstacle);
 
-        std::srand(static_cast<unsigned>(std::time(nullptr)));
+        if(inSeed == 0)
+            std::srand(static_cast<unsigned>(std::time(nullptr)));
+        else
+            std::srand(inSeed);
+
         std::vector<std::pair<int, int>> gCenterCoreUrban(3);
-        for (auto& gCenter : gCenterCoreUrban) {
+        for (auto &gCenter: gCenterCoreUrban) {
             gCenter = {std::rand() % (lSize + 1), std::rand() % (lSize + 1)};
             genClusterTypeSoil(gCenter, 6, 9, 13, gLayerTypeSoil);
         }
 
         std::vector<std::pair<int, int>> gCenterCoreIndustrial(2);
-        for (auto& gCenter : gCenterCoreIndustrial) {
+        for (auto &gCenter: gCenterCoreIndustrial) {
             gCenter = {std::rand() % (lSize + 1), std::rand() % (lSize + 1)};
             genClusterTypeIndustry(gCenter, 3, 8, gLayerTypeSoil);
         }
@@ -80,7 +126,10 @@ public:
 
 
         gCenterCoreUrban.insert(gCenterCoreUrban.end(), gCenterCoreIndustrial.begin(), gCenterCoreIndustrial.end());
-        return {gLayerTypeSoil, gCenterCoreUrban};
+
+        //Reorder cClusters:
+        std::vector<std::pair<int, int>> rP = nearestNeighbor(gCenterCoreUrban);
+        return {gLayerTypeSoil, rP};
     }
 
 private:

@@ -12,7 +12,7 @@
 #include "../sim/structure/grids/transformation/gBaseToGradientMinimum.h"
 #include "../sim/structure/grids/transformation/gBasicTransformations.h"
 #include "../sim/structure/grids/transformation/gBaseToWFC.h"
-#include "../sim/sMainSimulator.h"
+#include "../sim/sSimulatorMain.h"
 #include "../display/menus/implementation/rBaseMenu.h"
 
 int tst_gBasicWFCBasic() {
@@ -20,7 +20,7 @@ int tst_gBasicWFCBasic() {
 
     int rRows = 100;
     int rCols = 100;
-    std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(rRows);
+    std::shared_ptr<sSimulatorMain> sMS = std::make_shared<sSimulatorMain>(rRows);
     //MASK:
     std::shared_ptr<gIGrid<bool>> b = std::make_shared<gBasicGrid<bool>>(gBasicGrid<bool>(rRows, rCols, -1));
 
@@ -31,7 +31,7 @@ int tst_gBasicWFCBasic() {
     sMS->gLayerAirPollution = gReal;
 
     std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gLayerAirPollution,
-                                                                       sMS->gLayerCurStruct, sMS->gLayerTransit);
+                                                                       sMS->gMainTerrain->gLayerCurStruct, sMS->gLayerTransit);
     //MENUS
     std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
     std::shared_ptr<rBaseMenu> rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->gLayerTypeGen,

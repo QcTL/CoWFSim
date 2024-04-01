@@ -10,14 +10,15 @@
 #include "src/sim/structure/grids/transformation/gBaseToPattern.h"
 #include "src/sim/structure/grids/transformation/gBaseToGradientMinimum.h"
 #include "src/sim/structure/grids/transformation/gBasicTransformations.h"
-#include "src/sim/sMainSimulator.h"
+#include "src/sim/sSimulatorMain.h"
 #include "src/sim/structure/grids/transformation/sGridToSimulator.h"
 #include "src/display/rGlobal.h"
 #include "src/display/menus/implementation/rBaseMenu.h"
 #include "src/sim/structure/grids/transformation/gBaseToField.h"
 #include "src/sim/layers/implementations/sLayerType.h"
 #include "src/sim/layers/implementations/sLayerCells.h"
-#include "src/common/sMainContainer.h"
+#include "src/common/sContainerMain.h"
+#include "src/sim/snCommonAtr.h"
 
 class SimInitialize {
 public:
@@ -32,23 +33,21 @@ public:
         else if (mValues.at("Mida_Simulacio") == "Molt_Gran")
             lSizeGrid = 250;
 
-        std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(lSizeGrid);
+        std::shared_ptr<sSimulatorMain> sMS = std::make_shared<sSimulatorMain>(lSizeGrid);
 
-        sLayerType::returnLayerType tReturn = sLayerType::gen(lSizeGrid, sMS->gMainTerrain->gTG_TypeGen, mValues);
+        sLayerType::returnLayerType tReturn = sLayerType::gen(lSizeGrid, sMS->gMainTerrain->gTG_TypeGen, mValues, snCommonAtr::getFlagAtr("snCA_Seed"));
         sMS->gMainTerrain->gTG_TypeSoil = tReturn.genTypeSoil;
-        //sMS->gTotalAirPollution->gLayerAirPollution = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
 
-        sLayerCells::retObjSLayerCells retCells =
-                sLayerCells::gen(lSizeGrid, sMS->gMainTerrain->gTG_TypeSoil , sMS->gMainTerrain->gTG_TypeGen, tReturn.centerClusters, mValues);
-        sMS->gLayerCurStruct = retCells.gMatrix;
+        retObjSLayerCells retCells =
+                sLayerCells::gen(lSizeGrid, sMS->gMainTerrain, tReturn.centerClusters, mValues, snCommonAtr::getFlagAtr("snCA_Seed"));
+
         sMS->gTotalUnderground->gLayerUnderground = retCells.gUnderground;
         sMS->gTotalUnderground->setPointsTransit(retCells.routesMetro);
 
-
         sMS->completedSetupStage();
-        sMS->completedStartCompanies({});
+        sMS->completedStartCompanies(retCells.gCompanyPositions);
 
-        sMainContainer sMC(sMS);
+        sContainerMain sMC(sMS);
 
         sMC.gameLoop();
         return 0;

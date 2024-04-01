@@ -8,17 +8,17 @@
 
 #include "../display/rGlobal.h"
 #include "../sim/structure/grids/gBasicGrid.h"
-#include "../sim/sMainSimulator.h"
+#include "../sim/sSimulatorMain.h"
 #include "../display/menus/implementation/rBaseMenu.h"
 
 int tst_gMenus() {
 
     std::shared_ptr<gIGrid<uint8_t>> gB = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(30, 30, 255));
-    std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(30);
+    std::shared_ptr<sSimulatorMain> sMS = std::make_shared<sSimulatorMain>(30);
 
 
     std::shared_ptr<gDispLayers> gSimL = std::make_shared<gDispLayers>(sMS->gTotalAirPollution->gLayerAirPollution ,
-                                                                       sMS->gLayerCurStruct, sMS->gLayerTransit);
+                                                                       sMS->gMainTerrain->gLayerCurStruct, sMS->gLayerTransit);
     //MENUS
     std::shared_ptr<rPileMenus> pPM = std::make_shared<rPileMenus>(gSimL);
     std::shared_ptr<rBaseMenu> rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->gLayerTypeGen,

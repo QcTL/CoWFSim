@@ -5,36 +5,29 @@
 #ifndef CITYOFWEIRDFISHES_RCOMPVIEWLAYER_H
 #define CITYOFWEIRDFISHES_RCOMPVIEWLAYER_H
 
-#include "../rIMenu.h"
-#include "../../../sim/structure/obj/sCommon.h"
-#include "../oCommonMenus.h"
+#include "../../rIMenu.h"
+#include "../../../../sim/structure/obj/sCommon.h"
+#include "../../oCommonMenus.h"
+#include "./rCompViewMoreLayer.h"
 
 class rCompViewLayer : public rIMenu {
 public:
     explicit rCompViewLayer(const std::shared_ptr<rIMenu> &mParent, const objCompany &rShow,
-                            const std::string &pthFileD)
-            : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft) {
+                            const std::string &pthFileD, const std::shared_ptr<rPileMenus> &mPiles)
+            : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft), mPiles(mPiles), rCompRef(rShow) {
         std::vector<std::vector<int>> data = extractDataFromFile(pthFileD);
 
-        comV = std::vector<defTxtCompany>(9, {{0, 0}});
+        comV = std::vector<defTxtCompany>(11, {{0, 0}});
 
-        std::vector<uint8_t> sLengths = {11, 5, 5, 13, 6, 9, 4, 9, 4, 9, 4};
-
+        std::vector<uint8_t> sLengths = {11, 3, 3, 4, 6, 9, 4, 9, 4, 9, 4};
+        int nSeen = 0;
         for (int i = 0; i < data.size(); ++i) {
             for (int j = 0; j < data[i].size(); ++j) {
                 auto row = (rPos == pBottomLeft || rPos == pBottomRight) ? data.size() - 1 - i : i;
                 auto col = (rPos == pTopRight || rPos == pBottomRight) ? data[i].size() - 1 - j : j;
                 if (data[i][j] == 65 || data[i][j] == 48) {
-                    for (int t = 0; t < comV.size(); ++t) {
-                        bool condition = comV[t].pLength == 0;
-                        for (int k = 0; k < t; ++k) {
-                            condition = condition && (i != comV[k].pStartText.first);
-                        }
-                        if (condition) {
-                            comV[t] = {{row, col}, sLengths[t]};
-                            break;
-                        }
-                    }
+                    comV[nSeen] = {{row, col}, sLengths[nSeen]};
+                    nSeen++;
                 } else if (data[i][j] == 304 || data[i][j] == 305) {
                     pElemSel.emplace_back(row, col);
                     pElemSelAbs.emplace_back(i, j);
@@ -51,38 +44,44 @@ public:
         setText(1, oCommonMenus::getCompNumber(rShow.c_cActiveLocations.size()));
         setText(2, oCommonMenus::getCompNumber(rShow.c_cRentedLocations.size()));
         setText(3, getFloatToString2Decimal(rShow.c_cActiveFunds));
-        setText(4, "25.34");
+        setText(4, "25.34"); //TODO Change it;
 
+        for (int i = 5; i < 11; i++)
+            setText(i, "");
+        std::vector<std::pair<uint32_t, int>> pairVec(rShow.c_pOwn.begin(), rShow.c_pOwn.end());
 
-        setText(5, "");
-        setText(6, "");
+        std::sort(pairVec.begin(), pairVec.end(), [](const auto &lhs, const auto &rhs) {
+            return lhs.second > rhs.second;
+        });
 
-        setText(7, "");
-        setText(8, "");
-
-        if (rShow.c_pOwn.begin() != rShow.c_pOwn.end()) {
-            setText(5, std::to_string(rShow.c_pOwn.begin()->first));
-            setText(6, oCommonMenus::getCompNumber(rShow.c_pOwn.begin()->second));
-        } else {
-            setText(5, "");
-            setText(6, "");
-        }
+        for (int i = 0; i < 3 && i < pairVec.size(); ++i)
+            if (pairVec.size() > i && (pairVec.begin() + i)->second > 0) {
+                auto it = pairVec.begin() + i;
+                setText(5 + i * 2, std::to_string(it->first));
+                setText(6 + i * 2, oCommonMenus::getCompNumber(it->second));
+            }
     }
 
     void draw(sf::RenderWindow &rW) override {
         rW.draw(dInfo, &tsTex.tsTex);
     }
 
-    void setResponse(int v, uint16_t lID) override {}
+    void setResponse(int v, uint16_t lID) override {
+        mPiles->removeTop();
+    }
 
     bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override {
         switch (event.type) {
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::Escape)
                     parentMenu->setResponse(-1, 1);
-                break;
-            case sf::Event::MouseButtonPressed:
-                //parentMenu->setResponse(-1,1);
+                if (event.key.code == sf::Keyboard::P){
+                    std::shared_ptr<rCompViewMoreLayer> rComp = std::make_shared<rCompViewMoreLayer>(
+                            rCompViewMoreLayer(mPiles->vTopActiveMenu,
+                                           rCompRef,
+                                           "d_mCompViewMoreLayer"));
+                    mPiles->addMenuTop(rComp);
+                }
                 break;
             default:
                 break;
@@ -99,10 +98,10 @@ private:
         ss << std::fixed << std::setprecision(2) << nUsed;
         return ss.str();
     }
-
+    std::shared_ptr<rPileMenus> mPiles;
     std::vector<std::pair<int, int>> pElemSel;
     std::vector<std::pair<int, int>> pElemSelAbs;
-    int cCurrenSel = -1;
+    objCompany rCompRef;
 };
 
 #endif //CITYOFWEIRDFISHES_RCOMPVIEWLAYER_H

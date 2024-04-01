@@ -8,7 +8,7 @@
 #include <memory>
 
 #include "../gIGrid.h"
-#include "../../../sMainSimulator.h"
+#include "../../../sSimulatorMain.h"
 
 class sGridToSimulator {
 

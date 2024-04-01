@@ -15,21 +15,17 @@ public:
         std::vector<uint8_t> sLengths = {3, 3, 3, 3};
         comV = std::vector<defTxtCompany>(5, {{0, 0}});
         rCrossPos = std::vector<std::pair<int, int>>(5, {0, 0});
+
         int pAct = 0;
         int pCross = 0;
         for (int i = 0; i < dExtracted.size(); ++i) {
             for (int j = 0; j < dExtracted[i].size(); ++j) {
                 auto row = (rPos == pBottomLeft || rPos == pBottomRight) ? dExtracted.size() - 1 - i : i;
                 auto col = (rPos == pTopRight || rPos == pBottomRight) ? dExtracted[i].size() - 1 - j : j;
-                if (dExtracted[i][j] == 65 || dExtracted[i][j] == 48) {
-                    comV[pAct] = {{row, col}, sLengths[pAct]};
-                    pAct++;
-                } else if (dExtracted[i][j] == 277) {
-                    rCrossPos[pCross] = {i, j};
-                    pCross++;
-                } else if(dExtracted[i][j] == 272){
-                    rCenter = {i,j};
-                }
+                int val = dExtracted[i][j];
+                if (val == 65 || val == 48) comV[pAct++] = {{row, col}, sLengths[pAct]};
+                else if (val == 277) rCrossPos[pCross++] = {i, j};
+                else if (val == 272) rCenter = {i, j};
             }
         }
         setSizeWays(rSelRoad->getSizesNeighbor());
@@ -39,38 +35,19 @@ public:
         setRoadsCars(rSelRoad->getPosRoad(0));
     }
 
-    void setSizeWays(const std::pair<std::pair<int, int>, std::pair<int, int>> &fOpening) {
-        if (fOpening.first.first == -1)
-            setText(0, " ");
-        else {
-            setText(0, std::to_string(fOpening.first.first));
-            setPositionValue(rCrossPos[3], 32);
-        }
+    std::vector<uint8_t> rOrderDir = {0, 3, 1, 2};
+    std::vector<uint8_t> rOrderCross = {3, 0, 1, 2};
 
-        if (fOpening.first.second == -1)
-            setText(3, " ");
-        else {
-            setText(3, std::to_string(fOpening.first.second));
-            setPositionValue(rCrossPos[0], 32);
-        }
-
-        if (fOpening.second.first == -1)
-            setText(1, " ");
-        else {
-            setText(1, std::to_string(fOpening.second.first));
-            setPositionValue(rCrossPos[1], 32);
-        }
-
-        if (fOpening.second.second == -1)
-            setText(2, " ");
-        else {
-            setText(2, std::to_string(fOpening.second.second));
-            setPositionValue(rCrossPos[2], 32);
+    void setSizeWays(const std::vector<int> &fOpening) {
+        for(int i =0; i < 4; i++){
+            setText(rOrderDir[i], fOpening[i] == -1 ? " " : std::to_string(fOpening[i]));
+            if (fOpening[i] != -1)
+                setPositionValue(rCrossPos[rOrderCross[i]], 32);
         }
     }
 
     void setRoadsCars(const std::vector<std::list<uint32_t>> &rEleDins) {
-        setPositionValue(rCenter, rEleDins[0].empty()? 32 : 272);
+        setPositionValue(rCenter, rEleDins[0].empty() ? 32 : 272);
     }
 
 private:

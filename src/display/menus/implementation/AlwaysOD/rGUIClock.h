@@ -6,18 +6,10 @@
 #define CITYOFWEIRDFISHES_RGUICLOCK_H
 
 #include "../../rIMenu.h"
+#include "../../../../sim/behaviour/clock/sClockMain.h"
 
 class rGUIClock : public rIMenu {
 public:
-    struct objClockValues {
-        uint8_t rVHour;
-        uint8_t rVMinute;
-        bool rVIsAM;
-        uint8_t rVDay;
-        uint8_t rVMonth;
-        uint16_t rVYear;
-    };
-
 
     explicit rGUIClock(const std::shared_ptr<rIMenu> &mParent,
                        const std::string &pthFileD) : rIMenu(mParent, rRelativePos::pTopLeft) {
@@ -50,7 +42,7 @@ public:
             }
         }
         setVelocity(0);
-        setClock({12, 59, true, 12, 9, 2023});
+        setClock({0, 0, 0, 0, 0});
     }
 
     //TODO ha de poder cridar al pare per poder canviar la velocitat de reproduccio de la simulacio
@@ -59,16 +51,16 @@ public:
     //Tambe estaria be que el rGUI no comptes res ell i fos cada cop que hagui de canviar un missatge de rPiles que hauria
     // de venir de algun altre lloc.
 
-    void setClock(const objClockValues &vNew) {
+    void setClock(const sClockMain::sCM_ClockValues &vNew) {
+        std::string gHour = std::to_string((vNew.sCM_rVHour % 12) == 0 ? 12 : (vNew.sCM_rVHour % 12));
+        std::string gMinutes = std::to_string(vNew.sCM_rVMinute % 60);
+        setText(0, (gHour.size() == 1 ? "0" : "") + gHour +
+                   ":" +
+                   (gMinutes.size() == 1 ? "0" : "") + gMinutes +
+                   ((vNew.sCM_rVHour < 12) ? "am" : "pm"));
 
-        std::string gHour = std::to_string(vNew.rVHour % 13);
-        std::string gMinutes = std::to_string(vNew.rVMinute % 60);
-        setText(0, (vNew.rVHour < 10 ? "0" : "") + gHour +
-                   ':' +
-                   (vNew.rVMinute < 10 ? "0" : "") + gMinutes +
-                   (vNew.rVIsAM ? "am" : "pm"));
-        setText(1, std::to_string(vNew.rVDay % 32) + '/' + std::to_string(vNew.rVMonth % 13));
-        setText(2, std::to_string(vNew.rVYear));
+        setText(1, std::to_string(vNew.sCM_rVDay % 32) + '/' + std::to_string(vNew.sCM_rVMonth % 13));
+        setText(2, std::to_string(vNew.sCM_rVYear));
     }
 
     void setVelocity(const uint8_t &vNew) {

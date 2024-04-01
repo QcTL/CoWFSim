@@ -28,12 +28,12 @@ public:
     bool hasToChange(uint32_t gTimer) {
         if (gListTimers.empty())
             return false;
-        return gListTimers.front().sOT_Timer < gTimer;
+        return gListTimers.front().sOT_Timer <= gTimer;
     };
 
     std::vector<std::pair<uint32_t, uint32_t>> checkForTime(uint32_t gTimer) {
         std::vector<std::pair<uint32_t, uint32_t>> ret;
-        while (gListTimers.front().sOT_Timer < gTimer) {
+        while (!gListTimers.empty() && gListTimers.front().sOT_Timer <= gTimer) {
             ret.emplace_back(gListTimers.front().sOT_ItemGen, gListTimers.front().sOT_IdCompany);
             gListTimers.pop_front();
         }

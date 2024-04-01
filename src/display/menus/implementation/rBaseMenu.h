@@ -14,17 +14,18 @@
 #include "rCellViewMenu.h"
 #include "rRoadView/rRoadLineView.h"
 #include "rRoadView/rRoadCrossView.h"
+#include "home/rHomeViewLayer.h"
 
 class rBaseMenu : public rIMenu {
 public:
     explicit rBaseMenu(const std::shared_ptr<rPileMenus> &rPile,
-                       const std::shared_ptr<gIGrid<uint8_t>> &gType,
+                       const std::shared_ptr<sgTerrain> &sgTerrain,
                        const std::vector<std::vector<rNode *>> &gRoads,
                        const std::shared_ptr<gIGrid<std::list<uint32_t>>> &gLayerOwn,
-                       const std::shared_ptr<sTotalCompany> &sTComp)
+                       const std::shared_ptr<sCompanyStorage> &sTComp)
             : rIMenu(nullptr, rIMenu::rRelativePos::pBottomRight),
               refPile(rPile), lstValueLayer(1),
-              refLRoads(gRoads), refLTypes(gType), refLBuild(gLayerOwn), refSComp(sTComp) {
+              refLRoads(gRoads), rBM_refTerrain(sgTerrain), refLBuild(gLayerOwn), refSComp(sTComp) {
     }
 
     void draw(sf::RenderWindow &rW) override {}
@@ -57,7 +58,7 @@ public:
                     refPile->rInteractionGameVel = 1000.0;
                     break;
                 case 2:
-                    refPile->rInteractionGameVel = 100.0;
+                    refPile->rInteractionGameVel = 50.0;
                     break;
                 default:
                     break;
@@ -84,17 +85,25 @@ public:
 
     void pressedCell(std::pair<int, int> cPressed) override {
         std::cout << cPressed.first << ":" << cPressed.second << std::endl;
-        switch (refLTypes->get(cPressed)) {
-            case 1:
+        switch (rBM_refTerrain->gTG_TypeGen->get(cPressed)) {
+            case 1: {
+                std::shared_ptr<rHomeViewLayer> _rHome = std::make_shared<rHomeViewLayer>(
+                        rHomeViewLayer(refPile->vTopActiveMenu,
+                                       refSComp->getCompanyByUUID(refLBuild->get(cPressed).front()),
+                                       rBM_refTerrain->gTG_civilOccupancy->get(cPressed),
+                                       rBM_refTerrain->gTG_TypeSoil->get(cPressed), refPile));
+                refPile->addMenuTop(_rHome);
+            }
+                break;
             case 2:
             case 3:
-            case 4:{
+            case 4: {
                 if (!refLBuild->get(cPressed).empty()) {
                     if (refLBuild->get(cPressed).size() == 1) {
                         std::shared_ptr<rCompViewLayer> rComp = std::make_shared<rCompViewLayer>(
                                 rCompViewLayer(refPile->vTopActiveMenu,
                                                *refSComp->getCompanyByUUID(refLBuild->get(cPressed).front()),
-                                               "d_mCompViewLayer"));
+                                               "d_mCompViewLayer", refPile));
                         refPile->addMenuTop(rComp);
                         std::cout << "YEP" << std::endl;
                     } else {
@@ -111,12 +120,12 @@ public:
             case 5:
             case 6:
                 if (refLRoads[cPressed.first][cPressed.second] != nullptr) {
-                    if(refLRoads[cPressed.first][cPressed.second]->refCompressed->isCrossing()) {
+                    if (refLRoads[cPressed.first][cPressed.second]->refCompressed->isCrossing()) {
                         std::shared_ptr<rRoadViewMenu> rRoad = std::make_shared<rRoadCrossView>(
                                 refPile->vTopActiveMenu, refLRoads[cPressed.first][cPressed.second]->refCompressed,
                                 rIMenu::rRelativePos::pBottomLeft);
                         refPile->addMenuTop(rRoad);
-                    }else{
+                    } else {
                         std::shared_ptr<rRoadViewMenu> rRoad = std::make_shared<rRoadLineView>(
                                 refPile->vTopActiveMenu, refLRoads[cPressed.first][cPressed.second]->refCompressed,
                                 rIMenu::rRelativePos::pBottomLeft);
@@ -133,9 +142,9 @@ private:
     int lstValueLayer;
 
     std::vector<std::vector<rNode *>> refLRoads;
-    std::shared_ptr<gIGrid<uint8_t>> refLTypes;
+    std::shared_ptr<sgTerrain> rBM_refTerrain;
     std::shared_ptr<gIGrid<std::list<uint32_t>>> refLBuild;
-    std::shared_ptr<sTotalCompany> refSComp;
+    std::shared_ptr<sCompanyStorage> refSComp;
 };
 
 #endif //CITYOFWEIRDFISHES_RBASEMENU_H

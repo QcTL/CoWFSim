@@ -242,28 +242,31 @@ protected:
 
     void setPositionValue(std::pair<int, int> cPos, uint32_t cValue) {
         sf::Vertex *quad = &dInfo[(cPos.second + cPos.first * gWidth) * 4];
-        for (int k = 0; k < 4; k++) {
+        for (int k = 0; k < 4; k++)
             quad[k].texCoords = lRefTiles[cValue][k];
-        }
     }
 
-    void setText(const uint8_t tVal, const std::string &cText) {
+    void setText(const uint8_t tVal, std::string cText) {
+        if (rPos == rIMenu::rRelativePos::pBottomRight || rPos == rIMenu::rRelativePos::pTopRight) {
+            cText.append(comV[tVal].pLength - cText.size(), ' ');
+            std::reverse(cText.begin(), cText.end());
+        }
+
         for (int i = 0; i < comV[tVal].pLength; i++) {
-            sf::Vertex *quad = &dInfo[
-                    (comV[tVal].pStartText.second + i + comV[tVal].pStartText.first * gWidth) * 4];
+            sf::Vertex *quad = &dInfo[(comV[tVal].pStartText.second + i + comV[tVal].pStartText.first * gWidth) * 4];
+            char currentChar = (i < cText.size()) ? cText[i] : ' ';
+            int charIndex = -1;
+            if (currentChar >= 'a' && currentChar <= 'z') charIndex = currentChar - 'a' + 1;
+            else if (currentChar >= 'A' && currentChar <= 'Z') charIndex = currentChar - 'A' + 65;
+            else if (currentChar >= '0' && currentChar <= '9') charIndex = currentChar - '0' + 48;
+            else if (currentChar == '.') charIndex = 46;
+            else if (currentChar == ':') charIndex = 58;
+            else if (currentChar == '/') charIndex = 47;
+            else if (currentChar == '-') charIndex = 45;
+
+            const int defaultCharIndex = 32;
             for (int k = 0; k < 4; k++) {
-                if (i >= cText.size())
-                    quad[k].texCoords = lRefTiles[32][k];
-                else if (cText[i] >= 'a' && cText[i] <= 'z')
-                    quad[k].texCoords = lRefTiles[(cText[i] - 'a') + 1][k];
-                else if (cText[i] >= 'A' && cText[i] <= 'Z')
-                    quad[k].texCoords = lRefTiles[(cText[i] - 'A') + 65][k];
-                else if (cText[i] >= '0' && cText[i] <= '9')
-                    quad[k].texCoords = lRefTiles[(cText[i] - '0') + 48][k];
-                else if (cText[i] == '.')
-                    quad[k].texCoords = lRefTiles[46][k];
-                else
-                    quad[k].texCoords = lRefTiles[32][k];
+                quad[k].texCoords = lRefTiles[(charIndex != -1) ? charIndex : defaultCharIndex][k];
             }
         }
     }

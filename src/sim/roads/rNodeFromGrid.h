@@ -10,7 +10,7 @@
 #include <unordered_set>
 #include "../structure/grids/gIGrid.h"
 #include "node/rNode.h"
-#include "../sMainSimulator.h"
+#include "../sSimulatorMain.h"
 
 template<typename T>
 class rNodeFromGrid {
@@ -91,7 +91,6 @@ private:
             }
         }
     }
-
 
 };
 

@@ -10,17 +10,17 @@
 #include "../../structure/grids/gIGrid.h"
 #include "sCompanyTimer.h"
 #include "../market/sMarketBazaar.h"
-#include "../gTerrainGrid.h"
-#include "contract/sMainContractor.h"
+#include "../sgTerrain.h"
+#include "contract/sContractorMain.h"
 #include "sCompanyCompiler.h"
-#include "../market/sMainEvaluator.h"
+#include "../market/sEvaluatorMain.h"
 
 class sCompanyActions {
 public:
-    sCompanyActions(const std::shared_ptr<gTerrainGrid> &gType,
+    sCompanyActions(const std::shared_ptr<sgTerrain> &gType, const std::shared_ptr<sMarketBazaar> &inSMarketBazaar,
                     const std::shared_ptr<sCompanyTimer> &gCTimer,
-                    const std::shared_ptr<sMainEvaluator> &sMEvaluator)
-            : sCA_gTimer(gCTimer), sCA_gType(gType), sMEvaluator(sMEvaluator) {}
+                    const std::shared_ptr<sEvaluatorMain> &sMEvaluator)
+            : sCA_gTimer(gCTimer), sCA_gType(gType), sMEvaluator(sMEvaluator), sCA_MarketListing(inSMarketBazaar) {}
 
     bool
     gTryIntention(sCompanyCompiler::sCCIntentions &sCCI, std::shared_ptr<sCodeStorage> &sCodeStorage,
@@ -29,10 +29,14 @@ public:
             case sCompanyCompiler::sCCIntentions::CELL_Buy: {
                 sLBuyCell::sMFilter sMF(sCCI.scc_addIdInfo);
                 std::shared_ptr<sLBuyCell::sMOffering> sMOff = sCA_MarketListing->getListOfOffering(sMF);
-
-                //Creation of Contract:
-                sCA_MainContractor->addContractToCompany(sCCI.scc_objCompany, sMOff->sMO_givingCompany, *sMOff, cDate);
-                sCA_MarketListing->removeCompleteProcess(sMOff);
+                if(sMOff != nullptr) {
+                    //Creation of Contract:
+                    sCA_MainContractor->addContractToCompany(sCCI.scc_objCompany, sMOff->sMO_givingCompany, *sMOff,
+                                                             cDate);
+                    sCA_MarketListing->removeCompleteProcess(sMOff);
+                }else{
+                    //TODO REMOVE POINTS
+                }
             }
                 break;
             case sCompanyCompiler::sCCIntentions::CELL_GiveRent: {
@@ -69,6 +73,9 @@ public:
             case sCompanyCompiler::sCCIntentions::OBJ_Buy:
                 sMEvaluator->computeBoughtElement(sCCI.scc_addIdInfo, sCCI.scc_objCompany);
                 break;
+            case sCompanyCompiler::sCCIntentions::OBJ_SellInm:
+                sMEvaluator->computeSellInmElement(sCCI.scc_addIdInfo, sCCI.scc_objCompany);
+                break;
         }
         return true;
     }
@@ -85,28 +92,27 @@ private:
                     uint32_t cDate) {
         if (!hasTypeOwn(oC, gItemGen))
             return false;
-        if (!hasResources(*oC, gItemGen)) {
+        if (!hasResources(*oC, gItemGen))
             for (uint32_t mLack: sMEvaluator->getById(gItemGen).sMEE_iCElem) {
                 sCompanyCompiler::sCCIntentions buyItems = {
                         sCompanyCompiler::sCCIntentions::sCCEnumIntentions::OBJ_Buy, mLack, oC};
                 gTryIntention(buyItems, sCodeStorage, cDate);
             }
-        }
 
         for (const auto &gElem: sMEvaluator->getById(gItemGen).sMEE_iCElem)
             oC->c_pOwn[gElem] -= 1;
         oC->c_cAvailableByType[sMEvaluator->getById(gItemGen).sMEE_iReqTypeBuild] -= 1;
         sCA_gTimer->addTimer(gItemGen, sMEvaluator->getById(gItemGen).sMEE_iTime + cDate, oC->c_uuid);
+        std::cout << "CREATED PRODUCT" << std::endl;
         return true;
     }
 
     //ELEMENTS VALIDATIONS;
     bool hasTypeOwn(std::shared_ptr<objCompany> &oC, uint32_t gItemGen) {
-        std::map<uint32_t, uint8_t> gQuant; //TO IMPROVE;
         sTotalElements::sME_Element oPR = sMEvaluator->getById(gItemGen);
         if (oC->c_cAvailableByType.find(oPR.sMEE_iReqTypeBuild) == oC->c_cAvailableByType.end())
             return false;
-        return true;
+        return oC->c_cAvailableByType[oPR.sMEE_iReqTypeBuild] > 0;
     }
 
     bool hasResources(objCompany &oC, uint32_t gItemGen) {
@@ -122,11 +128,11 @@ private:
         return true;
     }
 
-    std::shared_ptr<sMainEvaluator> sMEvaluator;
-    std::shared_ptr<gTerrainGrid> sCA_gType;
+    std::shared_ptr<sEvaluatorMain> sMEvaluator;
+    std::shared_ptr<sgTerrain> sCA_gType;
     std::shared_ptr<sCompanyTimer> sCA_gTimer;
     std::shared_ptr<sMarketBazaar> sCA_MarketListing;
-    std::shared_ptr<sMainContractor> sCA_MainContractor;
+    std::shared_ptr<sContractorMain> sCA_MainContractor;
 };
 
 #endif //CITYOFWEIRDFISHES_SCOMPANYACTIONS_H

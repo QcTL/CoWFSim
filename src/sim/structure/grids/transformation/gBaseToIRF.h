@@ -22,9 +22,9 @@ public:
 
     template<typename T>
     static std::vector<gPositionEscape>
-    gen(const std::shared_ptr<gIGrid<T>> gOutput, const std::shared_ptr<gIGrid<uint8_t>> &gType,
-        std::pair<int, int> pStart, std::pair<double, double> vStart, T valueEnd, uint8_t valueTypeSoil,
-        uint8_t fDispersion, int seed = -1) {
+    gen(const std::shared_ptr<gIGrid<T>> &gType,
+        std::pair<int, int> pStart, std::pair<double, double> vStart, T valueEnd,
+        uint8_t fDispersion, int seed = 0) {
 
         std::vector<gPositionEscape> ret;
         std::pair<double, double> vUnitInertia = vStart;
@@ -33,13 +33,18 @@ public:
         double deviation = 4.0;
         int tToDisp = fDispersion;
 
-        std::default_random_engine re(seed == -1 ? std::random_device{}() : seed);
+        std::default_random_engine re(seed == 0 ? std::random_device{}() : seed);
         std::uniform_real_distribution<double> unif(-deviation, deviation);
 
+        std::mt19937 sCM_genRand;
+        if (snCommonAtr::getFlagAtr("snCA_Seed") != 0)
+            sCM_genRand.seed(snCommonAtr::getFlagAtr("snCA_Seed"));
+        else
+            sCM_genRand.seed(static_cast<unsigned int>(time(nullptr)));
+
         while (gType->isInside(pActive)) {
-            if (gType->get(pActive) != 5 && getSurroundRoads(gType, pActive, valueTypeSoil) <= 2) {
-                gOutput->set(pActive, valueEnd);
-                gType->set(pActive, valueTypeSoil);
+            if (gType->get(pActive) != 5 && getSurroundRoads(gType, pActive, valueEnd) <= 2) {
+                gType->set(pActive, valueEnd);
             }
 
             if (tToDisp <= 0) {

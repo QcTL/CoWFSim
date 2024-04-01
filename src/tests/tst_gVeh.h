@@ -14,43 +14,41 @@
 #include "../sim/roads/rNodeFromGrid.h"
 #include "../display/menus/implementation/rBaseMenu.h"
 #include "../sim/layers/implementations/sLayerType.h"
-#include "../common/sMainContainer.h"
+#include "../common/sContainerMain.h"
 
 
 int tst_gVeh() {
-    std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(100);
+    std::shared_ptr<sSimulatorMain> sMS = std::make_shared<sSimulatorMain>(100);
 
     std::shared_ptr<gIGrid<uint8_t>> gB = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(100, 100, 0));
     std::shared_ptr<gIGrid<uint8_t>> gTransit = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(100, 100, 0));
 
-    /*
-    gB->set(0, 2, 2);
-    gB->set(1, 0, 2);
-    gB->set(1, 1, 2);
-    gB->set(1, 2, 2);
-    gB->set(1, 3, 2);
-    gB->set(2, 2, 2);
-*/
+
+    gB->set(0, 2, 6);
+    gB->set(1, 0, 6);
+    gB->set(1, 1, 6);
+    gB->set(1, 2, 6);
+    gB->set(1, 3, 6);
+    gB->set(2, 2, 6);
+
 
     gBaseToPattern<uint8_t> gBP(gB,
                                 gBaseToPattern<uint8_t>::gPatternType::gBPBlobSquares,
                                 gBaseToPattern<uint8_t>::gPatternParameters(4, 4, 25, 25),
-                                2);
+                                6);
 
-    sMS->gLayerTypeGen = gB;
-    sMS->gTotalAirPollution->gLayerAirPollution  = gB;
+    sMS->gMainTerrain->gTG_TypeGen = gB;
+    sMS->gTotalAirPollution->gLayerAirPollution = gB;
     sMS->completedSetupStage();
 
-
-    sMS->gLayerRoads[0][0]->refCompressed->addNewCar(sMS->gLayerRoads[75][75]->refCompressed->locIdNode,
-                                                     sMS->gLayerRoads[75][75]->refCompressed->rBlock);
-
+/*
+    sMS->gMainRoads->gLayerRoads[0][0]->refCompressed->addNewCar(
+            sMS->gMainRoads->gLayerRoads[75][75]->refCompressed->locIdNode,
+            sMS->gMainRoads->gLayerRoads[75][75]->refCompressed->rBlock);
+*/
 
     //START TRANSIT;
-    // uint32_t p1 = sMS->gLayerRoads[22][51]->refCompressed->locIdNode;
-    // uint32_t b1 = sMS->gLayerRoads[22][51]->refCompressed->rBlock;
-    // sMS->gLayerRoads[43][39]->refCompressed->addNewCar(p1, b1);
-    sMainContainer sMC(sMS);
+    sContainerMain sMC(sMS);
 
     sMC.gameLoop();
     return 0;

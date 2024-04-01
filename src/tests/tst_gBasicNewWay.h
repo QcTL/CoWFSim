@@ -10,7 +10,7 @@
 #include "../display/layers/gDispLayers.h"
 #include "../display/rGlobal.h"
 #include "../sim/structure/grids/transformation/gBaseToGradientMinimum.h"
-#include "../sim/sMainSimulator.h"
+#include "../sim/sSimulatorMain.h"
 #include "../sim/structure/grids/transformation/sGridToSimulator.h"
 #include "../display/menus/implementation/rBaseMenu.h"
 #include "../sim/structure/grids/transformation/gBasicTransformations.h"
@@ -28,7 +28,7 @@ int tst_gBasicNewWay(const std::map<std::string, std::string> &mValues) {
     else if (mValues.at("Mida_Simulacio") == "Molt_Gran")
         lSizeGrid = 250;
 
-    std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(lSizeGrid);
+    std::shared_ptr<sSimulatorMain> sMS = std::make_shared<sSimulatorMain>(lSizeGrid);
 
     sMS->gTotalAirPollution->gLayerAirPollution = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
 

@@ -2,27 +2,27 @@
 // Created by Laminar on 02/03/2024.
 //
 
-#ifndef CITYOFWEIRDFISHES_SMAINCONTAINER_H
-#define CITYOFWEIRDFISHES_SMAINCONTAINER_H
+#ifndef CITYOFWEIRDFISHES_SCONTAINERMAIN_H
+#define CITYOFWEIRDFISHES_SCONTAINERMAIN_H
 
 #include <chrono>
 #include "../display/rGlobal.h"
 #include "../display/menus/implementation/rBaseMenu.h"
-#include "../sim/sMainSimulator.h"
+#include "../sim/sSimulatorMain.h"
 
-class sMainContainer {
+class sContainerMain {
 public:
 
-    explicit sMainContainer(const std::shared_ptr<sMainSimulator> &sMS)
+    explicit sContainerMain(const std::shared_ptr<sSimulatorMain> &sMS)
             : sMS(sMS) {
 
         gSimL = std::make_shared<gDispLayers>(sMS->gTotalAirPollution->gLayerAirPollution,
-                                              sMS->gLayerCurStruct, sMS->gMainRoads->gLayerTransit,
+                                              sMS->gMainTerrain->gTG_rLayer->gLayerCurStruct, sMS->gMainRoads->gLayerTransit,
                                               sMS->gTotalUnderground->gLayerUnderground);
         pPM = std::make_shared<rPileMenus>(gSimL);
         //MENUS
         sMS->rInteraction = pPM;
-        rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->gMainTerrain->gTG_TypeGen,
+        rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->gMainTerrain,
                                                        sMS->gMainRoads->gLayerRoads,
                                                        sMS->sComp->gLayerOwnership, sMS->sComp->sTComp));
         pPM->addMenuTop(rBasic);
@@ -69,13 +69,12 @@ public:
     }
 
 private:
-
     std::shared_ptr<rGlobal> rG;
     std::shared_ptr<rPileMenus> pPM;
     std::shared_ptr<rBaseMenu> rBasic;
 
-    std::shared_ptr<sMainSimulator> sMS;
+    std::shared_ptr<sSimulatorMain> sMS;
     std::shared_ptr<gDispLayers> gSimL;
 };
 
-#endif //CITYOFWEIRDFISHES_SMAINCONTAINER_H
+#endif //CITYOFWEIRDFISHES_SCONTAINERMAIN_H

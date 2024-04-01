@@ -10,20 +10,20 @@
 #include "../display/layers/gDispLayers.h"
 #include "../display/rGlobal.h"
 #include "../sim/structure/grids/transformation/gBaseToGradientMinimum.h"
-#include "../sim/sMainSimulator.h"
+#include "../sim/sSimulatorMain.h"
 #include "../sim/structure/grids/transformation/sGridToSimulator.h"
 #include "../display/menus/implementation/rBaseMenu.h"
 #include "../sim/structure/grids/transformation/gBasicTransformations.h"
 #include "../sim/layers/implementations/sLayerType.h"
-#include "../common/sMainContainer.h"
+#include "../common/sContainerMain.h"
 #include "../sim/layers/implementations/sLayerCells.h"
 
 int tst_gNewVisualization(const std::map<std::string, std::string> &mValues) {
     int lSizeGrid = 10;
 
-    std::shared_ptr<sMainSimulator> sMS = std::make_shared<sMainSimulator>(lSizeGrid);
+    std::shared_ptr<sSimulatorMain> sMS = std::make_shared<sSimulatorMain>(lSizeGrid);
 
-    //sMS->gLayerTypeSoil = sLayerType::gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
+    //sMS->gLayerTypeSoil = sLayerType::gBTGM_gen(lSizeGrid, sMS->gLayerTypeGen, mValues);
 
     sMS->gLayerTypeGen->set(0, 0, 5);
     sMS->gLayerTypeGen->set(1, 0, 5);
@@ -44,13 +44,13 @@ int tst_gNewVisualization(const std::map<std::string, std::string> &mValues) {
 
     sLayerCells::retObjSLayerCells retCells =
             sLayerCells::gen(lSizeGrid, sMS->gLayerTypeSoil, sMS->gLayerTypeGen, mValues);
-    sMS->gLayerCurStruct = retCells.gMatrix;
+    sMS->gMainTerrain->gLayerCurStruct = retCells.gMatrix;
 
 
     sMS->completedSetupStage();
     sMS->completedStartCompanies(retCells.gCompanyPositions);
 
-    sMainContainer sMC(sMS);
+    sContainerMain sMC(sMS);
 
     sMC.gameLoop();
     return 0;
