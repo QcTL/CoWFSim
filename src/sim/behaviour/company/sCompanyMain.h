@@ -49,14 +49,13 @@ public:
         }
 
         std::vector<std::pair<uint32_t, int>> sDiffEmp = sTComp->getDiffEmployeesByLocation(inRTime);
-        for (const std::pair<uint32_t, int> &dEmp: sDiffEmp) {
+        for (const std::pair<uint32_t, int> &dEmp: sDiffEmp)
             if (dEmp.second > 0)
                 for (int i = 0; i < dEmp.second; i++)
                     addEmployee(sTComp->getCompanyByUUID(dEmp.first));
             else
                 for (int i = 0; i < abs(dEmp.second); i++)
                     removeEmployee(sTComp->getCompanyByUUID(dEmp.first));
-        }
 
         if (inRTime == 0) {
             if ((inTDate % 1 << 9) == 0)
@@ -66,6 +65,15 @@ public:
             if ((inTDate % 1 << 3) == 0)
                 sTComp->applyEcoWeek();
         }
+
+        //Start bankruptcy
+        std::vector<std::shared_ptr<objCompany>> vCompBankruptcy = sTComp->getVecCompBankruptcy(inRTime);
+        for (const std::shared_ptr<objCompany> &oCompany: vCompBankruptcy)
+            for (int i = 0; i < oCompany->c_cActiveLocations.size(); i++) {
+                sCompanyCompiler::sCCIntentions sCCI = {
+                        sCompanyCompiler::sCCIntentions::CELL_Sell, (uint32_t) i, oCompany};
+                sCompA->gTryIntention(sCCI, sSCode, inTDate);
+            }
     }
 
     void completedStartCompanies(const std::vector<retObjCompany> &gPosCompanies) {
@@ -113,7 +121,7 @@ private:
     }
 
     void removeEmployee(const std::shared_ptr<objCompany> &inCompany) {
-        std::pair<int, int> pHouseEmployee =  sM_sCompEmployee->removeEmployeeToCompany(*inCompany);
+        std::pair<int, int> pHouseEmployee = sM_sCompEmployee->removeEmployeeToCompany(*inCompany);
         inCompany->c_objMonth += 300; //SALARI
         inCompany->c_nEmployee -= 1;
         if (!gLayerOwnership->get(pHouseEmployee).empty())

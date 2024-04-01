@@ -61,6 +61,17 @@ public:
         return ret;
     }
 
+    std::vector<std::shared_ptr<objCompany>>
+    getTotalBankruptcy(uint32_t tTimer) {
+        std::vector<std::shared_ptr<objCompany>> ret;
+        for (auto &i: tVecComp)
+            if (i.second != nullptr && i.second->c_cActiveFunds < 0 &&
+                (i.second->c_objYear + i.second->c_objMonth * 12 + i.second->c_objFortnight * 36) < 0)
+                ret.push_back(i.second);
+
+        return ret;
+    }
+
     void applyEcoWeek() {
         for (auto &i: tVecComp)
             if (i.second != nullptr)
@@ -137,6 +148,10 @@ public:
             r.push_back(*getCompanyByUUID(l));
         }
         return r;
+    }
+
+    std::vector<std::shared_ptr<objCompany>> getVecCompBankruptcy(const uint32_t inTDate) {
+        return sCT_vTotalComp.getTotalBankruptcy(inTDate);
     }
 
     void applyEcoWeek() {

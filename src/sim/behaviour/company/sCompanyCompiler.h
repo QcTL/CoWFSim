@@ -23,8 +23,15 @@ public:
         };
 
         sCCEnumIntentions scc_type;
-        uint32_t scc_addIdInfo;
+        uint32_t scc_addIdInfo{};
         std::shared_ptr<objCompany> scc_objCompany;
+
+        sCCIntentions(sCCEnumIntentions sccType, uint32_t sccAddIdInfo,
+                      const std::shared_ptr<objCompany> &sccObjCompany) : scc_type(sccType),
+                                                                          scc_addIdInfo(sccAddIdInfo),
+                                                                          scc_objCompany(sccObjCompany) {}
+
+        sCCIntentions() = default;
     };
 
     static sCCIntentions intentionsFromLong(const uint64_t &cVal, const std::shared_ptr<objCompany> &objC) {
