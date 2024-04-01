@@ -62,52 +62,52 @@ public:
     virtual void update() {}
 
     void setTransformation() {
-        int tSize = tsTex.getTileSize();
+        auto tSize = (float)tsTex.getTileSize();
         for (int i = 0; i < 40 * 9; i++) {
             std::pair<int, int> posTopLeft = tsTex.getPos(i);
-
-            if (rPos == rIMenu::rRelativePos::pTopLeft) {
-                lRefTiles.push_back(
-                        std::vector<sf::Vector2f>{
-                                sf::Vector2f(posTopLeft.first * tSize, posTopLeft.second * tSize),
-                                sf::Vector2f((posTopLeft.first + 1) * tSize, posTopLeft.second * tSize),
-                                sf::Vector2f((posTopLeft.first + 1) * tSize, (posTopLeft.second + 1) * tSize),
-                                sf::Vector2f(posTopLeft.first * tSize, (posTopLeft.second + 1) * tSize)
-                        }
-                );
-            } else if (rPos == rIMenu::rRelativePos::pBottomLeft) {
-                lRefTiles.push_back(
-                        std::vector<sf::Vector2f>{
-                                sf::Vector2f(posTopLeft.first * tSize, (posTopLeft.second + 1) * tSize),
-                                sf::Vector2f((posTopLeft.first + 1) * tSize, (posTopLeft.second + 1) * tSize),
-                                sf::Vector2f((posTopLeft.first + 1) * tSize, posTopLeft.second * tSize),
-                                sf::Vector2f(posTopLeft.first * tSize, posTopLeft.second * tSize)
-                        }
-                );
-            } else if (rPos == rIMenu::rRelativePos::pTopRight) {
-                lRefTiles.push_back(
-                        std::vector<sf::Vector2f>{
-                                sf::Vector2f((posTopLeft.first + 1) * tSize, posTopLeft.second * tSize),
-                                sf::Vector2f(posTopLeft.first * tSize, posTopLeft.second * tSize),
-                                sf::Vector2f(posTopLeft.first * tSize, (posTopLeft.second + 1) * tSize),
-                                sf::Vector2f((posTopLeft.first + 1) * tSize, (posTopLeft.second + 1) * tSize)
-                        }
-                );
-            } else if (rPos == rIMenu::rRelativePos::pBottomRight) {
-                lRefTiles.push_back(
-                        std::vector<sf::Vector2f>{
-                                sf::Vector2f((posTopLeft.first + 1) * tSize, (posTopLeft.second + 1) * tSize),
-                                sf::Vector2f(posTopLeft.first * tSize, (posTopLeft.second + 1) * tSize),
-                                sf::Vector2f(posTopLeft.first * tSize, posTopLeft.second * tSize),
-                                sf::Vector2f((posTopLeft.first + 1) * tSize, posTopLeft.second * tSize)
-                        }
-                );
+            std::vector<sf::Vector2f> tileCoords;
+            switch (rPos) {
+                case rIMenu::rRelativePos::pTopLeft:
+                    tileCoords = {
+                            sf::Vector2f((float)posTopLeft.first * tSize, (float)posTopLeft.second * tSize),
+                            sf::Vector2f((float)(posTopLeft.first + 1) * tSize, (float)posTopLeft.second * tSize),
+                            sf::Vector2f((float)(posTopLeft.first + 1) * tSize, (float)(posTopLeft.second + 1) * tSize),
+                            sf::Vector2f((float)posTopLeft.first * tSize, (float)(posTopLeft.second + 1) * tSize)
+                    };
+                    break;
+                case rIMenu::rRelativePos::pBottomLeft:
+                    tileCoords = {
+                            sf::Vector2f((float)posTopLeft.first * tSize, (float)(posTopLeft.second + 1) * tSize),
+                            sf::Vector2f((float)(posTopLeft.first + 1) * tSize, (float)(posTopLeft.second + 1) * tSize),
+                            sf::Vector2f((float)(posTopLeft.first + 1) * tSize, (float)posTopLeft.second * tSize),
+                            sf::Vector2f((float)posTopLeft.first * tSize, (float)posTopLeft.second * tSize)
+                    };
+                    break;
+                case rIMenu::rRelativePos::pTopRight:
+                    tileCoords = {
+                            sf::Vector2f((float)(posTopLeft.first + 1) * tSize, (float)posTopLeft.second * tSize),
+                            sf::Vector2f((float)posTopLeft.first * tSize, (float)posTopLeft.second * tSize),
+                            sf::Vector2f((float)posTopLeft.first * tSize, (float)(posTopLeft.second + 1) * tSize),
+                            sf::Vector2f((float)(posTopLeft.first + 1) * tSize, (float)(posTopLeft.second + 1) * tSize)
+                    };
+                    break;
+                case rIMenu::rRelativePos::pBottomRight:
+                    tileCoords = {
+                            sf::Vector2f((float)(posTopLeft.first + 1) * tSize, (float)(posTopLeft.second + 1) * tSize),
+                            sf::Vector2f((float)posTopLeft.first * tSize, (float)(posTopLeft.second + 1) * tSize),
+                            sf::Vector2f((float)posTopLeft.first * tSize, (float)posTopLeft.second * tSize),
+                            sf::Vector2f((float)(posTopLeft.first + 1) * tSize, (float)posTopLeft.second * tSize)
+                    };
+                    break;
+                default:
+                    break;
             }
+            lRefTiles.push_back(tileCoords);
         }
     }
 
     sf::VertexArray getVertexMenu(int GWidth, int GHeight, std::vector<std::vector<int>> strData) {
-        int GTileSize = 16;
+        float GTileSize = 16.0;
         v = sf::VertexArray(sf::Quads, GWidth * GHeight * 4);
 
         for (int i = 0; i < GHeight; i++) {
@@ -137,10 +137,10 @@ public:
                         xIndex = yIndex = 0;
                 }
                 quad = &v[(xIndex + yIndex * GWidth) * 4];
-                quad[0].position = sf::Vector2f(xIndex * GTileSize, yIndex * GTileSize);
-                quad[1].position = sf::Vector2f((xIndex + 1) * GTileSize, yIndex * GTileSize);
-                quad[2].position = sf::Vector2f((xIndex + 1) * GTileSize, (yIndex + 1) * GTileSize);
-                quad[3].position = sf::Vector2f(xIndex * GTileSize, (yIndex + 1) * GTileSize);
+                quad[0].position = sf::Vector2f((float)xIndex * GTileSize, (float)yIndex * GTileSize);
+                quad[1].position = sf::Vector2f((float)(xIndex + 1) * GTileSize, (float)yIndex * GTileSize);
+                quad[2].position = sf::Vector2f((float)(xIndex + 1) * GTileSize, (float)(yIndex + 1) * GTileSize);
+                quad[3].position = sf::Vector2f((float)xIndex * GTileSize, (float)(yIndex + 1) * GTileSize);
 
                 for (int k = 0; k < 4; k++)
                     quad[k].texCoords = lRefTiles[strData[i][j]][k];
@@ -166,9 +166,7 @@ public:
             case pTopRight:
                 return {mouseP.x - (wS.x - menuW), (unsigned int) mouseP.y};
             case pCenter:
-                break;
             case pCenterBottom:
-                break;
             case pCenterTop:
                 break;
         }
@@ -191,9 +189,7 @@ public:
                 if (mouseP.x >= (wS.x - menuW) && mouseP.x < wS.x && mouseP.y >= 0 && mouseP.y < menuH)
                     return true;
             case pCenter:
-                break;
             case pCenterBottom:
-                break;
             case pCenterTop:
                 break;
         }

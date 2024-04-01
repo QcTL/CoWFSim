@@ -17,10 +17,6 @@ rSelOptMenu::rSelOptMenu(const std::shared_ptr<rIMenu> &mParent, int strValue, c
                 pElemSel.emplace_back(row, col);
                 pElemSelAbs.emplace_back(i, j);
             }
-    dInfo = getVertexMenu((int) data[0].size(), (int) data.size(), data);
-    gWidth = (int) data[0].size();
-    gHeight = (int) data.size();
-
     setNewSel(strValue);
 }
 

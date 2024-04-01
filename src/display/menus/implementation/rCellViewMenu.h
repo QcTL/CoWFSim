@@ -45,7 +45,6 @@ public:
                         sf::Vector2<unsigned int> absPos = getAbsPos(rWindow, gHeight * 16, gWidth * 16, pMouse);
                         for (int i = 0; i < pElemSelAbs.size(); i++) {
                             if (pElemSelAbs[i].first * 16 < absPos.y && pElemSelAbs[i].first * 16 + 16 >= absPos.y) {
-                                std::cout <<"YEP "<< i<<std::endl;
                                 std::shared_ptr<rCompViewLayer> rComp = std::make_shared<rCompViewLayer>(
                                         rCompViewLayer(refPile->vTopActiveMenu, compShow[i],
                                         "d_mCompViewLayer", refPile));
@@ -70,7 +69,6 @@ private:
 
     std::vector<std::pair<int, int>> pElemSel;
     std::vector<std::pair<int, int>> pElemSelAbs;
-    int cCurrenSel = -1;
 
     struct defTxtCompany {
         struct pWrite {
@@ -89,18 +87,6 @@ private:
 
     std::shared_ptr<rPileMenus> refPile;
     std::vector<objCompany> compShow;
-
-    void setNewSel(int v) {
-        sf::Vertex *quad = &dInfo[(pElemSel[cCurrenSel].second + pElemSel[cCurrenSel].first * gWidth) * 4];
-        for (int k = 0; k < 4; k++) {
-            quad[k].texCoords = lRefTiles[305][k];
-        }
-        quad = &dInfo[(pElemSel[v].second + pElemSel[v].first * gWidth) * 4];
-        for (int k = 0; k < 4; k++) {
-            quad[k].texCoords = lRefTiles[304][k];
-        }
-        cCurrenSel = v;
-    }
 
     void setTextCompany(const uint8_t tVal, const std::string &cName, const std::string &cValue) {
         for (int i = 0; i < comV[tVal].nNameCom.pLength; i++) {
@@ -123,7 +109,6 @@ private:
             sf::Vertex *quad = &dInfo[
                     (comV[tVal].nValCom.pStartText.second + i + comV[tVal].nValCom.pStartText.first * gWidth) * 4];
             for (int k = 0; k < 4; k++) {
-
                 if (i >= cValue.size())
                     quad[k].texCoords = lRefTiles[32][k];
                 else if (cValue[i] >= 'a' && cValue[i] <= 'z')
