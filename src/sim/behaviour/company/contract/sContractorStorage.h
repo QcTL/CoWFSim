@@ -12,38 +12,45 @@
 class sContractorStorage {
 public:
     [[nodiscard]] uint32_t addCon(std::shared_ptr<con_rentCell> &con) {
-        gTypeAndIndex.emplace_back(0, gVecConRent.size());
+        gTypeAndIndex.emplace_back(con_Type::con_Type_Rent, gVecConRent.size());
         gVecConRent.push_back(con);
         con->ct_uuid = gTypeAndIndex.size();
         return gVecConRent.size() - 1;
     }
 
     [[nodiscard]] uint32_t addCon(std::shared_ptr<con_buyCell> &con) {
-        gTypeAndIndex.emplace_back(1, gVecConBuy.size());
+        gTypeAndIndex.emplace_back(con_Type::con_Type_Buy, gVecConBuy.size());
         gVecConBuy.push_back(con);
         con->ct_uuid = gTypeAndIndex.size();
         return gVecConBuy.size() - 1;
     }
 
     [[nodiscard]] uint32_t addCon(std::shared_ptr<con_loanInteraction> &con) {
-        gTypeAndIndex.emplace_back(2, gVecConLoan.size());
+        gTypeAndIndex.emplace_back(con_Type::con_Type_Loan, gVecConLoan.size());
         gVecConLoan.push_back(con);
         con->ct_uuid = gTypeAndIndex.size();
         return gVecConLoan.size() - 1;
     }
 
     [[nodiscard]] uint32_t addCon(std::shared_ptr<con_stockInteraction> &con) {
-        gTypeAndIndex.emplace_back(3, gVecConStock.size());
+        gTypeAndIndex.emplace_back(con_Type::con_Type_Stock, gVecConStock.size());
         gVecConStock.push_back(con);
         con->ct_uuid = gTypeAndIndex.size();
         return gVecConStock.size() - 1;
     }
 
     [[nodiscard]] uint32_t addCon(std::shared_ptr<con_hireInteraction> &con) {
-        gTypeAndIndex.emplace_back(4, gVecConStock.size());
+        gTypeAndIndex.emplace_back(con_Type::con_Type_Hire, gVecConHire.size());
         gVecConHire.push_back(con);
         con->ct_uuid = gTypeAndIndex.size();
         return gVecConHire.size() - 1;
+    }
+
+    [[nodiscard]] uint32_t addCon(std::shared_ptr<con_rentHouseInteraction> &con) {
+        gTypeAndIndex.emplace_back(con_Type::con_Type_RentHome, gVecConRentHome.size());
+        gVecConRentHome.push_back(con);
+        con->ct_uuid = gTypeAndIndex.size();
+        return gVecConRentHome.size() - 1;
     }
 
     [[nodiscard]] std::shared_ptr<con_b> getConByUuid(uint64_t uuidCon) {
@@ -52,12 +59,14 @@ public:
                 return gVecConRent[gTypeAndIndex[uuidCon].second];
             case con_Type::con_Type_Buy:
                 return gVecConBuy[gTypeAndIndex[uuidCon].second];
-            case 2:
+            case con_Type::con_Type_Loan:
                 return gVecConLoan[gTypeAndIndex[uuidCon].second];
-            case 3:
+            case con_Type::con_Type_Stock:
                 return gVecConStock[gTypeAndIndex[uuidCon].second];
-            case 4:
+            case con_Type::con_Type_Hire:
                 return gVecConHire[gTypeAndIndex[uuidCon].second];
+            case con_Type::con_Type_RentHome:
+                return gVecConRentHome[gTypeAndIndex[uuidCon].second];
             default:
                 return nullptr;
         }
@@ -82,6 +91,9 @@ public:
     con_hireInteraction getHireByUuid(
             uint64_t uuidCon) { return reinterpret_cast<con_hireInteraction &&>(gVecConHire[gTypeAndIndex[uuidCon].second]); }
 
+    con_rentHouseInteraction getRentHomeByUuid(
+            uint64_t uuidCon) { return reinterpret_cast<con_rentHouseInteraction &&>(gVecConRentHome[gTypeAndIndex[uuidCon].second]); }
+
 private:
     std::vector<std::pair<uint8_t, uint32_t>> gTypeAndIndex;
     std::vector<std::shared_ptr<con_rentCell>> gVecConRent;
@@ -89,6 +101,7 @@ private:
     std::vector<std::shared_ptr<con_loanInteraction>> gVecConLoan;
     std::vector<std::shared_ptr<con_stockInteraction>> gVecConStock;
     std::vector<std::shared_ptr<con_hireInteraction>> gVecConHire;
+    std::vector<std::shared_ptr<con_rentHouseInteraction>> gVecConRentHome;
 };
 
 #endif //CITYOFWEIRDFISHES_SCONTRACTORSTORAGE_H

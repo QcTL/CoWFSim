@@ -62,41 +62,45 @@ public:
     virtual void update() {}
 
     void setTransformation() {
-        auto tSize = (float)tsTex.getTileSize();
+        auto tSize = (float) tsTex.getTileSize();
         for (int i = 0; i < 40 * 9; i++) {
             std::pair<int, int> posTopLeft = tsTex.getPos(i);
             std::vector<sf::Vector2f> tileCoords;
             switch (rPos) {
                 case rIMenu::rRelativePos::pTopLeft:
                     tileCoords = {
-                            sf::Vector2f((float)posTopLeft.first * tSize, (float)posTopLeft.second * tSize),
-                            sf::Vector2f((float)(posTopLeft.first + 1) * tSize, (float)posTopLeft.second * tSize),
-                            sf::Vector2f((float)(posTopLeft.first + 1) * tSize, (float)(posTopLeft.second + 1) * tSize),
-                            sf::Vector2f((float)posTopLeft.first * tSize, (float)(posTopLeft.second + 1) * tSize)
+                            sf::Vector2f((float) posTopLeft.first * tSize, (float) posTopLeft.second * tSize),
+                            sf::Vector2f((float) (posTopLeft.first + 1) * tSize, (float) posTopLeft.second * tSize),
+                            sf::Vector2f((float) (posTopLeft.first + 1) * tSize,
+                                         (float) (posTopLeft.second + 1) * tSize),
+                            sf::Vector2f((float) posTopLeft.first * tSize, (float) (posTopLeft.second + 1) * tSize)
                     };
                     break;
                 case rIMenu::rRelativePos::pBottomLeft:
                     tileCoords = {
-                            sf::Vector2f((float)posTopLeft.first * tSize, (float)(posTopLeft.second + 1) * tSize),
-                            sf::Vector2f((float)(posTopLeft.first + 1) * tSize, (float)(posTopLeft.second + 1) * tSize),
-                            sf::Vector2f((float)(posTopLeft.first + 1) * tSize, (float)posTopLeft.second * tSize),
-                            sf::Vector2f((float)posTopLeft.first * tSize, (float)posTopLeft.second * tSize)
+                            sf::Vector2f((float) posTopLeft.first * tSize, (float) (posTopLeft.second + 1) * tSize),
+                            sf::Vector2f((float) (posTopLeft.first + 1) * tSize,
+                                         (float) (posTopLeft.second + 1) * tSize),
+                            sf::Vector2f((float) (posTopLeft.first + 1) * tSize, (float) posTopLeft.second * tSize),
+                            sf::Vector2f((float) posTopLeft.first * tSize, (float) posTopLeft.second * tSize)
                     };
                     break;
                 case rIMenu::rRelativePos::pTopRight:
                     tileCoords = {
-                            sf::Vector2f((float)(posTopLeft.first + 1) * tSize, (float)posTopLeft.second * tSize),
-                            sf::Vector2f((float)posTopLeft.first * tSize, (float)posTopLeft.second * tSize),
-                            sf::Vector2f((float)posTopLeft.first * tSize, (float)(posTopLeft.second + 1) * tSize),
-                            sf::Vector2f((float)(posTopLeft.first + 1) * tSize, (float)(posTopLeft.second + 1) * tSize)
+                            sf::Vector2f((float) (posTopLeft.first + 1) * tSize, (float) posTopLeft.second * tSize),
+                            sf::Vector2f((float) posTopLeft.first * tSize, (float) posTopLeft.second * tSize),
+                            sf::Vector2f((float) posTopLeft.first * tSize, (float) (posTopLeft.second + 1) * tSize),
+                            sf::Vector2f((float) (posTopLeft.first + 1) * tSize,
+                                         (float) (posTopLeft.second + 1) * tSize)
                     };
                     break;
                 case rIMenu::rRelativePos::pBottomRight:
                     tileCoords = {
-                            sf::Vector2f((float)(posTopLeft.first + 1) * tSize, (float)(posTopLeft.second + 1) * tSize),
-                            sf::Vector2f((float)posTopLeft.first * tSize, (float)(posTopLeft.second + 1) * tSize),
-                            sf::Vector2f((float)posTopLeft.first * tSize, (float)posTopLeft.second * tSize),
-                            sf::Vector2f((float)(posTopLeft.first + 1) * tSize, (float)posTopLeft.second * tSize)
+                            sf::Vector2f((float) (posTopLeft.first + 1) * tSize,
+                                         (float) (posTopLeft.second + 1) * tSize),
+                            sf::Vector2f((float) posTopLeft.first * tSize, (float) (posTopLeft.second + 1) * tSize),
+                            sf::Vector2f((float) posTopLeft.first * tSize, (float) posTopLeft.second * tSize),
+                            sf::Vector2f((float) (posTopLeft.first + 1) * tSize, (float) posTopLeft.second * tSize)
                     };
                     break;
                 default:
@@ -137,10 +141,10 @@ public:
                         xIndex = yIndex = 0;
                 }
                 quad = &v[(xIndex + yIndex * GWidth) * 4];
-                quad[0].position = sf::Vector2f((float)xIndex * GTileSize, (float)yIndex * GTileSize);
-                quad[1].position = sf::Vector2f((float)(xIndex + 1) * GTileSize, (float)yIndex * GTileSize);
-                quad[2].position = sf::Vector2f((float)(xIndex + 1) * GTileSize, (float)(yIndex + 1) * GTileSize);
-                quad[3].position = sf::Vector2f((float)xIndex * GTileSize, (float)(yIndex + 1) * GTileSize);
+                quad[0].position = sf::Vector2f((float) xIndex * GTileSize, (float) yIndex * GTileSize);
+                quad[1].position = sf::Vector2f((float) (xIndex + 1) * GTileSize, (float) yIndex * GTileSize);
+                quad[2].position = sf::Vector2f((float) (xIndex + 1) * GTileSize, (float) (yIndex + 1) * GTileSize);
+                quad[3].position = sf::Vector2f((float) xIndex * GTileSize, (float) (yIndex + 1) * GTileSize);
 
                 for (int k = 0; k < 4; k++)
                     quad[k].texCoords = lRefTiles[strData[i][j]][k];
@@ -284,12 +288,12 @@ protected:
 
     void setText(const uint8_t tVal, std::string cText) {
         if (rPos == rIMenu::rRelativePos::pBottomRight || rPos == rIMenu::rRelativePos::pTopRight) {
-            cText.append(comV[tVal].pLength - cText.size(), ' ');
             std::reverse(cText.begin(), cText.end());
+            cText.append(comV[tVal].pLength - cText.size(), ' ');
         }
 
         for (int i = 0; i < comV[tVal].pLength; i++) {
-            sf::Vertex *quad = &dInfo[(comV[tVal].pStartText.second + i + comV[tVal].pStartText.first * gWidth) * 4];
+            sf::Vertex *quad = &dInfo[( gWidth - 1 - comV[tVal].pStartText.second + i + comV[tVal].pStartText.first * gWidth) * 4];
             char currentChar = (i < cText.size()) ? cText[i] : ' ';
             int charIndex = -1;
             if (currentChar >= 'a' && currentChar <= 'z') charIndex = currentChar - 'a' + 1;
@@ -299,6 +303,7 @@ protected:
             else if (currentChar == ':') charIndex = 58;
             else if (currentChar == '/') charIndex = 47;
             else if (currentChar == '-') charIndex = 45;
+            else charIndex = 32;
 
             const int defaultCharIndex = 32;
             for (int k = 0; k < 4; k++) {

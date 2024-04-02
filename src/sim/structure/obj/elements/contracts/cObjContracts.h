@@ -19,52 +19,53 @@ enum con_Type {
     con_Type_Loan = 2,
     con_Type_Stock = 3,
     con_Type_Hire = 4,
+    con_Type_RentHome = 5,
 };
 
 
 class con_b {
 public:
     uint64_t ct_uuid = 0;
-    uint32_t ct_uuidCompanyGiving;
+    int ct_uuidCompanyGiving;
     uint32_t ct_strDate;
 
     bool ct_hasEndDate;
     bool ct_hasReceiving;
 
     uint32_t ct_endDate = 0;
-    uint32_t ct_uuidCompanyReceiving = 0;
+    int ct_uuidCompanyReceiving = 0;
 
-    con_b(uint32_t ctUuidCompanyGiving, uint32_t ctStrDate)
+    con_b(int ctUuidCompanyGiving, uint32_t ctStrDate)
             : ct_strDate(ctStrDate),
               ct_uuidCompanyGiving(ctUuidCompanyGiving),
               ct_hasEndDate(false), ct_hasReceiving(false) {}
 
-    con_b(uint32_t ctUuidCompanyGiving, uint32_t ctUuidCompanyReceiving, uint32_t ctStrDate)
+    con_b(int ctUuidCompanyGiving, int ctUuidCompanyReceiving, uint32_t ctStrDate)
             : ct_strDate(ctStrDate),
               ct_uuidCompanyGiving(ctUuidCompanyGiving),
               ct_hasEndDate(false),
               ct_hasReceiving(true), ct_uuidCompanyReceiving(ctUuidCompanyReceiving) {}
 
-    con_b(uint32_t ctUuidCompanyGiving, uint32_t ctUuidCompanyReceiving, uint32_t ctStrDate, uint32_t ctEndDate)
+    con_b(int ctUuidCompanyGiving, int ctUuidCompanyReceiving, uint32_t ctStrDate, uint32_t ctEndDate)
             : ct_strDate(ctStrDate),
               ct_uuidCompanyGiving(ctUuidCompanyGiving),
               ct_hasEndDate(true), ct_endDate(ctEndDate),
               ct_hasReceiving(true), ct_uuidCompanyReceiving(ctUuidCompanyReceiving) {}
 
     virtual void
-    addAsReceiving(std::shared_ptr<objCompany> &objCom) = 0;
+    addAsReceiving(const std::shared_ptr<objCompany> &objCom) = 0;
 
     virtual void
-    addAsGiving(std::shared_ptr<objCompany> &objCom) = 0;
+    addAsGiving(const std::shared_ptr<objCompany> &objCom) = 0;
 
     virtual void
-    removeAsReceiving(std::shared_ptr<objCompany> &objCom) = 0;
+    removeAsReceiving(const std::shared_ptr<objCompany> &objCom) = 0;
 
     virtual void
-    removeAsGiving(std::shared_ptr<objCompany> &objCom) = 0;
+    removeAsGiving(const std::shared_ptr<objCompany> &objCom) = 0;
 
     static void
-    addPropertyContract(std::shared_ptr<objCompany> &objCom, con_TypePaymentFreq c_TPF, float ct_recurrentCost,
+    addPropertyContract(const std::shared_ptr<objCompany> &objCom, con_TypePaymentFreq c_TPF, float ct_recurrentCost,
                         bool isGaining) {
         switch (c_TPF) {
             case LC_PAY_MONTH:
@@ -104,24 +105,28 @@ public:
 
     //TODO AFEGIR CANVIS A C_RENTEDlOCATIONS
     void
-    addAsReceiving(std::shared_ptr<objCompany> &objCom) override {
+    addAsReceiving(const std::shared_ptr<objCompany> &objCom) override {
         objCom->addAvailableLocation(ct_lCells, ct_typeCell);
         addPropertyContract(objCom, ct_typePayment, ct_recurrentCost, false);
     };
 
     void
-    addAsGiving(std::shared_ptr<objCompany> &objCom) override {
+    addAsGiving(const std::shared_ptr<objCompany> &objCom) override {
+        if (objCom == nullptr)
+            return;
         objCom->removeAvailableLocation(ct_lCells, ct_typeCell);
         addPropertyContract(objCom, ct_typePayment, ct_recurrentCost, true);
     };
 
     void
-    removeAsReceiving(std::shared_ptr<objCompany> &objCom) override {
+    removeAsReceiving(const std::shared_ptr<objCompany> &objCom) override {
         addAsGiving(objCom);
     };
 
     void
-    removeAsGiving(std::shared_ptr<objCompany> &objCom) override {
+    removeAsGiving(const std::shared_ptr<objCompany> &objCom) override {
+        if (objCom == nullptr)
+            return;
         addAsReceiving(objCom);
     };
 };
@@ -144,24 +149,28 @@ public:
               ct_totalCost(ctTotalCost), ct_lCells(ctLCells), ct_typeCell(typeCell) {}
 
     void
-    addAsReceiving(std::shared_ptr<objCompany> &objCom) override {
+    addAsReceiving(const std::shared_ptr<objCompany> &objCom) override {
         objCom->addAvailableLocation(ct_lCells, ct_typeCell);
         addPropertyContract(objCom, ct_typePayment, ct_recurrentCost, false);
     };
 
     void
-    addAsGiving(std::shared_ptr<objCompany> &objCom) override {
+    addAsGiving(const std::shared_ptr<objCompany> &objCom) override {
+        if (objCom == nullptr)
+            return;
         objCom->removeAvailableLocation(ct_lCells, ct_typeCell);
         addPropertyContract(objCom, ct_typePayment, ct_recurrentCost, true);
     };
 
     void
-    removeAsReceiving(std::shared_ptr<objCompany> &objCom) override {
+    removeAsReceiving(const std::shared_ptr<objCompany> &objCom) override {
         addAsGiving(objCom);
     };
 
     void
-    removeAsGiving(std::shared_ptr<objCompany> &objCom) override {
+    removeAsGiving(const std::shared_ptr<objCompany> &objCom) override {
+        if (objCom == nullptr)
+            return;
         addAsReceiving(objCom);
     };
 };
@@ -184,24 +193,24 @@ public:
               ct_askedStart(askedStart) {}
 
     void
-    addAsReceiving(std::shared_ptr<objCompany> &objCom) override {
+    addAsReceiving(const std::shared_ptr<objCompany> &objCom) override {
         objCom->c_cActiveFunds += ct_askedStart;
         addPropertyContract(objCom, ct_typePayment, ct_recurrentCostReturn, false);
     };
 
     void
-    addAsGiving(std::shared_ptr<objCompany> &objCom) override {
+    addAsGiving(const std::shared_ptr<objCompany> &objCom) override {
         objCom->c_cActiveFunds -= ct_askedStart;
         addPropertyContract(objCom, ct_typePayment, ct_recurrentCostReturn, true);
     };
 
     void
-    removeAsReceiving(std::shared_ptr<objCompany> &objCom) override {
+    removeAsReceiving(const std::shared_ptr<objCompany> &objCom) override {
         addPropertyContract(objCom, ct_typePayment, ct_recurrentCostReturn, true);
     };
 
     void
-    removeAsGiving(std::shared_ptr<objCompany> &objCom) override {
+    removeAsGiving(const std::shared_ptr<objCompany> &objCom) override {
         addPropertyContract(objCom, ct_typePayment, ct_recurrentCostReturn, false);
     };
 };
@@ -219,16 +228,16 @@ public:
 
     //TODO!!! STOCKS
     void
-    addAsReceiving(std::shared_ptr<objCompany> &objCom) override {};
+    addAsReceiving(const std::shared_ptr<objCompany> &objCom) override {};
 
     void
-    addAsGiving(std::shared_ptr<objCompany> &objCom) override {};
+    addAsGiving(const std::shared_ptr<objCompany> &objCom) override {};
 
     void
-    removeAsReceiving(std::shared_ptr<objCompany> &objCom) override {};
+    removeAsReceiving(const std::shared_ptr<objCompany> &objCom) override {};
 
     void
-    removeAsGiving(std::shared_ptr<objCompany> &objCom) override {};
+    removeAsGiving(const std::shared_ptr<objCompany> &objCom) override {};
 };
 
 class con_hireInteraction : public con_b {
@@ -236,24 +245,54 @@ public:
     std::pair<int, int> ct_home;
     uint32_t ct_salary;
 
-    con_hireInteraction(uint32_t ctUuidCompanyGiving, const std::pair<int, int> &ctHome, uint8_t ctSalary,
+    con_hireInteraction(uint32_t ctUuidCompanyGiving, const std::pair<int, int> &ctHome, uint32_t ctSalary,
                         uint32_t ctStrDate)
             : con_b(ctUuidCompanyGiving, ctStrDate), ct_home(ctHome), ct_salary(ctSalary) {}
 
     void
-    addAsReceiving(std::shared_ptr<objCompany> &objCom) override {
+    addAsReceiving(const std::shared_ptr<objCompany> &objCom) override {};
+
+    void
+    addAsGiving(const std::shared_ptr<objCompany> &objCom) override {
         objCom->c_objMonth -= (float) ct_salary;
         objCom->c_nEmployee += 1;
     };
 
     void
-    addAsGiving(std::shared_ptr<objCompany> &objCom) override {};
+    removeAsReceiving(const std::shared_ptr<objCompany> &objCom) override {};
 
     void
-    removeAsReceiving(std::shared_ptr<objCompany> &objCom) override {};
+    removeAsGiving(const std::shared_ptr<objCompany> &objCom) override {
+        objCom->c_objMonth += (float) ct_salary;
+        objCom->c_nEmployee -= 1;
+    };
+};
+
+class con_rentHouseInteraction : public con_b {
+public:
+    std::pair<int, int> ct_home;
+    uint32_t ct_cost;
+
+    con_rentHouseInteraction(uint32_t ctUuidCompanyGiving, const std::pair<int, int> &ctHome, uint32_t ctCost,
+                             uint32_t ctStrDate)
+            : con_b(ctUuidCompanyGiving, ctStrDate), ct_home(ctHome), ct_cost(ctCost) {}
 
     void
-    removeAsGiving(std::shared_ptr<objCompany> &objCom) override {};
+    addAsReceiving(const std::shared_ptr<objCompany> &objCom) override {
+    };
+
+    void
+    addAsGiving(const std::shared_ptr<objCompany> &objCom) override {
+        objCom->c_objMonth += (float) ct_cost;
+    };
+
+    void
+    removeAsReceiving(const std::shared_ptr<objCompany> &objCom) override {};
+
+    void
+    removeAsGiving(const std::shared_ptr<objCompany> &objCom) override {
+        objCom->c_objMonth -= (float) ct_cost;
+    };
 };
 
 #endif //CITYOFWEIRDFISHES_COBJCONTRACTS_H

@@ -25,6 +25,7 @@ public:
                           const std::shared_ptr<groupLand> &inGLand, const std::shared_ptr<groupEconomy> &inGEconomy)
             : sM_groupLand(inGLand), sM_sCompEmployee(inPCivilMain), sM_groupEconomy(inGEconomy) {
         sTComp = std::make_shared<sCompanyStorage>(inGridSize, 1000, sSCode);
+        sM_sContractor = std::make_shared<sContractorMain>();
     }
 
     void tickReduced(const uint32_t inRTime, const uint32_t inTDate) {
@@ -67,7 +68,7 @@ public:
                                                   oCompany}, *this, inTDate);
     }
 
-    void completedStartCompanies(const std::list<sgTerrain::sgT_emptySlot> &gPosCompanies) {
+    void completedStartCompanies(const std::list<sgTerrain::sgT_CellSlot> &gPosCompanies) {
         for (const auto &posNewComp: gPosCompanies) {
             uint32_t uuidNew = sTComp->createCompany({posNewComp.sgT_gPos},
                                                      posNewComp.sgT_gType);
@@ -263,9 +264,9 @@ private:
             uint32_t uuidNew = inSCM.sTComp->createCompany({}, gTypeCompany);
             gTryIntention({sCompanyCompiler::sCCIntentions::CELL_Buy, gTypeCompany,
                            inSCM.sTComp->getCompanyByUUID(uuidNew)}, inSCM, cDate);
-            for (int i = 0; i < 2; i++) //TODO, make it right
+            for (int i = 0; i < 2; i++)
                 FulfillIntentions::gTryIntention({sCompanyCompiler::sCCIntentions::GEN_HireEmployee, 0,
-                                                  sCCI.scc_objCompany}, inSCM, cDate);
+                                                  inSCM.sTComp->getCompanyByUUID(uuidNew)}, inSCM, cDate);
         }
 
         static void
@@ -275,9 +276,11 @@ private:
             inSCM.sM_sContractor->addContractToCompany(sCCI.scc_objCompany, pHouseEmployee,
                                                        400, cDate);
 
-            if (!inSCM.sTComp->isCompanyInPosition(pHouseEmployee))
-                sTComp->getCompanyByUUID(gLayerOwnership->get(pHouseEmployee).front())->c_objMonth += 150; //RENT
-            //TODO, UN ALTRE CONTRACTE DE RENT DE CIVILIAN QUE SE LI APLICARA A LA EMPRESA A LA QUAL ESTA FENT RENTING, ME CAGO EN TOT, TIOOOOOOO, MAAAAAAAAAAAAAAAAAN
+            if (!inSCM.sTComp->isCompanyInPosition(pHouseEmployee)) {
+                std::shared_ptr<objCompany> _oCRent = inSCM.sTComp->getCompanyByPosition(pHouseEmployee);
+                inSCM.sM_sContractor->addContractToCompanyRentHouse(_oCRent, pHouseEmployee,
+                                                                    400, cDate);
+            }
         }
 
         static void
@@ -288,8 +291,12 @@ private:
             sCCI.scc_objCompany->c_activeContracts[con_Type::con_Type_Hire].pop_front();
             inSCM.sM_sContractor->removeContractFromCompany(_uuidContractTerminate, inSCM.sTComp);
 
-            //TODO Remove RENT
-            //TODO, UN ALTRE CONTRACTE DE RENT DE CIVILIAN QUE SE LI APLICARA A LA EMPRESA A LA QUAL ESTA FENT RENTING, ME CAGO EN TOT, TIOOOOOOO, MAAAAAAAAAAAAAAAAAN
+            if (!inSCM.sTComp->isCompanyInPosition(pHouseEmployee)) {
+                std::shared_ptr<objCompany> _oCRent = inSCM.sTComp->getCompanyByPosition(pHouseEmployee);
+                inSCM.sM_sContractor->removeContractFromCompany(
+                        _oCRent->c_activeContracts[con_Type::con_Type_RentHome].front(), inSCM.sTComp);
+                _oCRent->c_activeContracts[con_Type::con_Type_RentHome].pop_front();
+            }
         }
     };
 };

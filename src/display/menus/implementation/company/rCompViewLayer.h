@@ -20,7 +20,9 @@ public:
         setText(1, oCommonMenus::getCompNumber(rShow.c_cActiveLocations.size()));
         setText(2, oCommonMenus::getCompNumber(rShow.c_cRentedLocations.size()));
         setText(3, getFloatToString2Decimal(rShow.c_cActiveFunds));
-        setText(4, "25.34"); //TODO Change it;
+        setText(4, getFloatToString2Decimal(
+                ((rShow.c_cActiveFunds + rShow.c_objYear + rShow.c_objMonth * 12 + rShow.c_objFortnight * 36) /
+                 rShow.c_cActiveFunds) * 100)); //TODO Change it;
 
         for (int i = 5; i < 11; i++)
             setText(i, "");
@@ -51,11 +53,11 @@ public:
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::Escape)
                     parentMenu->setResponse(-1, 1);
-                if (event.key.code == sf::Keyboard::P){
+                if (event.key.code == sf::Keyboard::P) {
                     std::shared_ptr<rCompViewMoreLayer> rComp = std::make_shared<rCompViewMoreLayer>(
                             rCompViewMoreLayer(mPiles->vTopActiveMenu,
-                                           rCompRef,
-                                           "d_mCompViewMoreLayer"));
+                                               rCompRef,
+                                               "d_mCompViewMoreLayer"));
                     mPiles->addMenuTop(rComp);
                 }
                 break;

@@ -73,6 +73,12 @@ public:
                            gTG_TypeGen->get(i, j) != sgT_TypeGen::sgT_TG_RoadB) {
                     switch (gTG_TypeSoil->get(i, j)) {
                         case sgT_TypeSoil::sgT_TS_T1Mixed:
+                        case sgT_TypeSoil::sgT_TS_T1Industrial:
+                        case sgT_TypeSoil::sgT_TS_T2Industrial:
+                            gTG_fullCell.push_back({gTG_TypeSoil->get(i, j), {i, j}});
+                    }
+                    switch (gTG_TypeSoil->get(i, j)) {
+                        case sgT_TypeSoil::sgT_TS_T1Mixed:
                         case sgT_TypeSoil::sgT_TS_T2Mixed:
                         case sgT_TypeSoil::sgT_TS_T3Mixed:
                             gTG_civilPresentCell.emplace_back(i, j);
@@ -96,7 +102,6 @@ public:
             case sgT_TypeSoil::sgT_TS_T3Mixed:
                 gTG_TypeGen->set(inGridPos, sgT_TypeGen::sgT_TG_CivBuilding);
                 gTG_civilPresentCell.push_back(inGridPos);
-
                 gTG_rLayer->addNewBuildingRender(inGridPos, sgT_TypeGen::sgT_TG_CivBuilding);
                 break;
             case sgT_TypeSoil::sgT_TS_T1Industrial:
@@ -166,18 +171,21 @@ public:
     std::shared_ptr<rgTerrain> gTG_rLayer;
     std::shared_ptr<gIGrid<uint8_t>> gTG_civilOccupancy;
 
-    struct sgT_emptySlot {
+    struct sgT_CellSlot {
         uint8_t sgT_gType;
         std::pair<int, int> sgT_gPos;
     };
 
-    std::list<sgT_emptySlot> getListPresentCompanies() { return gTG_emptyCell; }
+    std::list<sgT_CellSlot> getListPresentCompanies() { return gTG_fullCell; }
+
+    std::list<sgT_CellSlot> getListEmptyCompanies() { return gTG_emptyCell; }
 
 private:
     std::list<std::pair<int, int>> gTG_civilPresentCell;
     std::list<std::pair<int, int>> gTG_civilFilledCell;
     std::list<std::pair<int, int>> gTG_factoryFullCell;
-    std::list<sgT_emptySlot> gTG_emptyCell;
+    std::list<sgT_CellSlot> gTG_emptyCell;
+    std::list<sgT_CellSlot> gTG_fullCell;
     std::mt19937 gTG_genRPos;
 };
 

@@ -16,15 +16,15 @@ public:
     explicit sContainerMain(const std::shared_ptr<sSimulatorMain> &sMS)
             : sMS(sMS) {
 
-        gSimL = std::make_shared<gDispLayers>(sMS->gTotalAirPollution->gLayerAirPollution,
-                                              sMS->gMainTerrain->gTG_rLayer->gLayerCurStruct, sMS->gMainRoads->gLayerTransit,
+        gSimL = std::make_shared<gDispLayers>(sMS->sSM_groupLand->gL_gAirPollution->gLayerAirPollution,
+                                              sMS->sSM_groupLand->gL_gTerrain->gTG_rLayer->gLayerCurStruct, sMS->gMainRoads->gLayerTransit,
                                               sMS->gTotalUnderground->gLayerUnderground);
         pPM = std::make_shared<rPileMenus>(gSimL);
         //MENUS
         sMS->rInteraction = pPM;
-        rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->gMainTerrain,
+        rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->sSM_groupLand->gL_gTerrain,
                                                        sMS->gMainRoads->gLayerRoads,
-                                                       sMS->sSM_sCompany->gLayerOwnership, sMS->sSM_sCompany->sTComp));
+                                                       sMS->sSM_sCompany->sTComp->gLayerOwnership, sMS->sSM_sCompany->sTComp));
         pPM->addMenuTop(rBasic);
 
         rG = std::make_shared<rGlobal>(gSimL, pPM);

@@ -24,7 +24,9 @@ public:
         gL_gAirPollution->tickReduced(gL_gTerrain->gTG_TypeGen);
     }
 
-    std::list<sgTerrain::sgT_emptySlot> getListPresentCompanies(){return gL_gTerrain->getListPresentCompanies();}
+    std::list<sgTerrain::sgT_CellSlot> getListPresentCompanies() { return gL_gTerrain->getListPresentCompanies(); }
+
+    std::list<sgTerrain::sgT_CellSlot> getListEmptyCompanies() { return gL_gTerrain->getListEmptyCompanies(); }
 
     std::shared_ptr<sgAirPollutionMain> gL_gAirPollution;
     std::shared_ptr<sgTerrain> gL_gTerrain;

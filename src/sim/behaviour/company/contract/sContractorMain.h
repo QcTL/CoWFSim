@@ -16,7 +16,9 @@
 
 class sContractorMain {
 public:
-    sContractorMain() = default;
+    sContractorMain() {
+        sCM_ContractorSt = std::make_shared<sContractorStorage>();
+    };
 
     void addContractToCompany(const std::shared_ptr<objCompany> &inPObjComReceiving,
                               const std::shared_ptr<objCompany> &inPObjComGiving,
@@ -71,14 +73,17 @@ public:
         }
         std::shared_ptr<con_buyCell> _buyCell
                 = std::make_shared<con_buyCell>(con_buyCell(inPObjComReceiving->c_uuid,
-                                                            inPObjComGiving->c_uuid, inTDate,
+                                                            inPObjComGiving == nullptr ? -1
+                                                                                       : inPObjComGiving->c_uuid,
+                                                            inTDate,
                                                             inSMBuyOffer.sMO_typePayment, _cRecu, _cTotal,
                                                             {inSMBuyOffer.sMO_pos}, inSMBuyOffer.sMO_typePos));
         uint32_t _uuidContract = sCM_ContractorSt->addCon(_buyCell);
         _buyCell->addAsReceiving(inPObjComReceiving);
         _buyCell->addAsGiving(inPObjComGiving);
         //TODO ADD AS CONTRACTOR TIMER;
-        inPObjComGiving->addContractToCompany(con_Type::con_Type_Buy, _uuidContract);
+        if (inPObjComGiving != nullptr)
+            inPObjComGiving->addContractToCompany(con_Type::con_Type_Buy, _uuidContract);
         inPObjComReceiving->addContractToCompany(con_Type::con_Type_Buy, _uuidContract);
     }
 
@@ -86,11 +91,23 @@ public:
                               const uint32_t inESalary, const uint32_t inTDate) {
         std::shared_ptr<con_hireInteraction> _hireE
                 = std::make_shared<con_hireInteraction>(
-                        con_hireInteraction(inPObjComGiving->c_uuid, inEHome, inTDate, inTDate));
+                        con_hireInteraction(inPObjComGiving->c_uuid, inEHome, inESalary, inTDate));
         uint32_t _uuidContract = sCM_ContractorSt->addCon(_hireE);
         _hireE->addAsGiving(inPObjComGiving);
 
         inPObjComGiving->addContractToCompany(con_Type::con_Type_Rent, _uuidContract);
+    }
+
+    void addContractToCompanyRentHouse(const std::shared_ptr<objCompany> &inPObjComGiving,
+                                       const std::pair<int, int> &inEHome,
+                                       const uint32_t inECost, const uint32_t inTDate) {
+        std::shared_ptr<con_rentHouseInteraction> _rentHE
+                = std::make_shared<con_rentHouseInteraction>(
+                        con_rentHouseInteraction(inPObjComGiving->c_uuid, inEHome, inECost, inTDate));
+        uint32_t _uuidContract = sCM_ContractorSt->addCon(_rentHE);
+        _rentHE->addAsGiving(inPObjComGiving);
+
+        inPObjComGiving->addContractToCompany(con_Type::con_Type_RentHome, _uuidContract);
     }
 
     void removeContractFromCompany(const uint32_t inCUuid, std::shared_ptr<sCompanyStorage> &inSCS) {

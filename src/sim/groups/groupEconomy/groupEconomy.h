@@ -13,6 +13,16 @@ class groupEconomy {
 public:
     groupEconomy() = default;
 
+    void setEmptySlots(const std::list<sgTerrain::sgT_CellSlot> &inLEmpty) {
+        for (const sgTerrain::sgT_CellSlot &sCellSlot: inLEmpty) {
+            std::shared_ptr<sLBuyCell::sMOffering> sMO =
+                    std::make_shared<sLBuyCell::sMOffering>(nullptr, sCellSlot.sgT_gPos,
+                                                            sCellSlot.sgT_gType,
+                                                            0, 0); //TODO PRICE AND QUALITY
+            addListing<sLBuyCell>(sMO);
+        }
+    }
+
     void tickReduced(const uint32_t inRTime, const uint32_t inTDate) {
         gE_sEvaluator->tickReduced(inRTime, inTDate);
     }
@@ -41,8 +51,9 @@ public:
     }
 
     void computeSellInmElement(uint64_t inUuidElement, const std::shared_ptr<objCompany> &inObjCompany) {
-        gE_sEvaluator->computeSellInmElement(inUuidElement,inObjCompany);
+        gE_sEvaluator->computeSellInmElement(inUuidElement, inObjCompany);
     }
+
     sTotalElements::sME_Element getById(uint64_t inUuidElement) { return gE_sEvaluator->getById(inUuidElement); }
 
 

@@ -67,10 +67,11 @@ public:
 
     void completedSetupStage() {
         sSM_groupLand->completedSetupStage();
-
         gMainRoads->completedStartGrid();
-        sSM_sCompany->addNewCompany(sCompanyMain::sCM_strStyleCompany::SCM_strFactory);
+        sSM_groupEconomy->setEmptySlots(sSM_groupLand->getListEmptyCompanies());
 
+
+        sSM_sCompany->addNewCompany(sCompanyMain::sCM_strStyleCompany::SCM_strFactory);
         sSM_sCompany->completedStartCompanies(sSM_groupLand->getListPresentCompanies());
     }
 

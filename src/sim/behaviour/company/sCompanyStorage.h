@@ -160,6 +160,10 @@ public:
         return sCT_vTotalComp.getDestByComp(inIndex);
     }
 
+    std::shared_ptr<objCompany> getCompanyByPosition(std::pair<int,int> inPCell) {
+        return getCompanyByUUID(gLayerOwnership->get(inPCell).front());
+    }
+
     std::vector<objCompany> getVecCompByUUID(const std::list<uint32_t> &inLUuidComp) {
         std::vector<objCompany> r;
         for (const uint32_t l: inLUuidComp) {
@@ -191,12 +195,11 @@ public:
     getDiffEmployeesByLocation(uint32_t inRTimer) { return sCT_vTotalComp.getDiffEmployeesByLocation(inRTimer); }
 
 
+    std::shared_ptr<gIGrid<std::list<uint32_t>>> gLayerOwnership;
 private:
     rVectorCompanies sCT_vTotalComp;
     std::shared_ptr<sCodeStorage> sCT_sCodeS;
     std::mt19937 sCT_genRand;
-
-    std::shared_ptr<gIGrid<std::list<uint32_t>>> gLayerOwnership;
 
     std::vector<std::vector<bool>> sCT_vActiveDaysValid = {{true,  true,  true,  true,  true, false, false},
                                                            {true,  true,  true,  true,  true, true,  false},
