@@ -1,2 +1,4 @@
 type:mHomeViewer
 src:mHomeViewLayer.txt
+inSelTex:65
+inLengthTex:11,3,3,4,9

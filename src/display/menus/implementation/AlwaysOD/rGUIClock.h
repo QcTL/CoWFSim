@@ -12,31 +12,13 @@ class rGUIClock : public rIMenu {
 public:
 
     explicit rGUIClock(const std::shared_ptr<rIMenu> &mParent,
-                       const std::string &pthFileD) : rIMenu(mParent, rRelativePos::pTopLeft) {
-        std::vector<std::vector<int>> data = extractDataFromFile(pthFileD);
-        dInfo = getVertexMenu((int) data[0].size(), (int) data.size(), data);
-        gWidth = (int) data[0].size();
-        gHeight = (int) data.size();
-
-        comV = std::vector<defTxtCompany>(3, {{0, 0}});
-
-        std::vector<uint8_t> sLengths = {9, 5, 4};
+                       const std::string &pthFileD) : rIMenu(mParent, rRelativePos::pTopLeft, pthFileD) {
+        std::vector<std::vector<int>> data = dExtracted;
         for (int i = 0; i < data.size(); ++i) {
             for (int j = 0; j < data[i].size(); ++j) {
                 auto row = (rPos == pBottomLeft || rPos == pBottomRight) ? data.size() - 1 - i : i;
                 auto col = (rPos == pTopRight || rPos == pBottomRight) ? data[i].size() - 1 - j : j;
-                if (data[i][j] == 65 || data[i][j] == 48) {
-                    for (int t = 0; t < comV.size(); ++t) {
-                        bool condition = comV[t].pLength == 0;
-                        for (int k = 0; k < t; ++k) {
-                            condition = condition && (i != comV[k].pStartText.first);
-                        }
-                        if (condition) {
-                            comV[t] = {{row, col}, sLengths[t]};
-                            break;
-                        }
-                    }
-                } else if (data[i][j] == 277 || data[i][j] == 49 || data[i][j] == 50 || data[i][j] == 51) {
+                if (data[i][j] == 277 || data[i][j] == 49 || data[i][j] == 50 || data[i][j] == 51) {
                     comPSel.emplace_back(row + 1, col);
                 }
             }
@@ -106,17 +88,7 @@ public:
     void pressedCell(std::pair<int, int> cPressed) override {}
 
 private:
-    struct defTxtCompany {
-        std::pair<uint32_t, uint32_t> pStartText;
-        uint8_t pLength;
-    };
-    std::vector<defTxtCompany> comV;
-
     std::vector<std::pair<uint32_t, uint32_t>> comPSel;
-
-    sf::VertexArray dInfo;
-    int gWidth = 0;
-    int gHeight = 0;
 
     void setText(const uint8_t tVal, const std::string &cText) {
         for (int i = 0; i < comV[tVal].pLength; i++) {

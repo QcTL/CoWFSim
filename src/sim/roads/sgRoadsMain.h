@@ -12,12 +12,15 @@
 #include "../structure/grids/gIGrid.h"
 #include "../structure/grids/gBasicGrid.h"
 #include "rNodeFromGrid.h"
+#include "../groups/groupLand/groupLand.h"
+#include "../structure/grids/transformation/gBaseToNearestRoad.h"
+#include "rTransRNodeToRRNode.h"
 
 class sgRoadsMain {
 public:
 
-    sgRoadsMain(uint32_t inGridSize, const std::shared_ptr<sgTerrain> &inPsgTerrain)
-            : sgRM_inGridSize(inGridSize), sgRM_gTerrainGrid(inPsgTerrain) {
+    sgRoadsMain(uint32_t inGridSize, const std::shared_ptr<groupLand> &inGLand)
+            : sgRM_inGridSize(inGridSize), sgRM_gLand(inGLand) {
         gLayerTransit = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(inGridSize, inGridSize, 0));
         sgRM_gNearRoad = std::make_shared<gBasicGrid<rNode *>>(gBasicGrid<rNode *>(inGridSize, inGridSize, nullptr));
     }
@@ -40,8 +43,8 @@ public:
     }
 
     [[nodiscard]] std::pair<int, int> getNewRandomAssignedCivilHome() const {
-        auto _pHouseIt = sgRM_gTerrainGrid->returnRandomFullCivil();
-        sgRM_gTerrainGrid->addCivilHomeToPos(_pHouseIt);
+        auto _pHouseIt = sgRM_gLand->gL_gTerrain->returnRandomFullCivil();
+        sgRM_gLand->gL_gTerrain->addCivilHomeToPos(_pHouseIt);
         return sgRM_gNearRoad->get(*_pHouseIt)->rPos;
     }
 
@@ -57,8 +60,8 @@ public:
     }
 
 
-    void completedStartGrid(const std::shared_ptr<sgTerrain> &gMainTerrain) {
-        extractRoadsFromLayer(gMainTerrain);
+    void completedStartGrid() {
+        extractRoadsFromLayer();
         for (int i = 0; i < 2000; i++) {
             for (const std::shared_ptr<rRNodeI> &node: sgRM_listRRoads) {
                 node->sendInformationStart();
@@ -70,7 +73,7 @@ public:
 
     std::shared_ptr<gIGrid<uint8_t>> gLayerTransit;
     std::vector<std::vector<rNode *>> gLayerRoads;
-    std::shared_ptr<sgTerrain> sgRM_gTerrainGrid;
+    std::shared_ptr<groupLand> sgRM_gLand;
 private:
 
     void routeCarsCommute(const uint32_t inRTime, const uint32_t inTDate) {
@@ -86,30 +89,30 @@ private:
         if (inRTime % 24 != 0)
             return;
         for (int i = 0; i < sgRM_vecFreqGhostRiders[inRTime / 24] * 3; i++) {
-            std::pair<int, int> _gPointStart = getClosestRoadToBuilding(*sgRM_gTerrainGrid->returnRandomFullCivil());
-            std::pair<int, int> _gPointEnd = getClosestRoadToBuilding(*sgRM_gTerrainGrid->returnRandomFullCivil());
+            std::pair<int, int> _gPointStart = getClosestRoadToBuilding(
+                    *sgRM_gLand->gL_gTerrain->returnRandomFullCivil());
+            std::pair<int, int> _gPointEnd = getClosestRoadToBuilding(
+                    *sgRM_gLand->gL_gTerrain->returnRandomFullCivil());
             uint32_t _locId = gLayerRoads[_gPointEnd.first][_gPointEnd.second]->refCompressed->locIdNode;
             uint16_t _blocId = gLayerRoads[_gPointEnd.first][_gPointEnd.second]->refCompressed->rBlock;
             gLayerRoads[_gPointStart.first][_gPointStart.second]->refCompressed->addNewCar(_locId, _blocId);
         }
     }
 
-    void extractRoadsFromLayer(const std::shared_ptr<sgTerrain> &gMainTerrain) {
+    void extractRoadsFromLayer() {
         std::pair<std::vector<rNode *>, std::vector<std::vector<rNode *>>> r = rNodeFromGrid<uint8_t>::givenGrid(
-                gMainTerrain->gTG_TypeGen, {5, 6});
+                sgRM_gLand->gL_gTerrain->gTG_TypeGen, {5, 6});
         gLayerRoads = r.second;
         std::cout << r.first.size() << std::endl;
         for (const auto &rNode: r.first) {
             sgRM_listRRoads.merge(rTransRNodeToRRNode().conversion(rNode, sqrt(sgRM_inGridSize), sgRM_inGridSize,
-                                                                   sgRM_gTerrainGrid->gTG_TypeGen,
+                                                                   sgRM_gLand->gL_gTerrain->gTG_TypeGen,
                                                                    gLayerTransit));
             rInfoDist::initializeMatrix(
                     sgRM_inGridSize / sqrt(sgRM_inGridSize) * sgRM_inGridSize / sqrt(sgRM_inGridSize), sgRM_inGridSize,
                     sgRM_listRRoads.size());
         }
-
-        gBaseToNearestRoad::givenMatRef(sgRM_gNearRoad, gLayerRoads, gMainTerrain->gTG_TypeGen,
-                                        gMainTerrain->gTG_TypeSoil,
+        gBaseToNearestRoad::givenMatRef(sgRM_gNearRoad, gLayerRoads, sgRM_gLand->gL_gTerrain,
                                         {
                                                 sgTerrain::sgT_TypeGen::sgT_TG_RoadS,
                                                 sgTerrain::sgT_TypeGen::sgT_TG_RoadB},

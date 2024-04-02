@@ -13,46 +13,7 @@ public:
     explicit rCellViewMenu(const std::shared_ptr<rIMenu> &mParent, const std::vector<objCompany> &rShow,
                            const std::string &pthFileD,
                            const std::shared_ptr<rPileMenus> &mPiles)
-            : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft), refPile(mPiles), compShow(rShow) {
-        std::vector<std::vector<int>> data = extractDataFromFile(pthFileD);
-
-        for (int i = 0; i < data.size(); ++i) {
-            for (int j = 0; j < data[i].size(); ++j) {
-                auto row = (rPos == pBottomLeft || rPos == pBottomRight) ? data.size() - 1 - i : i;
-                auto col = (rPos == pTopRight || rPos == pBottomRight) ? data[i].size() - 1 - j : j;
-                if (data[i][j] == 65) {
-                    for (int t = 0; t < 3; ++t) {
-                        bool condition = comV[t].nNameCom.pLength == 0;
-                        for (int k = 0; k < t; ++k) {
-                            condition = condition && (i != comV[k].nNameCom.pStartText.first);
-                        }
-                        if (condition) {
-                            comV[t].nNameCom = {{row, col}, 11};
-                            break;
-                        }
-                    }
-                } else if (data[i][j] == 48) {
-                    for (int t = 0; t < 3; ++t) {
-                        bool condition = comV[t].nValCom.pLength == 0;
-                        for (int k = 0; k < t; ++k) {
-                            condition = condition && (i != comV[k].nValCom.pStartText.first);
-                        }
-                        if (condition) {
-                            comV[t].nValCom = {{row, col}, 6};
-                            break;
-                        }
-                    }
-                } else if (data[i][j] == 304 || data[i][j] == 305) {
-                    pElemSel.emplace_back(row, col);
-                    pElemSelAbs.emplace_back(i, j);
-                }
-            }
-        }
-
-        dInfo = getVertexMenu((int) data[0].size(), (int) data.size(), data);
-        gWidth = (int) data[0].size();
-        gHeight = (int) data.size();
-
+            : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft, pthFileD), refPile(mPiles), compShow(rShow) {
         int index = 0;
         for (const auto &it: rShow) {
             if (index < 3)
@@ -84,7 +45,6 @@ public:
                         sf::Vector2<unsigned int> absPos = getAbsPos(rWindow, gHeight * 16, gWidth * 16, pMouse);
                         for (int i = 0; i < pElemSelAbs.size(); i++) {
                             if (pElemSelAbs[i].first * 16 < absPos.y && pElemSelAbs[i].first * 16 + 16 >= absPos.y) {
-                                std::cout <<"YEP "<< i<<std::endl;
                                 std::shared_ptr<rCompViewLayer> rComp = std::make_shared<rCompViewLayer>(
                                         rCompViewLayer(refPile->vTopActiveMenu, compShow[i],
                                         "d_mCompViewLayer", refPile));
@@ -109,7 +69,6 @@ private:
 
     std::vector<std::pair<int, int>> pElemSel;
     std::vector<std::pair<int, int>> pElemSelAbs;
-    int cCurrenSel = -1;
 
     struct defTxtCompany {
         struct pWrite {
@@ -128,18 +87,6 @@ private:
 
     std::shared_ptr<rPileMenus> refPile;
     std::vector<objCompany> compShow;
-
-    void setNewSel(int v) {
-        sf::Vertex *quad = &dInfo[(pElemSel[cCurrenSel].second + pElemSel[cCurrenSel].first * gWidth) * 4];
-        for (int k = 0; k < 4; k++) {
-            quad[k].texCoords = lRefTiles[305][k];
-        }
-        quad = &dInfo[(pElemSel[v].second + pElemSel[v].first * gWidth) * 4];
-        for (int k = 0; k < 4; k++) {
-            quad[k].texCoords = lRefTiles[304][k];
-        }
-        cCurrenSel = v;
-    }
 
     void setTextCompany(const uint8_t tVal, const std::string &cName, const std::string &cValue) {
         for (int i = 0; i < comV[tVal].nNameCom.pLength; i++) {
@@ -162,7 +109,6 @@ private:
             sf::Vertex *quad = &dInfo[
                     (comV[tVal].nValCom.pStartText.second + i + comV[tVal].nValCom.pStartText.first * gWidth) * 4];
             for (int k = 0; k < 4; k++) {
-
                 if (i >= cValue.size())
                     quad[k].texCoords = lRefTiles[32][k];
                 else if (cValue[i] >= 'a' && cValue[i] <= 'z')

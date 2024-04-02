@@ -91,12 +91,11 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/structure/grids/transformation/gBaseToInertiaRoads.h
         src/sim/structure/grids/transformation/gBaseToIRF.h
         src/sim/structure/obj/sRoutesStorage.h
-        src/sim/behaviour/company/sCompanyActions.h
         src/sim/behaviour/company/sCompanyTimer.h
         src/sim/behaviour/company/sCompanyMain.h
         src/sim/behaviour/market/sMarketBazaar.h
         src/sim/behaviour/company/employee/sCivilMain.h
-        src/sim/behaviour/airPollution/sgAirPollutionMain.h
+        src/sim/groups/groupLand/sgAirPollutionMain.h
         src/tests/tst_gWindExpansion.h
         "src/sim/behaviour/recording/sStorageCivilRoutineState.h"
         src/tests/tst_gNewVisualitzation.h
@@ -107,7 +106,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/display/layers/implementation/gLayerUnderground.h
         src/sim/behaviour/metro/sgUndergroundMain.h
         src/sim/structure/obj/elements/objCivil.h
-        src/sim/behaviour/sgTerrain.h
+        src/sim/groups/groupLand/sgTerrain.h
         src/sim/structure/obj/elements/contracts/cObjContracts.h
         src/sim/behaviour/market/listings/sIListing.h
         src/sim/behaviour/market/listings/implementations/sLBuyCell.h
@@ -126,6 +125,8 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/snCommonAtr.h
         src/display/rgTerrain.h
         src/display/menus/implementation/home/rHomeViewLayer.h
+        src/sim/groups/groupLand/groupLand.h
+        src/sim/groups/groupEconomy/groupEconomy.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

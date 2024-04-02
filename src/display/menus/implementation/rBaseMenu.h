@@ -23,7 +23,7 @@ public:
                        const std::vector<std::vector<rNode *>> &gRoads,
                        const std::shared_ptr<gIGrid<std::list<uint32_t>>> &gLayerOwn,
                        const std::shared_ptr<sCompanyStorage> &sTComp)
-            : rIMenu(nullptr, rIMenu::rRelativePos::pBottomRight),
+            : rIMenu(nullptr, rIMenu::rRelativePos::pBottomRight, ""),
               refPile(rPile), lstValueLayer(1),
               refLRoads(gRoads), rBM_refTerrain(sgTerrain), refLBuild(gLayerOwn), refSComp(sTComp) {
     }
@@ -105,13 +105,11 @@ public:
                                                *refSComp->getCompanyByUUID(refLBuild->get(cPressed).front()),
                                                "d_mCompViewLayer", refPile));
                         refPile->addMenuTop(rComp);
-                        std::cout << "YEP" << std::endl;
                     } else {
                         std::shared_ptr<rCellViewMenu> rComp = std::make_shared<rCellViewMenu>(
                                 rCellViewMenu(refPile->vTopActiveMenu,
                                               refSComp->getVecCompByUUID(refLBuild->get(cPressed)),
                                               "d_mCellViewLayer", refPile));
-
                         refPile->addMenuTop(rComp);
                     }
                 }

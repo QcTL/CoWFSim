@@ -48,7 +48,6 @@ int tst_gNewVisualization(const std::map<std::string, std::string> &mValues) {
 
 
     sMS->completedSetupStage();
-    sMS->completedStartCompanies(retCells.gCompanyPositions);
 
     sContainerMain sMC(sMS);
 

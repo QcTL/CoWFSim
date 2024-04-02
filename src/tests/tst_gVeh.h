@@ -37,8 +37,8 @@ int tst_gVeh() {
                                 gBaseToPattern<uint8_t>::gPatternParameters(4, 4, 25, 25),
                                 6);
 
-    sMS->gMainTerrain->gTG_TypeGen = gB;
-    sMS->gTotalAirPollution->gLayerAirPollution = gB;
+    sMS->sSM_groupLand->gL_gTerrain->gTG_TypeGen = gB;
+    sMS->sSM_groupLand->gL_gAirPollution->gLayerAirPollution = gB;
     sMS->completedSetupStage();
 
 /*

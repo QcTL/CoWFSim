@@ -6,8 +6,8 @@
 
 
 rSelOptMenu::rSelOptMenu(const std::shared_ptr<rIMenu> &mParent, int strValue, const std::string &pthFileD,
-                         rIMenu::rRelativePos rPos) : rIMenu(mParent, rPos) {
-    std::vector<std::vector<int>> data = extractDataFromFile(pthFileD);
+                         rIMenu::rRelativePos rPos) : rIMenu(mParent, rPos, pthFileD) {
+    std::vector<std::vector<int>> data = dExtracted;
 
     for (int i = 0; i < data.size(); ++i)
         for (int j = 0; j < data[i].size(); ++j)
@@ -17,10 +17,6 @@ rSelOptMenu::rSelOptMenu(const std::shared_ptr<rIMenu> &mParent, int strValue, c
                 pElemSel.emplace_back(row, col);
                 pElemSelAbs.emplace_back(i, j);
             }
-    dInfo = getVertexMenu((int) data[0].size(), (int) data.size(), data);
-    gWidth = (int) data[0].size();
-    gHeight = (int) data.size();
-
     setNewSel(strValue);
 }
 

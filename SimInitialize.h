@@ -35,17 +35,16 @@ public:
 
         std::shared_ptr<sSimulatorMain> sMS = std::make_shared<sSimulatorMain>(lSizeGrid);
 
-        sLayerType::returnLayerType tReturn = sLayerType::gen(lSizeGrid, sMS->gMainTerrain->gTG_TypeGen, mValues, snCommonAtr::getFlagAtr("snCA_Seed"));
-        sMS->gMainTerrain->gTG_TypeSoil = tReturn.genTypeSoil;
+        sLayerType::returnLayerType tReturn = sLayerType::gen(lSizeGrid, sMS->sSM_groupLand->gL_gTerrain->gTG_TypeGen, mValues, snCommonAtr::getFlagAtr("snCA_Seed"));
+        sMS->sSM_groupLand->gL_gTerrain->gTG_TypeSoil = tReturn.genTypeSoil;
 
         retObjSLayerCells retCells =
-                sLayerCells::gen(lSizeGrid, sMS->gMainTerrain, tReturn.centerClusters, mValues, snCommonAtr::getFlagAtr("snCA_Seed"));
+                sLayerCells::gen(lSizeGrid, sMS->sSM_groupLand->gL_gTerrain, tReturn.centerClusters, mValues, snCommonAtr::getFlagAtr("snCA_Seed"));
 
         sMS->gTotalUnderground->gLayerUnderground = retCells.gUnderground;
         sMS->gTotalUnderground->setPointsTransit(retCells.routesMetro);
 
         sMS->completedSetupStage();
-        sMS->completedStartCompanies(retCells.gCompanyPositions);
 
         sContainerMain sMC(sMS);
 

@@ -14,37 +14,15 @@ class rCompViewLayer : public rIMenu {
 public:
     explicit rCompViewLayer(const std::shared_ptr<rIMenu> &mParent, const objCompany &rShow,
                             const std::string &pthFileD, const std::shared_ptr<rPileMenus> &mPiles)
-            : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft), mPiles(mPiles), rCompRef(rShow) {
-        std::vector<std::vector<int>> data = extractDataFromFile(pthFileD);
-
-        comV = std::vector<defTxtCompany>(11, {{0, 0}});
-
-        std::vector<uint8_t> sLengths = {11, 3, 3, 4, 6, 9, 4, 9, 4, 9, 4};
-        int nSeen = 0;
-        for (int i = 0; i < data.size(); ++i) {
-            for (int j = 0; j < data[i].size(); ++j) {
-                auto row = (rPos == pBottomLeft || rPos == pBottomRight) ? data.size() - 1 - i : i;
-                auto col = (rPos == pTopRight || rPos == pBottomRight) ? data[i].size() - 1 - j : j;
-                if (data[i][j] == 65 || data[i][j] == 48) {
-                    comV[nSeen] = {{row, col}, sLengths[nSeen]};
-                    nSeen++;
-                } else if (data[i][j] == 304 || data[i][j] == 305) {
-                    pElemSel.emplace_back(row, col);
-                    pElemSelAbs.emplace_back(i, j);
-                }
-            }
-        }
-
-        dInfo = getVertexMenu((int) data[0].size(), (int) data.size(), data);
-        gWidth = (int) data[0].size();
-        gHeight = (int) data.size();
-
+            : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft, pthFileD), mPiles(mPiles), rCompRef(rShow) {
 
         setText(0, rShow.nName);
         setText(1, oCommonMenus::getCompNumber(rShow.c_cActiveLocations.size()));
         setText(2, oCommonMenus::getCompNumber(rShow.c_cRentedLocations.size()));
         setText(3, getFloatToString2Decimal(rShow.c_cActiveFunds));
-        setText(4, "25.34"); //TODO Change it;
+        setText(4, getFloatToString2Decimal(
+                ((rShow.c_cActiveFunds + rShow.c_objYear + rShow.c_objMonth * 12 + rShow.c_objFortnight * 36) /
+                 rShow.c_cActiveFunds) * 100)); //TODO Change it;
 
         for (int i = 5; i < 11; i++)
             setText(i, "");
@@ -75,11 +53,11 @@ public:
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::Escape)
                     parentMenu->setResponse(-1, 1);
-                if (event.key.code == sf::Keyboard::P){
+                if (event.key.code == sf::Keyboard::P) {
                     std::shared_ptr<rCompViewMoreLayer> rComp = std::make_shared<rCompViewMoreLayer>(
                             rCompViewMoreLayer(mPiles->vTopActiveMenu,
-                                           rCompRef,
-                                           "d_mCompViewMoreLayer"));
+                                               rCompRef,
+                                               "d_mCompViewMoreLayer"));
                     mPiles->addMenuTop(rComp);
                 }
                 break;
@@ -93,14 +71,7 @@ public:
 
 private:
 
-    static std::string getFloatToString2Decimal(const float nUsed) {
-        std::stringstream ss;
-        ss << std::fixed << std::setprecision(2) << nUsed;
-        return ss.str();
-    }
     std::shared_ptr<rPileMenus> mPiles;
-    std::vector<std::pair<int, int>> pElemSel;
-    std::vector<std::pair<int, int>> pElemSelAbs;
     objCompany rCompRef;
 };
 

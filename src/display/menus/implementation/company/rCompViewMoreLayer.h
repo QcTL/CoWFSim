@@ -14,27 +14,7 @@ class rCompViewMoreLayer : public rIMenu {
 public:
     explicit rCompViewMoreLayer(const std::shared_ptr<rIMenu> &mParent, const objCompany &rShow,
                                 const std::string &pthFileD)
-            : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft) {
-        std::vector<std::vector<int>> data = extractDataFromFile(pthFileD);
-
-        comV = std::vector<defTxtCompany>(12, {{0, 0}});
-
-        std::vector<uint8_t> sLengths = {8, 8, 7, 7, 7, 7, 7, 7, 7, 7, 7};
-        int nSeen = 0;
-        for (int i = 0; i < data.size(); ++i) {
-            for (int j = 0; j < data[i].size(); ++j) {
-                auto row = (rPos == pBottomLeft || rPos == pBottomRight) ? data.size() - 1 - i : i;
-                auto col = (rPos == pTopRight || rPos == pBottomRight) ? data[i].size() - 1 - j : j;
-                if (data[i][j] == 65) {
-                    comV[nSeen] = {{row, col}, sLengths[nSeen]};
-                    nSeen++;
-                }
-            }
-        }
-
-        dInfo = getVertexMenu((int) data[0].size(), (int) data.size(), data);
-        gWidth = (int) data[0].size();
-        gHeight = (int) data.size();
+            : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft, pthFileD) {
 
         setText(2, getFloatToString2Decimal(rShow.c_objFortnight));
         setText(4, getFloatToString2Decimal(rShow.c_objMonth));
@@ -74,12 +54,6 @@ public:
                 break;
         }
         return false;
-    }
-
-    static std::string getFloatToString2Decimal(const float nUsed) {
-        std::stringstream ss;
-        ss << std::fixed << std::setprecision(2) << nUsed;
-        return ss.str();
     }
 
     void pressedCell(std::pair<int, int> cPressed) override {}
