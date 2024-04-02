@@ -45,7 +45,6 @@ public:
         sMS->gTotalUnderground->setPointsTransit(retCells.routesMetro);
 
         sMS->completedSetupStage();
-        sMS->completedStartCompanies(retCells.gCompanyPositions);
 
         sContainerMain sMC(sMS);
 

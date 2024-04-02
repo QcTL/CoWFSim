@@ -110,16 +110,19 @@ private:
 
 class sCompanyStorage {
 public:
-    explicit sCompanyStorage(uint32_t maxComp, const std::shared_ptr<sCodeStorage> &sStorageCode)
+    explicit sCompanyStorage(uint32_t inGridSize, uint32_t maxComp, const std::shared_ptr<sCodeStorage> &sStorageCode)
             : sCT_vTotalComp(maxComp), sCT_sCodeS(sStorageCode) {
+
+        gLayerOwnership = std::make_shared<gBasicGrid<std::list<uint32_t>>>
+                (gBasicGrid<std::list<uint32_t>>(inGridSize, inGridSize, {}));
+
         if (snCommonAtr::getFlagAtr("snCA_Seed") != 0)
             sCT_genRand.seed(snCommonAtr::getFlagAtr("snCA_Seed"));
         else
             sCT_genRand.seed(static_cast<unsigned int>(time(nullptr)));
     }
 
-    uint32_t addCompanyAtPosition(const std::shared_ptr<gIGrid<std::list<uint32_t>>> &gLayer,
-                                  const std::list<std::pair<int, int>> &vecNPos, uint8_t typeCompany) {
+    uint32_t createCompany(const std::list<std::pair<int, int>> &vecNPos, uint8_t typeCompany) {
         std::uniform_int_distribution<> disDay(0, (int) sCT_vActiveDaysValid.size() - 1);
         std::uniform_int_distribution<> disHour(0, (int) sCT_vActiveHoursValid.size() - 1);
         int randomIndexDay = disDay(sCT_genRand);
@@ -130,13 +133,28 @@ public:
                                                       sCT_vActiveHoursValid[randomIndexHour]});
         sCT_sCodeS->initNewCode(_idNewComp);
         getCompanyByUUID(_idNewComp)->c_cCode = sCT_sCodeS->getPointerCodeByUuid(_idNewComp);
-        for (const auto &nPos: vecNPos) {
-            auto p = gLayer->get({nPos.first, nPos.second});
-            p.push_front(_idNewComp); //AAAAAAAAAAAAAAAAAAAAAA
-            gLayer->set({nPos.first, nPos.second}, p);//TODO no m'agrada que aixo vulgi dir que estem creant una copia.
-        }
+        for (const auto &nPos: vecNPos)
+            addRefPosOwnCompany(nPos, _idNewComp);
+
         return _idNewComp;
     }
+
+    bool isCompanyInPosition(const std::pair<int,int>& inPCell){return !gLayerOwnership->get(inPCell).empty();}
+
+    void addRefPosOwnCompany(std::pair<int, int> inPCell, uint32_t uuidCompany) {
+        auto p = gLayerOwnership->get({inPCell.first, inPCell.second});
+        p.push_front(uuidCompany); //AAAAAAAAAAAAAAAAAAAAAA
+        gLayerOwnership->set(inPCell, p);
+        //TODO no m'agrada que aixo vulgi dir que estem creant una copia.
+    }
+
+    void removeRefPosOwnCompany(std::pair<int,int> inPCell, uint32_t uuidCompany){
+        auto p = gLayerOwnership->get({inPCell.first, inPCell.second});
+        p.remove(uuidCompany); //AAAAAAAAAAAAAAAAAAAAAA
+        gLayerOwnership->set(inPCell, p);
+        //TODO no m'agrada que aixo vulgi dir que estem creant una copia.
+    }
+
 
     std::shared_ptr<objCompany> getCompanyByUUID(uint32_t inIndex) {
         return sCT_vTotalComp.getDestByComp(inIndex);
@@ -177,6 +195,8 @@ private:
     rVectorCompanies sCT_vTotalComp;
     std::shared_ptr<sCodeStorage> sCT_sCodeS;
     std::mt19937 sCT_genRand;
+
+    std::shared_ptr<gIGrid<std::list<uint32_t>>> gLayerOwnership;
 
     std::vector<std::vector<bool>> sCT_vActiveDaysValid = {{true,  true,  true,  true,  true, false, false},
                                                            {true,  true,  true,  true,  true, true,  false},

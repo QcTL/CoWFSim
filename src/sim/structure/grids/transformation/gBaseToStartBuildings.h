@@ -15,12 +15,11 @@
 class gBaseToStartBuildings {
 public:
 
-    static std::vector<retObjCompany>
+    static void
     gen(const std::shared_ptr<gIGrid<uint8_t>> &tSoil, const std::shared_ptr<gIGrid<uint8_t>> &tType,
         const std::vector<uint8_t> &groupSoil, const std::vector<uint8_t> &groupRoads,
         int seed = 0) {
 
-        std::vector<retObjCompany> sFactory;
         std::pair<std::pair<int, int>, std::pair<int, int>> gRange = tType->rangeUse();
         std::set<uint8_t> sGroupSoil(groupSoil.begin(), groupSoil.end());
         std::set<uint8_t> sGroupRoads(groupRoads.begin(), groupRoads.end());
@@ -36,7 +35,6 @@ public:
                     switch (tSoil->get(i, j)) {
                         case TypeSoil_T1Urban:
                             tType->set(i, j, 1);
-                            sFactory.push_back(retObjCompany({{i, j}}, 1));
                             break;
                         case TypeSoil_T2Urban:
                             tType->set(i, j, 1);
@@ -46,17 +44,14 @@ public:
                             break;
                         case TypeSoil_T1Factory:
                             tType->set(i, j, 3);
-                            sFactory.push_back(retObjCompany({{i, j}}, 3));
                             break;
                         case TypeSoil_T2Factory:
                             tType->set(i, j, 2);
-                            sFactory.push_back(retObjCompany({{i, j}}, 3));
                             break;
                     }
                 }
             }
         }
-        return sFactory;
     }
 
     template<typename T>

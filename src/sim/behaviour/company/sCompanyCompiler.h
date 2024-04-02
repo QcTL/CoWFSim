@@ -19,7 +19,10 @@ public:
             CELL_Sell,
             OBJ_Produce,
             OBJ_Buy,
-            OBJ_SellInm
+            OBJ_SellInm,
+            GEN_CreateCompany,
+            GEN_HireEmployee,
+            GEN_TerminateEmployee,
         };
 
         sCCEnumIntentions scc_type;

@@ -35,7 +35,6 @@ public:
 
     void callToProcessEndedContracts(uint32_t gTimer) {
         while (gListTimers.front().sOT_Timer < gTimer) {
-
             std::shared_ptr<con_b>  r_B = sStorageCon->getConByUuid(gListTimers.front().sOT_uuidContract);
             r_B->removeAsGiving(gListTimers.front().sOT_GivingCompany);
             r_B->removeAsGiving(gListTimers.front().sOT_ReceivingCompany);

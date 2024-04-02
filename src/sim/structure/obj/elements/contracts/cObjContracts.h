@@ -13,6 +13,15 @@ enum con_TypePaymentFreq {
     LC_PAY_MONTH, LC_PAY_YEAR, LC_PAY_FORTNIGHT
 };
 
+enum con_Type {
+    con_Type_Rent = 0,
+    con_Type_Buy = 1,
+    con_Type_Loan = 2,
+    con_Type_Stock = 3,
+    con_Type_Hire = 4,
+};
+
+
 class con_b {
 public:
     uint64_t ct_uuid = 0;
@@ -84,12 +93,15 @@ public:
 
     con_rentCell(uint32_t ctUuidCompanyReceiving, uint32_t ctUuidCompanyGiving, uint32_t ctStrDate, uint32_t ctEndDate,
                  con_TypePaymentFreq ctTypePayment, uint32_t ctRecurrentCost, uint32_t ctTotalCost,
-                 const std::list<std::pair<int, int>> &ctLCells,uint8_t typeCell) : con_b(ctUuidCompanyGiving, ctUuidCompanyReceiving,
-                                                                         ctStrDate, ctEndDate),
-                                                                   ct_typePayment(ctTypePayment),
-                                                                   ct_recurrentCost(ctRecurrentCost),
-                                                                   ct_totalCost(ctTotalCost),
-                                                                   ct_lCells(ctLCells), ct_typeCell(typeCell) {}
+                 const std::list<std::pair<int, int>> &ctLCells, uint8_t typeCell) : con_b(ctUuidCompanyGiving,
+                                                                                           ctUuidCompanyReceiving,
+                                                                                           ctStrDate, ctEndDate),
+                                                                                     ct_typePayment(ctTypePayment),
+                                                                                     ct_recurrentCost(ctRecurrentCost),
+                                                                                     ct_totalCost(ctTotalCost),
+                                                                                     ct_lCells(ctLCells),
+                                                                                     ct_typeCell(typeCell) {}
+
     //TODO AFEGIR CANVIS A C_RENTEDlOCATIONS
     void
     addAsReceiving(std::shared_ptr<objCompany> &objCom) override {
@@ -125,7 +137,7 @@ public:
 
     con_buyCell(uint32_t ctUuidCompanyReceiving, uint32_t ctUuidCompanyGiving, uint32_t ctStrDate,
                 con_TypePaymentFreq ctTypePayment, uint32_t ctRecurrentCost, uint32_t ctTotalCost,
-                const std::list<std::pair<int, int>> &ctLCells,uint8_t typeCell)
+                const std::list<std::pair<int, int>> &ctLCells, uint8_t typeCell)
             : con_b(ctUuidCompanyGiving, ctUuidCompanyReceiving, ctStrDate),
               ct_typePayment(ctTypePayment),
               ct_recurrentCost(ctRecurrentCost),
@@ -205,7 +217,7 @@ public:
               ct_boughtStock(boughtStock),
               ct_relativeTotalStock(relativeTotalStock) {}
 
-              //TODO!!! STOCKS
+    //TODO!!! STOCKS
     void
     addAsReceiving(std::shared_ptr<objCompany> &objCom) override {};
 
@@ -219,5 +231,29 @@ public:
     removeAsGiving(std::shared_ptr<objCompany> &objCom) override {};
 };
 
+class con_hireInteraction : public con_b {
+public:
+    std::pair<int, int> ct_home;
+    uint32_t ct_salary;
+
+    con_hireInteraction(uint32_t ctUuidCompanyGiving, const std::pair<int, int> &ctHome, uint8_t ctSalary,
+                        uint32_t ctStrDate)
+            : con_b(ctUuidCompanyGiving, ctStrDate), ct_home(ctHome), ct_salary(ctSalary) {}
+
+    void
+    addAsReceiving(std::shared_ptr<objCompany> &objCom) override {
+        objCom->c_objMonth -= (float) ct_salary;
+        objCom->c_nEmployee += 1;
+    };
+
+    void
+    addAsGiving(std::shared_ptr<objCompany> &objCom) override {};
+
+    void
+    removeAsReceiving(std::shared_ptr<objCompany> &objCom) override {};
+
+    void
+    removeAsGiving(std::shared_ptr<objCompany> &objCom) override {};
+};
 
 #endif //CITYOFWEIRDFISHES_COBJCONTRACTS_H

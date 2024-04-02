@@ -80,8 +80,7 @@ public:
         }
 
         //HOUSES:
-        std::vector<retObjCompany> gCompany;
-        gCompany = gBaseToStartBuildings::gen(sgTerrain->gTG_TypeSoil, sgTerrain->gTG_TypeGen,
+        gBaseToStartBuildings::gen(sgTerrain->gTG_TypeSoil, sgTerrain->gTG_TypeGen,
                                               {TypeSoil_T1Urban, TypeSoil_T2Urban, TypeSoil_T3Urban,
                                                TypeSoil_T1Factory, TypeSoil_T2Factory},
                                               {5, 6}, inSeed);
@@ -123,7 +122,7 @@ public:
                                             {{1, ((uint32_t) (uint8_t) strtol("00010001", nullptr, 2)) << 24}});
         */
 
-        return {gUnderground, gCompany, rMetro};
+        return {gUnderground, rMetro};
     }
 
 };

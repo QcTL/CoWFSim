@@ -87,6 +87,13 @@ public:
                           lIndex % (uint32_t) c_cActiveLocations.size()); // Advance iterator by 2 positions
     }
 
+    void addContractToCompany(uint8_t inCType, uint64_t inCUuid) {
+        if (c_activeContracts.find(inCType) != c_activeContracts.end())
+            c_activeContracts[inCType].push_back(inCUuid);
+        else
+            c_activeContracts[inCType] = {inCUuid};
+    }
+
     std::map<uint32_t, int> c_pOwn;
     std::list<std::pair<int, int>> c_cActiveLocations;
     std::map<uint8_t, int> c_cAvailableByType;
@@ -100,6 +107,8 @@ public:
     float c_objMonth = 0;
 
     std::shared_ptr<sCodeStorage::sCodeObj> c_cCode;
+
+    std::map<uint8_t, std::list<uint64_t>> c_activeContracts;
 };
 
 #endif //CITYOFWEIRDFISHES_OBJCOMPANY_H
