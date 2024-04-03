@@ -45,6 +45,20 @@ public:
 
     bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override {
         switch (event.type) {
+            case sf::Event::MouseButtonPressed:
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    sf::Vector2<int> pMouse = sf::Mouse::getPosition(rWindow);
+                    int _gPressed = getButtonPressed(rWindow, pMouse);
+                    if (_gPressed != -1) {
+                        if (_gPressed == 0) {
+                            std::shared_ptr<rCompViewLayer> rComp = std::make_shared<rCompViewLayer>(
+                                    rCompViewLayer(mPiles->vTopActiveMenu,
+                                                   *rCompRef, "d_mCompViewLayer", mPiles));
+                            mPiles->addMenuTop(rComp);
+                        }
+                    }
+                }
+                break;
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::Escape)
                     parentMenu->setResponse(-1, 1);

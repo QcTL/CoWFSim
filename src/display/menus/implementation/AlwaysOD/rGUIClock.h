@@ -68,6 +68,24 @@ public:
 
     bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override {
         switch (event.type) {
+            case sf::Event::MouseButtonPressed:
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    sf::Vector2<int> pMouse = sf::Mouse::getPosition(rWindow);
+                    int _gPressed = getButtonPressed(rWindow, pMouse);
+                    if (_gPressed != -1) {
+                        if (_gPressed == 0) {
+                            setVelocity(0);
+                            parentMenu->setResponse(0, 16);
+                        } else if (_gPressed == 1) {
+                            setVelocity(1);
+                            parentMenu->setResponse(1, 16);
+                        } else if (_gPressed == 2) {
+                            setVelocity(2);
+                            parentMenu->setResponse(2, 16);
+                        }
+                    }
+                }
+                break;
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::Num0) {
                     parentMenu->setResponse(0, 16);
