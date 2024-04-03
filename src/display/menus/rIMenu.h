@@ -350,11 +350,10 @@ protected:
 
     static std::string getFloatToString2Decimal(const float nUsed) {
         std::stringstream ss;
-        if (nUsed > 10000) {
+        if (nUsed > 10000)
             ss << std::fixed << static_cast<int>(nUsed);
-        } else {
+        else
             ss << std::fixed << std::setprecision(2) << nUsed;
-        }
         return ss.str();
     }
 };
