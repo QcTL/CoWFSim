@@ -24,14 +24,8 @@ public:
             }
         }
         setVelocity(0);
-        setClock({0, 0, 0, 0, 0});
+        setClock({0, 0, 1, 1, 0});
     }
-
-    //TODO ha de poder cridar al pare per poder canviar la velocitat de reproduccio de la simulacio
-    // Tambe el rPileMenu s'haura de alguna manera comunicar amb el simulador per saber quant s'ha de activar la
-    //superspeed que canvia molts dels possibles valors que te el sistema.
-    //Tambe estaria be que el rGUI no comptes res ell i fos cada cop que hagui de canviar un missatge de rPiles que hauria
-    // de venir de algun altre lloc.
 
     void setClock(const sClockMain::sCM_ClockValues &vNew) {
         std::string gHour = std::to_string((vNew.sCM_rVHour % 12) == 0 ? 12 : (vNew.sCM_rVHour % 12));
@@ -68,6 +62,16 @@ public:
 
     bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override {
         switch (event.type) {
+            case sf::Event::MouseButtonPressed:
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    sf::Vector2<int> pMouse = sf::Mouse::getPosition(rWindow);
+                    int _gPressed = getButtonPressed(rWindow, pMouse);
+                    if (_gPressed != -1 && _gPressed < 3) {
+                        setVelocity(_gPressed);
+                        parentMenu->setResponse(_gPressed, 16);
+                    }
+                }
+                break;
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::Num0) {
                     parentMenu->setResponse(0, 16);

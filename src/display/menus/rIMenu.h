@@ -30,7 +30,7 @@ public:
             rIMenu_objFile _dInfoFile = extractDataFromFile(pthFileD);
             dExtracted = _dInfoFile.of_data;
             comV = std::vector<defTxtCompany>(_dInfoFile.of_inLengthTex.size(), {{0, 0}});
-
+            comVButtons = _dInfoFile.of_vecButton;
             std::vector<uint8_t> sLengths = _dInfoFile.of_inLengthTex;
             int nSeen = 0;
             for (int i = 0; i < _dInfoFile.of_data.size(); ++i) {
@@ -177,6 +177,32 @@ public:
         return {};
     }
 
+
+    sf::Vector2<int> getRelPosMenu(const sf::RenderWindow &rW, const sf::Vector2<int> &mouseP) {
+        sf::Vector2<int> mouseRel = {mouseP.x / 16, mouseP.y / 16};
+        sf::Vector2<int> wS = {(int) rW.getSize().x / 16, (int) rW.getSize().y / 16};
+
+        if (rPos == rRelativePos::pBottomRight || rPos == rRelativePos::pTopRight)
+            mouseRel.x = mouseRel.x - (wS.x - gWidth);
+
+        if (rPos == rRelativePos::pBottomRight || rPos == rRelativePos::pBottomLeft)
+            mouseRel.y = mouseRel.y - (wS.y - gHeight) - 1;
+
+        return mouseRel;
+    }
+
+    int getButtonPressed(const sf::RenderWindow &rW, const sf::Vector2<int> &mouseP) {
+        sf::Vector2<int> mouseRel = getRelPosMenu(rW, mouseP);
+
+        for (int i = 0; i < comVButtons.size(); i++)
+            if (mouseRel.x >= comVButtons[i].ofb_pX && mouseRel.y >= comVButtons[i].ofb_pY &&
+                mouseRel.x <= (comVButtons[i].ofb_pX + comVButtons[i].ofb_pWidth) &&
+                mouseRel.y <= (comVButtons[i].ofb_pY + comVButtons[i].ofb_pHeight))
+                return i;
+
+        return -1;
+    }
+
     bool isInside(const sf::RenderWindow &rW, int menuH, int menuW, const sf::Vector2<int> &mouseP) {
         auto wS = rW.getSize();
         switch (rPos) {
@@ -218,16 +244,18 @@ protected:
     int gHeight = 0;
     std::vector<std::vector<int>> dExtracted;
 
+    struct of_button {
+        uint32_t ofb_pX;
+        uint32_t ofb_pY;
+        uint32_t ofb_pWidth;
+        uint32_t ofb_pHeight;
+    };
+    std::vector<of_button> comVButtons;
+
     struct rIMenu_objFile {
         std::vector<std::vector<int>> of_data;
         uint32_t of_inSelTex;
         std::vector<uint8_t> of_inLengthTex;
-        struct of_button {
-            uint32_t ofb_pX;
-            uint32_t ofb_pY;
-            uint32_t ofb_pHeight;
-            uint32_t ofb_pWidth;
-        };
         std::vector<of_button> of_vecButton;
     };
 
@@ -262,22 +290,22 @@ protected:
                 _gVecLengthTex.push_back(std::stoul(segment));
         }
 
-        std::vector<rIMenu_objFile::of_button> _gVecPosButtons = {};
+        std::vector<of_button> _gVecPosButtons = {};
         if (sm.find("inPosButtons") != sm.end()) {
             std::istringstream ss(sm["inPosButtons"]);
             std::string segment;
             while (std::getline(ss, segment, ',')) {
-                std::istringstream ssInside(sm["inPosButtons"]);
+                std::istringstream ssInside(segment);
                 std::string segmentInside;
                 std::vector<uint32_t> _gVecComponent;
-                while (std::getline(ss, segmentInside, '#'))
+                while (std::getline(ssInside, segmentInside, '#'))
                     _gVecComponent.push_back(std::stoul(segmentInside));
                 if (_gVecComponent.size() == 4)
                     _gVecPosButtons.push_back(
                             {_gVecComponent[0], _gVecComponent[1], _gVecComponent[2], _gVecComponent[3]});
             }
         }
-        return {_gContentF, _gSelTex, _gVecLengthTex};
+        return {_gContentF, _gSelTex, _gVecLengthTex, _gVecPosButtons};
     }
 
     void setPositionValue(std::pair<int, int> cPos, uint32_t cValue) {
@@ -287,13 +315,21 @@ protected:
     }
 
     void setText(const uint8_t tVal, std::string cText) {
+
         if (rPos == rIMenu::rRelativePos::pBottomRight || rPos == rIMenu::rRelativePos::pTopRight) {
             std::reverse(cText.begin(), cText.end());
             cText.append(comV[tVal].pLength - cText.size(), ' ');
         }
 
         for (int i = 0; i < comV[tVal].pLength; i++) {
-            sf::Vertex *quad = &dInfo[( gWidth - 1 - comV[tVal].pStartText.second + i + comV[tVal].pStartText.first * gWidth) * 4];
+            sf::Vertex *quad;
+
+            if (rPos == rIMenu::rRelativePos::pBottomRight || rPos == rIMenu::rRelativePos::pTopRight)
+                quad = &dInfo[(gWidth - 1 - comV[tVal].pStartText.second + i
+                               + comV[tVal].pStartText.first * gWidth) * 4];
+            else
+                quad = &dInfo[(comV[tVal].pStartText.second + i + comV[tVal].pStartText.first * gWidth) * 4];
+
             char currentChar = (i < cText.size()) ? cText[i] : ' ';
             int charIndex = -1;
             if (currentChar >= 'a' && currentChar <= 'z') charIndex = currentChar - 'a' + 1;
@@ -314,7 +350,10 @@ protected:
 
     static std::string getFloatToString2Decimal(const float nUsed) {
         std::stringstream ss;
-        ss << std::fixed << std::setprecision(2) << nUsed;
+        if (nUsed > 10000)
+            ss << std::fixed << static_cast<int>(nUsed);
+        else
+            ss << std::fixed << std::setprecision(2) << nUsed;
         return ss.str();
     }
 };

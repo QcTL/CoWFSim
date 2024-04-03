@@ -14,7 +14,7 @@ class rCompViewMoreLayer : public rIMenu {
 public:
     explicit rCompViewMoreLayer(const std::shared_ptr<rIMenu> &mParent, const objCompany &rShow,
                                 const std::string &pthFileD)
-            : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft, pthFileD) {
+            : rIMenu(mParent, rIMenu::rRelativePos::pBottomLeft, pthFileD) {
 
         setText(2, getFloatToString2Decimal(rShow.c_objFortnight));
         setText(4, getFloatToString2Decimal(rShow.c_objMonth));
