@@ -8,6 +8,7 @@
 #include <memory>
 #include "../../behaviour/market/sMarketBazaar.h"
 #include "../../behaviour/market/sEvaluatorMain.h"
+#include "../../behaviour/market/listings/sRollingListsRent.h"
 
 class groupEconomy {
 public:
@@ -56,7 +57,7 @@ public:
 
     sTotalElements::sME_Element getById(uint64_t inUuidElement) { return gE_sEvaluator->getById(inUuidElement); }
 
-
+    std::shared_ptr<sRollingListsRent> gE_sRLR = std::make_shared<sRollingListsRent>(10);
     std::shared_ptr<sEvaluatorMain> gE_sEvaluator = std::make_shared<sEvaluatorMain>();
     std::shared_ptr<sMarketBazaar> gE_sMarketBazaar = std::make_shared<sMarketBazaar>();
 };

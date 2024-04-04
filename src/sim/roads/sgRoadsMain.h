@@ -42,12 +42,6 @@ public:
         return sgRM_gNearRoad->get(inGridPos)->rPos;
     }
 
-    [[nodiscard]] std::pair<int, int> getNewRandomAssignedCivilHome() const {
-        auto _pHouseIt = sgRM_gLand->gL_gTerrain->returnRandomFullCivil();
-        sgRM_gLand->gL_gTerrain->addCivilHomeToPos(_pHouseIt);
-        return *_pHouseIt;
-    }
-
     std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator>
     addRuteCivil(const std::shared_ptr<objCivil> &oC) {
         return sgRM_sTRoutes->addRuteCivil(oC);
@@ -90,9 +84,9 @@ private:
             return;
         for (int i = 0; i < sgRM_vecFreqGhostRiders[inRTime / 24] * 3; i++) {
             std::pair<int, int> _gPointStart = getClosestRoadToBuilding(
-                    *sgRM_gLand->gL_gTerrain->returnRandomFullCivil());
+                    sgRM_gLand->gL_gTerrain->returnRandomFullCivil());
             std::pair<int, int> _gPointEnd = getClosestRoadToBuilding(
-                    *sgRM_gLand->gL_gTerrain->returnRandomFullCivil());
+                    sgRM_gLand->gL_gTerrain->returnRandomFullCivil());
             uint32_t _locId = gLayerRoads[_gPointEnd.first][_gPointEnd.second]->refCompressed->locIdNode;
             uint16_t _blocId = gLayerRoads[_gPointEnd.first][_gPointEnd.second]->refCompressed->rBlock;
             gLayerRoads[_gPointStart.first][_gPointStart.second]->refCompressed->addNewCar(_locId, _blocId);

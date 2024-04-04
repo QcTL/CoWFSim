@@ -30,7 +30,7 @@ public:
         sSM_groupLand = std::make_shared<groupLand>(lSize);
 
         gMainRoads = std::make_shared<sgRoadsMain>(lSize, sSM_groupLand);
-        sMCivil = std::make_shared<sCivilMain>(gMainRoads, gTotalUnderground);
+        sMCivil = std::make_shared<sCivilMain>(gMainRoads, sSM_groupLand, sSM_groupEconomy, gTotalUnderground);
         sSM_sCompany = std::make_shared<sCompanyMain>(lSize, sMCivil,
                                                       sSM_groupLand, sSM_groupEconomy);
         sMClock = std::make_shared<sClockMain>();

@@ -43,6 +43,7 @@ public:
         gTG_TypeSoil = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(inGridSize, inGridSize, 0));
         gTG_TypeGen = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(inGridSize, inGridSize, 0));
         gTG_civilOccupancy = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(inGridSize, inGridSize, 0));
+        gTG_baseQualityAttr = std::make_shared<gBasicGrid<uint32_t>>(gBasicGrid<uint32_t>(inGridSize, inGridSize, 20));
 
         gTG_rLayer = std::make_shared<rgTerrain>(inGridSize);
 
@@ -84,7 +85,7 @@ public:
                         case sgT_TypeSoil::sgT_TS_T1Mixed:
                         case sgT_TypeSoil::sgT_TS_T2Mixed:
                         case sgT_TypeSoil::sgT_TS_T3Mixed:
-                            gTG_civilPresentCell.emplace_back(i, j);
+                            addToCivilPresentBySoil(gTG_TypeSoil->get(i, j), {i, j});
                             break;
                         case sgT_TypeSoil::sgT_TS_T1Industrial:
                         case sgT_TypeSoil::sgT_TS_T2Industrial:
@@ -96,6 +97,27 @@ public:
                 }
             }
         }
+        std::pair<std::pair<int, int>, std::pair<int, int>> range = gTG_baseQualityAttr->rangeUse();
+        for (int i = range.second.first; i < (range.second.second + 1); i++) {
+            for (int j = range.first.first; j < (range.first.second + 1); j++) {
+                switch (gTG_TypeSoil->get(i, j)) {
+
+                    case sgT_TypeSoil::sgT_TS_T1Mixed:
+                        gTG_baseQualityAttr->set(i, j, 100);
+                        break;
+                    case sgT_TypeSoil::sgT_TS_T2Mixed:
+                        gTG_baseQualityAttr->set(i, j, 50);
+                        break;
+                    case sgT_TypeSoil::sgT_TS_T3Mixed:
+                        gTG_baseQualityAttr->set(i, j, 35);
+                        break;
+                }
+                if (gPointToNearestElem::find<uint8_t>(gTG_TypeSoil, {i, j}, sgT_TypeSoil::sgT_TS_T1Obstacle,
+                                                       10).first != -1)
+                    gTG_baseQualityAttr->set(i, j, gTG_baseQualityAttr->get(i, j) + 15);
+
+            }
+        }
     }
 
     void addNewBuilding(const std::pair<int, int> &inGridPos) {
@@ -104,7 +126,7 @@ public:
             case sgT_TypeSoil::sgT_TS_T2Mixed:
             case sgT_TypeSoil::sgT_TS_T3Mixed:
                 gTG_TypeGen->set(inGridPos, sgT_TypeGen::sgT_TG_CivBuilding);
-                gTG_civilPresentCell.push_back(inGridPos);
+                addToCivilPresentBySoil(gTG_TypeSoil->get(inGridPos), inGridPos);
                 gTG_rLayer->addNewBuildingRender(inGridPos, sgT_TypeGen::sgT_TG_CivBuilding);
                 break;
             case sgT_TypeSoil::sgT_TS_T1Industrial:
@@ -123,7 +145,7 @@ public:
             case sgT_TypeSoil::sgT_TS_T1Mixed:
             case sgT_TypeSoil::sgT_TS_T2Mixed:
             case sgT_TypeSoil::sgT_TS_T3Mixed:
-                gTG_civilPresentCell.remove(inGridPos);
+                gTG_civilPresentCellBySoil[gTG_TypeSoil->get(inGridPos)].remove(inGridPos);
                 break;
             case sgT_TypeSoil::sgT_TS_T1Industrial:
             case sgT_TypeSoil::sgT_TS_T2Industrial:
@@ -139,20 +161,25 @@ public:
         gTG_rLayer->loadRenderWithSimGrids(gTG_TypeGen, gTG_TypeSoil);
     }
 
-    std::list<std::pair<int, int>>::iterator returnRandomFullCivil() {
-        std::uniform_int_distribution<> dist(0, (int) gTG_civilPresentCell.size() - 1);
-        int _rIndex = dist(gTG_genRPos);
+    std::pair<int, int> returnRandomFullCivil() {
+        std::uniform_int_distribution<> dist(0, (int) gTG_civilPresentCellBySoil.size() - 1);
+        auto it = std::next(gTG_civilPresentCellBySoil.begin(), dist(gTG_genRPos));
 
-        auto _it = gTG_civilPresentCell.begin();
-        std::advance(_it, _rIndex % gTG_civilPresentCell.size());
-        return _it;
-    };
+        const auto &selLists = it->second;
+        std::uniform_int_distribution<> dist2(0, (int) selLists.size() - 1);
+        return *std::next(selLists.begin(), dist2(gTG_genRPos));
+    }
 
-    void addCivilHomeToPos(std::list<std::pair<int, int>>::iterator inItPosHome) {
-        gTG_civilOccupancy->set(*inItPosHome, gTG_civilOccupancy->get(*inItPosHome) + 1);
-        if (gTG_civilOccupancy->get(*inItPosHome) >= getMaxOccBySoil(gTG_TypeSoil->get(*inItPosHome))) {
-            gTG_civilPresentCell.erase(inItPosHome);
-            gTG_civilFilledCell.push_back(*inItPosHome);
+    //TODO A REMOVE CIVILIAN FROM HOUSE POS
+    void addCivilHomeToPos(std::pair<int, int> inItPosHome) {
+        //TODO REFACTOR
+        gTG_civilOccupancy->set(inItPosHome, gTG_civilOccupancy->get(inItPosHome) + 1);
+
+        if (gTG_civilOccupancy->get(inItPosHome) >= getMaxOccBySoil(gTG_TypeSoil->get(inItPosHome))) {
+            gTG_civilPresentCellBySoil[gTG_TypeSoil->get(inItPosHome)].pop_front();
+            if (gTG_civilFilledCellBySoil.find(gTG_TypeSoil->get(inItPosHome)) == gTG_civilFilledCellBySoil.end())
+                gTG_civilFilledCellBySoil[gTG_TypeSoil->get(inItPosHome)] = {};
+            gTG_civilFilledCellBySoil[gTG_TypeSoil->get(inItPosHome)].push_back(inItPosHome);
         }
     }
 
@@ -173,10 +200,28 @@ public:
         }
     }
 
+
+    [[nodiscard]] std::pair<int, int>
+    getHomeSortLessQuality(const uint8_t inTypeSoil) {
+        return gTG_civilPresentCellBySoil[inTypeSoil].front();
+    }
+
+    [[nodiscard]] uint32_t getHomeSortValueQuality(const uint8_t inTypeSoil) const {
+        return gTG_baseQualityAttr->get(gTG_civilPresentCellBySoil.at(inTypeSoil).front());
+    }
+
+    [[nodiscard]]  double getRemainHomes(const uint8_t inTypeSoil) const {
+        double gTotalBuild = (double) gTG_civilPresentCellBySoil.at(inTypeSoil).size() +
+                             (gTG_civilFilledCellBySoil.find(inTypeSoil) != gTG_civilFilledCellBySoil.end()
+                              ? (double) gTG_civilFilledCellBySoil.at(inTypeSoil).size() : 0);
+        return (double) gTG_civilPresentCellBySoil.at(inTypeSoil).size() / gTotalBuild;
+    }
+
     std::shared_ptr<gIGrid<uint8_t>> gTG_TypeSoil;
     std::shared_ptr<gIGrid<uint8_t>> gTG_TypeGen;
     std::shared_ptr<rgTerrain> gTG_rLayer;
     std::shared_ptr<gIGrid<uint8_t>> gTG_civilOccupancy;
+    std::shared_ptr<gIGrid<uint32_t>> gTG_baseQualityAttr;
 
     struct sgT_CellSlot {
         uint8_t sgT_gType;
@@ -188,8 +233,21 @@ public:
     std::list<sgT_CellSlot> getListEmptyCompanies() { return gTG_emptyCell; }
 
 private:
-    std::list<std::pair<int, int>> gTG_civilPresentCell;
-    std::list<std::pair<int, int>> gTG_civilFilledCell;
+
+    void addToCivilPresentBySoil(const uint8_t inKey, std::pair<int, int> intPosToAdd) {
+        if (gTG_civilPresentCellBySoil.find(gTG_TypeSoil->get(intPosToAdd)) == gTG_civilPresentCellBySoil.end())
+            gTG_civilPresentCellBySoil[inKey] = {};
+        auto insertPos = std::find_if(gTG_civilPresentCellBySoil[inKey].begin(),
+                                      gTG_civilPresentCellBySoil[gTG_TypeSoil->get(intPosToAdd)].end(),
+                                      [&](const std::pair<int, int> element) {
+                                          return gTG_baseQualityAttr->get(element) <
+                                                 gTG_baseQualityAttr->get(intPosToAdd);
+                                      });
+        gTG_civilPresentCellBySoil[inKey].insert(insertPos, intPosToAdd);
+    }
+
+    std::map<uint8_t, std::list<std::pair<int, int>>> gTG_civilPresentCellBySoil;
+    std::map<uint8_t, std::list<std::pair<int, int>>> gTG_civilFilledCellBySoil;
     std::list<std::pair<int, int>> gTG_factoryFullCell;
     std::list<sgT_CellSlot> gTG_emptyCell;
     std::list<sgT_CellSlot> gTG_fullCell;
