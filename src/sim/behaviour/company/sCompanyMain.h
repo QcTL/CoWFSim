@@ -72,9 +72,18 @@ public:
         for (const auto &posNewComp: gPosCompanies) {
             uint32_t uuidNew = sTComp->createCompany({posNewComp.sgT_gPos},
                                                      posNewComp.sgT_gType);
-            for (int i = 0; i < 2; i++)
-                FulfillIntentions::gTryIntention({sCompanyCompiler::sCCIntentions::GEN_HireEmployee, 0,
-                                                  sTComp->getCompanyByUUID(uuidNew)}, *this, 0); //TODO DATE;
+
+            if (sM_groupLand->gL_gTerrain->gTG_TypeSoil->get(posNewComp.sgT_gPos) !=
+                sgTerrain::sgT_TypeSoil::sgT_TS_T2Mixed &&
+                sM_groupLand->gL_gTerrain->gTG_TypeSoil->get(posNewComp.sgT_gPos) !=
+                sgTerrain::sgT_TypeSoil::sgT_TS_T3Mixed) {
+                for (int i = 0; i < 2; i++)
+                    FulfillIntentions::gTryIntention({sCompanyCompiler::sCCIntentions::GEN_HireEmployee, 0,
+                                                      sTComp->getCompanyByUUID(uuidNew)}, *this, 0); //TODO DATE;
+            }
+            for (int i = 0; i < sM_groupLand->gL_gTerrain->gTG_civilOccupancy->get(posNewComp.sgT_gPos); i++)
+                sM_sContractor->addContractToCompanyRentHouse(sTComp->getCompanyByUUID(uuidNew), posNewComp.sgT_gPos,
+                                                              400, 0); //TODO DATE;
             //TODO, hauria de ser similar al addNewCompany, però el fet que ja tinguin les caselles ja seleccionades és una merda.
         }
     }
@@ -154,6 +163,12 @@ private:
                 inSCM.sTComp->addRefPosOwnCompany(sMOff->sMO_pos, sCCI.scc_objCompany->c_uuid);
                 inSCM.sM_groupLand->gL_gTerrain->addNewBuilding(sMOff->sMO_pos);
                 inSCM.sM_groupEconomy->removeCompleteProcess<sLBuyCell>(sMOff);
+
+                //You earn the right to the rents in the actual residency
+                for (int i = 0; i < inSCM.sM_groupLand->gL_gTerrain->gTG_civilOccupancy->get(sMOff->sMO_pos); i++) {
+                    inSCM.sM_sContractor->addContractToCompanyRentHouse(sCCI.scc_objCompany, sMOff->sMO_pos,
+                                                                        400, cDate);
+                }
             }
         }
 
@@ -291,7 +306,7 @@ private:
             sCCI.scc_objCompany->c_activeContracts[con_Type::con_Type_Hire].pop_front();
             inSCM.sM_sContractor->removeContractFromCompany(_uuidContractTerminate, inSCM.sTComp);
 
-            if (!inSCM.sTComp->isCompanyInPosition(pHouseEmployee)) {
+            if (inSCM.sTComp->isCompanyInPosition(pHouseEmployee)) {
                 std::shared_ptr<objCompany> _oCRent = inSCM.sTComp->getCompanyByPosition(pHouseEmployee);
                 inSCM.sM_sContractor->removeContractFromCompany(
                         _oCRent->c_activeContracts[con_Type::con_Type_RentHome].front(), inSCM.sTComp);

@@ -98,7 +98,7 @@ private:
 
     void blobRoadsToGrid(std::map<T, std::vector<std::pair<std::pair<int, int>, uint8_t>>> edges, int sSquareWidth,
                          int sSquareHeight) {
-        uint32_t bigRoad = (((uint32_t) (uint8_t) strtol("100001", nullptr, 2)) << 24);
+        uint32_t bigRoad = 5;
         for (const auto &mapElem: edges) {
             for (const auto &vecElem: mapElem.second) {
                 std::pair<int, int> pair = vecElem.first;

@@ -34,7 +34,7 @@ public:
         if (lVRMetro.totalDistance < 100)
             _oCivil = std::make_shared<objCivil>(
                     objCivil(objCivil::typeRouteSystem::OC_TRS_TRAIN, rPosCivHome,
-                             {inObjCompany.c_cActiveLocations.front(), rPosCivHome},
+                             {inObjCompany.c_cActiveLocations.front(), rPosCivHome}, // TODO POSAR LES ESTACIONS DE TREN
                              sCM_sUndergroundMain->getClosestTimeForStation(lVRMetro.closestSt1,
                                                                             inObjCompany.c_activeDates.c_StrEndTime.first),
                              sCM_sUndergroundMain->getClosestTimeForStation(lVRMetro.closestSt2,
@@ -45,7 +45,7 @@ public:
             _oCivil = std::make_shared<objCivil>(
                     objCivil(objCivil::typeRouteSystem::OC_TRS_CAR, rPosCivHome,
                              {sCM_sRoadsMain->getClosestRoadToBuilding(inObjCompany.c_cActiveLocations.front()),
-                              rPosCivHome},
+                              sCM_sRoadsMain->getClosestRoadToBuilding(rPosCivHome)},
                              inObjCompany.c_activeDates.c_StrEndTime.first + distrib(sCM_genRand),
                              inObjCompany.c_activeDates.c_StrEndTime.second + distrib(sCM_genRand),
                              inObjCompany.c_activeDates.cAD_jobWeek));

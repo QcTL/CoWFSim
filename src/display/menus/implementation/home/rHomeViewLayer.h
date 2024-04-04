@@ -14,23 +14,22 @@
 class rHomeViewLayer : public rIMenu {
 public:
     explicit rHomeViewLayer(const std::shared_ptr<rIMenu> &mParent, const std::shared_ptr<objCompany> &rShow,
-                            uint8_t nOccupancy, uint8_t typeHouse, const std::shared_ptr<rPileMenus> &mPiles)
+                            uint8_t nOccupancy, uint8_t nMaxOccupancy, uint8_t typeHouse,
+                            const std::shared_ptr<rPileMenus> &mPiles)
             : rIMenu(mParent, rIMenu::rRelativePos::pBottomRight, "d_mHomeViewLayer"), mPiles(mPiles), rCompRef(rShow) {
         switch (typeHouse) {
             case 3:
                 setText(0, "Small H");
-                setText(2, "15");
                 break;
             case 2:
                 setText(0, "Medium H");
-                setText(2, "20"); // TODO Make it standard.
                 break;
             case 1:
                 setText(0, "Large H");
-                setText(2, "50");
                 break;
         }
         setText(1, std::to_string(nOccupancy));
+        setText(2, std::to_string(nMaxOccupancy));
 
         setText(4, rShow != nullptr ? rShow->nName : "");
     }
@@ -50,7 +49,7 @@ public:
                     sf::Vector2<int> pMouse = sf::Mouse::getPosition(rWindow);
                     int _gPressed = getButtonPressed(rWindow, pMouse);
                     if (_gPressed != -1) {
-                        if (_gPressed == 0) {
+                        if (_gPressed == 0 && rCompRef != nullptr) {
                             std::shared_ptr<rCompViewLayer> rComp = std::make_shared<rCompViewLayer>(
                                     rCompViewLayer(mPiles->vTopActiveMenu,
                                                    *rCompRef, "d_mCompViewLayer", mPiles));
