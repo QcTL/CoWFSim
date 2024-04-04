@@ -45,7 +45,7 @@ public:
     [[nodiscard]] std::pair<int, int> getNewRandomAssignedCivilHome() const {
         auto _pHouseIt = sgRM_gLand->gL_gTerrain->returnRandomFullCivil();
         sgRM_gLand->gL_gTerrain->addCivilHomeToPos(_pHouseIt);
-        return sgRM_gNearRoad->get(*_pHouseIt)->rPos;
+        return *_pHouseIt;
     }
 
     std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator>

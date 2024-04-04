@@ -75,7 +75,6 @@ public:
                                      (((uint32_t) (uint8_t) strtol("110000", nullptr, 2)) << 24) + p);
             }
         }
-
         //END RIVER
 
         //ROADS

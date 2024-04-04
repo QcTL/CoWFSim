@@ -73,10 +73,13 @@ public:
                            gTG_TypeGen->get(i, j) != sgT_TypeGen::sgT_TG_RoadB) {
                     switch (gTG_TypeSoil->get(i, j)) {
                         case sgT_TypeSoil::sgT_TS_T1Mixed:
+                        case sgT_TypeSoil::sgT_TS_T2Mixed:
+                        case sgT_TypeSoil::sgT_TS_T3Mixed:
                         case sgT_TypeSoil::sgT_TS_T1Industrial:
                         case sgT_TypeSoil::sgT_TS_T2Industrial:
-                            gTG_fullCell.push_back({gTG_TypeSoil->get(i, j), {i, j}});
+                            gTG_fullCell.push_back({gTG_TypeGen->get(i, j), {i, j}});
                     }
+
                     switch (gTG_TypeSoil->get(i, j)) {
                         case sgT_TypeSoil::sgT_TS_T1Mixed:
                         case sgT_TypeSoil::sgT_TS_T2Mixed:
@@ -151,6 +154,10 @@ public:
             gTG_civilPresentCell.erase(inItPosHome);
             gTG_civilFilledCell.push_back(*inItPosHome);
         }
+    }
+
+    [[nodiscard]] uint8_t getMaxOccByPos(const std::pair<int, int> &inPCell) const {
+        return getMaxOccBySoil(gTG_TypeSoil->get(inPCell));
     }
 
     static uint8_t getMaxOccBySoil(const uint8_t tSoil) {

@@ -89,8 +89,9 @@ public:
             case 1: {
                 std::shared_ptr<rHomeViewLayer> _rHome = std::make_shared<rHomeViewLayer>(
                         rHomeViewLayer(refPile->vTopActiveMenu,
-                                       refSComp->getCompanyByUUID(refLBuild->get(cPressed).front()),
-                                       rBM_refTerrain->gTG_civilOccupancy->get(cPressed),
+                                       refLBuild->get(cPressed).empty() ? nullptr : refSComp->getCompanyByUUID(
+                                               refLBuild->get(cPressed).front()),
+                                       rBM_refTerrain->gTG_civilOccupancy->get(cPressed),rBM_refTerrain->getMaxOccByPos(cPressed),
                                        rBM_refTerrain->gTG_TypeSoil->get(cPressed), refPile));
                 refPile->addMenuTop(_rHome);
             }

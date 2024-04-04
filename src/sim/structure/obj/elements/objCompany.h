@@ -20,11 +20,11 @@
 #include "../../../behaviour/company/code/sCodeStoratge.h"
 
 std::vector<std::string> vSyllablesP = {"am", "ca", "mi", "o", "ul", "er", "es", "pin", "tu", "ra", "ta", "la", "dro",
-                                        "me", "dia", "mart", "sen", "ti", "ments", "tran", "qui", "li", "tat", "pen",
-                                        "sa", "ment", "u", "su", "al", "ment", "ar", "ma", "ri"};
+                                        "me", "dia", "mart", "sen", "ti", "tran", "qui", "li", "tat", "pen",
+                                        "sa", "ment", "u", "su", "al", "ar", "ma", "ri", "ja", "po", "nes"};
 std::random_device oC_rd;
 std::mt19937 oC_gen(oC_rd());
-std::uniform_int_distribution<> numStringsDist(2, 4);
+std::uniform_int_distribution<> numStringsDist(2, 3);
 
 class objCompany {
 public:
@@ -56,7 +56,8 @@ public:
 
         for (const auto &str: selectedStrings)
             nName += str;
-        nName[0] = toupper(nName[0]);
+        nName[0] = static_cast<char>(toupper(nName[0]));
+
     }
 
 
