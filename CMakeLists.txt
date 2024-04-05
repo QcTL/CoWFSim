@@ -127,6 +127,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/display/menus/implementation/home/rHomeViewLayer.h
         src/sim/groups/groupLand/groupLand.h
         src/sim/groups/groupEconomy/groupEconomy.h
+        src/sim/behaviour/market/listings/sRollingListsRent.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

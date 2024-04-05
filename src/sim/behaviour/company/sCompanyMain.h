@@ -72,7 +72,7 @@ public:
         for (const auto &posNewComp: gPosCompanies) {
             uint32_t uuidNew = sTComp->createCompany({posNewComp.sgT_gPos},
                                                      posNewComp.sgT_gType);
-
+            //MEEEEN HAS DE DEIXAR DE FER LA BROMA I FER QUE PASSIN PER EL PUTO INTENTIONS, aixi no es pot.
             if (sM_groupLand->gL_gTerrain->gTG_TypeSoil->get(posNewComp.sgT_gPos) !=
                 sgTerrain::sgT_TypeSoil::sgT_TS_T2Mixed &&
                 sM_groupLand->gL_gTerrain->gTG_TypeSoil->get(posNewComp.sgT_gPos) !=
@@ -81,10 +81,7 @@ public:
                     FulfillIntentions::gTryIntention({sCompanyCompiler::sCCIntentions::GEN_HireEmployee, 0,
                                                       sTComp->getCompanyByUUID(uuidNew)}, *this, 0); //TODO DATE;
             }
-            for (int i = 0; i < sM_groupLand->gL_gTerrain->gTG_civilOccupancy->get(posNewComp.sgT_gPos); i++)
-                sM_sContractor->addContractToCompanyRentHouse(sTComp->getCompanyByUUID(uuidNew), posNewComp.sgT_gPos,
-                                                              400, 0); //TODO DATE;
-            //TODO, hauria de ser similar al addNewCompany, però el fet que ja tinguin les caselles ja seleccionades és una merda.
+            FulfillIntentions::gainNewRentForExistingResidents(posNewComp.sgT_gPos, *this, 0);
         }
     }
 
@@ -150,6 +147,23 @@ private:
             oC->c_cAvailableByType[inGEconomy->getById(gItemGen).sMEE_iReqTypeBuild] += 1;
         }
 
+
+        static void gainNewRentForExistingResidents(const std::pair<int, int> &inPHouse,
+                                                    sCompanyMain &inSCM, uint32_t inTDate) {
+            uint8_t nResidents = inSCM.sM_groupLand->gL_gTerrain->gTG_civilOccupancy->get(inPHouse);
+            if (nResidents <= 0)
+                return;
+            uint32_t pValueHome = inSCM.sM_sCompEmployee->getPriceByHouse(inPHouse);
+            uint32_t endRentPrice =
+                    pValueHome - 5 * inSCM.sM_groupLand->gL_gAirPollution->gLayerAirPollution->get(inPHouse);
+
+            for (int i = 0; i < nResidents; i++) {
+                std::shared_ptr<objCompany> _oCRent = inSCM.sTComp->getCompanyByPosition(inPHouse);
+                inSCM.sM_sContractor->addContractToCompanyRentHouse(_oCRent, inPHouse,
+                                                                    endRentPrice, inTDate);
+            }
+        }
+
     private:
         // BUY CELL
         static void
@@ -164,11 +178,7 @@ private:
                 inSCM.sM_groupLand->gL_gTerrain->addNewBuilding(sMOff->sMO_pos);
                 inSCM.sM_groupEconomy->removeCompleteProcess<sLBuyCell>(sMOff);
 
-                //You earn the right to the rents in the actual residency
-                for (int i = 0; i < inSCM.sM_groupLand->gL_gTerrain->gTG_civilOccupancy->get(sMOff->sMO_pos); i++) {
-                    inSCM.sM_sContractor->addContractToCompanyRentHouse(sCCI.scc_objCompany, sMOff->sMO_pos,
-                                                                        400, cDate);
-                }
+                FulfillIntentions::gainNewRentForExistingResidents(sMOff->sMO_pos, inSCM, cDate);
             }
         }
 
@@ -287,14 +297,25 @@ private:
         static void
         gExecuteHireEmployeeGenOperation(const sCompanyCompiler::sCCIntentions &sCCI, sCompanyMain &inSCM,
                                          const uint32_t cDate) {
-            std::pair<int, int> pHouseEmployee = inSCM.sM_sCompEmployee->setRouteToNewEmployee(*sCCI.scc_objCompany);
-            inSCM.sM_sContractor->addContractToCompany(sCCI.scc_objCompany, pHouseEmployee,
-                                                       400, cDate);
+            sCivilMain::sCM_validHouse VHEmployee = inSCM.sM_sCompEmployee->getNewValidHouse();
+            inSCM.sM_sCompEmployee->setRouteToNewEmployee(VHEmployee.sCMvh_pos, *sCCI.scc_objCompany);
 
-            if (!inSCM.sTComp->isCompanyInPosition(pHouseEmployee)) {
-                std::shared_ptr<objCompany> _oCRent = inSCM.sTComp->getCompanyByPosition(pHouseEmployee);
-                inSCM.sM_sContractor->addContractToCompanyRentHouse(_oCRent, pHouseEmployee,
-                                                                    400, cDate);
+            //Aqui es farà la decisió si s'agafa o no
+
+            inSCM.sM_groupEconomy->gE_sRLR->addElement(cDate);
+            inSCM.sM_sContractor->addContractToCompany(sCCI.scc_objCompany, VHEmployee.sCMvh_pos,
+                                                       400, cDate);
+            inSCM.sM_groupLand->gL_gTerrain->addCivilHomeToPos(VHEmployee.sCMvh_pos);
+
+            if (inSCM.sTComp->isCompanyInPosition(VHEmployee.sCMvh_pos)) {
+                uint32_t endRentPrice = VHEmployee.sCMvh_rentVal - 5 *
+                                                                   inSCM.sM_groupLand->gL_gAirPollution->gLayerAirPollution->get(
+                                                                           VHEmployee.sCMvh_pos);
+                std::cout << "PLOCKET" << " a" << VHEmployee.sCMvh_pos.first << "-" << VHEmployee.sCMvh_pos.second
+                          << "PRICE" << endRentPrice << std::endl;
+                std::shared_ptr<objCompany> _oCRent = inSCM.sTComp->getCompanyByPosition(VHEmployee.sCMvh_pos);
+                inSCM.sM_sContractor->addContractToCompanyRentHouse(_oCRent, VHEmployee.sCMvh_pos,
+                                                                    endRentPrice, cDate);
             }
         }
 
