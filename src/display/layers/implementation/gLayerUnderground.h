@@ -14,7 +14,7 @@ public:
     explicit gLayerUnderground(const std::shared_ptr<gIGrid<uint8_t>> &gGrid)
             : gILayer(gTileset("ts_underground16.png", 16, 7, 4)), lGrid(gGrid) {
 
-        std::vector<int> rTopLeftPos = {7, 1, 0, 10, 1, 1, 3, 12, 0, 9, 0, 5, 2, 6, 13, 4};
+        std::vector<int> rTopLeftPos = {7, 1, 0, 10, 1, 1, 3, 12, 0, 9, 0, 5, 2, 6, 13, 4, 8};
         for (const int t: rTopLeftPos) {
             gPosSprites.first.push_back(getByPosTopLeft(lTs.getPos(t)));
             gPosSprites.second.push_back(getByPosTopLeft(lTs.getPos(t + 14)));
@@ -24,8 +24,8 @@ public:
 
     std::vector<sf::Vector2f> getTexPos(int x, int y) override {
         uint32_t v = lGrid->get(x, y);
-        uint8_t vSpec = v & 0xF;
-        return  static_cast<uint8_t>(v >> 4) ? gPosSprites.second[vSpec] : gPosSprites.first[vSpec];
+        uint8_t vSpec = v & 0x1F;
+        return  static_cast<uint8_t>(v >> 5) ? gPosSprites.second[vSpec] : gPosSprites.first[vSpec];
     }
 
     std::shared_ptr<gIGrid<uint8_t>> lGrid;

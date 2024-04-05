@@ -75,10 +75,6 @@ public:
 
         }
         retRoute.push_back(pEnd);
-
-        gGrid->set(pStart, endValue);
-        gGrid->set(pEnd, endValue);
-
         return retRoute;
     }
 

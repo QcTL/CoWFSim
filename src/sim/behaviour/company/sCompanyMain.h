@@ -70,18 +70,15 @@ public:
 
     void completedStartCompanies(const std::list<sgTerrain::sgT_CellSlot> &gPosCompanies) {
         for (const auto &posNewComp: gPosCompanies) {
-            uint32_t uuidNew = sTComp->createCompany({posNewComp.sgT_gPos},
-                                                     posNewComp.sgT_gType);
-            //MEEEEN HAS DE DEIXAR DE FER LA BROMA I FER QUE PASSIN PER EL PUTO INTENTIONS, aixi no es pot.
-            if (sM_groupLand->gL_gTerrain->gTG_TypeSoil->get(posNewComp.sgT_gPos) !=
-                sgTerrain::sgT_TypeSoil::sgT_TS_T2Mixed &&
-                sM_groupLand->gL_gTerrain->gTG_TypeSoil->get(posNewComp.sgT_gPos) !=
-                sgTerrain::sgT_TypeSoil::sgT_TS_T3Mixed) {
+            uint32_t uuidNew = sTComp->createCompany({posNewComp.sgT_gPos}, posNewComp.sgT_gType);
+            auto typeSoil = sM_groupLand->gL_gTerrain->gTG_TypeSoil->get(posNewComp.sgT_gPos);
+            if (typeSoil != sgTerrain::sgT_TypeSoil::sgT_TS_T2Mixed &&
+                typeSoil != sgTerrain::sgT_TypeSoil::sgT_TS_T3Mixed) {
                 for (int i = 0; i < 2; i++)
                     FulfillIntentions::gTryIntention({sCompanyCompiler::sCCIntentions::GEN_HireEmployee, 0,
                                                       sTComp->getCompanyByUUID(uuidNew)}, *this, 0); //TODO DATE;
             }
-            FulfillIntentions::gainNewRentForExistingResidents(posNewComp.sgT_gPos, *this, 0);
+            FulfillIntentions::doRentContractsExistingResidents(posNewComp.sgT_gPos, *this, 0);
         }
     }
 
@@ -91,7 +88,6 @@ public:
     }
 
     //STORAGE
-
     std::shared_ptr<sCodeStorage> sSCode = std::make_shared<sCodeStorage>();
     std::shared_ptr<sCompanyStorage> sTComp;
 private:
@@ -147,20 +143,13 @@ private:
             oC->c_cAvailableByType[inGEconomy->getById(gItemGen).sMEE_iReqTypeBuild] += 1;
         }
 
-
-        static void gainNewRentForExistingResidents(const std::pair<int, int> &inPHouse,
-                                                    sCompanyMain &inSCM, uint32_t inTDate) {
+        static void
+        doRentContractsExistingResidents(const std::pair<int, int> &inPHouse, sCompanyMain &inSCM, uint32_t inTDate) {
             uint8_t nResidents = inSCM.sM_groupLand->gL_gTerrain->gTG_civilOccupancy->get(inPHouse);
             if (nResidents <= 0)
                 return;
-            uint32_t pValueHome = inSCM.sM_sCompEmployee->getPriceByHouse(inPHouse);
-            uint32_t endRentPrice =
-                    pValueHome - 5 * inSCM.sM_groupLand->gL_gAirPollution->gLayerAirPollution->get(inPHouse);
-
             for (int i = 0; i < nResidents; i++) {
-                std::shared_ptr<objCompany> _oCRent = inSCM.sTComp->getCompanyByPosition(inPHouse);
-                inSCM.sM_sContractor->addContractToCompanyRentHouse(_oCRent, inPHouse,
-                                                                    endRentPrice, inTDate);
+                _addContractRentEmployee(inPHouse, inSCM, inTDate);
             }
         }
 
@@ -178,7 +167,7 @@ private:
                 inSCM.sM_groupLand->gL_gTerrain->addNewBuilding(sMOff->sMO_pos);
                 inSCM.sM_groupEconomy->removeCompleteProcess<sLBuyCell>(sMOff);
 
-                FulfillIntentions::gainNewRentForExistingResidents(sMOff->sMO_pos, inSCM, cDate);
+                FulfillIntentions::doRentContractsExistingResidents(sMOff->sMO_pos, inSCM, cDate);
             }
         }
 
@@ -187,10 +176,13 @@ private:
         gExecuteGiveRentCellOperation(const sCompanyCompiler::sCCIntentions &sCCI, sCompanyMain &inSCM,
                                       const uint32_t cDate) {
             std::pair<int, int> gTile = sCCI.scc_objCompany->getOwnedByIndex(sCCI.scc_addIdInfo);
+            uint32_t cQuality = inSCM.sM_groupLand->gL_gTerrain->getQualityGivenPosHome(gTile) -
+                                inSCM.sM_groupLand->gL_gAirPollution->getPenalizationAir(gTile);
+            uint32_t cPrice = inSCM.sM_groupLand->gL_gTerrain->gTG_civilOccupancy->get(gTile) * cQuality * 1.5;
             std::shared_ptr<sLRentCell::sMOffering> sMO =
                     std::make_shared<sLRentCell::sMOffering>(sCCI.scc_objCompany, gTile,
                                                              inSCM.sM_groupLand->gL_gTerrain->gTG_TypeGen->get(gTile),
-                                                             (uint16_t) 0, (uint32_t) 0,
+                                                             (uint16_t) cQuality, (uint32_t) cPrice,
                                                              con_TypePaymentFreq::LC_PAY_MONTH);
             inSCM.sM_groupEconomy->addListing<sLRentCell>(sMO);
         }
@@ -211,10 +203,14 @@ private:
         gExecuteSellCellOperation(const sCompanyCompiler::sCCIntentions &sCCI, sCompanyMain &inSCM,
                                   const uint32_t cDate) {
             std::pair<int, int> gTile = sCCI.scc_objCompany->getOwnedByIndex(sCCI.scc_addIdInfo);
+
+            uint32_t cQuality = inSCM.sM_groupLand->gL_gTerrain->getQualityGivenPosHome(gTile) -
+                                inSCM.sM_groupLand->gL_gAirPollution->getPenalizationAir(gTile);
+            uint32_t cPrice = inSCM.sM_groupLand->gL_gTerrain->gTG_civilOccupancy->get(gTile) * cQuality * 100;
             std::shared_ptr<sLBuyCell::sMOffering> sMO =
                     std::make_shared<sLBuyCell::sMOffering>(sCCI.scc_objCompany, gTile,
                                                             inSCM.sM_groupLand->gL_gTerrain->gTG_TypeGen->get(gTile),
-                                                            0, 0); //TODO SET QUALITY AND TOTAL PRICE
+                                                            cQuality, cPrice);
             inSCM.sM_groupEconomy->addListing<sLBuyCell>(sMO);
             inSCM.sM_groupLand->gL_gTerrain->removeBuilding(gTile);
             inSCM.sTComp->removeRefPosOwnCompany(gTile, sCCI.scc_objCompany->c_uuid);
@@ -225,11 +221,13 @@ private:
         gExecuteProduceObjOperation(const sCompanyCompiler::sCCIntentions &sCCI, sCompanyMain &inSCM,
                                     const uint32_t cDate) {
             if (!_gProduceProduct(sCCI, inSCM, cDate))
-                inSCM.sSCode->updateScoreCode(sCCI.scc_objCompany->c_uuid, -10);
+                inSCM.sSCode->updateScoreCode(sCCI.scc_objCompany->c_uuid, -50);
         }
 
         static bool
         _gProduceProduct(const sCompanyCompiler::sCCIntentions &sCCI, sCompanyMain &inSCM, const uint32_t cDate) {
+            if (!inSCM.sM_groupEconomy->doesObjectExists(sCCI.scc_addIdInfo))
+                return false;
             if (!_hasTypeOwn(sCCI.scc_objCompany, inSCM.sM_groupEconomy->getById(sCCI.scc_addIdInfo)))
                 return false;
             if (!_hasResources(*sCCI.scc_objCompany, inSCM.sM_groupEconomy->getById(sCCI.scc_addIdInfo)))
@@ -297,26 +295,35 @@ private:
         static void
         gExecuteHireEmployeeGenOperation(const sCompanyCompiler::sCCIntentions &sCCI, sCompanyMain &inSCM,
                                          const uint32_t cDate) {
-            sCivilMain::sCM_validHouse VHEmployee = inSCM.sM_sCompEmployee->getNewValidHouse();
-            inSCM.sM_sCompEmployee->setRouteToNewEmployee(VHEmployee.sCMvh_pos, *sCCI.scc_objCompany);
+            std::pair<int, int> _homePEmployee = inSCM.sM_sCompEmployee->getNewValidHouse();
+            inSCM.sM_sCompEmployee->setRouteToNewEmployee(_homePEmployee, *sCCI.scc_objCompany);
+            uint32_t _salaryEmployee = 400; // TODO :( Dinamic employee _salary
 
-            //Aqui es farà la decisió si s'agafa o no
+            if (_salaryEmployee < inSCM.sM_sCompEmployee->getPriceByHouse(_homePEmployee))
+                return; //Cannot pay he house
 
-            inSCM.sM_groupEconomy->gE_sRLR->addElement(cDate);
-            inSCM.sM_sContractor->addContractToCompany(sCCI.scc_objCompany, VHEmployee.sCMvh_pos,
+            _assignHouseEmployee(_homePEmployee, inSCM, cDate);
+            inSCM.sM_sContractor->addContractToCompany(sCCI.scc_objCompany, _homePEmployee,
                                                        400, cDate);
-            inSCM.sM_groupLand->gL_gTerrain->addCivilHomeToPos(VHEmployee.sCMvh_pos);
+            //Pagar al llogater.
+            if (inSCM.sTComp->isCompanyInPosition(_homePEmployee))
+                _addContractRentEmployee(_homePEmployee, inSCM, cDate);
+        }
 
-            if (inSCM.sTComp->isCompanyInPosition(VHEmployee.sCMvh_pos)) {
-                uint32_t endRentPrice = VHEmployee.sCMvh_rentVal - 5 *
-                                                                   inSCM.sM_groupLand->gL_gAirPollution->gLayerAirPollution->get(
-                                                                           VHEmployee.sCMvh_pos);
-                std::cout << "PLOCKET" << " a" << VHEmployee.sCMvh_pos.first << "-" << VHEmployee.sCMvh_pos.second
-                          << "PRICE" << endRentPrice << std::endl;
-                std::shared_ptr<objCompany> _oCRent = inSCM.sTComp->getCompanyByPosition(VHEmployee.sCMvh_pos);
-                inSCM.sM_sContractor->addContractToCompanyRentHouse(_oCRent, VHEmployee.sCMvh_pos,
-                                                                    endRentPrice, cDate);
-            }
+        static void _assignHouseEmployee(const std::pair<int, int> &inPHouse, sCompanyMain &inSCM, uint32_t inTDate) {
+            inSCM.sM_groupEconomy->gE_sRLR->addElement(inTDate);
+            inSCM.sM_groupLand->gL_gTerrain->addCivilHomeToPos(inPHouse);
+        }
+
+        static void
+        _addContractRentEmployee(const std::pair<int, int> &inPHouse, sCompanyMain &inSCM, uint32_t inTDate) {
+            uint32_t pValueHome = inSCM.sM_sCompEmployee->getPriceByHouse(inPHouse);
+            uint32_t endRentPrice = pValueHome -
+                                    inSCM.sM_groupLand->gL_gAirPollution->getPenalizationAir(inPHouse);
+
+            std::shared_ptr<objCompany> _oCRent = inSCM.sTComp->getCompanyByPosition(inPHouse);
+            inSCM.sM_sContractor->addContractToCompanyRentHouse(_oCRent, inPHouse,
+                                                                endRentPrice, inTDate);
         }
 
         static void

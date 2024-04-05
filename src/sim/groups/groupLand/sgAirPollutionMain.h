@@ -66,6 +66,10 @@ public:
         }
     }
 
+    uint32_t getPenalizationAir(const std::pair<int, int> inPCell) {
+        return 5 * gLayerAirPollution->get(inPCell);
+    }
+
     std::shared_ptr<gIGrid<uint8_t>> gLayerAirPollution;
 private:
 

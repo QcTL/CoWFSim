@@ -24,7 +24,7 @@ public:
             }
         }
         setVelocity(0);
-        setClock({0, 0, 1, 1, 0});
+        setClock({0, 0, 0, 0, 0});
     }
 
     void setClock(const sClockMain::sCM_ClockValues &vNew) {
@@ -35,7 +35,7 @@ public:
                    (gMinutes.size() == 1 ? "0" : "") + gMinutes +
                    ((vNew.sCM_rVHour < 12) ? "am" : "pm"));
 
-        setText(1, std::to_string(vNew.sCM_rVDay % 32) + '/' + std::to_string(vNew.sCM_rVMonth % 13));
+        setText(1, std::to_string(vNew.sCM_rVDay + 1 % 32) + '/' + std::to_string(vNew.sCM_rVMonth + 1 % 13));
         setText(2, std::to_string(vNew.sCM_rVYear));
     }
 

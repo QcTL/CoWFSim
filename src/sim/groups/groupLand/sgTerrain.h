@@ -211,7 +211,7 @@ public:
     }
 
     [[nodiscard]] uint32_t getQualityGivenPosHome(const std::pair<int, int> inPHouse) const {
-        return gTG_baseQualityAttr->get(inPHouse);
+        return gTG_baseQualityAttr->get(inPHouse) * 3;
     }
 
     [[nodiscard]]  double getRemainHomes(const uint8_t inTypeSoil) const {
