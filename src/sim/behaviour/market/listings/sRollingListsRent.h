@@ -30,11 +30,17 @@ public:
         auto itP1 = sRLR_winList.begin();
         auto itP2 = sRLR_winList.begin();
         if (sRLR_winList.size() < 2)
-            return 0;
+            return (uint32_t) 250;
         std::vector<uint32_t> vDiffRented;
 
         itP1++;
         while (itP1 != sRLR_winList.end()) {
+            if (*itP1 == *itP2) {
+                vDiffRented.push_back(0);
+                itP1++;
+                itP2++;
+                continue;
+            }
             uint8_t P1outWeekday = *itP1 & 0b111;
             uint8_t P1outWeekNumber = (*itP1 >> 3) & 0b11;
             uint8_t P1outMonth = (*itP1 >> 5) & 0b1111;

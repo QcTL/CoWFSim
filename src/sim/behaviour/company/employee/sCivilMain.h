@@ -33,16 +33,31 @@ public:
     };
 
     sCM_validHouse getNewValidHouse() {
-        uint8_t gPrefLivingType = sgTerrain::sgT_TypeSoil::sgT_TS_T1Mixed;
+        std::uniform_int_distribution<int> distribution(1, 3);
+        uint8_t gPrefLivingType = distribution(sCM_genRand);
 
         auto gPos = sCM_groupLand->gL_gTerrain->getHomeSortLessQuality(gPrefLivingType);
-        uint32_t gPosBasePrice = sCM_groupLand->gL_gTerrain->getHomeSortValueQuality(gPrefLivingType);
+        uint32_t gPosBasePrice = sCM_groupLand->gL_gTerrain->getQualityGivenPosHome(gPos);
+        double dUnitHouses = sCM_groupLand->gL_gTerrain->getRemainHomes(gPrefLivingType) == 1 ? 0.99
+                                                                                              : sCM_groupLand->gL_gTerrain->getRemainHomes(
+                        gPrefLivingType);
+        double gFactorRarity = (1 / dUnitHouses);
+        uint32_t _incrFactor = 50; //Relation between the inverse of the distance of times and the incremental factor
+        double gPremium =
+                (1.0 / std::sqrt((double) sCM_groupEconomy->gE_sRLR->getAverageBuyingTime() + 1)) * _incrFactor;
 
-        uint32_t _incrFactor = 25; //Relation between the inverse of the distance of times and the incremental factor
         return {gPos,
+                (uint32_t) (gPosBasePrice + gPremium * gFactorRarity)};
+    }
+
+    uint32_t getPriceByHouse(const std::pair<int, int> &inPCell) {
+        uint32_t gPosBasePrice = sCM_groupLand->gL_gTerrain->gTG_baseQualityAttr->get(inPCell) * 3;
+        uint32_t _incrFactor = 25;
+        return
                 gPosBasePrice +
                 uint32_t(((1.0 / sCM_groupEconomy->gE_sRLR->getAverageBuyingTime()) * _incrFactor) *
-                         (1 / (1 - sCM_groupLand->gL_gTerrain->getRemainHomes(gPrefLivingType))))};
+                         (1 / (1 - sCM_groupLand->gL_gTerrain->getRemainHomes(
+                                 sCM_groupLand->gL_gTerrain->gTG_TypeSoil->get(inPCell)))));
     }
 
     void setRouteToNewEmployee(std::pair<int, int> rPosCivHome, const objCompany &inObjCompany) {

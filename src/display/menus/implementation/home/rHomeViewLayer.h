@@ -14,7 +14,7 @@
 class rHomeViewLayer : public rIMenu {
 public:
     explicit rHomeViewLayer(const std::shared_ptr<rIMenu> &mParent, const std::shared_ptr<objCompany> &rShow,
-                            uint8_t nOccupancy, uint8_t nMaxOccupancy, uint8_t typeHouse,
+                            uint8_t nOccupancy, uint8_t nMaxOccupancy, uint8_t typeHouse, uint8_t valueHouse,
                             const std::shared_ptr<rPileMenus> &mPiles)
             : rIMenu(mParent, rIMenu::rRelativePos::pBottomRight, "d_mHomeViewLayer"), mPiles(mPiles), rCompRef(rShow) {
         switch (typeHouse) {
@@ -30,6 +30,7 @@ public:
         }
         setText(1, std::to_string(nOccupancy));
         setText(2, std::to_string(nMaxOccupancy));
+        setText(3, std::to_string(valueHouse));
 
         setText(4, rShow != nullptr ? rShow->nName : "");
     }

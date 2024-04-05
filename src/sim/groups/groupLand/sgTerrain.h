@@ -176,7 +176,7 @@ public:
         gTG_civilOccupancy->set(inItPosHome, gTG_civilOccupancy->get(inItPosHome) + 1);
 
         if (gTG_civilOccupancy->get(inItPosHome) >= getMaxOccBySoil(gTG_TypeSoil->get(inItPosHome))) {
-            gTG_civilPresentCellBySoil[gTG_TypeSoil->get(inItPosHome)].pop_front();
+            gTG_civilPresentCellBySoil[gTG_TypeSoil->get(inItPosHome)].remove(inItPosHome);
             if (gTG_civilFilledCellBySoil.find(gTG_TypeSoil->get(inItPosHome)) == gTG_civilFilledCellBySoil.end())
                 gTG_civilFilledCellBySoil[gTG_TypeSoil->get(inItPosHome)] = {};
             gTG_civilFilledCellBySoil[gTG_TypeSoil->get(inItPosHome)].push_back(inItPosHome);
@@ -203,11 +203,15 @@ public:
 
     [[nodiscard]] std::pair<int, int>
     getHomeSortLessQuality(const uint8_t inTypeSoil) {
-        return gTG_civilPresentCellBySoil[inTypeSoil].front();
+        //return gTG_civilPresentCellBySoil[inTypeSoil].front();
+        std::vector<std::pair<int, int>> topValidHomes(gTG_civilPresentCellBySoil[inTypeSoil].begin(),
+                                                       std::next(gTG_civilPresentCellBySoil[inTypeSoil].begin(), 5));
+        std::shuffle(topValidHomes.begin(), topValidHomes.end(), gTG_genRPos);
+        return topValidHomes.front();
     }
 
-    [[nodiscard]] uint32_t getHomeSortValueQuality(const uint8_t inTypeSoil) const {
-        return gTG_baseQualityAttr->get(gTG_civilPresentCellBySoil.at(inTypeSoil).front());
+    [[nodiscard]] uint32_t getQualityGivenPosHome(const std::pair<int, int> inPHouse) const {
+        return gTG_baseQualityAttr->get(inPHouse);
     }
 
     [[nodiscard]]  double getRemainHomes(const uint8_t inTypeSoil) const {

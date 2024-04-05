@@ -91,8 +91,10 @@ public:
                         rHomeViewLayer(refPile->vTopActiveMenu,
                                        refLBuild->get(cPressed).empty() ? nullptr : refSComp->getCompanyByUUID(
                                                refLBuild->get(cPressed).front()),
-                                       rBM_refTerrain->gTG_civilOccupancy->get(cPressed),rBM_refTerrain->getMaxOccByPos(cPressed),
-                                       rBM_refTerrain->gTG_TypeSoil->get(cPressed), refPile));
+                                       rBM_refTerrain->gTG_civilOccupancy->get(cPressed),
+                                       rBM_refTerrain->getMaxOccByPos(cPressed),
+                                       rBM_refTerrain->gTG_TypeSoil->get(cPressed),
+                                       rBM_refTerrain->gTG_baseQualityAttr->get(cPressed), refPile));
                 refPile->addMenuTop(_rHome);
             }
                 break;
