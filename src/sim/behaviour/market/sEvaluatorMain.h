@@ -66,6 +66,9 @@ public:
 
     sTotalElements::sME_Element getById(uint64_t inUuidElement) { return sEM_totalElements->getById(inUuidElement); }
 
+    bool doesObjectExists(const uint32_t uuidItem){
+        return uuidItem < sEM_totalElements->nElements();
+    }
 private:
 
     static void

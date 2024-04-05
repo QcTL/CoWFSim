@@ -21,8 +21,8 @@ public:
         setText(2, oCommonMenus::getCompNumber(rShow.c_cRentedLocations.size()));
         setText(3, getFloatToString2Decimal(rShow.c_cActiveFunds));
         setText(4, getFloatToString2Decimal(
-                ((rShow.c_cActiveFunds + rShow.c_objYear + rShow.c_objMonth * 12 + rShow.c_objFortnight * 36) /
-                 rShow.c_cActiveFunds) * 100)); //TODO Change it;
+                std::max(-100.0, ((rShow.c_objYear + rShow.c_objMonth * 12 + rShow.c_objFortnight * 36) /
+                                  rShow.c_cActiveFunds) * 100))); //TODO Change it;
 
         for (int i = 5; i < 11; i++)
             setText(i, "");

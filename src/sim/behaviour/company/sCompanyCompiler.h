@@ -37,9 +37,10 @@ public:
         sCCIntentions() = default;
     };
 
-    static sCCIntentions intentionsFromLong(const uint64_t &cVal, const std::shared_ptr<objCompany> &objC) {
+    static sCCIntentions
+    intentionsFromLong(const uint16_t inCIntention, const uint64_t &cVal, const std::shared_ptr<objCompany> &objC) {
         uint32_t dAddInfo = static_cast<uint32_t>(cVal & 0xFFFFFFFF);
-        switch (cVal >> 53 & 0xFF) { //TODO CREC QUE ESTA MALAMENT
+        switch (inCIntention) {
             case 0:
                 return {sCCIntentions::OBJ_Produce, dAddInfo, objC};
             case 1:
@@ -117,8 +118,11 @@ public:
                     cV2 = cV1;
                     cV1 = cCode[cPC] & 0x1FFFFFFFFFFFFFFF;
                     break;
-                case 6:
-                    cRet.push_back(intentionsFromLong(cCode[cPC], objC));
+                case 6: {
+                    uint16_t _pIntention = cCode[cPC] >> 53 & 0xFF;
+                    if (_pIntention < 10)
+                        cRet.push_back(intentionsFromLong(_pIntention, cCode[cPC], objC));
+                }
                     break;
                 case 7:
                 default:

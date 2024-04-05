@@ -108,7 +108,7 @@ public:
                                     | ((elm.second & (1 << 4)) >> 4) << 2
                                     | ((elm.second & (1 << 6)) >> 6) << 1
                                     | ((elm.second & (1 << 3)) >> 3);
-                if (gUnderground->get({elm.first.second, elm.first.first}) == 2) { pVal2Bits |= 1 >> 4; }
+                if (gUnderground->get({elm.first.second, elm.first.first}) == 2) { pVal2Bits = 16; }
                 gUnderground->set({elm.first.second, elm.first.first}, pVal2Bits);
             }
         }

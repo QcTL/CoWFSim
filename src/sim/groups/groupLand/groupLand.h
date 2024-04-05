@@ -30,6 +30,7 @@ public:
 
     std::shared_ptr<sgAirPollutionMain> gL_gAirPollution;
     std::shared_ptr<sgTerrain> gL_gTerrain;
+
 };
 
 #endif //CITYOFWEIRDFISHES_GROUPLAND_H

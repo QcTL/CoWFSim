@@ -55,6 +55,10 @@ public:
         gE_sEvaluator->computeSellInmElement(inUuidElement, inObjCompany);
     }
 
+    bool doesObjectExists(const uint32_t uuidItem){
+        return gE_sEvaluator->doesObjectExists(uuidItem);
+    }
+
     sTotalElements::sME_Element getById(uint64_t inUuidElement) { return gE_sEvaluator->getById(inUuidElement); }
 
     std::shared_ptr<sRollingListsRent> gE_sRLR = std::make_shared<sRollingListsRent>(10);

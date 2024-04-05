@@ -32,32 +32,24 @@ public:
         uint32_t sCMvh_rentVal;
     };
 
-    sCM_validHouse getNewValidHouse() {
+    std::pair<int, int> getNewValidHouse() {
         std::uniform_int_distribution<int> distribution(1, 3);
         uint8_t gPrefLivingType = distribution(sCM_genRand);
-
         auto gPos = sCM_groupLand->gL_gTerrain->getHomeSortLessQuality(gPrefLivingType);
-        uint32_t gPosBasePrice = sCM_groupLand->gL_gTerrain->getQualityGivenPosHome(gPos);
-        double dUnitHouses = sCM_groupLand->gL_gTerrain->getRemainHomes(gPrefLivingType) == 1 ? 0.99
-                                                                                              : sCM_groupLand->gL_gTerrain->getRemainHomes(
-                        gPrefLivingType);
+        return gPos;
+    }
+
+    uint32_t getPriceByHouse(const std::pair<int, int> &inPCell) {
+        uint32_t gPosBasePrice = sCM_groupLand->gL_gTerrain->getQualityGivenPosHome(inPCell);
+        uint8_t gPrefLivingType = sCM_groupLand->gL_gTerrain->gTG_TypeSoil->get(inPCell);
+        double dUnitHouses = std::min(sCM_groupLand->gL_gTerrain->getRemainHomes(gPrefLivingType), 0.99);
+
         double gFactorRarity = (1 / dUnitHouses);
         uint32_t _incrFactor = 50; //Relation between the inverse of the distance of times and the incremental factor
         double gPremium =
                 (1.0 / std::sqrt((double) sCM_groupEconomy->gE_sRLR->getAverageBuyingTime() + 1)) * _incrFactor;
 
-        return {gPos,
-                (uint32_t) (gPosBasePrice + gPremium * gFactorRarity)};
-    }
-
-    uint32_t getPriceByHouse(const std::pair<int, int> &inPCell) {
-        uint32_t gPosBasePrice = sCM_groupLand->gL_gTerrain->gTG_baseQualityAttr->get(inPCell) * 3;
-        uint32_t _incrFactor = 25;
-        return
-                gPosBasePrice +
-                uint32_t(((1.0 / sCM_groupEconomy->gE_sRLR->getAverageBuyingTime()) * _incrFactor) *
-                         (1 / (1 - sCM_groupLand->gL_gTerrain->getRemainHomes(
-                                 sCM_groupLand->gL_gTerrain->gTG_TypeSoil->get(inPCell)))));
+        return (uint32_t) (gPosBasePrice + gPremium * gFactorRarity);
     }
 
     void setRouteToNewEmployee(std::pair<int, int> rPosCivHome, const objCompany &inObjCompany) {

@@ -56,7 +56,7 @@ public:
 
         sgUM_actPos = sgUM_totalStations[0].sPos;
         sgUM_tActualStation = 0;
-        gLayerUnderground->set(sgUM_actPos, gLayerUnderground->get(sgUM_actPos) + 16);
+        gLayerUnderground->set(sgUM_actPos, gLayerUnderground->get(sgUM_actPos) + 32);
     }
 
     std::pair<int, int> getActualPosition(const uint32_t inCTime) {
@@ -77,13 +77,13 @@ public:
 
 
     void tick() {
-        gLayerUnderground->set(sgUM_actPos, gLayerUnderground->get(sgUM_actPos) - 16);
+        gLayerUnderground->set(sgUM_actPos, gLayerUnderground->get(sgUM_actPos) - 32);
 
         if (sgUM_tTick == 0)
             sgUM_tActualStation = 0;
 
         sgUM_actPos = getActualPosition(sgUM_tTick);
-        gLayerUnderground->set(sgUM_actPos, gLayerUnderground->get(sgUM_actPos) + 16);
+        gLayerUnderground->set(sgUM_actPos, gLayerUnderground->get(sgUM_actPos) + 32);
         sgUM_tTick = sgUM_tTick + 1 % 1440;
     }
 
