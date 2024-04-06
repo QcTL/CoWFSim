@@ -53,18 +53,26 @@ public:
             case sf::Event::MouseButtonPressed:
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     sf::Vector2<int> pMouse = sf::Mouse::getPosition(rWindow);
-                    int _gPressed = getButtonPressed(rWindow, pMouse);
-                    if (_gPressed != -1) {
-                        if (_gPressed == 0) {
-                            std::cout << "ADDED OBSERVER" << std::endl;
-                            rCVML_rShow.c_objWeek.setObserver(eyeCatcherActive::getInstance());
-                        } else if (_gPressed == 1) {
-                            std::cout << "ADDED OBSERVER" << std::endl;
-                            rCVML_rShow.c_objMonth.setObserver(eyeCatcherActive::getInstance());
-                        } else if (_gPressed == 2) {
-                            std::cout << "ADDED OBSERVER" << std::endl;
-                            rCVML_rShow.c_objYear.setObserver(eyeCatcherActive::getInstance());
+                    int _gEyePressed = getEyePressed(rWindow, pMouse);
+                    if (_gEyePressed != -1) {
+                        if (_gEyePressed == 0) {
+                            if (!comVEyesState[0])
+                                rCVML_rShow.c_objWeek.setObserver(eyeCatcherActive::getInstance());
+                            else
+                                rCVML_rShow.c_objWeek.removeObserver();
+                        } else if (_gEyePressed == 1) {
+                            if (!comVEyesState[1])
+                                rCVML_rShow.c_objMonth.setObserver(eyeCatcherActive::getInstance());
+                            else
+                                rCVML_rShow.c_objMonth.removeObserver();
+                        } else if (_gEyePressed == 2) {
+                            if (!comVEyesState[2])
+                                rCVML_rShow.c_objYear.setObserver(eyeCatcherActive::getInstance());
+                            else
+                                rCVML_rShow.c_objYear.removeObserver();
                         }
+                        setEyeVisualValue(_gEyePressed, !comVEyesState[_gEyePressed]);
+                        comVEyesState[_gEyePressed] = !comVEyesState[_gEyePressed];
                         return true;
                     }
                 }

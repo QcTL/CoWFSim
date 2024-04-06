@@ -41,12 +41,14 @@ public:
     }
 
     void setObserver(const std::shared_ptr<eyeCatcherActive> &inEyeCatcherActive) {
+        std::cout << "ADDED OBSERVER" << std::endl;
         eV_isToObserve = true;
         eV_observer = inEyeCatcherActive;
         updateValueEye();
     }
 
     void removeObserver() {
+        std::cout << "REMOVED OBSERVER" << std::endl;
         eV_isToObserve = false;
         eV_observer = nullptr;
     }

@@ -2,4 +2,4 @@ type:mCompViewer
 src:mCompViewLayer.txt
 inSelTex:65
 inLengthTex:11,3,3,4,6,9,4,9,4,9,4
-inPosButtons:17#6#1#1
+inPosEyes:17#6#1#1

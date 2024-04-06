@@ -64,11 +64,15 @@ public:
             case sf::Event::MouseButtonPressed:
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     sf::Vector2<int> pMouse = sf::Mouse::getPosition(rWindow);
-                    int _gPressed = getButtonPressed(rWindow, pMouse);
-                    if (_gPressed != -1) {
-                        if (_gPressed == 0) {
-                            std::cout << "ADDED OBSERVER" << std::endl;
-                            rCompRef.c_cActiveFunds.setObserver(eyeCatcherActive::getInstance());
+                    int _gEyePressed = getEyePressed(rWindow, pMouse);
+                    if (_gEyePressed != -1) {
+                        if (_gEyePressed == 0) {
+                            if (!comVEyesState[0])
+                                rCompRef.c_cActiveFunds.setObserver(eyeCatcherActive::getInstance());
+                            else
+                                rCompRef.c_cActiveFunds.removeObserver();
+                            setEyeVisualValue(0, !comVEyesState[0]);
+                            comVEyesState[0] = !comVEyesState[0];
                         }
                         return true;
                     }
