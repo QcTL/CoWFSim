@@ -69,16 +69,16 @@ public:
                         bool isGaining) {
         switch (c_TPF) {
             case LC_PAY_MONTH:
-                objCom->c_objMonth = isGaining ? objCom->c_objMonth + ct_recurrentCost : objCom->c_objMonth -
-                                                                                         ct_recurrentCost;
+                objCom->c_objMonth.set(
+                        isGaining ? objCom->c_objMonth + ct_recurrentCost : objCom->c_objMonth - ct_recurrentCost);
                 break;
             case LC_PAY_YEAR:
-                objCom->c_objYear = isGaining ? objCom->c_objYear + ct_recurrentCost : objCom->c_objYear -
-                                                                                       ct_recurrentCost;
+                objCom->c_objYear.set(
+                        isGaining ? objCom->c_objYear + ct_recurrentCost : objCom->c_objYear - ct_recurrentCost);
                 break;
             case LC_PAY_FORTNIGHT:
-                objCom->c_objFortnight = isGaining ? objCom->c_objFortnight + ct_recurrentCost :
-                                         objCom->c_objFortnight - ct_recurrentCost;
+                objCom->c_objWeek.set(
+                        isGaining ? objCom->c_objWeek + ct_recurrentCost : objCom->c_objWeek - ct_recurrentCost);
                 break;
         }
     }

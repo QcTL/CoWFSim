@@ -18,6 +18,7 @@
 #include <unordered_set>
 #include "contracts/cObjContracts.h"
 #include "../../../behaviour/company/code/sCodeStoratge.h"
+#include "../../../eyeCatcher/eyeValue.h"
 
 std::vector<std::string> vSyllablesP = {"am", "ca", "mi", "o", "ul", "er", "es", "pin", "tu", "ra", "ta", "la", "dro",
                                         "me", "dia", "mart", "sen", "ti", "tran", "qui", "li", "tat", "pen",
@@ -58,6 +59,11 @@ public:
             nName += str;
         nName[0] = static_cast<char>(toupper(nName[0]));
 
+        c_nEmployee = eyeValue<uint32_t>("oC_" + nName + "-nEmployees", 0);
+        c_cActiveFunds = eyeValue<double>("oC_" + nName + "-activeFunds", 0);
+        c_objWeek = eyeValue<float>("oC_" + nName + "-gainWeek", 0);
+        c_objYear = eyeValue<float>("oC_" + nName + "-gainYear", 0);
+        c_objMonth = eyeValue<float>("oC_" + nName + "-gainMonth", 0);
     }
 
 
@@ -101,11 +107,11 @@ public:
     std::list<std::pair<int, int>> c_cRentedLocations;
     objComp_activeDates c_activeDates;
 
-    uint32_t c_nEmployee = 0;
-    double c_cActiveFunds = 0;
-    float c_objFortnight = 0;
-    float c_objYear = 0;
-    float c_objMonth = 0;
+    eyeValue<uint32_t> c_nEmployee;
+    eyeValue<double> c_cActiveFunds;
+    eyeValue<float> c_objWeek;
+    eyeValue<float> c_objYear;
+    eyeValue<float> c_objMonth;
 
     std::shared_ptr<sCodeStorage::sCodeObj> c_cCode;
 

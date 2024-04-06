@@ -36,7 +36,7 @@ public:
         tVecComp[prevFEmpty] = {0,
                                 std::make_shared<objCompany>(
                                         prevFEmpty, sTilesStart, typeCompany, cActiveDates)};
-        tVecComp[prevFEmpty].second->c_cActiveFunds = 5000.0;
+        tVecComp[prevFEmpty].second->c_cActiveFunds.set(5000.0);
         return prevFEmpty;
     }
 
@@ -66,7 +66,7 @@ public:
         std::vector<std::shared_ptr<objCompany>> ret;
         for (auto &i: tVecComp)
             if (i.second != nullptr && i.second->c_cActiveFunds < 0 &&
-                (i.second->c_objYear + i.second->c_objMonth * 12 + i.second->c_objFortnight * 36) < 0)
+                (i.second->c_objYear + i.second->c_objMonth * 12 + i.second->c_objWeek * 36) < 0)
                 ret.push_back(i.second);
 
         return ret;
@@ -75,19 +75,19 @@ public:
     void applyEcoWeek() {
         for (auto &i: tVecComp)
             if (i.second != nullptr)
-                i.second->c_cActiveFunds -= i.second->c_objFortnight;
+                i.second->c_cActiveFunds += i.second->c_objWeek;
     }
 
     void applyEcoMonth() {
         for (auto &i: tVecComp)
             if (i.second != nullptr)
-                i.second->c_cActiveFunds -= i.second->c_objMonth;
+                i.second->c_cActiveFunds += i.second->c_objMonth;
     }
 
     void applyEcoYear() {
         for (auto &i: tVecComp)
             if (i.second != nullptr)
-                i.second->c_cActiveFunds -= i.second->c_objYear;
+                i.second->c_cActiveFunds += i.second->c_objYear;
     }
 
     std::vector<std::pair<uint32_t, int>> getDiffEmployeesByLocation(uint32_t inRTimer) {
@@ -139,7 +139,7 @@ public:
         return _idNewComp;
     }
 
-    bool isCompanyInPosition(const std::pair<int,int>& inPCell){return !gLayerOwnership->get(inPCell).empty();}
+    bool isCompanyInPosition(const std::pair<int, int> &inPCell) { return !gLayerOwnership->get(inPCell).empty(); }
 
     void addRefPosOwnCompany(std::pair<int, int> inPCell, uint32_t uuidCompany) {
         auto p = gLayerOwnership->get({inPCell.first, inPCell.second});
@@ -148,7 +148,7 @@ public:
         //TODO no m'agrada que aixo vulgi dir que estem creant una copia.
     }
 
-    void removeRefPosOwnCompany(std::pair<int,int> inPCell, uint32_t uuidCompany){
+    void removeRefPosOwnCompany(std::pair<int, int> inPCell, uint32_t uuidCompany) {
         auto p = gLayerOwnership->get({inPCell.first, inPCell.second});
         p.remove(uuidCompany); //AAAAAAAAAAAAAAAAAAAAAA
         gLayerOwnership->set(inPCell, p);
@@ -160,7 +160,7 @@ public:
         return sCT_vTotalComp.getDestByComp(inIndex);
     }
 
-    std::shared_ptr<objCompany> getCompanyByPosition(std::pair<int,int> inPCell) {
+    std::shared_ptr<objCompany> getCompanyByPosition(std::pair<int, int> inPCell) {
         return getCompanyByUUID(gLayerOwnership->get(inPCell).front());
     }
 

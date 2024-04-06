@@ -5,6 +5,7 @@
 #ifndef CITYOFWEIRDFISHES_SIMINITIALIZE_H
 #define CITYOFWEIRDFISHES_SIMINITIALIZE_H
 
+#include <thread>
 #include "src/sim/structure/grids/transformation/gBaseToRiver.h"
 #include "src/sim/structure/grids/transformation/gBaseToLineRoads.h"
 #include "src/sim/structure/grids/transformation/gBaseToPattern.h"
@@ -19,6 +20,8 @@
 #include "src/sim/layers/implementations/sLayerCells.h"
 #include "src/common/sContainerMain.h"
 #include "src/sim/snCommonAtr.h"
+#include "src/sim/eyeCatcher/eyeCatcherConnection.h"
+#include "src/sim/eyeCatcher/eyeCatcherActive.h"
 
 class SimInitialize {
 public:
@@ -35,11 +38,13 @@ public:
 
         std::shared_ptr<sSimulatorMain> sMS = std::make_shared<sSimulatorMain>(lSizeGrid);
 
-        sLayerType::returnLayerType tReturn = sLayerType::gen(lSizeGrid, sMS->sSM_groupLand->gL_gTerrain->gTG_TypeGen, mValues, snCommonAtr::getFlagAtr("snCA_Seed"));
+        sLayerType::returnLayerType tReturn = sLayerType::gen(lSizeGrid, sMS->sSM_groupLand->gL_gTerrain->gTG_TypeGen,
+                                                              mValues, snCommonAtr::getFlagAtr("snCA_Seed"));
         sMS->sSM_groupLand->gL_gTerrain->gTG_TypeSoil = tReturn.genTypeSoil;
 
         retObjSLayerCells retCells =
-                sLayerCells::gen(lSizeGrid, sMS->sSM_groupLand->gL_gTerrain, tReturn.centerClusters, mValues, snCommonAtr::getFlagAtr("snCA_Seed"));
+                sLayerCells::gen(lSizeGrid, sMS->sSM_groupLand->gL_gTerrain, tReturn.centerClusters, mValues,
+                                 snCommonAtr::getFlagAtr("snCA_Seed"));
 
         sMS->gTotalUnderground->gLayerUnderground = retCells.gUnderground;
         sMS->gTotalUnderground->setPointsTransit(retCells.routesMetro);
@@ -47,8 +52,11 @@ public:
         sMS->completedSetupStage();
 
         sContainerMain sMC(sMS);
+        std::shared_ptr<eyeCatcherConnection> _eCC = std::make_shared<eyeCatcherConnection>();
+        std::shared_ptr<eyeCatcherActive> _eCA = eyeCatcherActive::getInstance(_eCC);
 
         sMC.gameLoop();
+
         return 0;
     }
 

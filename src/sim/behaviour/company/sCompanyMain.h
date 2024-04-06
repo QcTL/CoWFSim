@@ -51,6 +51,8 @@ public:
                     FulfillIntentions::gTryIntention({sCompanyCompiler::sCCIntentions::GEN_TerminateEmployee, 0,
                                                       sTComp->getCompanyByUUID(dEmp.first)}, *this, inTDate);
 
+        sTComp->applyEcoMonth();
+
         if (inRTime == 0) {
             if ((inTDate % 1 << 9) == 0)
                 sTComp->applyEcoYear();
@@ -154,6 +156,11 @@ private:
         }
 
     private:
+        static uint32_t getTotalPriceOfHome(const std::pair<int, int> &cPos, sCompanyMain &inSCM) {
+            uint32_t pValueHome = inSCM.sM_sCompEmployee->getPriceByHouse(cPos);
+            return pValueHome - inSCM.sM_groupLand->gL_gAirPollution->getPenalizationAir(cPos);
+        }
+
         // BUY CELL
         static void
         gExecuteBuyCellOperation(const sCompanyCompiler::sCCIntentions &sCCI, sCompanyMain &inSCM,
@@ -178,7 +185,10 @@ private:
             std::pair<int, int> gTile = sCCI.scc_objCompany->getOwnedByIndex(sCCI.scc_addIdInfo);
             uint32_t cQuality = inSCM.sM_groupLand->gL_gTerrain->getQualityGivenPosHome(gTile) -
                                 inSCM.sM_groupLand->gL_gAirPollution->getPenalizationAir(gTile);
-            uint32_t cPrice = inSCM.sM_groupLand->gL_gTerrain->gTG_civilOccupancy->get(gTile) * cQuality * 1.5;
+
+            uint32_t endRentPrice = getTotalPriceOfHome(gTile, inSCM);
+            uint32_t cPrice = inSCM.sM_groupLand->gL_gTerrain->gTG_civilOccupancy->get(gTile) * endRentPrice * 1.5;
+
             std::shared_ptr<sLRentCell::sMOffering> sMO =
                     std::make_shared<sLRentCell::sMOffering>(sCCI.scc_objCompany, gTile,
                                                              inSCM.sM_groupLand->gL_gTerrain->gTG_TypeGen->get(gTile),
@@ -206,7 +216,9 @@ private:
 
             uint32_t cQuality = inSCM.sM_groupLand->gL_gTerrain->getQualityGivenPosHome(gTile) -
                                 inSCM.sM_groupLand->gL_gAirPollution->getPenalizationAir(gTile);
-            uint32_t cPrice = inSCM.sM_groupLand->gL_gTerrain->gTG_civilOccupancy->get(gTile) * cQuality * 100;
+
+            uint32_t endRentPrice = getTotalPriceOfHome(gTile, inSCM);
+            uint32_t cPrice = inSCM.sM_groupLand->gL_gTerrain->gTG_civilOccupancy->get(gTile) * endRentPrice * 100;
             std::shared_ptr<sLBuyCell::sMOffering> sMO =
                     std::make_shared<sLBuyCell::sMOffering>(sCCI.scc_objCompany, gTile,
                                                             inSCM.sM_groupLand->gL_gTerrain->gTG_TypeGen->get(gTile),
@@ -300,7 +312,7 @@ private:
             uint32_t _salaryEmployee = 400; // TODO :( Dinamic employee _salary
 
             if (_salaryEmployee < inSCM.sM_sCompEmployee->getPriceByHouse(_homePEmployee))
-                return; //Cannot pay he house
+                return; //Cannot pay the house
 
             _assignHouseEmployee(_homePEmployee, inSCM, cDate);
             inSCM.sM_sContractor->addContractToCompany(sCCI.scc_objCompany, _homePEmployee,
@@ -317,10 +329,7 @@ private:
 
         static void
         _addContractRentEmployee(const std::pair<int, int> &inPHouse, sCompanyMain &inSCM, uint32_t inTDate) {
-            uint32_t pValueHome = inSCM.sM_sCompEmployee->getPriceByHouse(inPHouse);
-            uint32_t endRentPrice = pValueHome -
-                                    inSCM.sM_groupLand->gL_gAirPollution->getPenalizationAir(inPHouse);
-
+            uint32_t endRentPrice = getTotalPriceOfHome(inPHouse, inSCM);
             std::shared_ptr<objCompany> _oCRent = inSCM.sTComp->getCompanyByPosition(inPHouse);
             inSCM.sM_sContractor->addContractToCompanyRentHouse(_oCRent, inPHouse,
                                                                 endRentPrice, inTDate);

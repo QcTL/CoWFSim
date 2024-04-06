@@ -128,6 +128,9 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/groups/groupLand/groupLand.h
         src/sim/groups/groupEconomy/groupEconomy.h
         src/sim/behaviour/market/listings/sRollingListsRent.h
+        src/sim/eyeCatcher/eyeCatcherConnection.h
+        src/sim/eyeCatcher/eyeCatcherActive.h
+        src/sim/eyeCatcher/eyeValue.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)
