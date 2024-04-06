@@ -48,7 +48,7 @@ public:
     }
 
     void computeBoughtElement(uint64_t inUuidElement, const std::shared_ptr<objCompany> &inObjCompany) {
-        gE_sEvaluator->computeCreatedElement(inUuidElement, inObjCompany);
+        gE_sEvaluator->computeBoughtElement(inUuidElement, inObjCompany);
     }
 
     void computeSellInmElement(uint64_t inUuidElement, const std::shared_ptr<objCompany> &inObjCompany) {

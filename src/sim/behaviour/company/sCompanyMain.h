@@ -13,6 +13,7 @@
 #include "code/sCodeStoratge.h"
 #include "../../groups/groupEconomy/groupEconomy.h"
 #include "contract/sContractorMain.h"
+#include "../globalAttr/stGlobalAttr.h"
 
 class sCompanyMain {
 public:
@@ -314,6 +315,9 @@ private:
             if (_salaryEmployee < inSCM.sM_sCompEmployee->getPriceByHouse(_homePEmployee))
                 return; //Cannot pay the house
 
+            std::shared_ptr<stGlobalAttr> sGA = stGlobalAttr::getInstance();
+            sGA->stGA_totalPopulation += 1;
+
             _assignHouseEmployee(_homePEmployee, inSCM, cDate);
             inSCM.sM_sContractor->addContractToCompany(sCCI.scc_objCompany, _homePEmployee,
                                                        400, cDate);
@@ -342,6 +346,9 @@ private:
             uint32_t _uuidContractTerminate = sCCI.scc_objCompany->c_activeContracts[con_Type::con_Type_Hire].front();
             sCCI.scc_objCompany->c_activeContracts[con_Type::con_Type_Hire].pop_front();
             inSCM.sM_sContractor->removeContractFromCompany(_uuidContractTerminate, inSCM.sTComp);
+
+            std::shared_ptr<stGlobalAttr> sGA = stGlobalAttr::getInstance();
+            sGA->stGA_totalPopulation -= 1;
 
             if (inSCM.sTComp->isCompanyInPosition(pHouseEmployee)) {
                 std::shared_ptr<objCompany> _oCRent = inSCM.sTComp->getCompanyByPosition(pHouseEmployee);

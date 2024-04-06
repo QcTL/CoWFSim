@@ -15,6 +15,7 @@
 #include "rRoadView/rRoadLineView.h"
 #include "rRoadView/rRoadCrossView.h"
 #include "home/rHomeViewLayer.h"
+#include "global/rGlobalAttrViewLayer.h"
 
 class rBaseMenu : public rIMenu {
 public:
@@ -76,6 +77,10 @@ public:
                             refPile->vTopActiveMenu, lstValueLayer, "d_mSelectLayer",
                             rIMenu::rRelativePos::pBottomRight);
                     refPile->addMenuTop(rSom);
+                } else if (event.key.code == sf::Keyboard::P) {
+                    std::shared_ptr<rGlobalAttrViewLayer> rGlob = std::make_shared<rGlobalAttrViewLayer>(
+                            refPile->vTopActiveMenu);
+                    refPile->addMenuTop(rGlob);
                 }
             default:
                 break;

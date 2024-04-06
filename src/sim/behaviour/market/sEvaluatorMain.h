@@ -14,6 +14,7 @@
 #include "../../../common/RelPath.h"
 #include "items/sRollingListsEvaluator.h"
 #include "items/sTotalElements.h"
+#include "../globalAttr/stGlobalAttr.h"
 
 class sEvaluatorMain {
 public:
@@ -46,11 +47,13 @@ public:
 
         if (sEM_gAvailableItems.find(inUuidElement) != sEM_gAvailableItems.end() &&
             sEM_gAvailableItems[inUuidElement] > 0) {
-
             diffElementCompany(inUuidElement, -1, sEM_companyHasItem[inUuidElement].front());
             if (sEM_companyHasItem[inUuidElement].front()->c_pOwn[inUuidElement] <= 0)
                 sEM_companyHasItem[inUuidElement].pop_front();
             sEM_gAvailableItems[inUuidElement] -= 1;
+        } else {
+            std::shared_ptr<stGlobalAttr> sGA = stGlobalAttr::getInstance();
+            sGA->stGA_totalImports += _pItem;
         }
 
         diffElementCompany(inUuidElement, 1, inObjCompany);
@@ -58,17 +61,21 @@ public:
     }
 
     void computeSellInmElement(uint64_t inUuidElement, const std::shared_ptr<objCompany> &inObjCompany) {
-        uint32_t pItem = getPriceItemActual(inUuidElement);
+        uint32_t _pItem = getPriceItemActual(inUuidElement);
+
+        std::shared_ptr<stGlobalAttr> sGA = stGlobalAttr::getInstance();
+        sGA->stGA_totalExports += _pItem;
 
         diffElementCompany(inUuidElement, -1, inObjCompany);
-        inObjCompany->c_cActiveFunds += pItem;
+        inObjCompany->c_cActiveFunds += _pItem;
     }
 
     sTotalElements::sME_Element getById(uint64_t inUuidElement) { return sEM_totalElements->getById(inUuidElement); }
 
-    bool doesObjectExists(const uint32_t uuidItem){
+    bool doesObjectExists(const uint32_t uuidItem) {
         return uuidItem < sEM_totalElements->nElements();
     }
+
 private:
 
     static void

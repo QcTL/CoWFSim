@@ -1,0 +1,5 @@
+type:mGlobalAttrViewLayer
+src:mGlobalAttrViewLayer.txt
+inSelTex:65
+inLengthTex:14,14,14,14,14
+inPosEyes:4#5#1#1,4#8#1#1,4#11#1#1,4#14#1#1,4#17#1#1

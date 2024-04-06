@@ -131,6 +131,8 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/eyeCatcher/eyeCatcherConnection.h
         src/sim/eyeCatcher/eyeCatcherActive.h
         src/sim/eyeCatcher/eyeValue.h
+        src/display/menus/implementation/global/rGlobalAttrViewLayer.h
+        src/sim/behaviour/globalAttr/stGlobalAttr.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)
