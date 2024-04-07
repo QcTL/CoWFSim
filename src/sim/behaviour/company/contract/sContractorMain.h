@@ -20,7 +20,7 @@ public:
         sCM_ContractorSt = std::make_shared<sContractorStorage>();
     };
 
-    void addContractToCompany(const std::shared_ptr<objCompany> &inPObjComReceiving,
+    uint32_t addContractToCompany(const std::shared_ptr<objCompany> &inPObjComReceiving,
                               const std::shared_ptr<objCompany> &inPObjComGiving,
                               const sLRentCell::sMOffering &inSMRentOffer, const uint32_t inTDate) {
         uint32_t _cRecu;
@@ -50,9 +50,10 @@ public:
         //TODO ADD AS CONTRACTOR TIMER;
         inPObjComGiving->addContractToCompany(con_Type::con_Type_Rent, _uuidContract);
         inPObjComReceiving->addContractToCompany(con_Type::con_Type_Rent, _uuidContract);
+        return _uuidContract;
     }
 
-    void addContractToCompany(const std::shared_ptr<objCompany> &inPObjComReceiving,
+    uint32_t addContractToCompany(const std::shared_ptr<objCompany> &inPObjComReceiving,
                               const std::shared_ptr<objCompany> &inPObjComGiving,
                               const sLBuyCell::sMOffering &inSMBuyOffer, const uint32_t inTDate) {
         uint32_t _cRecu;
@@ -85,6 +86,7 @@ public:
         if (inPObjComGiving != nullptr)
             inPObjComGiving->addContractToCompany(con_Type::con_Type_Buy, _uuidContract);
         inPObjComReceiving->addContractToCompany(con_Type::con_Type_Buy, _uuidContract);
+        return _uuidContract;
     }
 
     void addContractToCompany(const std::shared_ptr<objCompany> &inPObjComGiving, const std::pair<int, int> &inEHome,

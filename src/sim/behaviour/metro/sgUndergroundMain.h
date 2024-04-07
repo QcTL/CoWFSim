@@ -44,7 +44,7 @@ public:
             sgUM_timeArriving[j] = {};
         }
 
-        while (_sStartTimeLoop < 288) { //Nombre de voltes
+        while (_sStartTimeLoop < 288*5) { //Nombre de voltes
             for (int j = 0; j < sgUM_totalStations.size(); j++) {
                 sgUM_timeArriving[j].push_back(_sStartTimeLoop + _prepTime);
                 sgUM_vecTimeStation.emplace_back(_sStartTimeLoop + _prepTime, j);

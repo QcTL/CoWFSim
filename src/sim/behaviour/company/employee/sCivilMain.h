@@ -27,11 +27,6 @@ public:
             sCM_genRand.seed(static_cast<unsigned int>(time(nullptr)));
     };
 
-    struct sCM_validHouse {
-        std::pair<int, int> sCMvh_pos;
-        uint32_t sCMvh_rentVal;
-    };
-
     std::pair<int, int> getNewValidHouse() {
         std::uniform_int_distribution<int> distribution(1, 3);
         uint8_t gPrefLivingType = distribution(sCM_genRand);
@@ -59,21 +54,23 @@ public:
         sgUndergroundMain::sgUM_lowestViableRoute lVRMetro = sCM_sUndergroundMain->getLowestDistanceCommute(
                 inObjCompany.c_cActiveLocations.front(), rPosCivHome);
         std::shared_ptr<objCivil> _oCivil;
-        if (lVRMetro.totalDistance < 100)
+        if (lVRMetro.totalDistance < 30) {
+            std::cout << "POINTO METRO" << std::endl;
             _oCivil = std::make_shared<objCivil>(
                     objCivil(objCivil::typeRouteSystem::OC_TRS_TRAIN, rPosCivHome,
-                             {inObjCompany.c_cActiveLocations.front(), rPosCivHome}, // TODO POSAR LES ESTACIONS DE TREN
+                             {inObjCompany.c_cActiveLocations.front(), rPosCivHome,
+                              false}, // TODO POSAR LES ESTACIONS DE TREN
                              sCM_sUndergroundMain->getClosestTimeForStation(lVRMetro.closestSt1,
                                                                             inObjCompany.c_activeDates.c_StrEndTime.first),
                              sCM_sUndergroundMain->getClosestTimeForStation(lVRMetro.closestSt2,
                                                                             inObjCompany.c_activeDates.c_StrEndTime.second),
                              inObjCompany.c_activeDates.cAD_jobWeek));
-        else {
+        } else {
             std::uniform_int_distribution<> distrib(-5, 5);
             _oCivil = std::make_shared<objCivil>(
                     objCivil(objCivil::typeRouteSystem::OC_TRS_CAR, rPosCivHome,
                              {sCM_sRoadsMain->getClosestRoadToBuilding(inObjCompany.c_cActiveLocations.front()),
-                              sCM_sRoadsMain->getClosestRoadToBuilding(rPosCivHome)},
+                              sCM_sRoadsMain->getClosestRoadToBuilding(rPosCivHome), false},
                              inObjCompany.c_activeDates.c_StrEndTime.first + distrib(sCM_genRand),
                              inObjCompany.c_activeDates.c_StrEndTime.second + distrib(sCM_genRand),
                              inObjCompany.c_activeDates.cAD_jobWeek));

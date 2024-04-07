@@ -18,9 +18,9 @@ public:
     struct objRoadTravel {
         std::pair<int, int> c_RStart;
         std::pair<int, int> c_REnd;
-
-        objRoadTravel(const std::pair<int, int> &cRStart, const std::pair<int, int> &cREnd)
-                : c_RStart(cRStart), c_REnd(cREnd) {}
+        bool c_IsReversed;
+        objRoadTravel(const std::pair<int, int> &cRStart, const std::pair<int, int> &cREnd, bool isReversed)
+                : c_RStart(cRStart), c_REnd(cREnd), c_IsReversed(isReversed) {}
     };
 
     objCivil(typeRouteSystem cTrs, const std::pair<int,int> pHome, objRoadTravel cTravel, uint32_t cTBegin, uint32_t cTEnd, uint8_t cActiveDays)

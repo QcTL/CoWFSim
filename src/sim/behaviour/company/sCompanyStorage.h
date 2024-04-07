@@ -95,8 +95,8 @@ public:
         for (auto &i: tVecComp) {
             if (i.second != nullptr) {
                 std::pair<uint32_t, uint32_t> pairTimeActive = i.second->c_activeDates.c_StrEndTime;
-                if (inRTimer >= pairTimeActive.first && inRTimer <= pairTimeActive.second &&
-                    i.second->c_nEmployee != i.second->c_cActiveLocations.size() * 2)
+                if (i.second->c_attrCanEmployee &&inRTimer >= pairTimeActive.first && inRTimer <= pairTimeActive.second &&
+                    i.second->c_nEmployee < i.second->c_cActiveLocations.size() * 2)
                     ret.emplace_back(i.second->c_uuid, i.second->c_cActiveLocations.size() * 2 - i.second->c_nEmployee);
             }
         }

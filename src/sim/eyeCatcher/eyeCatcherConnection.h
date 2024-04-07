@@ -18,6 +18,8 @@
 class eyeCatcherConnection {
 public:
     explicit eyeCatcherConnection() {
+        std::cout << "WAITING FOR WEB CONNECTION" << std::endl;
+
         eyC_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
         if (eyC_serverSocket < 0) {
             std::cerr << "Error opening socket" << std::endl;

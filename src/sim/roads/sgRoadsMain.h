@@ -15,6 +15,7 @@
 #include "../groups/groupLand/groupLand.h"
 #include "../structure/grids/transformation/gBaseToNearestRoad.h"
 #include "rTransRNodeToRRNode.h"
+#include "../events/sEventManager.h"
 
 class sgRoadsMain {
 public:
@@ -73,6 +74,7 @@ private:
     void routeCarsCommute(const uint32_t inRTime, const uint32_t inTDate) {
         auto newRoutes = sgRM_sTRoutes->getRoutesCarByTime(inRTime, inTDate);
         for (auto r: newRoutes) {
+            sEventManager::getInstance()->callEventStartRoute(inRTime,inTDate,0,r); //TODO STORAGE CITIZEN
             uint32_t locId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->locIdNode;
             uint16_t blocId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->rBlock;
             gLayerRoads[r.c_RStart.first][r.c_RStart.second]->refCompressed->addNewCar(locId, blocId);

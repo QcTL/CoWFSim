@@ -20,10 +20,14 @@
 #include "groups/groupLand/groupLand.h"
 #include "groups/groupEconomy/groupEconomy.h"
 
+std::shared_ptr<sEventManager> sEventManager::sEM_instance = nullptr;
+    //TODO :(
 class sSimulatorMain {
 
 public:
     explicit sSimulatorMain(int lSize) {
+        sSM_GlobalTracker = stGlobalTrackerAttr::getInstance();
+
         gLayerNextRoad = std::make_shared<gBasicGrid<rNode *>>(gBasicGrid<rNode *>(lSize, lSize, nullptr));
         gTotalUnderground = std::make_shared<sgUndergroundMain>(lSize);
         sSM_groupEconomy = std::make_shared<groupEconomy>();
@@ -54,6 +58,9 @@ public:
     //MEMORY:
     std::shared_ptr<sCivilMain> sMCivil;
     std::shared_ptr<sCompanyMain> sSM_sCompany;
+
+    //TRACKERS:
+    std::shared_ptr<stGlobalTrackerAttr> sSM_GlobalTracker;
 
     void tick() {
         if (sMClock->isReducedTick()) {

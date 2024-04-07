@@ -14,7 +14,7 @@
 #include "../../../common/RelPath.h"
 #include "items/sRollingListsEvaluator.h"
 #include "items/sTotalElements.h"
-#include "../globalAttr/stGlobalAttr.h"
+#include "../globalAttr/stGlobalTrackerAttr.h"
 
 class sEvaluatorMain {
 public:
@@ -41,33 +41,40 @@ public:
         sEM_companyHasItem[inUuidElement].push_back(inObjCompany);
     }
 
-    void computeBoughtElement(uint64_t inUuidElement, const std::shared_ptr<objCompany> &inObjCompany) {
+    void computeBoughtElement(uint64_t inUuidElement, const std::shared_ptr<objCompany> &inObjCompany, uint32_t inRTime,
+                              uint32_t inCDate) {
         uint32_t _pItem = getPriceItemActual(inUuidElement);
         sEM_vLastTransactions[inUuidElement].addLastBought();
+        std::shared_ptr<sEventManager> sEM = sEventManager::getInstance();
 
         if (sEM_gAvailableItems.find(inUuidElement) != sEM_gAvailableItems.end() &&
             sEM_gAvailableItems[inUuidElement] > 0) {
             diffElementCompany(inUuidElement, -1, sEM_companyHasItem[inUuidElement].front());
-            if (sEM_companyHasItem[inUuidElement].front()->c_pOwn[inUuidElement] <= 0)
+            if (sEM_companyHasItem[inUuidElement].front()->c_pOwn[inUuidElement] <= 0) {
+                sEM->callEventCompanySoldItemLocal(inRTime, inCDate, sEM_companyHasItem[inUuidElement].front()->c_uuid,
+                                                   inUuidElement, _pItem);
                 sEM_companyHasItem[inUuidElement].pop_front();
+            }
             sEM_gAvailableItems[inUuidElement] -= 1;
-        } else {
-            std::shared_ptr<stGlobalAttr> sGA = stGlobalAttr::getInstance();
-            sGA->stGA_totalImports += _pItem;
-        }
+
+            sEM->callEventCompanyBoughtItemLocal(inRTime, inCDate, inObjCompany->c_uuid, inUuidElement, _pItem);
+        } else
+            sEM->callEventCompanyBoughtItemImport(inRTime, inCDate, inObjCompany->c_uuid, inUuidElement, _pItem);
 
         diffElementCompany(inUuidElement, 1, inObjCompany);
         inObjCompany->c_cActiveFunds -= _pItem;
     }
 
-    void computeSellInmElement(uint64_t inUuidElement, const std::shared_ptr<objCompany> &inObjCompany) {
+    void
+    computeSellInmElement(uint64_t inUuidElement, const std::shared_ptr<objCompany> &inObjCompany, uint32_t inRTime,
+                          uint32_t inCDate) {
         uint32_t _pItem = getPriceItemActual(inUuidElement);
-
-        std::shared_ptr<stGlobalAttr> sGA = stGlobalAttr::getInstance();
-        sGA->stGA_totalExports += _pItem;
 
         diffElementCompany(inUuidElement, -1, inObjCompany);
         inObjCompany->c_cActiveFunds += _pItem;
+        sEventManager::getInstance()->callEventCompanySoldItemExport(inRTime, inCDate, inObjCompany->c_uuid,
+                                                                     inUuidElement, _pItem);
+
     }
 
     sTotalElements::sME_Element getById(uint64_t inUuidElement) { return sEM_totalElements->getById(inUuidElement); }

@@ -9,14 +9,14 @@
 #include "../../rIMenu.h"
 #include "../../../../sim/structure/obj/elements/objCompany.h"
 #include "../../../rPileMenus.h"
-#include "../../../../sim/behaviour/globalAttr/stGlobalAttr.h"
+#include "../../../../sim/behaviour/globalAttr/stGlobalTrackerAttr.h"
 
 class rGlobalAttrViewLayer : public rIMenu {
 public:
     explicit rGlobalAttrViewLayer(const std::shared_ptr<rIMenu> &mParent)
             : rIMenu(mParent, rIMenu::rRelativePos::pBottomLeft, "d_mGlobalAttrViewLayer") {
 
-        std::shared_ptr<stGlobalAttr> sGA = stGlobalAttr::getInstance();
+        std::shared_ptr<stGlobalTrackerAttr> sGA = stGlobalTrackerAttr::getInstance();
         setText(0, std::to_string(sGA->stGA_totalPopulation));
         setText(1, std::to_string(sGA->stGA_totalEnergy));
         setText(2, std::to_string(sGA->stGA_totalImports));
@@ -41,7 +41,7 @@ public:
                     sf::Vector2<int> pMouse = sf::Mouse::getPosition(rWindow);
                     int _gEyePressed = getEyePressed(rWindow, pMouse);
                     if (_gEyePressed != -1) {
-                        std::shared_ptr<stGlobalAttr> sGA = stGlobalAttr::getInstance();
+                        std::shared_ptr<stGlobalTrackerAttr> sGA = stGlobalTrackerAttr::getInstance();
 
                         if (_gEyePressed == 0) {
                             if (!comVEyesState[0])

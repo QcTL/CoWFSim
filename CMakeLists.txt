@@ -97,7 +97,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/behaviour/company/employee/sCivilMain.h
         src/sim/groups/groupLand/sgAirPollutionMain.h
         src/tests/tst_gWindExpansion.h
-        "src/sim/behaviour/recording/sStorageCivilRoutineState.h"
+        "src/sim/behaviour/recording/sSituationCivilTracker.h"
         src/tests/tst_gNewVisualitzation.h
         src/common/r2BitDirection.h
         src/common/gCSVLoader.h
@@ -132,7 +132,9 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/eyeCatcher/eyeCatcherActive.h
         src/sim/eyeCatcher/eyeValue.h
         src/display/menus/implementation/global/rGlobalAttrViewLayer.h
-        src/sim/behaviour/globalAttr/stGlobalAttr.h
+        src/sim/behaviour/globalAttr/stGlobalTrackerAttr.h
+        src/sim/events/sEventManager.h
+        src/sim/events/sEventReceiver.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

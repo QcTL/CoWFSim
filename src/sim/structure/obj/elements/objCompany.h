@@ -116,6 +116,7 @@ public:
     std::shared_ptr<sCodeStorage::sCodeObj> c_cCode;
 
     std::map<uint8_t, std::list<uint64_t>> c_activeContracts;
+    bool c_attrCanEmployee = true;
 };
 
 #endif //CITYOFWEIRDFISHES_OBJCOMPANY_H

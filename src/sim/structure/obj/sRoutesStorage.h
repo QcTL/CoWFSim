@@ -42,7 +42,7 @@ public:
         for (const auto &civ: mExitTimesCivil.at(cTime)) {
             if (civ.c_TRS == objCivil::typeRouteSystem::OC_TRS_CAR  && civ.isActiveDay(cDate))
                 rRet.push_back(civ.c_TBegin == cTime ? civ.c_Travel : objCivil::objRoadTravel(civ.c_Travel.c_REnd,
-                                                                                              civ.c_Travel.c_RStart));
+                                                                                              civ.c_Travel.c_RStart, true));
         }
         return rRet;
     };
@@ -54,7 +54,7 @@ public:
         for (const auto &civ: mExitTimesCivil.at(cTime)) {
             if (civ.c_TRS == objCivil::typeRouteSystem::OC_TRS_TRAIN && civ.isActiveDay(cDate))
                 rRet.push_back(civ.c_TBegin == cTime ? civ.c_Travel : objCivil::objRoadTravel(civ.c_Travel.c_REnd,
-                                                                                              civ.c_Travel.c_RStart));
+                                                                                              civ.c_Travel.c_RStart, true));
             //cRSTART i CREND es la dels trens, la que a ells els hi va be
         }
         return rRet;
