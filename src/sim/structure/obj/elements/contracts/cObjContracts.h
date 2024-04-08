@@ -242,12 +242,12 @@ public:
 
 class con_hireInteraction : public con_b {
 public:
-    std::pair<int, int> ct_home;
+    uint32_t ct_UuidCivil;
     uint32_t ct_salary;
 
-    con_hireInteraction(uint32_t ctUuidCompanyGiving, const std::pair<int, int> &ctHome, uint32_t ctSalary,
+    con_hireInteraction(uint32_t ctUuidCompanyGiving, uint32_t ctUuidCivil, uint32_t ctSalary,
                         uint32_t ctStrDate)
-            : con_b(ctUuidCompanyGiving, ctStrDate), ct_home(ctHome), ct_salary(ctSalary) {}
+            : con_b(ctUuidCompanyGiving, ctStrDate), ct_UuidCivil(ctUuidCivil), ct_salary(ctSalary) {}
 
     void
     addAsReceiving(const std::shared_ptr<objCompany> &objCom) override {};

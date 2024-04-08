@@ -89,11 +89,11 @@ public:
         return _uuidContract;
     }
 
-    void addContractToCompany(const std::shared_ptr<objCompany> &inPObjComGiving, const std::pair<int, int> &inEHome,
+    void addContractToCompany(const std::shared_ptr<objCompany> &inPObjComGiving, std::shared_ptr<objCivil> &inPCivil,
                               const uint32_t inESalary, const uint32_t inTDate) {
         std::shared_ptr<con_hireInteraction> _hireE
                 = std::make_shared<con_hireInteraction>(
-                        con_hireInteraction(inPObjComGiving->c_uuid, inEHome, inESalary, inTDate));
+                        con_hireInteraction(inPObjComGiving->c_uuid, inPCivil->c_uuid, inESalary, inTDate));
         uint32_t _uuidContract = sCM_ContractorSt->addCon(_hireE);
         _hireE->addAsGiving(inPObjComGiving);
 

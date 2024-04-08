@@ -329,15 +329,17 @@ private:
         gExecuteHireEmployeeGenOperation(const sCompanyCompiler::sCCIntentions &sCCI, sCompanyMain &inSCM,
                                          const uint32_t inRTime, const uint32_t inCDate) {
             std::pair<int, int> _homePEmployee = inSCM.sM_sCompEmployee->getNewValidHouse();
-            inSCM.sM_sCompEmployee->setRouteToNewEmployee(_homePEmployee, *sCCI.scc_objCompany);
             uint32_t _salaryEmployee = 400; // TODO :( Dinamic employee _salary
 
             if (_salaryEmployee < inSCM.sM_sCompEmployee->getPriceByHouse(_homePEmployee))
                 return; //Cannot pay the house
 
+            std::shared_ptr<objCivil> _newCivil = inSCM.sM_sCompEmployee->createCivil(_homePEmployee,
+                                                                                      *sCCI.scc_objCompany);
             _assignHouseEmployee(_homePEmployee, inSCM, inCDate);
-            inSCM.sM_sContractor->addContractToCompany(sCCI.scc_objCompany, _homePEmployee,
-                                                       400, inCDate);
+
+            inSCM.sM_sContractor->addContractToCompany(sCCI.scc_objCompany, _newCivil, 400, inCDate);
+
             //Pagar al llogater.
             if (inSCM.sTComp->isCompanyInPosition(_homePEmployee))
                 _addContractRentEmployee(_homePEmployee, inSCM, inCDate);
@@ -361,13 +363,13 @@ private:
         static void
         gExecuteTerminateEmployeeGenOperation(const sCompanyCompiler::sCCIntentions &sCCI, sCompanyMain &inSCM,
                                               const uint32_t inRTime, const uint32_t inCDate) {
-            std::pair<int, int> pHouseEmployee = inSCM.sM_sCompEmployee->removeEmployeeToCompany(*sCCI.scc_objCompany);
+            std::shared_ptr<objCivil> _removedCivil = inSCM.sM_sCompEmployee->removeEmployeeToCompany(sCCI.scc_objCompany->c_uuid);
             uint32_t _uuidContractTerminate = sCCI.scc_objCompany->c_activeContracts[con_Type::con_Type_Hire].front();
             sCCI.scc_objCompany->c_activeContracts[con_Type::con_Type_Hire].pop_front();
             inSCM.sM_sContractor->removeContractFromCompany(_uuidContractTerminate, inSCM.sTComp);
 
-            if (inSCM.sTComp->isCompanyInPosition(pHouseEmployee)) {
-                std::shared_ptr<objCompany> _oCRent = inSCM.sTComp->getCompanyByPosition(pHouseEmployee);
+            if (inSCM.sTComp->isCompanyInPosition(_removedCivil->c_pHome)) {
+                std::shared_ptr<objCompany> _oCRent = inSCM.sTComp->getCompanyByPosition(_removedCivil->c_pHome);
                 inSCM.sM_sContractor->removeContractFromCompany(
                         _oCRent->c_activeContracts[con_Type::con_Type_RentHome].front(), inSCM.sTComp);
                 _oCRent->c_activeContracts[con_Type::con_Type_RentHome].pop_front();

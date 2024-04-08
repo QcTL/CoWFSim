@@ -45,9 +45,9 @@ public:
         }
     };
 
-    explicit objCompany(uint32_t cUuid, const std::list<std::pair<int, int>> &ownStart, uint8_t typeCellStart,
+    explicit objCompany(const std::list<std::pair<int, int>> &ownStart, uint8_t typeCellStart,
                         objComp_activeDates activeDates)
-            : c_uuid(cUuid), c_activeDates(std::move(activeDates)) {
+            :c_activeDates(std::move(activeDates)) {
 
         addAvailableLocation(ownStart, typeCellStart);
         int numStrings = numStringsDist(oC_gen);
