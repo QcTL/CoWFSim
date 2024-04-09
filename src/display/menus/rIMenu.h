@@ -31,6 +31,9 @@ public:
             dExtracted = _dInfoFile.of_data;
             comV = std::vector<defTxtCompany>(_dInfoFile.of_inLengthTex.size(), {{0, 0}});
             comVButtons = _dInfoFile.of_vecButton;
+            comVEyes = _dInfoFile.of_vecEye;
+            comVEyesState = std::vector<bool>(_dInfoFile.of_vecEye.size(), false);
+
             std::vector<uint8_t> sLengths = _dInfoFile.of_inLengthTex;
             int nSeen = 0;
             for (int i = 0; i < _dInfoFile.of_data.size(); ++i) {
@@ -49,6 +52,30 @@ public:
             gWidth = (int) _dInfoFile.of_data[0].size();
             gHeight = (int) _dInfoFile.of_data.size();
         }
+    }
+
+    virtual void setEyeVisualValue(uint32_t idEye, bool rNewV) {
+        sf::Vertex *quad;
+        switch (rPos) {
+            case pBottomLeft:
+                quad = &dInfo[(comVEyes[idEye].ofb_pX + (gHeight - 1 - comVEyes[idEye].ofb_pY) * gWidth) * 4];
+                break;
+            case pBottomRight:
+                quad = &dInfo[(gWidth - 1 - comVEyes[idEye].ofb_pX + (gHeight - 1 - comVEyes[idEye].ofb_pY) * gWidth) *
+                              4];
+                break;
+            case pTopLeft:
+                quad = &dInfo[(comVEyes[idEye].ofb_pX + (comVEyes[idEye].ofb_pY) * gWidth) * 4];
+                break;
+            case pTopRight:
+                quad = &dInfo[(gWidth - 1 - comVEyes[idEye].ofb_pX + (comVEyes[idEye].ofb_pY) * gWidth) * 4];
+                break;
+            default:
+                break;
+        }
+
+        for (int k = 0; k < 4; k++)
+            quad[k].texCoords = lRefTiles[rNewV ? 277 : 279][k];
     }
 
     virtual void draw(sf::RenderWindow &rW) = 0;
@@ -193,13 +220,21 @@ public:
 
     int getButtonPressed(const sf::RenderWindow &rW, const sf::Vector2<int> &mouseP) {
         sf::Vector2<int> mouseRel = getRelPosMenu(rW, mouseP);
-
         for (int i = 0; i < comVButtons.size(); i++)
             if (mouseRel.x >= comVButtons[i].ofb_pX && mouseRel.y >= comVButtons[i].ofb_pY &&
                 mouseRel.x <= (comVButtons[i].ofb_pX + comVButtons[i].ofb_pWidth) &&
                 mouseRel.y <= (comVButtons[i].ofb_pY + comVButtons[i].ofb_pHeight))
                 return i;
+        return -1;
+    }
 
+    int getEyePressed(const sf::RenderWindow &rW, const sf::Vector2<int> &mouseP) {
+        sf::Vector2<int> mouseRel = getRelPosMenu(rW, mouseP);
+        for (int i = 0; i < comVEyes.size(); i++)
+            if (mouseRel.x >= comVEyes[i].ofb_pX && mouseRel.y >= comVEyes[i].ofb_pY &&
+                mouseRel.x <= (comVEyes[i].ofb_pX + comVEyes[i].ofb_pWidth) &&
+                mouseRel.y <= (comVEyes[i].ofb_pY + comVEyes[i].ofb_pHeight))
+                return i;
         return -1;
     }
 
@@ -251,12 +286,15 @@ protected:
         uint32_t ofb_pHeight;
     };
     std::vector<of_button> comVButtons;
+    std::vector<of_button> comVEyes;
+    std::vector<bool> comVEyesState;
 
     struct rIMenu_objFile {
         std::vector<std::vector<int>> of_data;
         uint32_t of_inSelTex;
         std::vector<uint8_t> of_inLengthTex;
         std::vector<of_button> of_vecButton;
+        std::vector<of_button> of_vecEye;
     };
 
     static rIMenu_objFile extractDataFromFile(const std::string &pthFileD) {
@@ -305,7 +343,23 @@ protected:
                             {_gVecComponent[0], _gVecComponent[1], _gVecComponent[2], _gVecComponent[3]});
             }
         }
-        return {_gContentF, _gSelTex, _gVecLengthTex, _gVecPosButtons};
+
+        std::vector<of_button> _gVecPosEyes = {};
+        if (sm.find("inPosEyes") != sm.end()) {
+            std::istringstream ss(sm["inPosEyes"]);
+            std::string segment;
+            while (std::getline(ss, segment, ',')) {
+                std::istringstream ssInside(segment);
+                std::string segmentInside;
+                std::vector<uint32_t> _gVecComponent;
+                while (std::getline(ssInside, segmentInside, '#'))
+                    _gVecComponent.push_back(std::stoul(segmentInside));
+                if (_gVecComponent.size() == 4)
+                    _gVecPosEyes.push_back(
+                            {_gVecComponent[0], _gVecComponent[1], _gVecComponent[2], _gVecComponent[3]});
+            }
+        }
+        return {_gContentF, _gSelTex, _gVecLengthTex, _gVecPosButtons, _gVecPosEyes};
     }
 
     void setPositionValue(std::pair<int, int> cPos, uint32_t cValue) {

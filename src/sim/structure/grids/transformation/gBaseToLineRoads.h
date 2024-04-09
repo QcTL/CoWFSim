@@ -44,38 +44,82 @@ public:
                                                            T endValue,
                                                            std::shared_ptr<gIGrid<bool>> gMask = nullptr) {
         hasMask = gMask != nullptr;
-        std::vector<std::pair<int, int>> retRoute;
+        std::vector<std::pair<int, int>> path;
+        path.push_back(pStart);
+        int x = pStart.first, y = pStart.second; // starting cell
+        int dx = (pStart.first == pEnd.first) ? 0 : (pEnd.first > pStart.first ? 1 : -1); // right or left
+        int dy = (pStart.second == pEnd.second) ? 0 : (pEnd.second > pStart.second ? 1 : -1); // up or down
 
-        retRoute.push_back(pStart);
-        double dSteep =
-                (pEnd.first - pStart.first) != 0 ? (pEnd.second - pStart.second + 0.0) /
-                                                   (pEnd.first - pStart.first)
-                                                 : 0;
-        double dHeight = pStart.second - dSteep * pStart.first;
-        int start = pStart.first;
-        int end = pEnd.first;
-        int step = start > end ? -1 : 1;
+        if (dx == 0 || dy == 0) {
+            // STRAIGHT LINE ...
+        } else if (std::abs(pEnd.first - pStart.first) > std::abs(pEnd.second - pStart.second)) {
+            // MAINLY HORIZONTAL
+            double tan = static_cast<double>(pEnd.second - pStart.second) / (pEnd.first - pStart.first); // tangent
+            double max = (1 - std::abs(tan)) / 2; // distance threshold
 
-        for (int j = start; (step > 0) == (j < end); j += step) {
-            int yPre = std::round(dSteep * j + dHeight);
-            int yPost = std::round(dSteep * (j + 1) + dHeight);
-            int mMax = std::max(yPre, yPost);
-            int mMin = std::min(yPre, yPost);
-            std::vector<std::pair<int, int>> eachLine;
-            for (int k = mMin; k <= mMax; k++) {
-                if (gGrid->isInside(j, k) && (!hasMask || gMask->get(j, k))) {
-                    gGrid->set(j, k, endValue);
-                    eachLine.emplace_back(j, k);
-                }
+            while (x != pEnd.first || y != pEnd.second) { // while target not reached
+                double ideal = pStart.second + (x - pStart.first) * tan; // y of ideal line at x
+                if ((ideal - y) * dy >= max)
+                    y += dy; // move vertically
+                else
+                    x += dx; // move horizontally
+                gGrid->set(x, y, endValue);
+                path.emplace_back(x, y); // add cell to path
             }
-            if (pStart.second < pEnd.second)
-                retRoute.insert(retRoute.end(), eachLine.begin(), eachLine.end());
-            else
-                retRoute.insert(retRoute.end(), eachLine.rbegin(), eachLine.rend());
+        } else {
+            // MAINLY VERTICAL
+            double cotan = static_cast<double>(pEnd.first - pStart.first) / (pEnd.second - pStart.second); // cotangent
+            double max = (1 - std::abs(cotan)) / 2; // distance threshold
 
+            while (x != pEnd.first || y != pEnd.second) { // while target not reached
+                double ideal = pStart.first + (y - pStart.second) * cotan; // x of ideal line at y
+                if ((ideal - x) * dx >= max)
+                    x += dx; // move horizontally
+                else
+                    y += dy; // move vertically
+                gGrid->set(x, y, endValue);
+                path.emplace_back(x, y); // add cell to path
+            }
         }
-        retRoute.push_back(pEnd);
-        return retRoute;
+        return path;
+        //Code by: https://stackoverflow.com/questions/38773900/line-algorithm-that-connects-all-points-no-diagonals
+    }
+
+    template<typename T>
+    static std::vector<std::pair<int, int>> givenTwoPointsV2(std::shared_ptr<gIGrid<T>> gGrid,
+                                                             std::pair<int, int> pStart, std::pair<int, int> pEnd,
+                                                             T endValue,
+                                                             std::shared_ptr<gIGrid<bool>> gMask = nullptr) {
+        hasMask = gMask != nullptr;
+        std::vector<std::pair<int, int>> linePoints;
+        int dx = pEnd.first - pStart.first;
+        int dy = pEnd.second - pStart.second;
+        int sx = (dx > 0) ? 1 : -1;
+        int sy = (dy > 0) ? 1 : -1;
+        dx = abs(dx);
+        dy = abs(dy);
+
+        int err = dx - dy;
+        int x = pStart.first;
+        int y = pStart.second;
+        while (x != pEnd.first || y != pEnd.second) {
+            if (gGrid->isInside(x, y) && (!hasMask || gMask->get(x, y))) {
+                gGrid->set(x, y, endValue);
+                linePoints.emplace_back(x, y);
+            }
+
+            int err2 = 2 * err;
+            if (err2 > -dy) {
+                err -= dy;
+                x += sx;
+            }
+            if (err2 < dx) {
+                err += dx;
+                y += sy;
+            }
+        }
+
+        return linePoints;
     }
 
     template<typename T>

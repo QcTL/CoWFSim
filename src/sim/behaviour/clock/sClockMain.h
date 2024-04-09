@@ -6,6 +6,7 @@
 #define CITYOFWEIRDFISHES_SCLOCKMAIN_H
 
 #include <cstdint>
+#include "../../events/sEventManager.h"
 
 class sClockMain {
 public:
@@ -25,7 +26,9 @@ public:
             if (sCM_clock.sCM_rVMinute == 0) {
                 sCM_clock.sCM_rVHour = (sCM_clock.sCM_rVHour + 1) % 24;
                 if (sCM_clock.sCM_rVHour == 0) {
+                    sCM_sEM->callEventEndDay(getDate());
                     sCM_clock.sCM_rVDay = (sCM_clock.sCM_rVDay + 1) % 31;
+                    sCM_sEM->callEventStartDay(getDate());
                     if (sCM_clock.sCM_rVDay == 0) {
                         sCM_clock.sCM_rVDay++;
                         sCM_clock.sCM_rVMonth = (sCM_clock.sCM_rVMonth + 1) % 13;
@@ -49,8 +52,13 @@ public:
         return sCM_clock.sCM_rVMinute / 5 + sCM_clock.sCM_rVHour * 12;
     };
 
+    [[nodiscard]] uint32_t getComplete() const {
+        return sCM_clock.sCM_rVMinute + sCM_pTickMinute + sCM_clock.sCM_rVHour * 60;
+    }
+
     [[nodiscard]] uint32_t getDate() const {
-        return packDateInfo(sCM_clock.sCM_rVDay % 7, sCM_clock.sCM_rVDay / 7, sCM_clock.sCM_rVMonth, sCM_clock.sCM_rVYear);
+        return packDateInfo(sCM_clock.sCM_rVDay % 7, sCM_clock.sCM_rVDay / 7, sCM_clock.sCM_rVMonth,
+                            sCM_clock.sCM_rVYear);
     };
 
     sCM_ClockValues getClock() { return sCM_clock; }
@@ -71,6 +79,7 @@ private:
     sCM_ClockValues sCM_clock{};
     uint8_t sCM_pTickMinute = 0;
     bool sCM_isReduced = true;
+    std::shared_ptr<sEventManager> sCM_sEM = sEventManager::getInstance();
 };
 
 #endif //CITYOFWEIRDFISHES_SCLOCKMAIN_H

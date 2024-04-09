@@ -81,9 +81,9 @@ public:
 
         //HOUSES:
         gBaseToStartBuildings::gen(sgTerrain->gTG_TypeSoil, sgTerrain->gTG_TypeGen,
-                                              {TypeSoil_T1Urban, TypeSoil_T2Urban, TypeSoil_T3Urban,
-                                               TypeSoil_T1Factory, TypeSoil_T2Factory},
-                                              {5, 6}, inSeed);
+                                   {TypeSoil_T1Urban, TypeSoil_T2Urban, TypeSoil_T3Urban,
+                                    TypeSoil_T1Factory, TypeSoil_T2Factory},
+                                   {5, 6}, inSeed);
 
         //METRO:
 
@@ -91,8 +91,8 @@ public:
         for (int i = 0; i < cClusters.size(); i++) {
             rMetro.push_back(
                     gBaseToLineRoads::givenTwoPoints<uint8_t>(gUnderground,
-                                                              cClusters[i], cClusters[(i + 1) % cClusters.size()],
-                                                              1));
+                                                                cClusters[i], cClusters[(i + 1) % cClusters.size()],
+                                                                1));
             gUnderground->set(cClusters[i], 2);
         }
 

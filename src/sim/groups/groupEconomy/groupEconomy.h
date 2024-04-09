@@ -47,12 +47,12 @@ public:
         gE_sEvaluator->computeCreatedElement(inUuidElement, inObjCompany);
     }
 
-    void computeBoughtElement(uint64_t inUuidElement, const std::shared_ptr<objCompany> &inObjCompany) {
-        gE_sEvaluator->computeCreatedElement(inUuidElement, inObjCompany);
+    void computeBoughtElement(uint64_t inUuidElement, const std::shared_ptr<objCompany> &inObjCompany, uint32_t inRTime, uint32_t inCDate) {
+        gE_sEvaluator->computeBoughtElement(inUuidElement, inObjCompany, inRTime, inCDate);
     }
 
-    void computeSellInmElement(uint64_t inUuidElement, const std::shared_ptr<objCompany> &inObjCompany) {
-        gE_sEvaluator->computeSellInmElement(inUuidElement, inObjCompany);
+    void computeSellInmElement(uint64_t inUuidElement, const std::shared_ptr<objCompany> &inObjCompany, uint32_t inRTime, uint32_t inCDate) {
+        gE_sEvaluator->computeSellInmElement(inUuidElement, inObjCompany, inRTime, inCDate);
     }
 
     bool doesObjectExists(const uint32_t uuidItem){

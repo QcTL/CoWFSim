@@ -12,11 +12,11 @@
 
 class rCompViewMoreLayer : public rIMenu {
 public:
-    explicit rCompViewMoreLayer(const std::shared_ptr<rIMenu> &mParent, const objCompany &rShow,
+    explicit rCompViewMoreLayer(const std::shared_ptr<rIMenu> &mParent, objCompany &rShow,
                                 const std::string &pthFileD)
-            : rIMenu(mParent, rIMenu::rRelativePos::pBottomLeft, pthFileD) {
+            : rIMenu(mParent, rIMenu::rRelativePos::pBottomLeft, pthFileD), rCVML_rShow(rShow) {
 
-        setText(2, getFloatToString2Decimal(rShow.c_objFortnight));
+        setText(2, getFloatToString2Decimal(rShow.c_objWeek));
         setText(4, getFloatToString2Decimal(rShow.c_objMonth));
         setText(6, getFloatToString2Decimal(rShow.c_objYear));
 
@@ -50,6 +50,33 @@ public:
                 if (event.key.code == sf::Keyboard::Escape)
                     parentMenu->setResponse(-1, 1);
                 break;
+            case sf::Event::MouseButtonPressed:
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    sf::Vector2<int> pMouse = sf::Mouse::getPosition(rWindow);
+                    int _gEyePressed = getEyePressed(rWindow, pMouse);
+                    if (_gEyePressed != -1) {
+                        if (_gEyePressed == 0) {
+                            if (!comVEyesState[0])
+                                rCVML_rShow.c_objWeek.setObserver(eyeCatcherActive::getInstance());
+                            else
+                                rCVML_rShow.c_objWeek.removeObserver();
+                        } else if (_gEyePressed == 1) {
+                            if (!comVEyesState[1])
+                                rCVML_rShow.c_objMonth.setObserver(eyeCatcherActive::getInstance());
+                            else
+                                rCVML_rShow.c_objMonth.removeObserver();
+                        } else if (_gEyePressed == 2) {
+                            if (!comVEyesState[2])
+                                rCVML_rShow.c_objYear.setObserver(eyeCatcherActive::getInstance());
+                            else
+                                rCVML_rShow.c_objYear.removeObserver();
+                        }
+                        setEyeVisualValue(_gEyePressed, !comVEyesState[_gEyePressed]);
+                        comVEyesState[_gEyePressed] = !comVEyesState[_gEyePressed];
+                        return true;
+                    }
+                }
+                break;
             default:
                 break;
         }
@@ -59,6 +86,7 @@ public:
     void pressedCell(std::pair<int, int> cPressed) override {}
 
 private:
+    objCompany &rCVML_rShow;
 };
 
 #endif //CITYOFWEIRDFISHES_RCOMPVIEWMORELAYER_H

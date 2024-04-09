@@ -12,7 +12,7 @@
 
 class rCompViewLayer : public rIMenu {
 public:
-    explicit rCompViewLayer(const std::shared_ptr<rIMenu> &mParent, const objCompany &rShow,
+    explicit rCompViewLayer(const std::shared_ptr<rIMenu> &mParent, objCompany &rShow,
                             const std::string &pthFileD, const std::shared_ptr<rPileMenus> &mPiles)
             : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft, pthFileD), mPiles(mPiles), rCompRef(rShow) {
 
@@ -21,7 +21,7 @@ public:
         setText(2, oCommonMenus::getCompNumber(rShow.c_cRentedLocations.size()));
         setText(3, getFloatToString2Decimal(rShow.c_cActiveFunds));
         setText(4, getFloatToString2Decimal(
-                std::max(-100.0, ((rShow.c_objYear + rShow.c_objMonth * 12 + rShow.c_objFortnight * 36) /
+                std::max(-100.0, ((rShow.c_objYear + rShow.c_objMonth * 12 + rShow.c_objWeek * 36) /
                                   rShow.c_cActiveFunds) * 100))); //TODO Change it;
 
         for (int i = 5; i < 11; i++)
@@ -61,6 +61,23 @@ public:
                     mPiles->addMenuTop(rComp);
                 }
                 break;
+            case sf::Event::MouseButtonPressed:
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    sf::Vector2<int> pMouse = sf::Mouse::getPosition(rWindow);
+                    int _gEyePressed = getEyePressed(rWindow, pMouse);
+                    if (_gEyePressed != -1) {
+                        if (_gEyePressed == 0) {
+                            if (!comVEyesState[0])
+                                rCompRef.c_cActiveFunds.setObserver(eyeCatcherActive::getInstance());
+                            else
+                                rCompRef.c_cActiveFunds.removeObserver();
+                            setEyeVisualValue(0, !comVEyesState[0]);
+                            comVEyesState[0] = !comVEyesState[0];
+                        }
+                        return true;
+                    }
+                }
+                break;
             default:
                 break;
         }
@@ -72,7 +89,7 @@ public:
 private:
 
     std::shared_ptr<rPileMenus> mPiles;
-    objCompany rCompRef;
+    objCompany &rCompRef;
 };
 
 #endif //CITYOFWEIRDFISHES_RCOMPVIEWLAYER_H

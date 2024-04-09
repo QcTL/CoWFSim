@@ -23,21 +23,21 @@ public:
                 : c_RStart(cRStart), c_REnd(cREnd) {}
     };
 
-    objCivil(typeRouteSystem cTrs, const std::pair<int,int> pHome, objRoadTravel cTravel, uint32_t cTBegin, uint32_t cTEnd, uint8_t cActiveDays)
-            : c_TRS(cTrs),
-              c_Travel(std::move(cTravel)),
-              c_TBegin(cTBegin),
-              c_TEnd(cTEnd),
+    objCivil(typeRouteSystem cTrs, const std::pair<int, int> pHome, objRoadTravel cTravel,
+             uint32_t cTBegin, uint32_t cTEnd, uint8_t cActiveDays)
+            : c_TRS(cTrs), c_Travel(std::move(cTravel)), c_pHome(pHome),
+              c_TBegin(cTBegin), c_TEnd(cTEnd),
               c_RActiveDays(cActiveDays) {}
 
     [[nodiscard]] bool isActiveDay(uint32_t cDate) const {
         return c_RActiveDays & (1 << cDate & 0x7);
     }
 
+    uint64_t c_uuid = 0;
     uint8_t c_RActiveDays;
     typeRouteSystem c_TRS;
     objRoadTravel c_Travel;
-    std::pair<int,int> c_pHome;
+    std::pair<int, int> c_pHome;
     uint32_t c_TBegin;
     uint32_t c_TEnd;
 };

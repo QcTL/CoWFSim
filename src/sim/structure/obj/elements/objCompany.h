@@ -16,15 +16,8 @@
 #include <random>
 #include <stdexcept>
 #include <unordered_set>
-#include "contracts/cObjContracts.h"
 #include "../../../behaviour/company/code/sCodeStoratge.h"
-
-std::vector<std::string> vSyllablesP = {"am", "ca", "mi", "o", "ul", "er", "es", "pin", "tu", "ra", "ta", "la", "dro",
-                                        "me", "dia", "mart", "sen", "ti", "tran", "qui", "li", "tat", "pen",
-                                        "sa", "ment", "u", "su", "al", "ar", "ma", "ri", "ja", "po", "nes"};
-std::random_device oC_rd;
-std::mt19937 oC_gen(oC_rd());
-std::uniform_int_distribution<> numStringsDist(2, 3);
+#include "../../../eyeCatcher/eyeValue.h"
 
 class objCompany {
 public:
@@ -44,9 +37,9 @@ public:
         }
     };
 
-    explicit objCompany(uint32_t cUuid, const std::list<std::pair<int, int>> &ownStart, uint8_t typeCellStart,
+    explicit objCompany(const std::list<std::pair<int, int>> &ownStart, uint8_t typeCellStart,
                         objComp_activeDates activeDates)
-            : c_uuid(cUuid), c_activeDates(std::move(activeDates)) {
+            :c_activeDates(std::move(activeDates)) {
 
         addAvailableLocation(ownStart, typeCellStart);
         int numStrings = numStringsDist(oC_gen);
@@ -58,6 +51,11 @@ public:
             nName += str;
         nName[0] = static_cast<char>(toupper(nName[0]));
 
+        c_nEmployee = eyeValue<uint32_t>("oC_" + nName + "-nEmployees", 0);
+        c_cActiveFunds = eyeValue<double>("oC_" + nName + "-activeFunds", 0);
+        c_objWeek = eyeValue<float>("oC_" + nName + "-gainWeek", 0);
+        c_objYear = eyeValue<float>("oC_" + nName + "-gainYear", 0);
+        c_objMonth = eyeValue<float>("oC_" + nName + "-gainMonth", 0);
     }
 
 
@@ -101,15 +99,21 @@ public:
     std::list<std::pair<int, int>> c_cRentedLocations;
     objComp_activeDates c_activeDates;
 
-    uint32_t c_nEmployee = 0;
-    double c_cActiveFunds = 0;
-    float c_objFortnight = 0;
-    float c_objYear = 0;
-    float c_objMonth = 0;
+    eyeValue<uint32_t> c_nEmployee;
+    eyeValue<double> c_cActiveFunds;
+    eyeValue<float> c_objWeek;
+    eyeValue<float> c_objYear;
+    eyeValue<float> c_objMonth;
 
     std::shared_ptr<sCodeStorage::sCodeObj> c_cCode;
 
     std::map<uint8_t, std::list<uint64_t>> c_activeContracts;
+    bool c_attrCanEmployee = true;
+private:
+    static std::vector<std::string> vSyllablesP;
+    static std::random_device oC_rd;
+    static std::mt19937 oC_gen;
+    static std::uniform_int_distribution<> numStringsDist;
 };
 
 #endif //CITYOFWEIRDFISHES_OBJCOMPANY_H
