@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include "../structure/obj/elements/objCivil.h"
+#include "../structure/obj/sCommon.h"
 
 class sEventReceiver {
 public:
@@ -49,7 +50,7 @@ public:
     er_EventCompanySoldItemExport(uint32_t inRTime, uint32_t inTDate, uint64_t inUuidCompany, uint32_t inUuidItem, uint32_t inItemPrice) {}
 
     virtual void er_EventStartRoute(uint32_t inRTime, uint32_t inTDate, uint64_t inUuidCitizen,
-                                    const objCivil::objRoadTravel inRoadTravel) {}
+                                    const objActiveRute&  inRoadTravel) {}
 
     virtual void er_EventEndDay(uint32_t inTDate) {}
 

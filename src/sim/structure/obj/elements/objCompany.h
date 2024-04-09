@@ -16,16 +16,8 @@
 #include <random>
 #include <stdexcept>
 #include <unordered_set>
-#include "contracts/cObjContracts.h"
 #include "../../../behaviour/company/code/sCodeStoratge.h"
 #include "../../../eyeCatcher/eyeValue.h"
-
-std::vector<std::string> vSyllablesP = {"am", "ca", "mi", "o", "ul", "er", "es", "pin", "tu", "ra", "ta", "la", "dro",
-                                        "me", "dia", "mart", "sen", "ti", "tran", "qui", "li", "tat", "pen",
-                                        "sa", "ment", "u", "su", "al", "ar", "ma", "ri", "ja", "po", "nes"};
-std::random_device oC_rd;
-std::mt19937 oC_gen(oC_rd());
-std::uniform_int_distribution<> numStringsDist(2, 3);
 
 class objCompany {
 public:
@@ -117,6 +109,11 @@ public:
 
     std::map<uint8_t, std::list<uint64_t>> c_activeContracts;
     bool c_attrCanEmployee = true;
+private:
+    static std::vector<std::string> vSyllablesP;
+    static std::random_device oC_rd;
+    static std::mt19937 oC_gen;
+    static std::uniform_int_distribution<> numStringsDist;
 };
 
 #endif //CITYOFWEIRDFISHES_OBJCOMPANY_H

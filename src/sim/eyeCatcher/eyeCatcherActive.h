@@ -39,7 +39,4 @@ private:
     static std::shared_ptr<eyeCatcherActive> instance;
 };
 
-std::shared_ptr<eyeCatcherActive> eyeCatcherActive::instance = nullptr;
-
-
 #endif //CITYOFWEIRDFISHES_EYECATCHERACTIVE_H

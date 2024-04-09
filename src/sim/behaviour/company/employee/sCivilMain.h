@@ -50,7 +50,7 @@ public:
     }
 
 
-    std::shared_ptr<objCivil> createCivil(std::pair<int, int> rPosCivHome, const objCompany &inObjCompany) {
+    std::shared_ptr<objCivil> createCivil(std::pair<int, int> rPosCivHome, const objCompany &inObjCompany, uint32_t inTDate) {
         std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator> r;
         std::shared_ptr<objCivil> _oCivil;
 
@@ -64,6 +64,10 @@ public:
 
         r = sCM_sRoadsMain->addRuteCivil(_oCivil);
         _oCivil->c_uuid = sCM_civilStorage->storeCivil(_oCivil, inObjCompany.c_uuid, r);
+
+        sCM_groupEconomy->gE_sRLR->addElement(inTDate);
+        sCM_groupLand->gL_gTerrain->addCivilHomeToPos(rPosCivHome);
+
         return _oCivil;
     }
 
@@ -78,8 +82,7 @@ private:
                                              const sgUndergroundMain::sgUM_lowestViableRoute &rRouteTrain) {
         return std::make_shared<objCivil>(
                 objCivil(objCivil::typeRouteSystem::OC_TRS_TRAIN, rPosCivHome,
-                         {inObjCompany.c_cActiveLocations.front(), rPosCivHome,
-                          false}, // TODO POSAR LES ESTACIONS DE TREN
+                         {inObjCompany.c_cActiveLocations.front(), rPosCivHome}, // TODO POSAR LES ESTACIONS DE TREN
                          sCM_sUndergroundMain->getClosestTimeForStation(rRouteTrain.closestSt1,
                                                                         inObjCompany.c_activeDates.c_StrEndTime.first),
                          sCM_sUndergroundMain->getClosestTimeForStation(rRouteTrain.closestSt2,
@@ -93,7 +96,7 @@ private:
         return std::make_shared<objCivil>(
                 objCivil(objCivil::typeRouteSystem::OC_TRS_CAR, rPosCivHome,
                          {sCM_sRoadsMain->getClosestRoadToBuilding(inObjCompany.c_cActiveLocations.front()),
-                          sCM_sRoadsMain->getClosestRoadToBuilding(rPosCivHome), false},
+                          sCM_sRoadsMain->getClosestRoadToBuilding(rPosCivHome)},
                          inObjCompany.c_activeDates.c_StrEndTime.first + distrib(sCM_genRand),
                          inObjCompany.c_activeDates.c_StrEndTime.second + distrib(sCM_genRand),
                          inObjCompany.c_activeDates.cAD_jobWeek));
@@ -105,7 +108,6 @@ private:
     std::shared_ptr<groupEconomy> sCM_groupEconomy;
     std::shared_ptr<sgUndergroundMain> sCM_sUndergroundMain;
     std::shared_ptr<sCivilStorage> sCM_civilStorage;
-    //Given company id Returns a list of iterators in the sRoutesStorage;
 };
 
 #endif //CITYOFWEIRDFISHES_SCIVILMAIN_H

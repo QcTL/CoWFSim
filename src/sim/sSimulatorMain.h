@@ -21,7 +21,15 @@
 #include "groups/groupEconomy/groupEconomy.h"
 
 std::shared_ptr<sEventManager> sEventManager::sEM_instance = nullptr;
+std::shared_ptr<eyeCatcherActive> eyeCatcherActive::instance = nullptr;
+std::vector<std::string> objCompany::vSyllablesP = {"am", "ca", "mi", "o", "ul", "er", "es", "pin", "tu", "ra", "ta", "la", "dro",
+                                                    "me", "dia", "mart", "sen", "ti", "tran", "qui", "li", "tat", "pen",
+                                                    "sa", "ment", "u", "su", "al", "ar", "ma", "ri", "ja", "po", "nes"};
+std::random_device objCompany::oC_rd;
+std::mt19937 objCompany::oC_gen(objCompany::oC_rd());
+std::uniform_int_distribution<> objCompany::numStringsDist(2, 3);
     //TODO :(
+
 class sSimulatorMain {
 
 public:

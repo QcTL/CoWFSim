@@ -154,7 +154,7 @@ private:
             if (nResidents <= 0)
                 return;
             for (int i = 0; i < nResidents; i++) {
-                _addContractRentEmployee(inPHouse, inSCM, inTDate);
+                _addContractRentHomeEmployee(inPHouse, inSCM, inTDate);
             }
         }
 
@@ -331,29 +331,23 @@ private:
             std::pair<int, int> _homePEmployee = inSCM.sM_sCompEmployee->getNewValidHouse();
             uint32_t _salaryEmployee = 400; // TODO :( Dinamic employee _salary
 
-            if (_salaryEmployee < inSCM.sM_sCompEmployee->getPriceByHouse(_homePEmployee))
+            if (_salaryEmployee < getTotalPriceOfHome(_homePEmployee, inSCM))
                 return; //Cannot pay the house
 
             std::shared_ptr<objCivil> _newCivil = inSCM.sM_sCompEmployee->createCivil(_homePEmployee,
-                                                                                      *sCCI.scc_objCompany);
-            _assignHouseEmployee(_homePEmployee, inSCM, inCDate);
+                                                                                      *sCCI.scc_objCompany, inCDate);
 
             inSCM.sM_sContractor->addContractToCompany(sCCI.scc_objCompany, _newCivil, 400, inCDate);
 
             //Pagar al llogater.
             if (inSCM.sTComp->isCompanyInPosition(_homePEmployee))
-                _addContractRentEmployee(_homePEmployee, inSCM, inCDate);
+                _addContractRentHomeEmployee(_homePEmployee, inSCM, inCDate);
 
-            sEventManager::getInstance()->callEventNewCitizen(inRTime, inCDate, 0); //TODO STORAGE CITIZEN
-        }
-
-        static void _assignHouseEmployee(const std::pair<int, int> &inPHouse, sCompanyMain &inSCM, uint32_t inTDate) {
-            inSCM.sM_groupEconomy->gE_sRLR->addElement(inTDate);
-            inSCM.sM_groupLand->gL_gTerrain->addCivilHomeToPos(inPHouse);
+            sEventManager::getInstance()->callEventNewCitizen(inRTime, inCDate, _newCivil->c_uuid);
         }
 
         static void
-        _addContractRentEmployee(const std::pair<int, int> &inPHouse, sCompanyMain &inSCM, uint32_t inTDate) {
+        _addContractRentHomeEmployee(const std::pair<int, int> &inPHouse, sCompanyMain &inSCM, uint32_t inTDate) {
             uint32_t endRentPrice = getTotalPriceOfHome(inPHouse, inSCM);
             std::shared_ptr<objCompany> _oCRent = inSCM.sTComp->getCompanyByPosition(inPHouse);
             inSCM.sM_sContractor->addContractToCompanyRentHouse(_oCRent, inPHouse,

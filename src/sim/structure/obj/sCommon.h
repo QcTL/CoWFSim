@@ -6,16 +6,6 @@
 #define CITYOFWEIRDFISHES_SCOMMON_H
 
 
-#include <cstdint>
-#include <utility>
-#include <list>
-#include <vector>
-#include <map>
-#include <string>
-#include <algorithm>
-#include <random>
-#include "elements/contracts/cObjContracts.h"
-
 struct objProdRecipe {
     std::uint32_t pr_idObjEnd;
     std::vector<std::uint16_t> pr_reqBuilding;
@@ -29,5 +19,11 @@ struct retObjSLayerCells {
 
 };
 
+struct objActiveRute {
+    std::pair<int, int> c_RStart;
+    std::pair<int, int> c_REnd;
+    bool c_IsReversed;
+    uint64_t c_uuid;
+};
 
 #endif //CITYOFWEIRDFISHES_SCOMMON_H

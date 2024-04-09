@@ -57,7 +57,7 @@ public:
     }
 
     void er_EventStartRoute(uint32_t inRTime, uint32_t inTDate, uint64_t inUuidCitizen,
-                            const objCivil::objRoadTravel inRoadTravel) override {
+                            const objActiveRute& inRoadTravel) override {
         if (!inRoadTravel.c_IsReversed)
             sSituationCivilT->addChangeSituation(inRTime, 0, 1);
         else

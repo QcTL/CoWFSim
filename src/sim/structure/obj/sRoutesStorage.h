@@ -20,7 +20,8 @@ public:
         mExitTimesCivil = std::vector<std::list<objCivil>>(289);
     };
 
-    std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator> addRuteCivil(const std::shared_ptr<objCivil> &objCivil) {
+    std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator>
+    addRuteCivil(const std::shared_ptr<objCivil> &objCivil) {
         mExitTimesCivil[objCivil->c_TBegin].push_back(*objCivil);
         mExitTimesCivil[objCivil->c_TEnd].push_back(*objCivil);
 
@@ -28,35 +29,24 @@ public:
     }
 
     void removeRuteCivil(const std::shared_ptr<objCivil> &inObjCivil,
-                         const std::list<objCivil>::iterator& gPBegin,
-                         const std::list<objCivil>::iterator& gPEnd) {
+                         const std::list<objCivil>::iterator &gPBegin,
+                         const std::list<objCivil>::iterator &gPEnd) {
         mExitTimesCivil[inObjCivil->c_TBegin].erase(gPBegin);
         mExitTimesCivil[inObjCivil->c_TEnd].erase(gPEnd);
     }
 
 
-    std::vector<objCivil::objRoadTravel> getRoutesCarByTime(uint32_t cTime, uint32_t cDate) {
-        std::vector<objCivil::objRoadTravel> rRet;
+    std::vector<objActiveRute> getRoutesCarByType(const objCivil::typeRouteSystem inRouteType, uint32_t cTime, uint32_t cDate) {
+        std::vector<objActiveRute> rRet;
         if (mExitTimesCivil[cTime].empty())
             return {};
-        for (const auto &civ: mExitTimesCivil.at(cTime)) {
-            if (civ.c_TRS == objCivil::typeRouteSystem::OC_TRS_CAR  && civ.isActiveDay(cDate))
-                rRet.push_back(civ.c_TBegin == cTime ? civ.c_Travel : objCivil::objRoadTravel(civ.c_Travel.c_REnd,
-                                                                                              civ.c_Travel.c_RStart, true));
-        }
-        return rRet;
-    };
-
-    std::vector<objCivil::objRoadTravel> getRoutesCarByTrain(uint32_t cTime, uint32_t cDate) {
-        std::vector<objCivil::objRoadTravel> rRet;
-        if (mExitTimesCivil[cTime].empty())
-            return {};
-        for (const auto &civ: mExitTimesCivil.at(cTime)) {
-            if (civ.c_TRS == objCivil::typeRouteSystem::OC_TRS_TRAIN && civ.isActiveDay(cDate))
-                rRet.push_back(civ.c_TBegin == cTime ? civ.c_Travel : objCivil::objRoadTravel(civ.c_Travel.c_REnd,
-                                                                                              civ.c_Travel.c_RStart, true));
-            //cRSTART i CREND es la dels trens, la que a ells els hi va be
-        }
+        for (const auto &civ: mExitTimesCivil.at(cTime))
+            if (civ.c_TRS == inRouteType && civ.isActiveDay(cDate)) {
+                if (civ.c_TBegin == cTime)
+                    rRet.push_back(objActiveRute{civ.c_Travel.c_RStart, civ.c_Travel.c_REnd, false, civ.c_uuid});
+                else
+                    rRet.push_back(objActiveRute{civ.c_Travel.c_REnd, civ.c_Travel.c_RStart, true, civ.c_uuid});
+            }
         return rRet;
     };
 

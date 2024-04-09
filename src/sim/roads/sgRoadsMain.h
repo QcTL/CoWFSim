@@ -72,12 +72,17 @@ public:
 private:
 
     void routeCarsCommute(const uint32_t inRTime, const uint32_t inTDate) {
-        auto newRoutes = sgRM_sTRoutes->getRoutesCarByTime(inRTime, inTDate);
-        for (auto r: newRoutes) {
-            sEventManager::getInstance()->callEventStartRoute(inRTime,inTDate,0,r); //TODO STORAGE CITIZEN
+        auto newCarRoutes = sgRM_sTRoutes->getRoutesCarByType(objCivil::typeRouteSystem::OC_TRS_CAR,inRTime, inTDate);
+        for (auto &r: newCarRoutes) {
+            sEventManager::getInstance()->callEventStartRoute(inRTime,inTDate,r.c_uuid,r);
             uint32_t locId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->locIdNode;
             uint16_t blocId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->rBlock;
             gLayerRoads[r.c_RStart.first][r.c_RStart.second]->refCompressed->addNewCar(locId, blocId);
+        }
+
+        auto newMetroRoutes = sgRM_sTRoutes->getRoutesCarByType(objCivil::typeRouteSystem::OC_TRS_TRAIN, inRTime, inTDate);
+        for(auto &r: newMetroRoutes){
+            sEventManager::getInstance()->callEventStartRoute(inRTime,inTDate,r.c_uuid,r);
         }
     }
 

@@ -134,7 +134,7 @@ public:
     }
 
     void callEventStartRoute(uint32_t inRTime, uint32_t inTDate, uint64_t inUuidCitizen,
-                             const objCivil::objRoadTravel inRoadTravel) {
+                             const objActiveRute &inRoadTravel) {
         for (const auto eR: sEM_mapEventReceivers[sEM_EventStartRoute])
             eR->er_EventStartRoute(inRTime, inTDate, inUuidCitizen, inRoadTravel);
     }

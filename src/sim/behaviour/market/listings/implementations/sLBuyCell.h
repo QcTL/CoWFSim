@@ -9,6 +9,7 @@
 #include "../sIListing.h"
 #include "../../../../structure/grids/gIGrid.h"
 #include "../../../../structure/grids/gBasicGrid.h"
+#include "../../../../structure/obj/elements/contracts/cObjContracts.h"
 
 class sLBuyCell : public sIListing {
 public:
