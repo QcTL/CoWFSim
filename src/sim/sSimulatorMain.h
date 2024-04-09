@@ -77,7 +77,7 @@ public:
         }
         eyeTotalTick::pTick();
         sMClock->tick();
-        gTotalUnderground->tick();
+        gTotalUnderground->tick(sMClock->getComplete());
         gMainRoads->tick();
     }
 

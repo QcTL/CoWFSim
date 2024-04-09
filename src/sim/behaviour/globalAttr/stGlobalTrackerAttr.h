@@ -63,7 +63,6 @@ public:
         else
             sSituationCivilT->addChangeSituation(inRTime, 1, 0);
 
-        std::cout<< sSituationCivilT->getByTime(inRTime).first << " - " << sSituationCivilT->getByTime(inRTime).second << std::endl;
         stGA_totalEnergy.set(
                 sSituationCivilT->getByTime(inRTime).first * 4 + sSituationCivilT->getByTime(inRTime).second * 3);
     }

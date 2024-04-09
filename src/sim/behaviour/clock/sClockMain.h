@@ -52,8 +52,13 @@ public:
         return sCM_clock.sCM_rVMinute / 5 + sCM_clock.sCM_rVHour * 12;
     };
 
+    [[nodiscard]] uint32_t getComplete() const {
+        return sCM_clock.sCM_rVMinute + sCM_pTickMinute + sCM_clock.sCM_rVHour * 60;
+    }
+
     [[nodiscard]] uint32_t getDate() const {
-        return packDateInfo(sCM_clock.sCM_rVDay % 7, sCM_clock.sCM_rVDay / 7, sCM_clock.sCM_rVMonth, sCM_clock.sCM_rVYear);
+        return packDateInfo(sCM_clock.sCM_rVDay % 7, sCM_clock.sCM_rVDay / 7, sCM_clock.sCM_rVMonth,
+                            sCM_clock.sCM_rVYear);
     };
 
     sCM_ClockValues getClock() { return sCM_clock; }

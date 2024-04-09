@@ -20,7 +20,6 @@ public:
         gLayerUnderground = std::make_shared<gBasicGrid<uint8_t >>
                 (gBasicGrid<uint8_t>(inGridSize, inGridSize, 0));
         sgUM_tActualStation = 0;
-        sgUM_tTick = 0;
     }
 
     struct sgUM_gPosStation {
@@ -36,7 +35,8 @@ public:
         for (const auto &i: totalStations)
             sgUM_totalStations.push_back({i[0], {}});
         for (int i = 0; i < totalStations.size(); i++)
-            sgUM_totalStations[i].gVecNext.push_back({&sgUM_totalStations[(i + 1) % sgUM_totalStations.size()], totalStations[i]});
+            sgUM_totalStations[i].gVecNext.push_back(
+                    {&sgUM_totalStations[(i + 1) % sgUM_totalStations.size()], totalStations[i]});
 
         uint32_t _sStartTimeLoop = 0;
         uint32_t _prepTime = 0;
@@ -44,11 +44,14 @@ public:
             sgUM_timeArriving[j] = {};
         }
 
-        while (_sStartTimeLoop < 288*5) { //Nombre de voltes
+        while (_sStartTimeLoop < 288 * 5) { //Nombre de voltes
             for (int j = 0; j < sgUM_totalStations.size(); j++) {
                 sgUM_timeArriving[j].push_back(_sStartTimeLoop + _prepTime);
                 sgUM_vecTimeStation.emplace_back(_sStartTimeLoop + _prepTime, j);
                 _prepTime += sgUM_totalStations[j].gVecNext[0].gNexRoute.size();
+
+                if(_sStartTimeLoop + _prepTime > 288 * 5)
+                    break;
             }
             _sStartTimeLoop += _prepTime;
             _prepTime = 0;
@@ -61,6 +64,9 @@ public:
 
     std::pair<int, int> getActualPosition(const uint32_t inCTime) {
         if (inCTime != sgUM_vecTimeStation[sgUM_tActualStation].first) {
+            if (inCTime >= sgUM_vecTimeStation[sgUM_vecTimeStation.size() - 1].first)
+                return sgUM_totalStations[sgUM_vecTimeStation[sgUM_tActualStation].second].sPos;
+
             //No esta en la estacio:
             if (inCTime >= sgUM_vecTimeStation[(sgUM_tActualStation + 1) % sgUM_vecTimeStation.size()].first) {
                 //ES EL SEGUENT
@@ -76,15 +82,14 @@ public:
     }
 
 
-    void tick() {
+    void tick(uint32_t inTick) {
         gLayerUnderground->set(sgUM_actPos, gLayerUnderground->get(sgUM_actPos) - 32);
-
-        if (sgUM_tTick == 0)
+        std::cout << inTick << std::endl;
+        if (inTick == 0)
             sgUM_tActualStation = 0;
 
-        sgUM_actPos = getActualPosition(sgUM_tTick);
+        sgUM_actPos = getActualPosition(inTick);
         gLayerUnderground->set(sgUM_actPos, gLayerUnderground->get(sgUM_actPos) + 32);
-        sgUM_tTick = sgUM_tTick + 1 % 1440;
     }
 
     uint32_t getClosestTimeForStation(const uint16_t inNStation, const uint32_t inCTime) {
@@ -100,19 +105,24 @@ public:
         uint32_t totalDistance;
     };
 
-    std::pair<int,int> getPosStationById(uint16_t uuidStation){
+    std::pair<int, int> getPosStationById(uint16_t uuidStation) {
         return sgUM_totalStations[uuidStation].sPos;
     }
 
-    sgUM_lowestViableRoute getLowestDistanceCommute(const std::pair<int, int> inPoint1, const std::pair<int, int> inPoint2) {
+    sgUM_lowestViableRoute
+    getLowestDistanceCommute(const std::pair<int, int> inPoint1, const std::pair<int, int> inPoint2) {
         uint16_t _closestSt1 = 0, _closestSt2 = 0;
         uint32_t _dMinDistance1 = 0, _dMinDistance2 = 0;
 
         for (int i = 0; i < sgUM_totalStations.size(); i++) {
-            uint32_t _dDist1 = (inPoint1.first - sgUM_totalStations[i].sPos.first) * (inPoint1.first - sgUM_totalStations[i].sPos.first) +
-                               (inPoint1.second - sgUM_totalStations[i].sPos.second) * (inPoint1.second - sgUM_totalStations[i].sPos.second);
-            uint32_t _dDist2 = (inPoint2.first - sgUM_totalStations[i].sPos.first) * (inPoint2.first - sgUM_totalStations[i].sPos.first) +
-                               (inPoint2.second - sgUM_totalStations[i].sPos.second) * (inPoint2.second - sgUM_totalStations[i].sPos.second);
+            uint32_t _dDist1 = (inPoint1.first - sgUM_totalStations[i].sPos.first) *
+                               (inPoint1.first - sgUM_totalStations[i].sPos.first) +
+                               (inPoint1.second - sgUM_totalStations[i].sPos.second) *
+                               (inPoint1.second - sgUM_totalStations[i].sPos.second);
+            uint32_t _dDist2 = (inPoint2.first - sgUM_totalStations[i].sPos.first) *
+                               (inPoint2.first - sgUM_totalStations[i].sPos.first) +
+                               (inPoint2.second - sgUM_totalStations[i].sPos.second) *
+                               (inPoint2.second - sgUM_totalStations[i].sPos.second);
             if (_dMinDistance1 == 0 || _dDist1 < _dMinDistance1) {
                 _closestSt1 = i;
                 _dMinDistance1 = _dDist1;
@@ -135,7 +145,6 @@ private:
 
     std::vector<std::pair<uint32_t, uint16_t>> sgUM_vecTimeStation;
     uint32_t sgUM_tActualStation;
-    uint32_t sgUM_tTick;
     std::pair<int, int> sgUM_actPos;
 };
 
