@@ -20,6 +20,7 @@ public:
         mExitTimesCivil = std::vector<std::list<objCivil>>(289);
     };
 
+    [[nodiscard]]
     std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator>
     addRuteCivil(const std::shared_ptr<objCivil> &objCivil) {
         mExitTimesCivil[objCivil->c_TBegin].push_back(*objCivil);

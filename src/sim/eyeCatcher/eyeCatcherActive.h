@@ -8,13 +8,13 @@
 #include <vector>
 #include <string>
 #include "eyeCatcherConnection.h"
-
+#include "./eyeTotalTick.h"
 class eyeCatcherActive {
 public:
     void updateValue(int inNewValue, const std::string &inUuidEye) {
         std::cout << "SEND INFORMATION" << inNewValue << std::endl;
         if (eCA_eyeCatcherConnection) {
-            eCA_eyeCatcherConnection->sendInformation(inNewValue, inUuidEye);
+            eCA_eyeCatcherConnection->sendInformation(inNewValue, inUuidEye, eyeTotalTick::getTick());
         } else {
             std::cerr << "Error: eyeCatcherConnection is nullptr." << std::endl;
         }

@@ -75,6 +75,7 @@ public:
             allTicksReduced(sMClock->getReduced(), sMClock->getDate());
             rInteraction->gClock->setClock(sMClock->getClock());
         }
+        eyeTotalTick::pTick();
         sMClock->tick();
         gTotalUnderground->tick();
         gMainRoads->tick();

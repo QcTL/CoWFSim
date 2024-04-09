@@ -137,6 +137,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/events/sEventReceiver.h
         src/sim/behaviour/company/employee/sCivilStorage.h
         src/sim/behaviour/iVectorStorage.h
+        src/sim/eyeCatcher/eyeTotalTick.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

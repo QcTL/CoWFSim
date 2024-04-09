@@ -50,12 +50,13 @@ public:
     };
 
     struct eyC_DataPacket {
-        int eyc_nValue;
+        int eyC_nValue;
+        int eyeC_nTime;
         char eyC_uuidEyeValue[32];
     };
 
-    void sendInformation(int inNewValue, const std::string &inUuidEye) const {
-        eyC_DataPacket inEyC_DP = {inNewValue, ""};
+    void sendInformation(int inNewValue, const std::string &inUuidEye, int inTotalTick) const {
+        eyC_DataPacket inEyC_DP = {inNewValue, inTotalTick, ""};
         strncpy(inEyC_DP.eyC_uuidEyeValue, inUuidEye.c_str(), sizeof(inEyC_DP.eyC_uuidEyeValue) - 1);
         inEyC_DP.eyC_uuidEyeValue[sizeof(inEyC_DP.eyC_uuidEyeValue) - 1] = '\0';
         for (size_t i = inUuidEye.length(); i < sizeof(inEyC_DP.eyC_uuidEyeValue); ++i) {

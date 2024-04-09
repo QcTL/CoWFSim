@@ -100,6 +100,10 @@ public:
         uint32_t totalDistance;
     };
 
+    std::pair<int,int> getPosStationById(uint16_t uuidStation){
+        return sgUM_totalStations[uuidStation].sPos;
+    }
+
     sgUM_lowestViableRoute getLowestDistanceCommute(const std::pair<int, int> inPoint1, const std::pair<int, int> inPoint2) {
         uint16_t _closestSt1 = 0, _closestSt2 = 0;
         uint32_t _dMinDistance1 = 0, _dMinDistance2 = 0;
