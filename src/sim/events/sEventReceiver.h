@@ -38,23 +38,29 @@ public:
                                                           uint64_t inUuidContract) {}
 
     virtual void
-    er_EventCompanyBoughtItemLocal(uint32_t inRTime, uint32_t inTDate, uint64_t inUuidCompany, uint32_t inUuidItem, uint32_t inItemPrice) {}
+    er_EventCompanyBoughtItemLocal(uint32_t inRTime, uint32_t inTDate, uint64_t inUuidCompany, uint32_t inUuidItem,
+                                   uint32_t inItemPrice) {}
 
     virtual void
-    er_EventCompanyBoughtItemImport(uint32_t inRTime, uint32_t inTDate, uint64_t inUuidCompany, uint32_t inUuidItem, uint32_t inItemPrice) {}
+    er_EventCompanyBoughtItemImport(uint32_t inRTime, uint32_t inTDate, uint64_t inUuidCompany, uint32_t inUuidItem,
+                                    uint32_t inItemPrice) {}
 
     virtual void
-    er_EventCompanySoldItemLocal(uint32_t inRTime, uint32_t inTDate, uint64_t inUuidCompany, uint32_t inUuidItem, uint32_t inItemPrice) {}
+    er_EventCompanySoldItemLocal(uint32_t inRTime, uint32_t inTDate, uint64_t inUuidCompany, uint32_t inUuidItem,
+                                 uint32_t inItemPrice) {}
 
     virtual void
-    er_EventCompanySoldItemExport(uint32_t inRTime, uint32_t inTDate, uint64_t inUuidCompany, uint32_t inUuidItem, uint32_t inItemPrice) {}
+    er_EventCompanySoldItemExport(uint32_t inRTime, uint32_t inTDate, uint64_t inUuidCompany, uint32_t inUuidItem,
+                                  uint32_t inItemPrice) {}
 
     virtual void er_EventStartRoute(uint32_t inRTime, uint32_t inTDate, uint64_t inUuidCitizen,
-                                    const objActiveRute&  inRoadTravel) {}
+                                    const objActiveRute &inRoadTravel) {}
 
     virtual void er_EventEndDay(uint32_t inTDate) {}
 
     virtual void er_EventStartDay(uint32_t inTDate) {}
+
+    virtual void er_EventCountHour(uint32_t inRTime, uint32_t inTDate) {}
 };
 
 #endif //CITYOFWEIRDFISHES_SEVENTRECEIVER_H

@@ -37,7 +37,7 @@ public:
     }
 
 
-    std::vector<objActiveRute> getRoutesCarByType(const objCivil::typeRouteSystem inRouteType, uint32_t cTime, uint32_t cDate) {
+    std::vector<objActiveRute> getRoutesByType(const objCivil::typeRouteSystem inRouteType, uint32_t cTime, uint32_t cDate) {
         std::vector<objActiveRute> rRet;
         if (mExitTimesCivil[cTime].empty())
             return {};

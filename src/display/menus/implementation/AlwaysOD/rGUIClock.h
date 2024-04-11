@@ -28,6 +28,7 @@ public:
     }
 
     void setClock(const sClockMain::sCM_ClockValues &vNew) {
+        rGUIC_lastClock = vNew;
         std::string gHour = std::to_string((vNew.sCM_rVHour % 12) == 0 ? 12 : (vNew.sCM_rVHour % 12));
         std::string gMinutes = std::to_string(vNew.sCM_rVMinute % 60);
         setText(0, (gHour.size() == 1 ? "0" : "") + gHour +
@@ -66,7 +67,7 @@ public:
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     sf::Vector2<int> pMouse = sf::Mouse::getPosition(rWindow);
                     int _gPressed = getButtonPressed(rWindow, pMouse);
-                    if (_gPressed != -1 && _gPressed < 3) {
+                    if (_gPressed != -1 && _gPressed <= 3) {
                         setVelocity(_gPressed);
                         parentMenu->setResponse(_gPressed, 16);
                     }
@@ -82,6 +83,9 @@ public:
                 } else if (event.key.code == sf::Keyboard::Num2) {
                     parentMenu->setResponse(2, 16);
                     setVelocity(2);
+                }else if (event.key.code == sf::Keyboard::Num3) {
+                    parentMenu->setResponse(3, 16);
+                    setVelocity(3);
                 }
             default:
                 break;
@@ -89,8 +93,8 @@ public:
         return false;
     }
 
-    void pressedCell(std::pair<int, int> cPressed) override {}
-
+    void pressedCell(std::pair<int, int> cPressed,uint32_t inPTime, uint32_t inUTime) override {}
+    sClockMain::sCM_ClockValues rGUIC_lastClock;
 private:
     std::vector<std::pair<uint32_t, uint32_t>> comPSel;
 

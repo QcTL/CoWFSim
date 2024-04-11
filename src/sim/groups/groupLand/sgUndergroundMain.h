@@ -81,10 +81,16 @@ public:
         return sgUM_totalStations[sgUM_vecTimeStation[sgUM_tActualStation].second].sPos;
     }
 
+    int hasStation(const std::pair<int,int>& inPStation){
+        for(int i = 0; i < sgUM_totalStations.size(); i++)
+            if(sgUM_totalStations[i].sPos.first == inPStation.first && sgUM_totalStations[i].sPos.second == inPStation.second)
+                return i;
+
+        return -1;
+    }
 
     void tick(uint32_t inTick) {
         gLayerUnderground->set(sgUM_actPos, gLayerUnderground->get(sgUM_actPos) - 32);
-        std::cout << inTick << std::endl;
         if (inTick == 0)
             sgUM_tActualStation = 0;
 
@@ -95,6 +101,13 @@ public:
     uint32_t getClosestTimeForStation(const uint16_t inNStation, const uint32_t inCTime) {
         for (const uint32_t tArr: sgUM_timeArriving[inNStation])
             if (tArr >= inCTime * 5)
+                return tArr / 5;
+        return 0;
+    }
+
+    uint32_t getPastClosestTimeForStation(const uint16_t inNStation, const uint32_t inCTime) {
+        for (const uint32_t tArr: sgUM_timeArriving[inNStation])
+            if (tArr <= inCTime * 5)
                 return tArr / 5;
         return 0;
     }

@@ -95,10 +95,9 @@ public:
 
     uint32_t createCompany(const std::list<std::pair<int, int>> &vecNPos, uint8_t typeCompany) {
         std::uniform_int_distribution<> disDay(0, (int) sCT_vActiveDaysValid.size() - 1);
-        std::uniform_int_distribution<> disHour(0, (int) sCT_vActiveHoursValid.size() - 1);
+        std::discrete_distribution<> disHour(sCT_vActiveHoursWeight.begin(), sCT_vActiveHoursWeight.end());
         int randomIndexDay = disDay(sCT_genRand);
         int randomIndexHour = disHour(sCT_genRand);
-
 
         std::shared_ptr newObjCompany = std::make_shared<objCompany>(objCompany(vecNPos, typeCompany,
                                                                                 {sCT_vActiveDaysValid[randomIndexDay],
@@ -184,6 +183,7 @@ private:
                                                                         {96,  192},
                                                                         {120, 216},
                                                                         {216, 276}};
+    std::vector<double> sCT_vActiveHoursWeight = {0.45, 0.45, 0.1};
 };
 
 #endif //CITYOFWEIRDFISHES_SCOMPANYSTORAGE_H

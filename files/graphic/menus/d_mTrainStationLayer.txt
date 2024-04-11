@@ -1,0 +1,5 @@
+type:mTrainStationLayer
+src:mTrainStationLayer.txt
+inSelTex:65
+inLengthTex:7,7,6
+inPosEyes:3#10#1#1

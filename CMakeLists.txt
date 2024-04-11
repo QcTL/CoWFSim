@@ -104,7 +104,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/display/menus/implementation/rRoadView/rRoadCrossView.h
         src/display/menus/implementation/rRoadView/rRoadLineView.h
         src/display/layers/implementation/gLayerUnderground.h
-        src/sim/behaviour/metro/sgUndergroundMain.h
+        src/sim/groups/groupLand/sgUndergroundMain.h
         src/sim/structure/obj/elements/objCivil.h
         src/sim/groups/groupLand/sgTerrain.h
         src/sim/structure/obj/elements/contracts/cObjContracts.h
@@ -138,6 +138,8 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/behaviour/company/employee/sCivilStorage.h
         src/sim/behaviour/iVectorStorage.h
         src/sim/eyeCatcher/eyeTotalTick.h
+        src/sim/behaviour/globalAttr/sEnergyAttr.h
+        src/display/menus/implementation/station/rStationViewLayer.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

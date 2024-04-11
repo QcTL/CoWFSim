@@ -32,7 +32,8 @@ public:
         sEM_EventCompanySoldItemExport = 14,
         sEM_EventStartRoute = 15,
         sEM_EventEndDay = 16,
-        sEM_EventStartDay = 16,
+        sEM_EventStartDay = 17,
+        sEM_EventCountHour = 18,
     };
 
     sEventManager() = default;
@@ -147,6 +148,11 @@ public:
     void callEventStartDay(uint32_t inTDate) {
         for (const auto eR: sEM_mapEventReceivers[sEM_EventStartDay])
             eR->er_EventStartDay(inTDate);
+    }
+
+    void callEventCountHour(uint32_t inRTime, uint32_t inTDate) {
+        for (const auto eR: sEM_mapEventReceivers[sEM_EventStartDay])
+            eR->er_EventCountHour(inRTime,inTDate);
     }
 
 private:

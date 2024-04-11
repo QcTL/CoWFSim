@@ -46,8 +46,8 @@ public:
                 sLayerCells::gen(lSizeGrid, sMS->sSM_groupLand->gL_gTerrain, tReturn.centerClusters, mValues,
                                  snCommonAtr::getFlagAtr("snCA_Seed"));
 
-        sMS->gTotalUnderground->gLayerUnderground = retCells.gUnderground;
-        sMS->gTotalUnderground->setPointsTransit(retCells.routesMetro);
+        sMS->sSM_groupLand->gL_gUnderground->gLayerUnderground = retCells.gUnderground;
+        sMS->sSM_groupLand->gL_gUnderground->setPointsTransit(retCells.routesMetro);
 
         sMS->completedSetupStage();
 

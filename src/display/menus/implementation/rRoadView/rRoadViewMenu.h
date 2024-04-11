@@ -48,7 +48,7 @@ public:
         return false;
     }
 
-    void pressedCell(std::pair<int, int> cPressed) override{
+    void pressedCell(std::pair<int, int> cPressed,uint32_t inPTime, uint32_t inUTime) override{
         parentMenu->setResponse(-1,2);
     }
 

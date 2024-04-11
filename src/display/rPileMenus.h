@@ -85,7 +85,7 @@ public:
     }
 
     void pressedCell(std::pair<int, int> cPressed) {
-        vTopActiveMenu->pressedCell(cPressed);
+        vTopActiveMenu->pressedCell(cPressed,gClock->rGUIC_lastClock.sCM_RTick,gClock->rGUIC_lastClock.sCM_CDate);
     }
 
     std::shared_ptr<rIMenu> vTopActiveMenu;
