@@ -84,7 +84,7 @@ public:
 
     virtual bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) = 0;
 
-    virtual void pressedCell(std::pair<int, int> cPressed) = 0;
+    virtual void pressedCell(std::pair<int, int> cPressed, uint32_t inPTime, uint32_t inCDate) = 0;
 
     virtual void update() {}
 

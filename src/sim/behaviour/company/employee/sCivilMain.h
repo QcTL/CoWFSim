@@ -10,7 +10,7 @@
 #include <memory>
 #include "../../../structure/obj/sCommon.h"
 #include "../../../roads/sgRoadsMain.h"
-#include "../../metro/sgUndergroundMain.h"
+#include "../../../groups/groupLand/sgUndergroundMain.h"
 #include "../../../groups/groupEconomy/groupEconomy.h"
 #include "sCivilStorage.h"
 
@@ -18,10 +18,8 @@ class sCivilMain {
 public:
 
     explicit sCivilMain(const std::shared_ptr<sgRoadsMain> &inPsRoadsMain,
-                        const std::shared_ptr<groupLand> &inGLand, const std::shared_ptr<groupEconomy> &inGEconomy,
-                        const std::shared_ptr<sgUndergroundMain> &inPSUndergroundMain)
-            : sCM_sRoadsMain(inPsRoadsMain), sCM_groupLand(inGLand), sCM_groupEconomy(inGEconomy),
-              sCM_sUndergroundMain(inPSUndergroundMain) {
+                        const std::shared_ptr<groupLand> &inGLand, const std::shared_ptr<groupEconomy> &inGEconomy)
+            : sCM_sRoadsMain(inPsRoadsMain), sCM_groupLand(inGLand), sCM_groupEconomy(inGEconomy) {
         if (snCommonAtr::getFlagAtr("snCA_Seed") != 0)
             sCM_genRand.seed(snCommonAtr::getFlagAtr("snCA_Seed"));
         else
@@ -55,7 +53,7 @@ public:
         std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator> r;
         std::shared_ptr<objCivil> _oCivil;
 
-        sgUndergroundMain::sgUM_lowestViableRoute lVRMetro = sCM_sUndergroundMain->getLowestDistanceCommute(
+        sgUndergroundMain::sgUM_lowestViableRoute lVRMetro = sCM_groupLand->gL_gUnderground->getLowestDistanceCommute(
                 rPosCivHome, inObjCompany.c_cActiveLocations.front());
 
         if (lVRMetro.totalDistance < 30)
@@ -84,12 +82,12 @@ private:
                                              const sgUndergroundMain::sgUM_lowestViableRoute &rRouteTrain) {
         return std::make_shared<objCivil>(
                 objCivil(objCivil::typeRouteSystem::OC_TRS_TRAIN, rPosCivHome,
-                         {sCM_sUndergroundMain->getPosStationById(rRouteTrain.closestSt1),
-                          sCM_sUndergroundMain->getPosStationById(rRouteTrain.closestSt2)},
-                         sCM_sUndergroundMain->getClosestTimeForStation(rRouteTrain.closestSt1,
-                                                                        inObjCompany.c_activeDates.c_StrEndTime.first),
-                         sCM_sUndergroundMain->getClosestTimeForStation(rRouteTrain.closestSt2,
-                                                                        inObjCompany.c_activeDates.c_StrEndTime.second),
+                         {sCM_groupLand->gL_gUnderground->getPosStationById(rRouteTrain.closestSt1),
+                          sCM_groupLand->gL_gUnderground->getPosStationById(rRouteTrain.closestSt2)},
+                         sCM_groupLand->gL_gUnderground->getClosestTimeForStation(rRouteTrain.closestSt1,
+                                                                                  inObjCompany.c_activeDates.c_StrEndTime.first),
+                         sCM_groupLand->gL_gUnderground->getClosestTimeForStation(rRouteTrain.closestSt2,
+                                                                                  inObjCompany.c_activeDates.c_StrEndTime.second),
                          inObjCompany.c_activeDates.cAD_jobWeek));
     }
 
@@ -110,7 +108,6 @@ private:
     std::shared_ptr<sgRoadsMain> sCM_sRoadsMain;
     std::shared_ptr<groupLand> sCM_groupLand;
     std::shared_ptr<groupEconomy> sCM_groupEconomy;
-    std::shared_ptr<sgUndergroundMain> sCM_sUndergroundMain;
     std::shared_ptr<sCivilStorage> sCM_civilStorage;
 };
 

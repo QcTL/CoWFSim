@@ -10,6 +10,7 @@
 #include "../../events/sEventReceiver.h"
 #include "../recording/sSituationCivilTracker.h"
 #include "../../events/sEventManager.h"
+#include "sEnergyAttr.h"
 
 class stGlobalTrackerAttr : sEventReceiver {
 public:
@@ -21,8 +22,10 @@ public:
         sEM->addReceiverToEvent(sEventManager::sEM_Events::sEM_EventEndDay, this);
         sEM->addReceiverToEvent(sEventManager::sEM_Events::sEM_EventCompanyBoughtItemImport, this);
         sEM->addReceiverToEvent(sEventManager::sEM_Events::sEM_EventCompanySoldItemExport, this);
+        sEM->addReceiverToEvent(sEventManager::sEM_Events::sEM_EventCountHour, this);
 
         sSituationCivilT = std::make_shared<sSituationCivilTracker>();
+        sGTA_sEnergyAttr = std::make_shared<sEnergyAttr>();
     };
 
     static std::shared_ptr<stGlobalTrackerAttr> getInstance() {
@@ -44,7 +47,8 @@ public:
         sSituationCivilT->addNCivilian(1);
 
         stGA_totalEnergy.set(
-                sSituationCivilT->getByTime(inRTime).first * 4 + sSituationCivilT->getByTime(inRTime).second * 3);
+                sGTA_sEnergyAttr->computeTotalEnergyByState(sSituationCivilT->getByTime(inRTime).first,
+                                                            sSituationCivilT->getByTime(inRTime).second, inRTime));
     }
 
     void er_EventLeaveCitizen(uint32_t inRTime, uint32_t inTDate,
@@ -53,11 +57,12 @@ public:
         sSituationCivilT->removeNCivilian(1);
 
         stGA_totalEnergy.set(
-                sSituationCivilT->getByTime(inRTime).first * 4 + sSituationCivilT->getByTime(inRTime).second * 3);
+                sGTA_sEnergyAttr->computeTotalEnergyByState(sSituationCivilT->getByTime(inRTime).first,
+                                                            sSituationCivilT->getByTime(inRTime).second, inRTime));
     }
 
     void er_EventStartRoute(uint32_t inRTime, uint32_t inTDate, uint64_t inUuidCitizen,
-                            const objActiveRute& inRoadTravel) override {
+                            const objActiveRute &inRoadTravel) override {
         if (!inRoadTravel.c_IsReversed)
             sSituationCivilT->addChangeSituation(inRTime, 0, 1);
         else
@@ -83,9 +88,15 @@ public:
         stGA_totalExports += inItemPrice;
     }
 
+    void er_EventCountHour(uint32_t inRTime, uint32_t inTDate) override {
+        stGA_totalEnergy.set(
+                sSituationCivilT->getByTime(inRTime).first * 4 + sSituationCivilT->getByTime(inRTime).second * 3);
+    }
+
 private:
     static std::shared_ptr<stGlobalTrackerAttr> instance;
     std::shared_ptr<sSituationCivilTracker> sSituationCivilT;
+    std::shared_ptr<sEnergyAttr> sGTA_sEnergyAttr;
 };
 
 std::shared_ptr<stGlobalTrackerAttr> stGlobalTrackerAttr::instance = nullptr;

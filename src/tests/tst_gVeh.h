@@ -42,9 +42,9 @@ int tst_gVeh() {
     sMS->completedSetupStage();
 
 /*
-    sMS->gMainRoads->gLayerRoads[0][0]->refCompressed->addNewCar(
-            sMS->gMainRoads->gLayerRoads[75][75]->refCompressed->locIdNode,
-            sMS->gMainRoads->gLayerRoads[75][75]->refCompressed->rBlock);
+    sMS->sSM_gMainRoads->gLayerRoads[0][0]->refCompressed->addNewCar(
+            sMS->sSM_gMainRoads->gLayerRoads[75][75]->refCompressed->locIdNode,
+            sMS->sSM_gMainRoads->gLayerRoads[75][75]->refCompressed->rBlock);
 */
 
     //START TRANSIT;
