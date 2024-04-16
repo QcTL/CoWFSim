@@ -27,7 +27,7 @@ public:
     explicit sCompanyMain(uint32_t inGridSize, const std::shared_ptr<sCivilMain> &inPCivilMain,
                           const std::shared_ptr<groupLand> &inGLand, const std::shared_ptr<groupEconomy> &inGEconomy)
             : sM_groupLand(inGLand), sM_sCompEmployee(inPCivilMain), sM_groupEconomy(inGEconomy) {
-        sTComp = std::make_shared<sCompanyStorage>(inGridSize, 1000, sSCode);
+        sTComp = std::make_shared<sCompanyStorage>(inGridSize, 5000, sSCode);
         sM_sContractor = std::make_shared<sContractorMain>();
     }
 
@@ -73,8 +73,8 @@ public:
 
     void completedStartCompanies(const std::list<sgTerrain::sgT_CellSlot> &gPosCompanies) {
         for (const auto &posNewComp: gPosCompanies) {
-            uint32_t uuidNew = sTComp->createCompany({posNewComp.sgT_gPos}, posNewComp.sgT_gType);
-            auto typeSoil = sM_groupLand->gL_gTerrain->gTG_TypeSoil->get(posNewComp.sgT_gPos);
+            uint32_t uuidNew = sTComp->createCompany(posNewComp.sgT_gPos, posNewComp.sgT_gType);
+            auto typeSoil = sM_groupLand->gL_gTerrain->gTG_TypeSoil->get(posNewComp.sgT_gPos.front());
             if (typeSoil != sgTerrain::sgT_TypeSoil::sgT_TS_T2Mixed &&
                 typeSoil != sgTerrain::sgT_TypeSoil::sgT_TS_T3Mixed) {
                 for (int i = 0; i < 2; i++)
@@ -82,7 +82,8 @@ public:
                                                       sTComp->getCompanyByUUID(uuidNew)}, *this, 0, 0); //TODO DATE;
             } else
                 sTComp->getCompanyByUUID(uuidNew)->c_attrCanEmployee = false;
-            FulfillIntentions::doRentContractsExistingResidents(posNewComp.sgT_gPos, *this, 0);
+            for(const auto p : posNewComp.sgT_gPos)
+                FulfillIntentions::doRentContractsExistingResidents(p, *this, 0);
         }
     }
 

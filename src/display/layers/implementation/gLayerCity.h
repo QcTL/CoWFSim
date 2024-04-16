@@ -57,7 +57,7 @@ private:
         int s4Way[] = {22, 39, 38, 35, 29, 23, 25, 37, 28, 34, 33, 36, 24, 27, 26, 32};
 
         for (const int t: s4Way)
-            addToMapSprites(64, getByPosTopLeft(lTs.getPos(t + 80)));
+            addToMapSprites(64, getByPosTopLeft(lTs.getPos(t + 60)));
 
         //Water:
         int wTiles[] = {85, 75, 95, 84, 86, 74, 94, 96, 76, 83, 82, 72, 73};

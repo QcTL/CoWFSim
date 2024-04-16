@@ -28,7 +28,7 @@ public:
                        const std::shared_ptr<sCompanyStorage> &sTComp)
             : rIMenu(nullptr, rIMenu::rRelativePos::pBottomRight, ""),
               refPile(rPile), lstValueLayer(1), rBM_refRoads(sgRoads),
-              rBM_refLRoads(gRoads), rBM_refLand(sgLand), rBM_refLBuild(gLayerOwn), rBM_refSComp(sTComp) {
+              rBM_refLRoads(gRoads), rBM_refLand(sgLand), rBM_refLBuild(gLayerOwn), rBM_refSComp(sTComp),rBM_actLayer(gSimLayersTypes::G_CITY) {
     }
 
     void draw(sf::RenderWindow &rW) override {}

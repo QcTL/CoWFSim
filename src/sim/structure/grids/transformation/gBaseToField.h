@@ -16,10 +16,13 @@
 template<typename T>
 class gBaseToField {
 public:
-    explicit gBaseToField(std::shared_ptr<gIGrid<T>> gR, T endValue,
-                          const std::shared_ptr<gIGrid<bool>> &pMask = nullptr, int seed = -1)
-            : hasMask(pMask != nullptr), gMask(pMask),gEnd(gR) {
-        gen.seed(seed);
+    [[nodiscard]]
+    static std::map<uint32_t , std::vector<std::pair<std::pair<int, int>, uint8_t>>>
+    genMapPos(std::shared_ptr<gIGrid<T>> gR,
+              const std::shared_ptr<gIGrid<bool>> &pMask = nullptr, int seed = -1) {
+        bool hasMask = pMask != nullptr;
+
+        std::mt19937 gen(seed);
         std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gR->rangeUse();
         int GWidth = (gRange.first.second - gRange.first.first) + 1;
         int GHeight = (gRange.second.second - gRange.second.first) + 1;
@@ -28,71 +31,50 @@ public:
                 gHelpBlobbing::genListOfUniquePos(
                         gHelpBlobbing::genGridUnique(GHeight, GWidth));
 
-        dis_row = std::uniform_int_distribution<>(0, GWidth - 1);
-        dis_col = std::uniform_int_distribution<>(0, GHeight - 1);
-        dis_dir = std::uniform_int_distribution<>(0, 3);
+        std::uniform_int_distribution<> dis_row = std::uniform_int_distribution<>(0, GWidth - 1);
+        std::uniform_int_distribution<> dis_col = std::uniform_int_distribution<>(0, GHeight - 1);
+        std::uniform_int_distribution<> dis_dir = std::uniform_int_distribution<>(0, 3);
 
         for (int i = 0; i < 5000; i++) {
             g = gHelpBlobbing::blobTwoPositions(g, gen, dis_row, dis_col, dis_dir);
         }
 
-        std::shared_ptr<gIGrid<T>> gGrid = gHelpBlobbing::blobToGrid<T>(g);
-        mGenFields = gBaseToBorderDetection::generate(gGrid,
-                                                      {gBorderType::gBNonConnex, gBorderOutside::gIsNotGroup},
-                                                      {});
-        blobFieldsToGrid(mGenFields, gR);
-    }
+        std::shared_ptr<gIGrid<uint32_t>> gGrid = gHelpBlobbing::blobToGrid<uint32_t>(g);
+        std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint8_t>>> mGenFields = gBaseToBorderDetection::generate(
+                gGrid, {gBorderType::gBNonConnex, gBorderOutside::gIsNotGroup}, {});
 
-
-    std::vector<std::vector<std::pair<int, int>>> genCollectivePositions() {
-        return rPosComp;
-    }
-
-private:
-    bool hasMask;
-    std::shared_ptr<gIGrid<bool>> gMask;
-    std::shared_ptr<gIGrid<T>> gEnd;
-    std::map<T, std::vector<std::pair<std::pair<int, int>, uint8_t>>> mGenFields;
-    std::vector<std::vector<std::pair<int, int>>> rPosComp;
-
-    std::mt19937 gen;
-    std::uniform_int_distribution<> dis_row;
-    std::uniform_int_distribution<> dis_col;
-    std::uniform_int_distribution<> dis_dir;
-
-    void blobFieldsToGrid(std::map<T, std::vector<std::pair<std::pair<int, int>, uint8_t>>> edges,
-                          std::shared_ptr<gIGrid<T>> gFinal) {
-        for (const auto &mapElem: edges) {
-            //if (mapElem.second.size() >= 5) {
-
-
+        for (auto it = mGenFields.begin(); it != mGenFields.end();) {
             bool hasAllInsideMask = true;
-            for (const auto &vecElem: mapElem.second) {
+            for (const auto &vecElem: it->second) {
                 std::pair<int, int> pair = vecElem.first;
-                if ((hasMask && !gMask->get({pair.second, pair.first})) ||
-                    !gFinal->isInside({pair.second, pair.first}) || !gFinal->get(pair.second, pair.first) == 0) {
+                bool complyMask = !hasMask || pMask->get(pair.second, pair.first);
+                bool complyGrid =  gR->isInside(pair.second, pair.first);
+                bool isUsed = gR->get(pair.second, pair.first) == 5 || gR->get(pair.second, pair.first) == 6;
+                if (!complyMask || !complyGrid || isUsed) {
                     hasAllInsideMask = false;
                     break;
                 }
             }
             if (!hasAllInsideMask)
-                continue;
+                it = mGenFields.erase(it); // Remove the element from the map
+            else
+                ++it;
 
+        }
+        return mGenFields;
+    }
 
-            const std::vector<std::pair<std::pair<int, int>, uint8_t>> &value = mapElem.second;
-            std::vector<std::pair<int, int>> transformedValue;
-
+    static void blobFieldsToGrid(const std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint8_t>>> &edges,
+                                 std::shared_ptr<gIGrid<T>> gFinal) {
+        for (const auto &mapElem: edges) {
             for (const auto &vecElem: mapElem.second) {
-                std::pair<int, int> pair = vecElem.first;
                 uint8_t p = ((vecElem.second & (1 << 1)) != 0) << 3
                             | ((vecElem.second & (1 << 4)) != 0) << 2
                             | ((vecElem.second & (1 << 6)) != 0) << 1
                             | ((vecElem.second & (1 << 3)) != 0);
                 gFinal->set({vecElem.first.second, vecElem.first.first},
                             (((uint32_t) (uint8_t) strtol("1000000", nullptr, 2)) << 24) + p);
-                transformedValue.push_back(vecElem.first);
             }
-            rPosComp.push_back(transformedValue);
         }
     }
 
