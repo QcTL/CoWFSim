@@ -7,7 +7,7 @@ public:
 
     static rActiveVehicle initializer;
     rActiveVehicle() {
-        initialize(1200);
+        initialize(15000);
         fEmpty = 0;
     }
 

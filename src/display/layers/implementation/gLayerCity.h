@@ -22,6 +22,8 @@ public:
         uint32_t v = lGrid->get(x, y);
         auto vType = static_cast<uint8_t>(v >> 24);
         uint8_t vSpec = v & 0xFF;
+        if(vType == 0)
+            return  mTypeSprites.at(vType)[0];
         return mTypeSprites.at(vType)[vSpec];
     }
 

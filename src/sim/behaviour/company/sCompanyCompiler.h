@@ -90,7 +90,7 @@ public:
                     break;
                 case 4:
                     cV2 = cV1;
-                    switch ((uint8_t) (cCode[0] >> 57) & 0b1111) {
+                    switch ((uint8_t) (cCode[cPC] >> 57) & 0b1111) {
                         case 0:
                             cV1 = objC->c_uuid;
                             break;

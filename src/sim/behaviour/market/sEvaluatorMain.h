@@ -87,10 +87,12 @@ private:
 
     static void
     diffElementCompany(uint64_t inUuidElement, int inNElements, const std::shared_ptr<objCompany> &inPObjCompany) {
-        if (inPObjCompany->c_pOwn.find(inUuidElement) == inPObjCompany->c_pOwn.end())
-            inPObjCompany->c_pOwn[inUuidElement] = inNElements;
-        else
-            inPObjCompany->c_pOwn[inUuidElement] += inNElements;
+        if (inPObjCompany != nullptr) {
+            if (inPObjCompany->c_pOwn.find(inUuidElement) == inPObjCompany->c_pOwn.end())
+                inPObjCompany->c_pOwn[inUuidElement] = inNElements;
+            else
+                inPObjCompany->c_pOwn[inUuidElement] += inNElements;
+        }
     }
 
     uint32_t getPriceItemActual(uint64_t inUuidElement) {

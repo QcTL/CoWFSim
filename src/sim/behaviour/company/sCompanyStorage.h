@@ -116,6 +116,10 @@ public:
         return _idNewComp;
     }
 
+    void removeCompany(const std::shared_ptr<objCompany>& inObjCompany){
+        sCT_vTotalComp.removeElement(inObjCompany->c_uuid);
+    }
+
     bool isCompanyInPosition(const std::pair<int, int> &inPCell) { return !gLayerOwnership->get(inPCell).empty(); }
 
     void addRefPosOwnCompany(std::pair<int, int> inPCell, uint32_t uuidCompany) {

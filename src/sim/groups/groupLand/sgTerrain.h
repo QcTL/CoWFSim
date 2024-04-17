@@ -104,7 +104,7 @@ public:
                         case sgT_TypeSoil::sgT_TS_T1Industrial:
                         case sgT_TypeSoil::sgT_TS_T2Industrial:
                         case sgT_TypeSoil::sgT_TS_T1Farm:
-                            gTG_factoryFullCell.emplace_back(i, j);
+                            gTG_factoryFieldFullCell.emplace_back(i, j);
                             break;
                         default:
                             break;
@@ -146,8 +146,9 @@ public:
                 break;
             case sgT_TypeSoil::sgT_TS_T1Industrial:
             case sgT_TypeSoil::sgT_TS_T2Industrial:
+            case sgT_TypeSoil::sgT_TS_T1Farm:
                 gTG_TypeGen->set(inGridPos, sgT_TypeGen::sgT_TG_IndBuilding);
-                gTG_factoryFullCell.push_back(inGridPos);
+                gTG_factoryFieldFullCell.push_back(inGridPos);
                 gTG_rLayer->addNewBuildingRender(inGridPos,
                                                  gTG_TypeSoil->get(inGridPos) == sgT_TypeSoil::sgT_TS_T1Industrial
                                                  ? sgT_TypeGen::sgT_TG_IndBuilding : sgT_TypeGen::sgT_TG_HIndBuilding);
@@ -164,7 +165,8 @@ public:
                 break;
             case sgT_TypeSoil::sgT_TS_T1Industrial:
             case sgT_TypeSoil::sgT_TS_T2Industrial:
-                gTG_factoryFullCell.remove(inGridPos);
+            case sgT_TypeSoil::sgT_TS_T1Farm:
+                gTG_factoryFieldFullCell.remove(inGridPos);
                 break;
         }
 
@@ -268,7 +270,7 @@ private:
 
     std::map<uint8_t, std::list<std::pair<int, int>>> gTG_civilPresentCellBySoil;
     std::map<uint8_t, std::list<std::pair<int, int>>> gTG_civilFilledCellBySoil;
-    std::list<std::pair<int, int>> gTG_factoryFullCell;
+    std::list<std::pair<int, int>> gTG_factoryFieldFullCell;
     std::list<sgT_CellSlot> gTG_emptyCell;
     std::list<sgT_CellSlot> gTG_fullCell;
     std::mt19937 gTG_genRPos;
