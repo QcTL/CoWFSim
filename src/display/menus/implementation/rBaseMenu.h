@@ -22,13 +22,15 @@ class rBaseMenu : public rIMenu {
 public:
     explicit rBaseMenu(const std::shared_ptr<rPileMenus> &rPile,
                        const std::shared_ptr<groupLand> &sgLand,
+                       const std::shared_ptr<groupEconomy> &sgEconomy,
                        const std::shared_ptr<sgRoadsMain> &sgRoads,
                        const std::vector<std::vector<rNode *>> &gRoads,
                        const std::shared_ptr<gIGrid<std::list<uint32_t>>> &gLayerOwn,
                        const std::shared_ptr<sCompanyStorage> &sTComp)
             : rIMenu(nullptr, rIMenu::rRelativePos::pBottomRight, ""),
               refPile(rPile), lstValueLayer(1), rBM_refRoads(sgRoads),
-              rBM_refLRoads(gRoads), rBM_refLand(sgLand), rBM_refLBuild(gLayerOwn), rBM_refSComp(sTComp),rBM_actLayer(gSimLayersTypes::G_CITY) {
+              rBM_refLRoads(gRoads), rBM_refLand(sgLand), rBM_refEconomy(sgEconomy), rBM_refLBuild(gLayerOwn),
+              rBM_refSComp(sTComp), rBM_actLayer(gSimLayersTypes::G_CITY) {
     }
 
     void draw(sf::RenderWindow &rW) override {}
@@ -109,10 +111,7 @@ public:
                                                rBM_refLBuild->get(cPressed).empty() ? nullptr
                                                                                     : rBM_refSComp->getCompanyByUUID(
                                                        rBM_refLBuild->get(cPressed).front()),
-                                               rBM_refLand->gL_gTerrain->gTG_civilOccupancy->get(cPressed),
-                                               rBM_refLand->gL_gTerrain->getMaxOccByPos(cPressed),
-                                               rBM_refLand->gL_gTerrain->gTG_TypeSoil->get(cPressed),
-                                               rBM_refLand->gL_gTerrain->gTG_baseQualityAttr->get(cPressed), refPile));
+                                               rBM_refLand, cPressed, rBM_refEconomy ,refPile));
                         refPile->addMenuTop(_rHome);
                     }
                         break;
@@ -124,14 +123,13 @@ public:
                                 std::shared_ptr<rCompViewLayer> rComp = std::make_shared<rCompViewLayer>(
                                         rCompViewLayer(refPile->vTopActiveMenu,
                                                        *rBM_refSComp->getCompanyByUUID(
-                                                               rBM_refLBuild->get(cPressed).front()),
-                                                       "d_mCompViewLayer", refPile));
+                                                               rBM_refLBuild->get(cPressed).front()), rBM_refEconomy,
+                                                       refPile));
                                 refPile->addMenuTop(rComp);
                             } else {
                                 std::shared_ptr<rCellViewMenu> rComp = std::make_shared<rCellViewMenu>(
                                         rCellViewMenu(refPile->vTopActiveMenu,
-                                                      rBM_refSComp->getVecCompByUUID(rBM_refLBuild->get(cPressed)),
-                                                      "d_mCellViewLayer", refPile));
+                                                      rBM_refSComp->getVecCompByUUID(rBM_refLBuild->get(cPressed)), rBM_refEconomy, refPile));
                                 refPile->addMenuTop(rComp);
                             }
                         }
@@ -160,13 +158,13 @@ public:
                 break;
             case G_AIRPOLLUTION:
                 break;
-            case G_UNDERGROUND:
-            {int _uuidStation = rBM_refLand->gL_gUnderground->hasStation(cPressed);
-                if( _uuidStation != -1){
+            case G_UNDERGROUND: {
+                int _uuidStation = rBM_refLand->gL_gUnderground->hasStation(cPressed);
+                if (_uuidStation != -1) {
                     std::shared_ptr<rStationViewLayer> _rStation = std::make_shared<rStationViewLayer>(
                             rStationViewLayer(refPile->vTopActiveMenu, rBM_refLand->gL_gUnderground,
-                                           _uuidStation, inPTime, inUTime, rBM_refRoads,
-                                                "d_mTrainStationLayer", refPile));
+                                              _uuidStation, inPTime, inUTime, rBM_refRoads,
+                                              "d_mTrainStationLayer", refPile));
                     refPile->addMenuTop(_rStation);
                 }
             }
@@ -181,6 +179,7 @@ private:
 
     std::vector<std::vector<rNode *>> rBM_refLRoads;
     std::shared_ptr<groupLand> rBM_refLand;
+    std::shared_ptr<groupEconomy> rBM_refEconomy;
     std::shared_ptr<gIGrid<std::list<uint32_t>>> rBM_refLBuild;
     std::shared_ptr<sCompanyStorage> rBM_refSComp;
     std::shared_ptr<sgRoadsMain> rBM_refRoads;

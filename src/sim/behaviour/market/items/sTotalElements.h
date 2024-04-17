@@ -49,12 +49,15 @@ public:
 
     sME_Element getById(uint32_t idRec) { return sME_listItems[idRec]; }
 
+    std::string getNameById(uint32_t idRec) {return sME_gRecipeTotalName[idRec];}
+
     uint32_t nElements() { return sME_listItems.size(); }
 
 private:
 
     std::vector<sME_Element> sME_listItems;
     std::map<std::string, uint32_t> sME_gRecipeIdByName;
+    std::vector<std::string> sME_gRecipeTotalName;
 
     sME_Element getRecipeFromTokens(const uint32_t &idAct, const std::vector<std::string> &gTokens) {
         std::vector<uint8_t> rTypeBuilding;
@@ -75,6 +78,7 @@ private:
             rReqMaterials.push_back(sME_gRecipeIdByName.at(c));
 
         sME_gRecipeIdByName.insert({gTokens[0], idAct});
+        sME_gRecipeTotalName.push_back(gTokens[0]);
 
         return {idAct, rReqMaterials, rTypeBuilding[0] , static_cast<uint32_t>(std::stoul(gTokens[3]))};
     }

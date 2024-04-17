@@ -14,10 +14,12 @@
 class rHomeViewLayer : public rIMenu {
 public:
     explicit rHomeViewLayer(const std::shared_ptr<rIMenu> &mParent, const std::shared_ptr<objCompany> &rShow,
-                            uint8_t nOccupancy, uint8_t nMaxOccupancy, uint8_t typeHouse, uint8_t valueHouse,
+                            const std::shared_ptr<groupLand>& sg_groupLand, std::pair<int,int> cPressed,
+                            const std::shared_ptr<groupEconomy>& sg_groupEconomy,
                             const std::shared_ptr<rPileMenus> &mPiles)
-            : rIMenu(mParent, rIMenu::rRelativePos::pBottomRight, "d_mHomeViewLayer"), mPiles(mPiles), rCompRef(rShow) {
-        switch (typeHouse) {
+            : rIMenu(mParent, rIMenu::rRelativePos::pBottomRight, "d_mHomeViewLayer"), mPiles(mPiles), rCompRef(rShow),
+              rHVL_groupEconomy(sg_groupEconomy){
+        switch (sg_groupLand->gL_gTerrain->gTG_TypeSoil->get(cPressed)) {
             case 3:
                 setText(0, "Small H");
                 break;
@@ -28,9 +30,9 @@ public:
                 setText(0, "Large H");
                 break;
         }
-        setText(1, std::to_string(nOccupancy));
-        setText(2, std::to_string(nMaxOccupancy));
-        setText(3, std::to_string(valueHouse));
+        setText(1, std::to_string(sg_groupLand->gL_gTerrain->gTG_civilOccupancy->get(cPressed)));
+        setText(2, std::to_string(sg_groupLand->gL_gTerrain->getMaxOccByPos(cPressed)));
+        setText(3, std::to_string( sg_groupLand->gL_gTerrain->gTG_baseQualityAttr->get(cPressed)));
 
         setText(4, rShow != nullptr ? rShow->nName : "");
     }
@@ -53,7 +55,7 @@ public:
                         if (_gPressed == 0 && rCompRef != nullptr) {
                             std::shared_ptr<rCompViewLayer> rComp = std::make_shared<rCompViewLayer>(
                                     rCompViewLayer(mPiles->vTopActiveMenu,
-                                                   *rCompRef, "d_mCompViewLayer", mPiles));
+                                                   *rCompRef, rHVL_groupEconomy, mPiles));
                             mPiles->addMenuTop(rComp);
                         }
                     }
@@ -65,7 +67,7 @@ public:
                 if (event.key.code == sf::Keyboard::C && rCompRef != nullptr) {
                     std::shared_ptr<rCompViewLayer> rComp = std::make_shared<rCompViewLayer>(
                             rCompViewLayer(mPiles->vTopActiveMenu,
-                                           *rCompRef, "d_mCompViewLayer", mPiles));
+                                           *rCompRef,rHVL_groupEconomy, mPiles));
                     mPiles->addMenuTop(rComp);
                 }
                 break;
@@ -83,6 +85,8 @@ private:
     std::vector<std::pair<int, int>> pElemSel;
     std::vector<std::pair<int, int>> pElemSelAbs;
     std::shared_ptr<objCompany> rCompRef;
+
+    std::shared_ptr<groupEconomy> rHVL_groupEconomy;
 };
 
 #endif //CITYOFWEIRDFISHES_RHOMEVIEWLAYER_H

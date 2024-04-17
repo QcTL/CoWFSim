@@ -12,9 +12,9 @@
 
 class rCompViewLayer : public rIMenu {
 public:
-    explicit rCompViewLayer(const std::shared_ptr<rIMenu> &mParent, objCompany &rShow,
-                            const std::string &pthFileD, const std::shared_ptr<rPileMenus> &mPiles)
-            : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft, pthFileD), mPiles(mPiles), rCompRef(rShow) {
+    explicit rCompViewLayer(const std::shared_ptr<rIMenu> &mParent, objCompany &rShow,  const std::shared_ptr<groupEconomy> &sgEconomy
+                            , const std::shared_ptr<rPileMenus> &mPiles)
+            : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft, "d_mCompViewLayer"), mPiles(mPiles), rCompRef(rShow) {
 
         setText(0, rShow.nName);
         setText(1, oCommonMenus::getCompNumber(rShow.getNumberActiveCells()));
@@ -35,7 +35,7 @@ public:
         for (int i = 0; i < 3 && i < pairVec.size(); ++i)
             if (pairVec.size() > i && (pairVec.begin() + i)->second > 0) {
                 auto it = pairVec.begin() + i;
-                setText(5 + i * 2, std::to_string(it->first));
+                setText(5 + i * 2, sgEconomy->gE_sEvaluator->getStringByObjId(it->first).substr(3));
                 setText(6 + i * 2, oCommonMenus::getCompNumber(it->second));
             }
     }

@@ -27,6 +27,7 @@ public:
                                                                                  std::list<std::shared_ptr<objCompany>>());
     };
 
+    std::string getStringByObjId(const uint32_t inIdProduct) const {return sEM_totalElements->getNameById(inIdProduct);}
 
     void tickReduced(uint32_t inRTick, uint32_t inTDate) {
         if (inRTick == 0)

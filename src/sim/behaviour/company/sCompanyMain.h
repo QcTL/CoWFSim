@@ -150,9 +150,11 @@ private:
 
         static void gCompletedProduct(const std::shared_ptr<objCompany> &oC, uint32_t gItemGen,
                                       std::shared_ptr<groupEconomy> &inGEconomy) {
-            inGEconomy->computeCreatedElement(gItemGen, oC);
-            oC->c_cAvailableByType[inGEconomy->getById(gItemGen).sMEE_iReqTypeBuild] += 1;
-            std::cout << "PRODUCTE CREAT / FINALITZAT" << std::endl;
+            if (oC != nullptr) {
+                inGEconomy->computeCreatedElement(gItemGen, oC);
+                oC->c_cAvailableByType[inGEconomy->getById(gItemGen).sMEE_iReqTypeBuild] += 1;
+                std::cout << "PRODUCTE CREAT / FINALITZAT" << std::endl;
+            }
         }
 
         static void
