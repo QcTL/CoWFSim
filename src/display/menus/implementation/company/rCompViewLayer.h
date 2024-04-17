@@ -17,8 +17,8 @@ public:
             : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft, pthFileD), mPiles(mPiles), rCompRef(rShow) {
 
         setText(0, rShow.nName);
-        setText(1, oCommonMenus::getCompNumber(rShow.c_cActiveLocations.size()));
-        setText(2, oCommonMenus::getCompNumber(rShow.c_cRentedLocations.size()));
+        setText(1, oCommonMenus::getCompNumber(rShow.getNumberActiveCells()));
+        setText(2, oCommonMenus::getCompNumber(rShow.getNumberRentedCells()));
         setText(3, getFloatToString2Decimal(rShow.c_cActiveFunds));
         setText(4, getFloatToString2Decimal(
                 std::max(-100.0, ((rShow.c_objYear + rShow.c_objMonth * 12 + rShow.c_objWeek * 36) /

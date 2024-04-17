@@ -61,11 +61,13 @@ private:
 
         for (const std::string &c: split(gTokens[1], '.')) {
             if (c == "GTYPE_FARMLAND")
-                rTypeBuilding.push_back(0);
+                rTypeBuilding.push_back(sgTerrain::sgT_TypeGen::sgT_TG_FieldBuilding);
             else if (c == "GTYPE_LOWFACT")
-                rTypeBuilding.push_back(1);
+                rTypeBuilding.push_back(sgTerrain::sgT_TypeGen::sgT_TG_IndBuilding);
             else if (c == "GTYPE_HEAVYFACT")
-                rTypeBuilding.push_back(2);
+                rTypeBuilding.push_back(sgTerrain::sgT_TypeGen::sgT_TG_HIndBuilding);
+            else if (c == "GTYPE_CIV")
+                rTypeBuilding.push_back(sgTerrain::sgT_TypeGen::sgT_TG_CivBuilding);
         }
 
         std::vector<uint64_t> rReqMaterials;

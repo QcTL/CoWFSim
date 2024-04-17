@@ -140,6 +140,9 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/eyeCatcher/eyeTotalTick.h
         src/sim/behaviour/globalAttr/sEnergyAttr.h
         src/display/menus/implementation/station/rStationViewLayer.h
+        src/sim/behaviour/company/code/implementations/sCodeManual.h
+        src/sim/behaviour/company/code/implementations/isCode.h
+        src/sim/behaviour/company/code/implementations/sCodeGenetic.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

@@ -90,18 +90,18 @@ public:
                     break;
                 case 4:
                     cV2 = cV1;
-                    switch ((uint8_t) (cCode[cPC] & 0x0F)) {
+                    switch ((uint8_t) (cCode[0] >> 57) & 0b1111) {
                         case 0:
                             cV1 = objC->c_uuid;
                             break;
                         case 1:
-                            cV1 = objC->c_cActiveLocations.size();
+                            cV1 = objC->getNumberActiveCells();
                             break;
                         case 2:
                             cV1 = objC->c_pOwn.size();
                             break;
                         case 3:
-                            cV1 = objC->c_cRentedLocations.size();
+                            cV1 = objC->getNumberRentedCells();
                             break;
                         case 4:
                             cV1 = (uint64_t) objC->c_cActiveFunds;
@@ -111,6 +111,9 @@ public:
                                 cV1 = objC->c_pOwn.at(static_cast<uint32_t>(cCode[cPC] & 0xFFFFFFFF));
                             else
                                 cV1 = 0;
+                            break;
+                        case 6:
+                            cV1 = objC->getNumberActiveCells() - objC->getNumberRentedCells();
                             break;
                     }
                     break;

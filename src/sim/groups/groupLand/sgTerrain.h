@@ -79,7 +79,7 @@ public:
                         case sgT_TypeSoil::sgT_TS_T3Mixed:
                         case sgT_TypeSoil::sgT_TS_T1Industrial:
                         case sgT_TypeSoil::sgT_TS_T2Industrial:
-                            gTG_fullCell.push_back({gTG_TypeGen->get(i, j), {{i, j}}});
+                            gTG_fullCell.push_back({gTG_TypeSoil->get(i, j), {{i, j}}});
                         case sgT_TypeSoil::sgT_TS_T1Farm: {
                             std::pair<int, int> tPos = {j, i};
                             for (const auto &pair: gTG_fieldsBlobPositions) {
@@ -244,7 +244,7 @@ public:
     std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint8_t>>> gTG_fieldsBlobPositions;
 
     struct sgT_CellSlot {
-        uint8_t sgT_gType;
+        uint8_t sgT_soilType;
         std::list<std::pair<int, int>> sgT_gPos;
     };
 

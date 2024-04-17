@@ -66,14 +66,14 @@ public:
         //Start bankruptcy
         std::vector<std::shared_ptr<objCompany>> vCompBankruptcy = sTComp->getVecCompBankruptcy(inRTime);
         for (const std::shared_ptr<objCompany> &oCompany: vCompBankruptcy)
-            for (int i = 0; i < oCompany->c_cActiveLocations.size(); i++)
-                FulfillIntentions::gTryIntention({sCompanyCompiler::sCCIntentions::CELL_Sell, (uint32_t) i,
+            for (int i = 0; i < oCompany->getNumberActiveCells(); i++)
+                FulfillIntentions::gTryIntention({sCompanyCompiler::sCCIntentions::CELL_Sell, (uint32_t) oCompany->getTypeByIndex(i),
                                                   oCompany}, *this, 0, inTDate);
     }
 
     void completedStartCompanies(const std::list<sgTerrain::sgT_CellSlot> &gPosCompanies) {
         for (const auto &posNewComp: gPosCompanies) {
-            uint32_t uuidNew = sTComp->createCompany(posNewComp.sgT_gPos, posNewComp.sgT_gType);
+            uint32_t uuidNew = sTComp->createCompany(posNewComp.sgT_gPos, posNewComp.sgT_soilType);
             auto typeSoil = sM_groupLand->gL_gTerrain->gTG_TypeSoil->get(posNewComp.sgT_gPos.front());
             if (typeSoil != sgTerrain::sgT_TypeSoil::sgT_TS_T2Mixed &&
                 typeSoil != sgTerrain::sgT_TypeSoil::sgT_TS_T3Mixed) {
@@ -82,6 +82,7 @@ public:
                                                       sTComp->getCompanyByUUID(uuidNew)}, *this, 0, 0); //TODO DATE;
             } else
                 sTComp->getCompanyByUUID(uuidNew)->c_attrCanEmployee = false;
+            sTComp->getCompanyByUUID(uuidNew)->c_objMonth -= 100; //TODO, haurien de fer-se un contracte de ownership de alguna manera aixi que no es faria aquí.
             for(const auto p : posNewComp.sgT_gPos)
                 FulfillIntentions::doRentContractsExistingResidents(p, *this, 0);
         }
@@ -194,12 +195,16 @@ private:
         static void
         gExecuteGiveRentCellOperation(const sCompanyCompiler::sCCIntentions &sCCI, sCompanyMain &inSCM,
                                       const uint32_t inRTime, const uint32_t inCDate) {
-            std::pair<int, int> gTile = sCCI.scc_objCompany->getOwnedByIndex(sCCI.scc_addIdInfo);
+            if(!sCCI.scc_objCompany->hasOwnedType(sCCI.scc_addIdInfo))
+                return;
+
+            std::pair<int, int> gTile = sCCI.scc_objCompany->getOwnedByType(sCCI.scc_addIdInfo);
+            sCCI.scc_objCompany->addRentedLocationByPos(gTile, sCCI.scc_addIdInfo);
             uint32_t cQuality = inSCM.sM_groupLand->gL_gTerrain->getQualityGivenPosHome(gTile) -
                                 inSCM.sM_groupLand->gL_gAirPollution->getPenalizationAir(gTile);
 
             uint32_t endRentPrice = getTotalPriceOfHome(gTile, inSCM);
-            uint32_t cPrice = inSCM.sM_groupLand->gL_gTerrain->gTG_civilOccupancy->get(gTile) * endRentPrice * 1.5;
+            auto cPrice = (uint32_t)(inSCM.sM_groupLand->gL_gTerrain->gTG_civilOccupancy->get(gTile) * endRentPrice * 1.5);
 
             std::shared_ptr<sLRentCell::sMOffering> sMO =
                     std::make_shared<sLRentCell::sMOffering>(sCCI.scc_objCompany, gTile,
@@ -230,7 +235,7 @@ private:
         static void
         gExecuteSellCellOperation(const sCompanyCompiler::sCCIntentions &sCCI, sCompanyMain &inSCM,
                                   const uint32_t inRTime, const uint32_t inCDate) {
-            std::pair<int, int> gTile = sCCI.scc_objCompany->getOwnedByIndex(sCCI.scc_addIdInfo);
+            std::pair<int, int> gTile = sCCI.scc_objCompany->getOwnedByType(sCCI.scc_addIdInfo);
 
             uint32_t cQuality = inSCM.sM_groupLand->gL_gTerrain->getQualityGivenPosHome(gTile) -
                                 inSCM.sM_groupLand->gL_gAirPollution->getPenalizationAir(gTile);

@@ -19,7 +19,7 @@ public:
             for (const auto &pElem: sCellSlot.sgT_gPos) {
                 std::shared_ptr<sLBuyCell::sMOffering> sMO =
                         std::make_shared<sLBuyCell::sMOffering>(nullptr, pElem,
-                                                                sCellSlot.sgT_gType,
+                                                                sCellSlot.sgT_soilType,
                                                                 0, 0); //TODO PRICE AND QUALITY
                 addListing<sLBuyCell>(sMO);
             }

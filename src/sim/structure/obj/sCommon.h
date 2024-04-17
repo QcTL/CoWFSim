@@ -26,4 +26,11 @@ struct objActiveRute {
     uint64_t c_uuid;
 };
 
+struct sCodeObj {
+    std::vector<uint64_t> sCO_Code;
+    uint32_t sCO_Score = 0;
+
+    sCodeObj(const std::vector<uint64_t> &sCoCode, uint32_t sCoScore) : sCO_Code(sCoCode), sCO_Score(sCoScore) {}
+};
+
 #endif //CITYOFWEIRDFISHES_SCOMMON_H
