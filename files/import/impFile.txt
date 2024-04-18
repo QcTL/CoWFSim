@@ -1,10 +1,13 @@
 Centres_Urbans:2
+Centres_Urbans_Mida:Mitjana
 Estructura_Ciutat:Graella
-Ciutat_Central:on
-Quanitat_Node_Industrial:0
-Quanitat_Carrers_Princiapls:1
+Ciutat_Central:off
+Quanitat_Node_Industrial:1
+Node_Industrial_Mida:Gran
+Quanitat_Carrers_Princiapls:2
 Mida_Simulacio:Petita
+Nivell_Poblacio_Inicial:Gran
 Estructures_Decoratives:off
 Conte_Riu:on
 Mida_Riu:Petita
-Llavor:15
+Llavor:16

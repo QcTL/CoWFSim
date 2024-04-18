@@ -24,7 +24,7 @@ public:
     static std::vector<gPositionEscape>
     gen(const std::shared_ptr<gIGrid<T>> &gType,
         std::pair<int, int> pStart, std::pair<double, double> vStart, T valueEnd,
-        uint8_t fDispersion, int seed = 0) {
+        uint8_t fDispersion, bool stopWhenFindRoad, int seed = 0) {
 
         std::vector<gPositionEscape> ret;
         std::pair<double, double> vUnitInertia = vStart;
@@ -43,9 +43,11 @@ public:
             sCM_genRand.seed(static_cast<unsigned int>(time(nullptr)));
 
         while (gType->isInside(pActive)) {
-            if (gType->get(pActive) != 5 && getSurroundRoads(gType, pActive, valueEnd) <= 2) {
+            if (stopWhenFindRoad && (gType->get(pActive) == 6))
+                break;
+
+            if (gType->get(pActive) != 5 && getSurroundRoads(gType, pActive, valueEnd) <= 2)
                 gType->set(pActive, valueEnd);
-            }
 
             if (tToDisp <= 0) {
                 std::pair<double, double> perUnitInertia = generateRandomPerpendicular(vUnitInertia);
@@ -70,7 +72,6 @@ public:
                 pActive.second = pActive.second + (rDir == 0 ? 0 : -1);
             }
             double angleDegrees = unif(re);
-
 
             double angleRadians = angleDegrees * M_PI / 180.0;
             vUnitInertia.first = vUnitInertia.first * cos(angleRadians) - vUnitInertia.second * sin(angleRadians);

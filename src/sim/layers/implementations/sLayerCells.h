@@ -34,9 +34,26 @@ public:
 
         //ROADS:
         //INTRACITY;
-        std::vector<gBaseToIRF::gPositionEscape> rNext = gBaseToIRF::gen<uint8_t>(sgTerrain->gTG_TypeGen,
-                                                                                  {lSize / 2, 0}, {0, 1},
-                                                                                  5, 30, inSeed);
+        struct sPosStartMainRoad {
+            std::pair<int, int> sPSM_StartPos;
+            std::pair<int, int> sPSM_StartDir;
+        };
+        std::vector<sPosStartMainRoad> sVecMainRoads = {
+                {{lSize / 2,             0},                     {0,  1}},
+                {{0,                     lSize / 2},             {1,  0}},
+                {{lSize / 2 + lSize / 3, lSize-1},                 {0,  -1}},
+                {{lSize-1,                 lSize / 2 + lSize / 3}, {-1, 0}},
+        };
+        std::vector<int> sDispersionByNRoads = {30,60,100, 150};
+
+        std::vector<gBaseToIRF::gPositionEscape> rNext;
+        for (int i = 0; i < std::stoi(mValues.at("Quanitat_Carrers_Princiapls")); i++) {
+            std::vector<gBaseToIRF::gPositionEscape> gNewVec = gBaseToIRF::gen<uint8_t>(sgTerrain->gTG_TypeGen,
+                                                                                        sVecMainRoads[i].sPSM_StartPos,
+                                                                                        sVecMainRoads[i].sPSM_StartDir,
+                                                                                        5, sDispersionByNRoads[i], false, inSeed);
+            rNext.insert(rNext.end(), gNewVec.begin(), gNewVec.end());
+        }
 
         if (mValues.at("Estructura_Ciutat") == "Graella") {
             gBaseToPattern<uint8_t> gBP(sgTerrain->gTG_TypeGen,
@@ -63,7 +80,7 @@ public:
 
         for (const gBaseToIRF::gPositionEscape rPerp: rNext) {
             gBaseToIRF::gen<uint8_t>(sgTerrain->gTG_TypeGen, rPerp.pPerpStart,
-                                     rPerp.pPerpOrigin, sgTerrain::sgT_TypeGen::sgT_TG_RoadS, 100, inSeed);
+                                     rPerp.pPerpOrigin, sgTerrain::sgT_TypeGen::sgT_TG_RoadS, 255, std::stoi(mValues.at("Quanitat_Carrers_Princiapls")) > 2, inSeed);
         }
 
 
@@ -79,17 +96,24 @@ public:
             }
         }
 
-        //HOUSES:
+        //HOUSES && BUILDINGS:
+        int levelPopulation = 1;
+        if (mValues.at("Nivell_Poblacio_Inicial") == "Petita")
+            levelPopulation = 3;
+        else if (mValues.at("Nivell_Poblacio_Inicial") == "Mitjana")
+            levelPopulation = 2;
+        else if (mValues.at("Nivell_Poblacio_Inicial") == "Gran")
+            levelPopulation = 1;
         gBaseToStartBuildings::gen(sgTerrain->gTG_TypeSoil, sgTerrain->gTG_TypeGen,
                                    {TypeSoil_T1Urban, TypeSoil_T2Urban, TypeSoil_T3Urban,
                                     TypeSoil_T1Factory, TypeSoil_T2Factory},
-                                   {5, 6}, inSeed);
+                                   {5, 6}, levelPopulation,inSeed);
 
         //FIELDS:
+
         sgTerrain->gTG_fieldsBlobPositions = gBaseToField<uint8_t>::genMapPos(
                 sgTerrain->gTG_TypeGen,
                 BasicTransformations::genMaskFromGrid(sgTerrain->gTG_TypeSoil, {TypeSoil_T1Farm}), inSeed);
-
         for (const auto &mapElem: sgTerrain->gTG_fieldsBlobPositions) {
             for (const auto &vecElem: mapElem.second) {
                 sgTerrain->gTG_TypeGen->set({vecElem.first.second, vecElem.first.first},

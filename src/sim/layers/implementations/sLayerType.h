@@ -29,7 +29,6 @@ const uint8_t TypeSoil_T2Obstacle = 9;
 class sLayerType {
 public:
 
-
     static double distance(const std::pair<int, int> &p1, const std::pair<int, int> &p2) {
         return std::sqrt(std::pow(p2.first - p1.first, 2) + std::pow(p2.second - p1.second, 2));
     }
@@ -76,7 +75,7 @@ public:
     };
 
     static returnLayerType gen(uint32_t lSize, const std::shared_ptr<gIGrid<uint8_t>> &gTypeGen,
-                               const std::map<std::string, std::string> &mValues,const int inSeed = 0 ) {
+                               const std::map<std::string, std::string> &mValues, const int inSeed = 0) {
         std::shared_ptr<gIGrid<uint8_t>> gLayerTypeSoil =
                 std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, TypeSoil_Nothing));
         std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gLayerTypeSoil->rangeUse();
@@ -94,21 +93,52 @@ public:
         if (mValues.at("Conte_Riu") == "on")
             gBaseToRiver<uint8_t>::generate(gLayerTypeSoil, 20, lSizeRiver, TypeSoil_T1Obstacle);
 
-        if(inSeed == 0)
-            std::srand(static_cast<unsigned>(std::time(nullptr)));
+        std::mt19937 sLT_genRVal;
+        if (inSeed == 0)
+            sLT_genRVal.seed(std::time(nullptr));
         else
-            std::srand(inSeed);
+            sLT_genRVal.seed(inSeed);
 
-        std::vector<std::pair<int, int>> gCenterCoreUrban(3);
+
+        //NUCLEUS CITY
+        struct sLT_typeNucleusSize {
+            int pRadiusC;
+            int pRadiusE;
+            int pRadiusQ;
+        };
+        std::vector<sLT_typeNucleusSize> tSizeNucleusCiv = {{3, 5,  9},
+                                                            {6, 9,  13},
+                                                            {9, 12, 17}};
+        int selSizeNucleus = 0;
+        if (mValues.at("Centres_Urbans_Mida") == "Petita")
+            selSizeNucleus = 0;
+        else if (mValues.at("Centres_Urbans_Mida") == "Mitjana")
+            selSizeNucleus = 1;
+        else if (mValues.at("Centres_Urbans_Mida") == "Gran")
+            selSizeNucleus = 2;
+        std::vector<std::pair<int, int>> gCenterCoreUrban(std::stoi(mValues.at("Centres_Urbans")));
+        std::uniform_int_distribution<int> distGCenter(0, (int) lSize);
         for (auto &gCenter: gCenterCoreUrban) {
-            gCenter = {std::rand() % (lSize + 1), std::rand() % (lSize + 1)};
-            genClusterTypeSoil(gCenter, 6, 9, 13, gLayerTypeSoil);
+            gCenter = {distGCenter(sLT_genRVal), distGCenter(sLT_genRVal)};
+            genClusterTypeSoil(gCenter,
+                               tSizeNucleusCiv[selSizeNucleus].pRadiusC,
+                               tSizeNucleusCiv[selSizeNucleus].pRadiusE,
+                               tSizeNucleusCiv[selSizeNucleus].pRadiusQ, gLayerTypeSoil);
         }
 
-        std::vector<std::pair<int, int>> gCenterCoreIndustrial(2);
+        //NUCLEUS INDUSTRIAL
+        int selSizeNucleusInd = 0;
+        if (mValues.at("Node_Industrial_Mida") == "Petita")
+            selSizeNucleusInd = 0;
+        else if (mValues.at("Node_Industrial_Mida") == "Mitjana")
+            selSizeNucleusInd = 1;
+        else if (mValues.at("Node_Industrial_Mida") == "Gran")
+            selSizeNucleusInd = 2;
+         std::vector<std::pair<int, int>> gCenterCoreIndustrial(std::stoi(mValues.at("Quanitat_Node_Industrial")));
         for (auto &gCenter: gCenterCoreIndustrial) {
-            gCenter = {std::rand() % (lSize + 1), std::rand() % (lSize + 1)};
-            genClusterTypeIndustry(gCenter, 3, 8, gLayerTypeSoil);
+            gCenter = {distGCenter(sLT_genRVal), distGCenter(sLT_genRVal)};
+            genClusterTypeIndustry(gCenter, tSizeNucleusCiv[selSizeNucleusInd].pRadiusC,
+                                   tSizeNucleusCiv[selSizeNucleusInd].pRadiusE, gLayerTypeSoil);
         }
 
         auto wMask = BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing});
@@ -121,8 +151,9 @@ public:
             }
         }
         BasicTransformations::copyWhere(gTypeGen, gLayerTypeSoil,
-                                        {{7,               5},
-                                         {TypeSoil_T1Farm, 4}});
+                                        {
+                                                {7,               5},
+                                                {TypeSoil_T1Farm, 4}});
 
 
         gCenterCoreUrban.insert(gCenterCoreUrban.end(), gCenterCoreIndustrial.begin(), gCenterCoreIndustrial.end());
