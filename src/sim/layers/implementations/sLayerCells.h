@@ -85,14 +85,26 @@ public:
                                     TypeSoil_T1Factory, TypeSoil_T2Factory},
                                    {5, 6}, inSeed);
 
+        //FIELDS:
+        sgTerrain->gTG_fieldsBlobPositions = gBaseToField<uint8_t>::genMapPos(
+                sgTerrain->gTG_TypeGen,
+                BasicTransformations::genMaskFromGrid(sgTerrain->gTG_TypeSoil, {TypeSoil_T1Farm}), inSeed);
+
+        for (const auto &mapElem: sgTerrain->gTG_fieldsBlobPositions) {
+            for (const auto &vecElem: mapElem.second) {
+                sgTerrain->gTG_TypeGen->set({vecElem.first.second, vecElem.first.first},
+                                            sgTerrain::sgT_TypeGen::sgT_TG_FieldBuilding);
+            }
+        }
+
         //METRO:
 
         std::vector<std::vector<std::pair<int, int>>> rMetro;
         for (int i = 0; i < cClusters.size(); i++) {
             rMetro.push_back(
                     gBaseToLineRoads::givenTwoPoints<uint8_t>(gUnderground,
-                                                                cClusters[i], cClusters[(i + 1) % cClusters.size()],
-                                                                1));
+                                                              cClusters[i], cClusters[(i + 1) % cClusters.size()],
+                                                              1));
             gUnderground->set(cClusters[i], 2);
         }
 
@@ -112,15 +124,6 @@ public:
                 gUnderground->set({elm.first.second, elm.first.first}, pVal2Bits);
             }
         }
-
-        //FIELDS:
-        // gBaseToField<uint32_t> gBFields(gCell, 0, BasicTransformations::genMaskFromGrid(gTypeSoil, {TypeSoil_T1Farm}), inSeed);
-        /*
-        BasicTransformations::replaceValues(gCell,
-                                            {{2, ((uint32_t) (uint8_t) strtol("00010000", nullptr, 2)) << 24}});
-        BasicTransformations::replaceValues(gCell,
-                                            {{1, ((uint32_t) (uint8_t) strtol("00010001", nullptr, 2)) << 24}});
-        */
 
         return {gUnderground, rMetro};
     }

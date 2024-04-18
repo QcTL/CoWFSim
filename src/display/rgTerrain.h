@@ -13,6 +13,7 @@
 #include "../sim/structure/grids/transformation/gBasicTransformations.h"
 #include "../sim/structure/grids/transformation/gBaseToStartBuildings.h"
 #include "../sim/snCommonAtr.h"
+#include "../sim/structure/grids/transformation/gBaseToField.h"
 
 
 class rgTerrain {
@@ -45,11 +46,12 @@ public:
     }
 
     void loadRenderWithSimGrids(const std::shared_ptr<gIGrid<uint8_t>> &inGTypeGen,
-                                const std::shared_ptr<gIGrid<uint8_t>> &inGTypeSoil) {
+                                const std::shared_ptr<gIGrid<uint8_t>> &inGTypeSoil,
+                                const std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint8_t>>> &inGBlobFields) {
         //RIVER:
         std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint8_t>>> pRiver = gBaseToBorderDetection::generate<uint32_t>(
                 gLayerCurStruct, {gBorderType::gBNonConnex, gBorderOutside::gIsGroup}, {},
-                BasicTransformations::genMaskFromGrid(inGTypeSoil, {8}));
+                BasicTransformations::genMaskFromGrid(inGTypeSoil, {TypeSoil_T1Obstacle}));
 
         for (const auto &map_element: pRiver) {
             for (const auto &elm: map_element.second) {
@@ -113,6 +115,10 @@ public:
         gBaseToStartBuildings::renderBuildingFromType<uint32_t>(gLayerCurStruct, inGTypeGen, inGTypeSoil,
                                                                 snCommonAtr::getFlagAtr("snCA_Seed"));
         //END BUILDINGS
+
+        // FIELDS:
+        gBaseToField<uint32_t>::blobFieldsToGrid(inGBlobFields, gLayerCurStruct);
+        // END FIELDS
     }
 
     std::shared_ptr<gIGrid<uint32_t>> gLayerCurStruct;

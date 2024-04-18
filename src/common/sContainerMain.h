@@ -22,7 +22,7 @@ public:
         pPM = std::make_shared<rPileMenus>(gSimL);
         //MENUS
         sMS->rInteraction = pPM;
-        rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->sSM_groupLand,sMS->sSM_gMainRoads,
+        rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->sSM_groupLand,sMS->sSM_groupEconomy,sMS->sSM_gMainRoads,
                                                        sMS->sSM_gMainRoads->gLayerRoads,
                                                        sMS->sSM_sCompany->sTComp->gLayerOwnership, sMS->sSM_sCompany->sTComp));
         pPM->addMenuTop(rBasic);

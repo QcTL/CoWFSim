@@ -27,6 +27,7 @@ public:
                                                                                  std::list<std::shared_ptr<objCompany>>());
     };
 
+    std::string getStringByObjId(const uint32_t inIdProduct) const {return sEM_totalElements->getNameById(inIdProduct);}
 
     void tickReduced(uint32_t inRTick, uint32_t inTDate) {
         if (inRTick == 0)
@@ -87,10 +88,12 @@ private:
 
     static void
     diffElementCompany(uint64_t inUuidElement, int inNElements, const std::shared_ptr<objCompany> &inPObjCompany) {
-        if (inPObjCompany->c_pOwn.find(inUuidElement) == inPObjCompany->c_pOwn.end())
-            inPObjCompany->c_pOwn[inUuidElement] = inNElements;
-        else
-            inPObjCompany->c_pOwn[inUuidElement] += inNElements;
+        if (inPObjCompany != nullptr) {
+            if (inPObjCompany->c_pOwn.find(inUuidElement) == inPObjCompany->c_pOwn.end())
+                inPObjCompany->c_pOwn[inUuidElement] = inNElements;
+            else
+                inPObjCompany->c_pOwn[inUuidElement] += inNElements;
+        }
     }
 
     uint32_t getPriceItemActual(uint64_t inUuidElement) {

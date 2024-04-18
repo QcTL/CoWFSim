@@ -16,11 +16,13 @@ public:
 
     void setEmptySlots(const std::list<sgTerrain::sgT_CellSlot> &inLEmpty) {
         for (const sgTerrain::sgT_CellSlot &sCellSlot: inLEmpty) {
-            std::shared_ptr<sLBuyCell::sMOffering> sMO =
-                    std::make_shared<sLBuyCell::sMOffering>(nullptr, sCellSlot.sgT_gPos,
-                                                            sCellSlot.sgT_gType,
-                                                            0, 0); //TODO PRICE AND QUALITY
-            addListing<sLBuyCell>(sMO);
+            for (const auto &pElem: sCellSlot.sgT_gPos) {
+                std::shared_ptr<sLBuyCell::sMOffering> sMO =
+                        std::make_shared<sLBuyCell::sMOffering>(nullptr, pElem,
+                                                                sCellSlot.sgT_soilType,
+                                                                0, 0); //TODO PRICE AND QUALITY
+                addListing<sLBuyCell>(sMO);
+            }
         }
     }
 
@@ -47,15 +49,18 @@ public:
         gE_sEvaluator->computeCreatedElement(inUuidElement, inObjCompany);
     }
 
-    void computeBoughtElement(uint64_t inUuidElement, const std::shared_ptr<objCompany> &inObjCompany, uint32_t inRTime, uint32_t inCDate) {
+    void computeBoughtElement(uint64_t inUuidElement, const std::shared_ptr<objCompany> &inObjCompany, uint32_t inRTime,
+                              uint32_t inCDate) {
         gE_sEvaluator->computeBoughtElement(inUuidElement, inObjCompany, inRTime, inCDate);
     }
 
-    void computeSellInmElement(uint64_t inUuidElement, const std::shared_ptr<objCompany> &inObjCompany, uint32_t inRTime, uint32_t inCDate) {
+    void
+    computeSellInmElement(uint64_t inUuidElement, const std::shared_ptr<objCompany> &inObjCompany, uint32_t inRTime,
+                          uint32_t inCDate) {
         gE_sEvaluator->computeSellInmElement(inUuidElement, inObjCompany, inRTime, inCDate);
     }
 
-    bool doesObjectExists(const uint32_t uuidItem){
+    bool doesObjectExists(const uint32_t uuidItem) {
         return gE_sEvaluator->doesObjectExists(uuidItem);
     }
 

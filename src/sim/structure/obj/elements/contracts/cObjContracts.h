@@ -26,27 +26,27 @@ enum con_Type {
 class con_b {
 public:
     uint64_t ct_uuid = 0;
-    int ct_uuidCompanyGiving;
+    uint32_t ct_uuidCompanyGiving;
     uint32_t ct_strDate;
 
     bool ct_hasEndDate;
     bool ct_hasReceiving;
 
     uint32_t ct_endDate = 0;
-    int ct_uuidCompanyReceiving = 0;
+    uint32_t ct_uuidCompanyReceiving = 0;
 
-    con_b(int ctUuidCompanyGiving, uint32_t ctStrDate)
+    con_b(uint32_t ctUuidCompanyGiving, uint32_t ctStrDate)
             : ct_strDate(ctStrDate),
               ct_uuidCompanyGiving(ctUuidCompanyGiving),
               ct_hasEndDate(false), ct_hasReceiving(false) {}
 
-    con_b(int ctUuidCompanyGiving, int ctUuidCompanyReceiving, uint32_t ctStrDate)
+    con_b(uint32_t ctUuidCompanyGiving, uint32_t ctUuidCompanyReceiving, uint32_t ctStrDate)
             : ct_strDate(ctStrDate),
               ct_uuidCompanyGiving(ctUuidCompanyGiving),
               ct_hasEndDate(false),
               ct_hasReceiving(true), ct_uuidCompanyReceiving(ctUuidCompanyReceiving) {}
 
-    con_b(int ctUuidCompanyGiving, int ctUuidCompanyReceiving, uint32_t ctStrDate, uint32_t ctEndDate)
+    con_b(uint32_t ctUuidCompanyGiving, uint32_t ctUuidCompanyReceiving, uint32_t ctStrDate, uint32_t ctEndDate)
             : ct_strDate(ctStrDate),
               ct_uuidCompanyGiving(ctUuidCompanyGiving),
               ct_hasEndDate(true), ct_endDate(ctEndDate),
@@ -151,6 +151,7 @@ public:
     void
     addAsReceiving(const std::shared_ptr<objCompany> &objCom) override {
         objCom->addAvailableLocation(ct_lCells, ct_typeCell);
+        objCom->c_objMonth -= 100; //TODO Improve this maintance COST
         addPropertyContract(objCom, ct_typePayment, ct_recurrentCost, false);
     };
 
@@ -159,6 +160,7 @@ public:
         if (objCom == nullptr)
             return;
         objCom->removeAvailableLocation(ct_lCells, ct_typeCell);
+        objCom->c_objMonth += 100;
         addPropertyContract(objCom, ct_typePayment, ct_recurrentCost, true);
     };
 

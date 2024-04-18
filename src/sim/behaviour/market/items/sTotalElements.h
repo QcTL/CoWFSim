@@ -49,23 +49,28 @@ public:
 
     sME_Element getById(uint32_t idRec) { return sME_listItems[idRec]; }
 
+    std::string getNameById(uint32_t idRec) {return sME_gRecipeTotalName[idRec];}
+
     uint32_t nElements() { return sME_listItems.size(); }
 
 private:
 
     std::vector<sME_Element> sME_listItems;
     std::map<std::string, uint32_t> sME_gRecipeIdByName;
+    std::vector<std::string> sME_gRecipeTotalName;
 
     sME_Element getRecipeFromTokens(const uint32_t &idAct, const std::vector<std::string> &gTokens) {
         std::vector<uint8_t> rTypeBuilding;
 
         for (const std::string &c: split(gTokens[1], '.')) {
             if (c == "GTYPE_FARMLAND")
-                rTypeBuilding.push_back(0);
+                rTypeBuilding.push_back(sgTerrain::sgT_TypeSoil::sgT_TS_T1Farm);
             else if (c == "GTYPE_LOWFACT")
-                rTypeBuilding.push_back(1);
+                rTypeBuilding.push_back(sgTerrain::sgT_TypeSoil::sgT_TS_T1Industrial);
             else if (c == "GTYPE_HEAVYFACT")
-                rTypeBuilding.push_back(2);
+                rTypeBuilding.push_back(sgTerrain::sgT_TypeSoil::sgT_TS_T2Industrial);
+            else if (c == "GTYPE_CIV")
+                rTypeBuilding.push_back(sgTerrain::sgT_TypeSoil::sgT_TS_T1Mixed);
         }
 
         std::vector<uint64_t> rReqMaterials;
@@ -73,6 +78,7 @@ private:
             rReqMaterials.push_back(sME_gRecipeIdByName.at(c));
 
         sME_gRecipeIdByName.insert({gTokens[0], idAct});
+        sME_gRecipeTotalName.push_back(gTokens[4]);
 
         return {idAct, rReqMaterials, rTypeBuilding[0] , static_cast<uint32_t>(std::stoul(gTokens[3]))};
     }

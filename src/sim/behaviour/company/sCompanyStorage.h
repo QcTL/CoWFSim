@@ -70,8 +70,8 @@ public:
                 std::pair<uint32_t, uint32_t> pairTimeActive = i.second->c_activeDates.c_StrEndTime;
                 if (i.second->c_attrCanEmployee && inRTimer >= pairTimeActive.first &&
                     inRTimer <= pairTimeActive.second &&
-                    i.second->c_nEmployee < i.second->c_cActiveLocations.size() * 2)
-                    ret.emplace_back(i.second->c_uuid, i.second->c_cActiveLocations.size() * 2 - i.second->c_nEmployee);
+                    i.second->c_nEmployee < i.second->getNumberActiveCells() * 2)
+                    ret.emplace_back(i.second->c_uuid, i.second->getNumberActiveCells() * 2 - i.second->c_nEmployee);
             }
         }
         return ret;
@@ -93,25 +93,31 @@ public:
             sCT_genRand.seed(static_cast<unsigned int>(time(nullptr)));
     }
 
-    uint32_t createCompany(const std::list<std::pair<int, int>> &vecNPos, uint8_t typeCompany) {
+    uint32_t createCompany(const std::list<std::pair<int, int>> &vecNPos, uint8_t typeSoilCompany) {
         std::uniform_int_distribution<> disDay(0, (int) sCT_vActiveDaysValid.size() - 1);
         std::discrete_distribution<> disHour(sCT_vActiveHoursWeight.begin(), sCT_vActiveHoursWeight.end());
         int randomIndexDay = disDay(sCT_genRand);
         int randomIndexHour = disHour(sCT_genRand);
 
-        std::shared_ptr newObjCompany = std::make_shared<objCompany>(objCompany(vecNPos, typeCompany,
+        std::shared_ptr newObjCompany = std::make_shared<objCompany>(objCompany(vecNPos, typeSoilCompany,
                                                                                 {sCT_vActiveDaysValid[randomIndexDay],
                                                                                  sCT_vActiveHoursValid[randomIndexHour]}));
         uint32_t _idNewComp = sCT_vTotalComp.storeElement(newObjCompany);
         newObjCompany->c_uuid = _idNewComp;
         newObjCompany->c_cActiveFunds.set(5000);
 
-        sCT_sCodeS->initNewCode(_idNewComp);
+        sCT_sCodeS->initNewCode(_idNewComp, typeSoilCompany);
         getCompanyByUUID(_idNewComp)->c_cCode = sCT_sCodeS->getPointerCodeByUuid(_idNewComp);
+
+
         for (const auto &nPos: vecNPos)
             addRefPosOwnCompany(nPos, _idNewComp);
 
         return _idNewComp;
+    }
+
+    void removeCompany(const std::shared_ptr<objCompany>& inObjCompany){
+        sCT_vTotalComp.removeElement(inObjCompany->c_uuid);
     }
 
     bool isCompanyInPosition(const std::pair<int, int> &inPCell) { return !gLayerOwnership->get(inPCell).empty(); }

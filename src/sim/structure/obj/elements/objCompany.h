@@ -16,7 +16,6 @@
 #include <random>
 #include <stdexcept>
 #include <unordered_set>
-#include "../../../behaviour/company/code/sCodeStoratge.h"
 #include "../../../eyeCatcher/eyeValue.h"
 
 class objCompany {
@@ -39,7 +38,7 @@ public:
 
     explicit objCompany(const std::list<std::pair<int, int>> &ownStart, uint8_t typeCellStart,
                         objComp_activeDates activeDates)
-            :c_activeDates(std::move(activeDates)) {
+            : c_activeDates(std::move(activeDates)) {
 
         addAvailableLocation(ownStart, typeCellStart);
         int numStrings = numStringsDist(oC_gen);
@@ -59,31 +58,52 @@ public:
     }
 
 
-    void addAvailableLocation(const std::list<std::pair<int, int>> &ctLCells, uint8_t typeCell) {
-        c_cActiveLocations.insert(
-                c_cActiveLocations.end(), ctLCells.begin(), ctLCells.end());
-        if (c_cAvailableByType.find(typeCell) != c_cAvailableByType.end())
-            c_cAvailableByType[typeCell] += 1;
+    void addAvailableLocation(const std::list<std::pair<int, int>> &ctLCells, uint8_t typeSoilCell) {
+        c_cActiveLocations[typeSoilCell].insert(
+                c_cActiveLocations[typeSoilCell].end(), ctLCells.begin(), ctLCells.end());
+        if (c_cAvailableByType.find(typeSoilCell) != c_cAvailableByType.end())
+            c_cAvailableByType[typeSoilCell] += 1;
         else
-            c_cAvailableByType[typeCell] = 1;
+            c_cAvailableByType[typeSoilCell] = 1;
     }
-
 
     void removeAvailableLocation(const std::list<std::pair<int, int>> &ctLCells, uint8_t typeCell) {
         for (const auto &item: ctLCells) {
-            c_cActiveLocations.erase(
-                    std::remove(c_cActiveLocations.begin(), c_cActiveLocations.end(), item),
-                    c_cActiveLocations.end());
+            c_cActiveLocations[typeCell].erase(
+                    std::remove(c_cActiveLocations[typeCell].begin(), c_cActiveLocations[typeCell].end(), item),
+                    c_cActiveLocations[typeCell].end());
         }
         c_cAvailableByType[typeCell] -= 1;
+    }
+
+    void addRentedLocationByPos(const std::pair<int,int> inPRented, uint8_t typeCell){
+        removeAvailableLocation({inPRented}, typeCell);
+        c_cRentedLocations[typeCell].push_back(inPRented);
     }
 
     uint32_t c_uuid{};
     std::string nName;
 
-    std::pair<int, int> getOwnedByIndex(uint32_t lIndex) {
-        return *std::next(c_cActiveLocations.begin(),
-                          lIndex % (uint32_t) c_cActiveLocations.size()); // Advance iterator by 2 positions
+    [[nodiscard]] bool hasOwnedType(uint8_t inNType) const{
+        return !c_cActiveLocations.at(inNType).empty();
+    }
+
+    [[nodiscard]] uint32_t getNumberRentedCells() const{
+        size_t totalLength = 0;
+        for (const auto& pair : c_cRentedLocations)
+            totalLength += pair.second.size();
+        return totalLength;
+    }
+
+    [[nodiscard]] uint32_t getNumberActiveCells() const{
+        size_t totalLength = 0;
+        for (const auto& pair : c_cActiveLocations)
+            totalLength += pair.second.size();
+        return totalLength;
+    }
+
+    std::pair<int, int> getOwnedByType(uint8_t inNType) {
+        return c_cActiveLocations[inNType].front();
     }
 
     void addContractToCompany(uint8_t inCType, uint64_t inCUuid) {
@@ -93,10 +113,26 @@ public:
             c_activeContracts[inCType] = {inCUuid};
     }
 
+    uint8_t getTypeByIndex(uint32_t inIndexCell){
+        size_t remainingIndex = inIndexCell;
+        for (const auto& pair : c_cActiveLocations) {
+            const auto& list = pair.second;
+            size_t listSize = list.size();
+
+            if (remainingIndex < listSize) {
+                auto it = list.begin();
+                std::advance(it, remainingIndex);
+                return pair.first;
+            }
+            remainingIndex -= listSize;
+        }
+        return 0;
+    }
+
     std::map<uint32_t, int> c_pOwn;
-    std::list<std::pair<int, int>> c_cActiveLocations;
+    std::map<uint8_t, std::list<std::pair<int, int>>> c_cActiveLocations;
     std::map<uint8_t, int> c_cAvailableByType;
-    std::list<std::pair<int, int>> c_cRentedLocations;
+    std::map<uint8_t, std::list<std::pair<int, int>>> c_cRentedLocations;
     objComp_activeDates c_activeDates;
 
     eyeValue<uint32_t> c_nEmployee;
@@ -105,7 +141,7 @@ public:
     eyeValue<float> c_objYear;
     eyeValue<float> c_objMonth;
 
-    std::shared_ptr<sCodeStorage::sCodeObj> c_cCode;
+    std::shared_ptr<sCodeObj> c_cCode;
 
     std::map<uint8_t, std::list<uint64_t>> c_activeContracts;
     bool c_attrCanEmployee = true;

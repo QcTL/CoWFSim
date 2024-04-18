@@ -54,7 +54,7 @@ public:
         std::shared_ptr<objCivil> _oCivil;
 
         sgUndergroundMain::sgUM_lowestViableRoute lVRMetro = sCM_groupLand->gL_gUnderground->getLowestDistanceCommute(
-                rPosCivHome, inObjCompany.c_cActiveLocations.front());
+                rPosCivHome, inObjCompany.c_cActiveLocations.begin()->second.front());
 
         if (lVRMetro.totalDistance < 30)
             _oCivil = _getCivilMetro(rPosCivHome, inObjCompany, lVRMetro);
@@ -97,7 +97,7 @@ private:
         return std::make_shared<objCivil>(
                 objCivil(objCivil::typeRouteSystem::OC_TRS_CAR, rPosCivHome,
                          {sCM_sRoadsMain->getClosestRoadToBuilding(rPosCivHome),
-                          sCM_sRoadsMain->getClosestRoadToBuilding(inObjCompany.c_cActiveLocations.front())},
+                          sCM_sRoadsMain->getClosestRoadToBuilding(inObjCompany.c_cActiveLocations.begin()->second.front())},
                          inObjCompany.c_activeDates.c_StrEndTime.first + distrib(sCM_genRand),
                          inObjCompany.c_activeDates.c_StrEndTime.second + distrib(sCM_genRand),
                          inObjCompany.c_activeDates.cAD_jobWeek));

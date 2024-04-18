@@ -11,9 +11,8 @@
 class rCellViewMenu : public rIMenu {
 public:
     explicit rCellViewMenu(const std::shared_ptr<rIMenu> &mParent, const std::vector<objCompany> &rShow,
-                           const std::string &pthFileD,
-                           const std::shared_ptr<rPileMenus> &mPiles)
-            : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft, pthFileD), refPile(mPiles), compShow(rShow) {
+                           const std::shared_ptr<groupEconomy>& sg_groupEconomy,const std::shared_ptr<rPileMenus> &mPiles)
+            : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft, "d_mCellViewLayer"), refPile(mPiles), compShow(rShow) {
         int index = 0;
         for (const auto &it: rShow) {
             if (index < 3)
@@ -32,27 +31,26 @@ public:
         switch (event.type) {
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::Escape) {
-                    parentMenu->setResponse(-1,0);
+                    parentMenu->setResponse(-1, 0);
                 }
                 break;
             case sf::Event::MouseButtonPressed:
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     sf::Vector2<int> pMouse = sf::Mouse::getPosition(rWindow);
-                    std::cout<< pMouse.x << ":" << pMouse.y<< std::endl;
-                    std::cout<<"TO" << gHeight * 16 << ":" <<gWidth * 16 << std::endl;
+                    std::cout << pMouse.x << ":" << pMouse.y << std::endl;
+                    std::cout << "TO" << gHeight * 16 << ":" << gWidth * 16 << std::endl;
                     if (isInside(rWindow, gHeight * 16, gWidth * 16, pMouse)) {
                         //Now check if its in the same line as some element select;
                         sf::Vector2<unsigned int> absPos = getAbsPos(rWindow, gHeight * 16, gWidth * 16, pMouse);
                         for (int i = 0; i < pElemSelAbs.size(); i++) {
                             if (pElemSelAbs[i].first * 16 < absPos.y && pElemSelAbs[i].first * 16 + 16 >= absPos.y) {
                                 std::shared_ptr<rCompViewLayer> rComp = std::make_shared<rCompViewLayer>(
-                                        rCompViewLayer(refPile->vTopActiveMenu, compShow[i],
-                                        "d_mCompViewLayer", refPile));
+                                        rCompViewLayer(refPile->vTopActiveMenu, compShow[i], rCVM_groupEconomy,refPile));
                                 refPile->addMenuTop(rComp);
                             }
                         }
                     } else {
-                       // parentMenu->setResponse(-1);
+                        // parentMenu->setResponse(-1);
                     }
                     return true;
                 }
@@ -63,12 +61,13 @@ public:
         return false;
     }
 
-    void pressedCell(std::pair<int, int> cPressed,uint32_t inPTime, uint32_t inUTime) override {}
+    void pressedCell(std::pair<int, int> cPressed, uint32_t inPTime, uint32_t inUTime) override {}
 
 private:
 
     std::vector<std::pair<int, int>> pElemSel;
     std::vector<std::pair<int, int>> pElemSelAbs;
+    std::shared_ptr<groupEconomy> rCVM_groupEconomy;
 
     struct defTxtCompany {
         struct pWrite {
