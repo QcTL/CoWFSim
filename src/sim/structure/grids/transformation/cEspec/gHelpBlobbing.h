@@ -27,6 +27,8 @@ public:
 
     static std::vector<std::vector<std::shared_ptr<std::list<std::pair<int, int>>>>>
     genListOfUniquePos(std::vector<std::vector<int>> gSquares) {
+        if(gSquares.empty())
+            return {};
         std::vector<std::vector<std::shared_ptr<std::list<std::pair<int, int>>>>> ret(gSquares.size(),
                                                                                       std::vector<std::shared_ptr<std::list<std::pair<int, int>>>>(
                                                                                               gSquares[0].size()));

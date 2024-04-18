@@ -17,7 +17,7 @@ public:
 
     static void
     gen(const std::shared_ptr<gIGrid<uint8_t>> &tSoil, const std::shared_ptr<gIGrid<uint8_t>> &tType,
-        const std::vector<uint8_t> &groupSoil, const std::vector<uint8_t> &groupRoads,
+        const std::vector<uint8_t> &groupSoil, const std::vector<uint8_t> &groupRoads, int levelPopulation,
         int seed = 0) {
 
         std::pair<std::pair<int, int>, std::pair<int, int>> gRange = tType->rangeUse();
@@ -31,7 +31,7 @@ public:
         for (int i = gRange.first.first; i <= gRange.first.second; ++i) {
             for (int j = gRange.second.first; j <= gRange.second.second; ++j) {
                 if (sGroupSoil.find(tSoil->get(i, j)) != sGroupSoil.end() && tType->get(i, j) == 0 &&
-                    rand() % (tSoil->get(i, j)) == 0) {
+                    rand() % (tSoil->get(i, j)*levelPopulation) == 0) {
                     switch (tSoil->get(i, j)) {
                         case TypeSoil_T1Urban:
                             tType->set(i, j, 1);
