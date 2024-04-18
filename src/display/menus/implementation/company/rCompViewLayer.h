@@ -12,8 +12,8 @@
 
 class rCompViewLayer : public rIMenu {
 public:
-    explicit rCompViewLayer(const std::shared_ptr<rIMenu> &mParent, objCompany &rShow,  const std::shared_ptr<groupEconomy> &sgEconomy
-                            , const std::shared_ptr<rPileMenus> &mPiles)
+    explicit rCompViewLayer(const std::shared_ptr<rIMenu> &mParent, objCompany &rShow,
+                            const std::shared_ptr<groupEconomy> &sgEconomy, const std::shared_ptr<rPileMenus> &mPiles)
             : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft, "d_mCompViewLayer"), mPiles(mPiles), rCompRef(rShow) {
 
         setText(0, rShow.nName);
@@ -21,8 +21,8 @@ public:
         setText(2, oCommonMenus::getCompNumber(rShow.getNumberRentedCells()));
         setText(3, getFloatToString2Decimal(rShow.c_cActiveFunds));
         setText(4, getFloatToString2Decimal(
-                std::max(-100.0, ((rShow.c_objYear + rShow.c_objMonth * 12 + rShow.c_objWeek * 36) /
-                                  rShow.c_cActiveFunds) * 100))); //TODO Change it;
+                (float) std::max(-100.0, ((rShow.c_objYear + rShow.c_objMonth * 12 + rShow.c_objWeek * 36) /
+                                          rShow.c_cActiveFunds) * 100)));
 
         for (int i = 5; i < 11; i++)
             setText(i, "");
@@ -35,7 +35,7 @@ public:
         for (int i = 0; i < 3 && i < pairVec.size(); ++i)
             if (pairVec.size() > i && (pairVec.begin() + i)->second > 0) {
                 auto it = pairVec.begin() + i;
-                setText(5 + i * 2, sgEconomy->gE_sEvaluator->getStringByObjId(it->first).substr(3));
+                setText(5 + i * 2, sgEconomy->gE_sEvaluator->getStringByObjId(it->first));
                 setText(6 + i * 2, oCommonMenus::getCompNumber(it->second));
             }
     }
@@ -84,7 +84,7 @@ public:
         return false;
     }
 
-    void pressedCell(std::pair<int, int> cPressed,uint32_t inPTime, uint32_t inUTime) override {}
+    void pressedCell(std::pair<int, int> cPressed, uint32_t inPTime, uint32_t inUTime) override {}
 
 private:
 

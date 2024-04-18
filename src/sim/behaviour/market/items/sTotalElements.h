@@ -78,7 +78,7 @@ private:
             rReqMaterials.push_back(sME_gRecipeIdByName.at(c));
 
         sME_gRecipeIdByName.insert({gTokens[0], idAct});
-        sME_gRecipeTotalName.push_back(gTokens[0]);
+        sME_gRecipeTotalName.push_back(gTokens[4]);
 
         return {idAct, rReqMaterials, rTypeBuilding[0] , static_cast<uint32_t>(std::stoul(gTokens[3]))};
     }
