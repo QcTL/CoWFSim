@@ -17,14 +17,14 @@ public:
             : sMS(sMS) {
 
         gSimL = std::make_shared<gDispLayers>(sMS->sSM_groupLand->gL_gAirPollution->gLayerAirPollution,
-                                              sMS->sSM_groupLand->gL_gTerrain->gTG_rLayer->gLayerCurStruct, sMS->sSM_gMainRoads->gLayerTransit,
+                                              sMS->sSM_groupLand->gL_gTerrain->gTG_rLayer->gLayerCurStruct,
+                                              sMS->sSM_gMainRoads->gLayerTransit,
                                               sMS->sSM_groupLand->gL_gUnderground->gLayerUnderground);
         pPM = std::make_shared<rPileMenus>(gSimL);
         //MENUS
         sMS->rInteraction = pPM;
-        rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->sSM_groupLand,sMS->sSM_groupEconomy,sMS->sSM_gMainRoads,
-                                                       sMS->sSM_gMainRoads->gLayerRoads,
-                                                       sMS->sSM_sCompany->sTComp->gLayerOwnership, sMS->sSM_sCompany->sTComp));
+        rBasic = std::make_shared<rBaseMenu>(rBaseMenu(pPM, sMS->sSM_groupLand, sMS->sSM_groupEconomy,
+                                                       sMS->sSM_gMainRoads, sMS->sSM_sCompany->sTComp));
         pPM->addMenuTop(rBasic);
 
         rG = std::make_shared<rGlobal>(gSimL, pPM);

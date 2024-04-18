@@ -38,7 +38,7 @@ public:
     }
 
     void draw(sf::RenderWindow &rW) override {
-        rW.draw(dInfo, &tsTex.tsTex);
+        rW.draw(rIM_dInfo, &rIM_tsTex.tsTex);
     }
 
     void setResponse(int v, uint16_t lID) override {
@@ -63,7 +63,7 @@ public:
                 break;
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::Escape)
-                    parentMenu->setResponse(-1, 1);
+                    rIM_parentMenu->setResponse(-1, 1);
                 if (event.key.code == sf::Keyboard::C && rCompRef != nullptr) {
                     std::shared_ptr<rCompViewLayer> rComp = std::make_shared<rCompViewLayer>(
                             rCompViewLayer(mPiles->vTopActiveMenu,

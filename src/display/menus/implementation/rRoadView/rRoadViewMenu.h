@@ -23,37 +23,30 @@ std::string uint16_to_padded_string(const uint16_t num) {
 class rRoadViewMenu : public rIMenu {
 public:
     explicit rRoadViewMenu(const std::shared_ptr<rIMenu> &mParent, const std::shared_ptr<rRNodeI> &refView,
-                           const std::string &pthFileD, rIMenu::rRelativePos rPos)
-            : rIMenu(mParent, rPos, pthFileD), rSelRoad(refView) {
+                           const std::string &pthFileD)
+            : rIMenu(mParent, rIMenu::rRelativePos::pBottomLeft, pthFileD), rRVM_selRoad(refView) {
     }
 
     void update() override {}
 
-    void draw(sf::RenderWindow &rW) override {
-        rW.draw(dInfo, &tsTex.tsTex);
+    void draw(sf::RenderWindow &inRenderWin) override {
+        inRenderWin.draw(rIM_dInfo, &rIM_tsTex.tsTex);
     }
 
     void setResponse(int v, uint16_t lID) override {}
 
-    bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override {
-        switch (event.type) {
-            case sf::Event::KeyPressed:
-                if (event.key.code == sf::Keyboard::Escape) {
-                    parentMenu->setResponse(-1,2);
-                }
-                break;
-            default:
-                break;
-        }
+    bool interact(const sf::Event &inEvent, const sf::RenderWindow &inRenderWin) override {
+        if (inEvent.type == sf::Event::KeyPressed && inEvent.key.code == sf::Keyboard::Escape)
+            rIM_parentMenu->setResponse(-1, 2);
         return false;
     }
 
-    void pressedCell(std::pair<int, int> cPressed,uint32_t inPTime, uint32_t inUTime) override{
-        parentMenu->setResponse(-1,2);
+    void pressedCell(std::pair<int, int> cPressed, uint32_t inPTime, uint32_t inUTime) override {
+        rIM_parentMenu->setResponse(-1, 2);
     }
 
 protected:
-    std::shared_ptr<rRNodeI> rSelRoad;
+    std::shared_ptr<rRNodeI> rRVM_selRoad;
 };
 
 #endif //CITYOFWEIRDFISHES_RROADVIEWMENU_H

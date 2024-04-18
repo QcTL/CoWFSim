@@ -25,7 +25,7 @@ public:
     }
 
     void draw(sf::RenderWindow &rW) override {
-        rW.draw(dInfo, &tsTex.tsTex);
+        rW.draw(rIM_dInfo, &rIM_tsTex.tsTex);
     }
 
     void setResponse(int v, uint16_t lID) override {}
@@ -34,7 +34,7 @@ public:
         switch (event.type) {
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::Escape)
-                    parentMenu->setResponse(-1, 1);
+                    rIM_parentMenu->setResponse(-1, 1);
                 break;
             case sf::Event::MouseButtonPressed:
                 if (event.mouseButton.button == sf::Mouse::Left) {
@@ -44,34 +44,34 @@ public:
                         std::shared_ptr<stGlobalTrackerAttr> sGA = stGlobalTrackerAttr::getInstance();
 
                         if (_gEyePressed == 0) {
-                            if (!comVEyesState[0])
+                            if (!rIM_comVEyesState[0])
                                 sGA->stGA_totalPopulation.setObserver(eyeCatcherActive::getInstance());
                             else
                                 sGA->stGA_totalPopulation.removeObserver();
                         } else if (_gEyePressed == 1) {
-                            if (!comVEyesState[1])
+                            if (!rIM_comVEyesState[1])
                                 sGA->stGA_totalEnergy.setObserver(eyeCatcherActive::getInstance());
                             else
                                 sGA->stGA_totalEnergy.removeObserver();
                         } else if (_gEyePressed == 2) {
-                            if (!comVEyesState[2])
+                            if (!rIM_comVEyesState[2])
                                 sGA->stGA_totalImports.setObserver(eyeCatcherActive::getInstance());
                             else
                                 sGA->stGA_totalImports.removeObserver();
                         } else if (_gEyePressed == 3) {
-                            if (!comVEyesState[3])
+                            if (!rIM_comVEyesState[3])
                                 sGA->stGA_totalExports.setObserver(eyeCatcherActive::getInstance());
                             else
                                 sGA->stGA_totalExports.removeObserver();
                         } else if (_gEyePressed == 4) {
-                            if (!comVEyesState[4])
+                            if (!rIM_comVEyesState[4])
                                 sGA->stGA_ratioEmptyHouses.setObserver(eyeCatcherActive::getInstance());
                             else
                                 sGA->stGA_ratioEmptyHouses.removeObserver();
                         }
 
-                        setEyeVisualValue(_gEyePressed, !comVEyesState[_gEyePressed]);
-                        comVEyesState[_gEyePressed] = !comVEyesState[_gEyePressed];
+                        setEyeVisualValue(_gEyePressed, !rIM_comVEyesState[_gEyePressed]);
+                        rIM_comVEyesState[_gEyePressed] = !rIM_comVEyesState[_gEyePressed];
                         return true;
                     }
                 }

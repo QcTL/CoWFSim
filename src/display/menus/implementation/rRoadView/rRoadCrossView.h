@@ -9,30 +9,29 @@
 
 class rRoadCrossView : public rRoadViewMenu {
 public:
-    explicit rRoadCrossView(const std::shared_ptr<rIMenu> &mParent, const std::shared_ptr<rRNodeI> &refView,
-                            rIMenu::rRelativePos rPos)
-            : rRoadViewMenu(mParent, refView, "d_mRoadsViewCrossing", rPos) {
-        std::vector<uint8_t> sLengths = {3, 3, 3, 3};
-        comV = std::vector<defTxtCompany>(5, {{0, 0}});
+    explicit rRoadCrossView(const std::shared_ptr<rIMenu> &mParent, const std::shared_ptr<rRNodeI> &refView)
+            : rRoadViewMenu(mParent, refView, "d_mRoadsViewCrossing") {
+        std::vector<uint8_t> _sLengths = {3, 3, 3, 3};
+        rIM_comV = std::vector<defTxtCompany>(5, {{0, 0}});
         rCrossPos = std::vector<std::pair<int, int>>(5, {0, 0});
 
         int pAct = 0;
         int pCross = 0;
-        for (int i = 0; i < dExtracted.size(); ++i) {
-            for (int j = 0; j < dExtracted[i].size(); ++j) {
-                auto row = (rPos == pBottomLeft || rPos == pBottomRight) ? dExtracted.size() - 1 - i : i;
-                auto col = (rPos == pTopRight || rPos == pBottomRight) ? dExtracted[i].size() - 1 - j : j;
-                int val = dExtracted[i][j];
-                if (val == 65 || val == 48) comV[pAct++] = {{row, col}, sLengths[pAct]};
+        for (int i = 0; i < rIM_dExtracted.size(); ++i) {
+            for (int j = 0; j < rIM_dExtracted[i].size(); ++j) {
+                auto row = (rIM_rPos == pBottomLeft || rIM_rPos == pBottomRight) ? rIM_dExtracted.size() - 1 - i : i;
+                auto col = (rIM_rPos == pTopRight || rIM_rPos == pBottomRight) ? rIM_dExtracted[i].size() - 1 - j : j;
+                int val = rIM_dExtracted[i][j];
+                if (val == 65 || val == 48) rIM_comV[pAct++] = {{row, col}, _sLengths[pAct]};
                 else if (val == 277) rCrossPos[pCross++] = {i, j};
                 else if (val == 272) rCenter = {i, j};
             }
         }
-        setSizeWays(rSelRoad->getSizesNeighbor());
+        setSizeWays(rRVM_selRoad->getSizesNeighbor());
     }
 
     void update() override {
-        setRoadsCars(rSelRoad->getPosRoad(0));
+        setRoadsCars(rRVM_selRoad->getPosRoad(0));
     }
 
     std::vector<uint8_t> rOrderDir = {0, 3, 1, 2};

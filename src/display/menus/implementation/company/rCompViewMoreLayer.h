@@ -39,7 +39,7 @@ public:
     }
 
     void draw(sf::RenderWindow &rW) override {
-        rW.draw(dInfo, &tsTex.tsTex);
+        rW.draw(rIM_dInfo, &rIM_tsTex.tsTex);
     }
 
     void setResponse(int v, uint16_t lID) override {}
@@ -48,7 +48,7 @@ public:
         switch (event.type) {
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::Escape)
-                    parentMenu->setResponse(-1, 1);
+                    rIM_parentMenu->setResponse(-1, 1);
                 break;
             case sf::Event::MouseButtonPressed:
                 if (event.mouseButton.button == sf::Mouse::Left) {
@@ -56,23 +56,23 @@ public:
                     int _gEyePressed = getEyePressed(rWindow, pMouse);
                     if (_gEyePressed != -1) {
                         if (_gEyePressed == 0) {
-                            if (!comVEyesState[0])
+                            if (!rIM_comVEyesState[0])
                                 rCVML_rShow.c_objWeek.setObserver(eyeCatcherActive::getInstance());
                             else
                                 rCVML_rShow.c_objWeek.removeObserver();
                         } else if (_gEyePressed == 1) {
-                            if (!comVEyesState[1])
+                            if (!rIM_comVEyesState[1])
                                 rCVML_rShow.c_objMonth.setObserver(eyeCatcherActive::getInstance());
                             else
                                 rCVML_rShow.c_objMonth.removeObserver();
                         } else if (_gEyePressed == 2) {
-                            if (!comVEyesState[2])
+                            if (!rIM_comVEyesState[2])
                                 rCVML_rShow.c_objYear.setObserver(eyeCatcherActive::getInstance());
                             else
                                 rCVML_rShow.c_objYear.removeObserver();
                         }
-                        setEyeVisualValue(_gEyePressed, !comVEyesState[_gEyePressed]);
-                        comVEyesState[_gEyePressed] = !comVEyesState[_gEyePressed];
+                        setEyeVisualValue(_gEyePressed, !rIM_comVEyesState[_gEyePressed]);
+                        rIM_comVEyesState[_gEyePressed] = !rIM_comVEyesState[_gEyePressed];
                         return true;
                     }
                 }

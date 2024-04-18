@@ -44,7 +44,7 @@ public:
     }
 
     void draw(sf::RenderWindow &rW) override {
-        rW.draw(dInfo, &tsTex.tsTex);
+        rW.draw(rIM_dInfo, &rIM_tsTex.tsTex);
     }
 
     void setResponse(int v, uint16_t lID) override {
@@ -55,7 +55,7 @@ public:
         switch (event.type) {
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::Escape)
-                    parentMenu->setResponse(-1, 1);
+                    rIM_parentMenu->setResponse(-1, 1);
                 break;
             case sf::Event::MouseButtonPressed:
                 if (event.mouseButton.button == sf::Mouse::Left) {
@@ -63,13 +63,13 @@ public:
                     int _gEyePressed = getEyePressed(rWindow, pMouse);
                     if (_gEyePressed != -1) {
                         if (_gEyePressed == 0) {
-                            /*if (!comVEyesState[0])
+                            /*if (!rIM_comVEyesState[0])
                                 soUnderground.c_cActiveFunds.setObserver(eyeCatcherActive::getInstance());
                             else
                                 soUnderground.c_cActiveFunds.removeObserver();
                             */
-                             setEyeVisualValue(0, !comVEyesState[0]);
-                            comVEyesState[0] = !comVEyesState[0];
+                             setEyeVisualValue(0, !rIM_comVEyesState[0]);
+                            rIM_comVEyesState[0] = !rIM_comVEyesState[0];
                         }
                         return true;
                     }

@@ -13,7 +13,7 @@ public:
     static std::string getCompNumber(int nValue){
         std::string numberString = std::to_string(nValue);
         std::vector<std::string> vVal = {"","k","M","kM","B"};
-        int nDec=(numberString.length()-1) / 3;
+        int nDec=(int)(numberString.length()-1) / 3;
 
         std::string nLeft;
         if(nDec >= 1){
