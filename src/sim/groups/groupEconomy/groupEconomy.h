@@ -55,6 +55,11 @@ public:
     }
 
     void
+    computeBoughtElementCiv(uint64_t inUuidElement, uint32_t inQuantityElement, uint32_t inRTime, uint32_t inCDate) {
+        gE_sEvaluator->computeBoughtElementCiv(inUuidElement, inQuantityElement, inRTime, inCDate);
+    }
+
+    void
     computeSellInmElement(uint64_t inUuidElement, const std::shared_ptr<objCompany> &inObjCompany, uint32_t inRTime,
                           uint32_t inCDate) {
         gE_sEvaluator->computeSellInmElement(inUuidElement, inObjCompany, inRTime, inCDate);

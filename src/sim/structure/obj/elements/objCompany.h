@@ -61,10 +61,12 @@ public:
     void addAvailableLocation(const std::list<std::pair<int, int>> &ctLCells, uint8_t typeSoilCell) {
         c_cActiveLocations[typeSoilCell].insert(
                 c_cActiveLocations[typeSoilCell].end(), ctLCells.begin(), ctLCells.end());
-        if (c_cAvailableByType.find(typeSoilCell) != c_cAvailableByType.end())
-            c_cAvailableByType[typeSoilCell] += 1;
-        else
-            c_cAvailableByType[typeSoilCell] = 1;
+        for (int i = 0; i < ctLCells.size(); i++) {
+            if (c_cAvailableByType.find(typeSoilCell) != c_cAvailableByType.end())
+                c_cAvailableByType[typeSoilCell] += 1;
+            else
+                c_cAvailableByType[typeSoilCell] = 1;
+        }
     }
 
     void removeAvailableLocation(const std::list<std::pair<int, int>> &ctLCells, uint8_t typeCell) {
@@ -76,7 +78,7 @@ public:
         c_cAvailableByType[typeCell] -= 1;
     }
 
-    void addRentedLocationByPos(const std::pair<int,int> inPRented, uint8_t typeCell){
+    void addRentedLocationByPos(const std::pair<int, int> inPRented, uint8_t typeCell) {
         removeAvailableLocation({inPRented}, typeCell);
         c_cRentedLocations[typeCell].push_back(inPRented);
     }
@@ -84,20 +86,20 @@ public:
     uint32_t c_uuid{};
     std::string nName;
 
-    [[nodiscard]] bool hasOwnedType(uint8_t inNType) const{
+    [[nodiscard]] bool hasOwnedType(uint8_t inNType) const {
         return !c_cActiveLocations.at(inNType).empty();
     }
 
-    [[nodiscard]] uint32_t getNumberRentedCells() const{
+    [[nodiscard]] uint32_t getNumberRentedCells() const {
         size_t totalLength = 0;
-        for (const auto& pair : c_cRentedLocations)
+        for (const auto &pair: c_cRentedLocations)
             totalLength += pair.second.size();
         return totalLength;
     }
 
-    [[nodiscard]] uint32_t getNumberActiveCells() const{
+    [[nodiscard]] uint32_t getNumberActiveCells() const {
         size_t totalLength = 0;
-        for (const auto& pair : c_cActiveLocations)
+        for (const auto &pair: c_cActiveLocations)
             totalLength += pair.second.size();
         return totalLength;
     }
@@ -113,10 +115,10 @@ public:
             c_activeContracts[inCType] = {inCUuid};
     }
 
-    uint8_t getTypeByIndex(uint32_t inIndexCell){
+    uint8_t getTypeByIndex(uint32_t inIndexCell) {
         size_t remainingIndex = inIndexCell;
-        for (const auto& pair : c_cActiveLocations) {
-            const auto& list = pair.second;
+        for (const auto &pair: c_cActiveLocations) {
+            const auto &list = pair.second;
             size_t listSize = list.size();
 
             if (remainingIndex < listSize) {

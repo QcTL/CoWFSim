@@ -25,9 +25,9 @@ public:
         uint32_t nTotalSold = 0;
         for (const auto &p: sRLE_winList) {
             nTotalCreated += p->first;
-            nTotalSold += p->first;
+            nTotalSold += p->second;
         }
-        return 1.0 + (0.1 * (double) nTotalCreated) - (0.1 * (double) nTotalSold);
+        return 1.0 + (0.01 * (double) nTotalSold) - (0.01 * (double) nTotalCreated);
     }
 
     void addLastCreate() { sRLE_winList.back()->first++; }

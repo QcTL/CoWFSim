@@ -28,7 +28,7 @@ public:
             : rIMenu(nullptr, rIMenu::rRelativePos::pBottomRight, ""),
               refPile(inRPile), lstValueLayer(1), rBM_refRoads(inSGRoads),
               rBM_refLRoads(inSGRoads->gLayerRoads), rBM_refLand(inSGLand),
-              rBM_refEconomy(inSGEconomy), rBM_refLBuild(sTComp->gLayerOwnership),
+              rBM_refEconomy(inSGEconomy), rBM_refLBuild(sTComp->sCT_gLayerOwnership),
               rBM_refSComp(sTComp), rBM_actLayer(gSimLayersTypes::G_CITY) {
     }
 

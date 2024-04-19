@@ -67,6 +67,7 @@ public:
         sCM_groupEconomy->gE_sRLR->addElement(inTDate);
         sCM_groupLand->gL_gTerrain->addCivilHomeToPos(rPosCivHome);
 
+        sCM_cTotalCivil ++;
         return _oCivil;
     }
 
@@ -74,7 +75,12 @@ public:
         sCivilStorage::sCS_cCivRoute _cRoute = sCM_civilStorage->routeCivilGivenCompany(inUuidCompany);
         sCM_sRoadsMain->removeRuteCivil(sCM_civilStorage->getByUuid(_cRoute.sCS_cCRCivil), _cRoute.sCS_cCRUrBegin,
                                         _cRoute.sCS_cCRUrEnd);
+        sCM_cTotalCivil --;
         return sCM_civilStorage->getByUuid(_cRoute.sCS_cCRCivil);
+    }
+
+    uint64_t getNCivil(){
+        return sCM_cTotalCivil;
     }
 
 private:
@@ -104,6 +110,8 @@ private:
     }
 
     std::mt19937 sCM_genRand;
+
+    uint64_t sCM_cTotalCivil = 0;
 
     std::shared_ptr<sgRoadsMain> sCM_sRoadsMain;
     std::shared_ptr<groupLand> sCM_groupLand;

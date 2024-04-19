@@ -21,18 +21,26 @@ public:
         setText(6, getFloatToString2Decimal(rShow.c_objYear));
 
 
-        setText(3, std::to_string(
-                rShow.c_cAvailableByType.find(1) != rShow.c_cAvailableByType.end() ? rShow.c_cAvailableByType.at(
-                        (uint8_t) 1) : 0));
+        int sTotalCiv =
+                (rShow.c_cAvailableByType.find(sgTerrain::sgT_TypeSoil::sgT_TS_T1Mixed) !=
+                 rShow.c_cAvailableByType.end() ? 1 : 0)
+                + (rShow.c_cAvailableByType.find(sgTerrain::sgT_TypeSoil::sgT_TS_T2Mixed) !=
+                   rShow.c_cAvailableByType.end() ? 1 : 0)
+                + (rShow.c_cAvailableByType.find(sgTerrain::sgT_TypeSoil::sgT_TS_T3Mixed) !=
+                   rShow.c_cAvailableByType.end() ? 1 : 0);
+        setText(3, std::to_string(sTotalCiv));
+
         setText(5, std::to_string(
-                rShow.c_cAvailableByType.find(2) != rShow.c_cAvailableByType.end() ? rShow.c_cAvailableByType.at(
-                        (uint8_t) 2) : 0));
+                rShow.c_cAvailableByType.find(sgTerrain::sgT_TypeSoil::sgT_TS_T1Industrial) !=
+                rShow.c_cAvailableByType.end() ? rShow.c_cAvailableByType.at(
+                        (uint8_t) sgTerrain::sgT_TypeSoil::sgT_TS_T1Industrial) : 0));
         setText(7, std::to_string(
-                rShow.c_cAvailableByType.find(3) != rShow.c_cAvailableByType.end() ? rShow.c_cAvailableByType.at(
-                        (uint8_t) 3) : 0));
+                rShow.c_cAvailableByType.find(sgTerrain::sgT_TypeSoil::sgT_TS_T2Industrial) !=
+                rShow.c_cAvailableByType.end() ? rShow.c_cAvailableByType.at(
+                        (uint8_t) sgTerrain::sgT_TypeSoil::sgT_TS_T2Industrial) : 0));
         setText(9, std::to_string(
-                rShow.c_cAvailableByType.find(4) != rShow.c_cAvailableByType.end() ? rShow.c_cAvailableByType.at(
-                        (uint8_t) 4) : 0));
+                rShow.c_cAvailableByType.find(sgTerrain::sgT_TypeSoil::sgT_TS_T1Farm) != rShow.c_cAvailableByType.end()
+                ? rShow.c_cAvailableByType.at((uint8_t) sgTerrain::sgT_TypeSoil::sgT_TS_T1Farm) : 0));
 
         setText(8, std::to_string(rShow.c_nEmployee));
         setText(1, std::to_string(rShow.c_cCode->sCO_Score));
@@ -83,7 +91,7 @@ public:
         return false;
     }
 
-    void pressedCell(std::pair<int, int> cPressed,uint32_t inPTime, uint32_t inUTime) override {}
+    void pressedCell(std::pair<int, int> cPressed, uint32_t inPTime, uint32_t inUTime) override {}
 
 private:
     objCompany &rCVML_rShow;

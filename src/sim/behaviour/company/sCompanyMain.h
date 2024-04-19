@@ -41,6 +41,9 @@ public:
                 FulfillIntentions::gTryIntention(sCCI, *this, inRTime, inTDate);
                 sSCode->updateScoreCode(sCCI.scc_objCompany->c_uuid, -1);
             }
+
+            //Requisits civilians
+            sM_groupEconomy->computeBoughtElementCiv(0, (uint64_t)sM_sCompEmployee->getNCivil()/100, inRTime, inTDate);
         }
 
         std::vector<std::pair<uint32_t, int>> sDiffEmp = sTComp->getDiffEmployeesByLocation(inRTime);
@@ -55,12 +58,16 @@ public:
                                                       sTComp->getCompanyByUUID(dEmp.first)}, *this, inRTime, inTDate);
 
         if (inRTime == 0 && inTDate != 0) {
-            if ((inTDate % 1 << 9) == 0)
+            if ((inTDate & 0x1E0) == 0 && (inTDate & 0x7) == 0 && (inTDate & 0x18) == 0) {
                 sTComp->applyEcoYear();
-            if ((inTDate % 1 << 5) == 0)
-                sTComp->applyEcoMonth();
-            if ((inTDate % 1 << 3) == 0)
                 sTComp->applyEcoWeek();
+                sTComp->applyEcoMonth();
+            }else if ((inTDate & 0x18) == 0 && (inTDate & 0x7) == 0) {
+                sTComp->applyEcoMonth();
+                sTComp->applyEcoWeek();
+            }else if ((inTDate & 0x7) == 0) {
+                sTComp->applyEcoWeek();
+            }
         }
 
         //Start bankruptcy
@@ -153,7 +160,6 @@ private:
             if (oC != nullptr) {
                 inGEconomy->computeCreatedElement(gItemGen, oC);
                 oC->c_cAvailableByType[inGEconomy->getById(gItemGen).sMEE_iReqTypeBuild] += 1;
-                std::cout << "PRODUCTE CREAT / FINALITZAT" << std::endl;
             }
         }
 

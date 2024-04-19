@@ -20,14 +20,16 @@ class sEvaluatorMain {
 public:
     sEvaluatorMain() {
         sEM_totalElements = std::make_shared<sTotalElements>("FObjProduced.csv");
-        sEM_gBasicPrices = std::vector<uint32_t>(sEM_totalElements->nElements(), 10);
+        sEM_gBasicPrices = std::vector<uint32_t>(sEM_totalElements->nElements(), 100);
         sEM_vLastTransactions = std::vector<sRollingListsEvaluator>(sEM_totalElements->nElements(),
                                                                     sRollingListsEvaluator(5));
         sEM_companyHasItem = std::vector<std::list<std::shared_ptr<objCompany>>>(sEM_totalElements->nElements(),
                                                                                  std::list<std::shared_ptr<objCompany>>());
     };
 
-    std::string getStringByObjId(const uint32_t inIdProduct) const {return sEM_totalElements->getNameById(inIdProduct);}
+    std::string getStringByObjId(const uint32_t inIdProduct) const {
+        return sEM_totalElements->getNameById(inIdProduct);
+    }
 
     void tickReduced(uint32_t inRTick, uint32_t inTDate) {
         if (inRTick == 0)
@@ -42,6 +44,21 @@ public:
         sEM_companyHasItem[inUuidElement].push_back(inObjCompany);
     }
 
+    void
+    computeBoughtElementCiv(uint64_t inUuidElement, uint32_t inQuantityElement, uint32_t inRTime, uint32_t inCDate) {
+
+
+        for (int i = 0; i < inQuantityElement; i++) {
+            sEM_vLastTransactions[inUuidElement].addLastBought();
+            if (sEM_gAvailableItems.find(inUuidElement) != sEM_gAvailableItems.end() &&
+                sEM_gAvailableItems[inUuidElement] > 0) {
+                _takeAndPayObjectLocalComp(inUuidElement, inRTime, inCDate);
+
+                sEM_companyHasItem[inUuidElement].pop_front();
+            }
+        }
+    }
+
     void computeBoughtElement(uint64_t inUuidElement, const std::shared_ptr<objCompany> &inObjCompany, uint32_t inRTime,
                               uint32_t inCDate) {
         uint32_t _pItem = getPriceItemActual(inUuidElement);
@@ -50,20 +67,25 @@ public:
 
         if (sEM_gAvailableItems.find(inUuidElement) != sEM_gAvailableItems.end() &&
             sEM_gAvailableItems[inUuidElement] > 0) {
-            diffElementCompany(inUuidElement, -1, sEM_companyHasItem[inUuidElement].front());
-            if (sEM_companyHasItem[inUuidElement].front()->c_pOwn[inUuidElement] <= 0) {
-                sEM->callEventCompanySoldItemLocal(inRTime, inCDate, sEM_companyHasItem[inUuidElement].front()->c_uuid,
-                                                   inUuidElement, _pItem);
-                sEM_companyHasItem[inUuidElement].pop_front();
-            }
-            sEM_gAvailableItems[inUuidElement] -= 1;
-
-            sEM->callEventCompanyBoughtItemLocal(inRTime, inCDate, inObjCompany->c_uuid, inUuidElement, _pItem);
+            _takeAndPayObjectLocalComp(inUuidElement, inRTime, inCDate);
+            sEM_companyHasItem[inUuidElement].pop_front();
         } else
             sEM->callEventCompanyBoughtItemImport(inRTime, inCDate, inObjCompany->c_uuid, inUuidElement, _pItem);
 
         diffElementCompany(inUuidElement, 1, inObjCompany);
         inObjCompany->c_cActiveFunds -= _pItem;
+    }
+
+    void _takeAndPayObjectLocalComp(uint64_t inUuidElement, uint32_t inRTime, uint32_t inCDate) {
+        std::shared_ptr<sEventManager> sEM = sEventManager::getInstance();
+
+        uint32_t _pItem = getPriceItemActual(inUuidElement);
+        diffElementCompany(inUuidElement, -1, sEM_companyHasItem[inUuidElement].front());
+        sEM_companyHasItem[inUuidElement].front()->c_cActiveFunds += _pItem;
+        sEM->callEventCompanySoldItemLocal(inRTime, inCDate, sEM_companyHasItem[inUuidElement].front()->c_uuid,
+                                           inUuidElement, _pItem);
+
+        sEM_gAvailableItems[inUuidElement] -= 1;
     }
 
     void
@@ -75,7 +97,6 @@ public:
         inObjCompany->c_cActiveFunds += _pItem;
         sEventManager::getInstance()->callEventCompanySoldItemExport(inRTime, inCDate, inObjCompany->c_uuid,
                                                                      inUuidElement, _pItem);
-
     }
 
     sTotalElements::sME_Element getById(uint64_t inUuidElement) { return sEM_totalElements->getById(inUuidElement); }
