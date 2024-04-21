@@ -9,6 +9,7 @@
 #include "../../../../sim/structure/obj/sCommon.h"
 #include "../../oCommonMenus.h"
 #include "./rCompViewMoreLayer.h"
+#include "rCompPaymentsViewLayer.h"
 
 class rCompViewLayer : public rIMenu {
 public:
@@ -60,6 +61,11 @@ public:
                             rCompViewMoreLayer(mPiles->vTopActiveMenu,
                                                rCompRef,
                                                "d_mCompViewMoreLayer"));
+                    mPiles->addMenuTop(rComp);
+                }else  if (inEvent.key.code == sf::Keyboard::H) {
+                    std::shared_ptr<rCompPaymentsViewLayer> rComp = std::make_shared<rCompPaymentsViewLayer>(
+                            rCompPaymentsViewLayer(mPiles->vTopActiveMenu,
+                                               rCompRef));
                     mPiles->addMenuTop(rComp);
                 }
                 break;

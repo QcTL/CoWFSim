@@ -17,6 +17,7 @@
 #include "home/rHomeViewLayer.h"
 #include "global/rGlobalAttrViewLayer.h"
 #include "station/rStationViewLayer.h"
+#include "products/rProductsListViewLayer.h"
 
 class rBaseMenu : public rIMenu {
 public:
@@ -83,13 +84,17 @@ public:
         switch (event.type) {
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::M) {
-                    std::shared_ptr<rSelOptMenu> rSom = std::make_shared<rSelOptMenu>(
+                    std::shared_ptr<rSelOptMenu> _rSom = std::make_shared<rSelOptMenu>(
                             refPile->vTopActiveMenu, lstValueLayer);
-                    refPile->addMenuTop(rSom);
+                    refPile->addMenuTop(_rSom);
                 } else if (event.key.code == sf::Keyboard::P) {
-                    std::shared_ptr<rGlobalAttrViewLayer> rGlob = std::make_shared<rGlobalAttrViewLayer>(
+                    std::shared_ptr<rGlobalAttrViewLayer> _rGlob = std::make_shared<rGlobalAttrViewLayer>(
                             refPile->vTopActiveMenu);
-                    refPile->addMenuTop(rGlob);
+                    refPile->addMenuTop(_rGlob);
+                }else if(event.key.code == sf::Keyboard::O){
+                    std::shared_ptr<rProductsListViewLayer> _rProds = std::make_shared<rProductsListViewLayer>(
+                            refPile->vTopActiveMenu, rBM_refEconomy);
+                    refPile->addMenuTop(_rProds);
                 }
             default:
                 break;

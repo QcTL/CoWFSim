@@ -69,6 +69,15 @@ public:
         return gE_sEvaluator->doesObjectExists(uuidItem);
     }
 
+
+    std::vector<std::pair<std::string, uint64_t>> getVecAllItemsPrices(){
+        return gE_sEvaluator->getVecAllItemsPrices();
+    }
+
+    void changeStateEyeProduct(const uint32_t inUuidProduct){
+        gE_sEvaluator->changeStateEye(inUuidProduct);
+    }
+
     sTotalElements::sME_Element getById(uint64_t inUuidElement) { return gE_sEvaluator->getById(inUuidElement); }
 
     std::shared_ptr<sRollingListsRent> gE_sRLR = std::make_shared<sRollingListsRent>(10);

@@ -43,7 +43,8 @@ public:
             }
 
             //Requisits civilians
-            sM_groupEconomy->computeBoughtElementCiv(0, (uint64_t)sM_sCompEmployee->getNCivil()/100, inRTime, inTDate);
+            sM_groupEconomy->computeBoughtElementCiv(0, (uint64_t) sM_sCompEmployee->getNCivil() / 100, inRTime,
+                                                     inTDate);
         }
 
         std::vector<std::pair<uint32_t, int>> sDiffEmp = sTComp->getDiffEmployeesByLocation(inRTime);
@@ -59,14 +60,14 @@ public:
 
         if (inRTime == 0 && inTDate != 0) {
             if ((inTDate & 0x1E0) == 0 && (inTDate & 0x7) == 0 && (inTDate & 0x18) == 0) {
-                sTComp->applyEcoYear();
-                sTComp->applyEcoWeek();
-                sTComp->applyEcoMonth();
-            }else if ((inTDate & 0x18) == 0 && (inTDate & 0x7) == 0) {
-                sTComp->applyEcoMonth();
-                sTComp->applyEcoWeek();
-            }else if ((inTDate & 0x7) == 0) {
-                sTComp->applyEcoWeek();
+                sTComp->applyObligations(objCompany::objC_TimeObligations::objC_TO_YEAR, inTDate);
+                sTComp->applyObligations(objCompany::objC_TimeObligations::objC_TO_MONTH, inTDate);
+                sTComp->applyObligations(objCompany::objC_TimeObligations::objC_TO_WEEK, inTDate);
+            } else if ((inTDate & 0x18) == 0 && (inTDate & 0x7) == 0) {
+                sTComp->applyObligations(objCompany::objC_TimeObligations::objC_TO_MONTH, inTDate);
+                sTComp->applyObligations(objCompany::objC_TimeObligations::objC_TO_WEEK, inTDate);
+            } else if ((inTDate & 0x7) == 0) {
+                sTComp->applyObligations(objCompany::objC_TimeObligations::objC_TO_WEEK, inTDate);
             }
         }
 
@@ -83,7 +84,7 @@ public:
 
     void completedStartCompanies(const std::list<sgTerrain::sgT_CellSlot> &gPosCompanies) {
         for (const auto &posNewComp: gPosCompanies) {
-            uint32_t uuidNew = sTComp->createCompany(posNewComp.sgT_gPos, posNewComp.sgT_soilType);
+            uint32_t uuidNew = sTComp->createCompany(posNewComp.sgT_gPos, posNewComp.sgT_soilType, 0, 0);
             auto typeSoil = sM_groupLand->gL_gTerrain->gTG_TypeSoil->get(posNewComp.sgT_gPos.front());
             if (typeSoil != sgTerrain::sgT_TypeSoil::sgT_TS_T2Mixed &&
                 typeSoil != sgTerrain::sgT_TypeSoil::sgT_TS_T3Mixed) {
@@ -340,7 +341,7 @@ private:
                                                                 sgTerrain::sgT_TypeGen::sgT_TG_IndBuilding,
                                                                 sgTerrain::sgT_TypeGen::sgT_TG_FieldBuilding};
             sgTerrain::sgT_TypeGen gTypeCompany = gTypeGivenTC[sCCI.scc_addIdInfo % gTypeGivenTC.size()];
-            uint32_t uuidNew = inSCM.sTComp->createCompany({}, gTypeCompany);
+            uint32_t uuidNew = inSCM.sTComp->createCompany({}, gTypeCompany, inRTime, inCDate);
             gTryIntention({sCompanyCompiler::sCCIntentions::CELL_Buy, gTypeCompany,
                            inSCM.sTComp->getCompanyByUUID(uuidNew)}, inSCM, inRTime, inCDate);
             for (int i = 0; i < 2; i++)

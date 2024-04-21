@@ -25,9 +25,22 @@ public:
                                                                     sRollingListsEvaluator(5));
         sEM_companyHasItem = std::vector<std::list<std::shared_ptr<objCompany>>>(sEM_totalElements->nElements(),
                                                                                  std::list<std::shared_ptr<objCompany>>());
+
+        for (int i = 0; i < sEM_totalElements->nElements(); i++) {
+            sEM_eyeLastCheckedValue.push_back(eyeValue<uint32_t>("Prod_" + getStringByObjId(i) + "-mPrice",
+                                                            sEM_gBasicPrices[i]));
+        }
     };
 
-    std::string getStringByObjId(const uint32_t inIdProduct) const {
+    std::vector<std::pair<std::string, uint64_t>> getVecAllItemsPrices() {
+        std::vector<std::pair<std::string, uint64_t>> _retVec;
+        for (const uint64_t uuidObj: sEM_totalElements->extractUuids())
+            _retVec.emplace_back(getStringByObjId(uuidObj), getPriceItemActual(uuidObj));
+
+        return _retVec;
+    }
+
+    [[nodiscard]] std::string getStringByObjId(const uint32_t inIdProduct) const {
         return sEM_totalElements->getNameById(inIdProduct);
     }
 
@@ -69,11 +82,12 @@ public:
             sEM_gAvailableItems[inUuidElement] > 0) {
             _takeAndPayObjectLocalComp(inUuidElement, inRTime, inCDate);
             sEM_companyHasItem[inUuidElement].pop_front();
-        } else
+        } else {
             sEM->callEventCompanyBoughtItemImport(inRTime, inCDate, inObjCompany->c_uuid, inUuidElement, _pItem);
-
+            std::cout << _pItem << " : Importat" << std::endl;
+        }
         diffElementCompany(inUuidElement, 1, inObjCompany);
-        inObjCompany->c_cActiveFunds -= _pItem;
+        inObjCompany->addPayment(-_pItem,oPC_TypePayment::oPC_TP_SOLD, inRTime, inCDate);
     }
 
     void _takeAndPayObjectLocalComp(uint64_t inUuidElement, uint32_t inRTime, uint32_t inCDate) {
@@ -81,7 +95,7 @@ public:
 
         uint32_t _pItem = getPriceItemActual(inUuidElement);
         diffElementCompany(inUuidElement, -1, sEM_companyHasItem[inUuidElement].front());
-        sEM_companyHasItem[inUuidElement].front()->c_cActiveFunds += _pItem;
+        sEM_companyHasItem[inUuidElement].front()->addPayment(_pItem,oPC_TypePayment::oPC_TP_SOLD, inRTime, inCDate);
         sEM->callEventCompanySoldItemLocal(inRTime, inCDate, sEM_companyHasItem[inUuidElement].front()->c_uuid,
                                            inUuidElement, _pItem);
 
@@ -94,7 +108,7 @@ public:
         uint32_t _pItem = getPriceItemActual(inUuidElement);
 
         diffElementCompany(inUuidElement, -1, inObjCompany);
-        inObjCompany->c_cActiveFunds += _pItem;
+        inObjCompany->addPayment(_pItem,oPC_TypePayment::oPC_TP_SOLD, inRTime, inCDate);
         sEventManager::getInstance()->callEventCompanySoldItemExport(inRTime, inCDate, inObjCompany->c_uuid,
                                                                      inUuidElement, _pItem);
     }
@@ -103,6 +117,13 @@ public:
 
     bool doesObjectExists(const uint32_t uuidItem) {
         return uuidItem < sEM_totalElements->nElements();
+    }
+
+    void changeStateEye(const uint32_t uuidItem) {
+        if (sEM_eyeLastCheckedValue[uuidItem].isObserved())
+            sEM_eyeLastCheckedValue[uuidItem].removeObserver();
+        else
+            sEM_eyeLastCheckedValue[uuidItem].setObserver(eyeCatcherActive::getInstance());
     }
 
 private:
@@ -118,11 +139,14 @@ private:
     }
 
     uint32_t getPriceItemActual(uint64_t inUuidElement) {
-        if (sEM_gAvailableItems[inUuidElement] <= 0)
-            return (uint32_t) (1.1 * sEM_totalElements->getById(inUuidElement).getPrice(
-                    sEM_vLastTransactions[inUuidElement].getDesirability(), sEM_gBasicPrices));
-        return sEM_totalElements->getById(inUuidElement).getPrice(
+        uint32_t _objPrice = sEM_totalElements->getById(inUuidElement).getPrice(
                 sEM_vLastTransactions[inUuidElement].getDesirability(), sEM_gBasicPrices);
+        if (sEM_eyeLastCheckedValue[inUuidElement].get() != _objPrice)
+            sEM_eyeLastCheckedValue[inUuidElement].set(_objPrice);
+
+        if (sEM_gAvailableItems[inUuidElement] <= 0)
+            return (uint32_t) (1.1 * _objPrice);
+        return _objPrice;
     }
 
     void updateStaticElements() {
@@ -133,8 +157,10 @@ private:
 
     std::shared_ptr<sTotalElements> sEM_totalElements;
 
-    std::vector<uint32_t> sEM_gBasicPrices; // Updated once a day;
+    std::vector<uint32_t> sEM_gBasicPrices;
     std::vector<sRollingListsEvaluator> sEM_vLastTransactions;
+
+    std::vector<eyeValue<uint32_t>> sEM_eyeLastCheckedValue;
 
     std::map<std::string, uint32_t> sEM_gItemUuidByName;
     std::map<uint64_t, uint32_t> sEM_gAvailableItems;

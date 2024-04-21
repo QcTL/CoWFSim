@@ -143,6 +143,8 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/behaviour/company/code/implementations/sCodeManual.h
         src/sim/behaviour/company/code/implementations/isCode.h
         src/sim/behaviour/company/code/implementations/sCodeGenetic.h
+        src/display/menus/implementation/products/rProductsListViewLayer.h
+        src/display/menus/implementation/company/rCompPaymentsViewLayer.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

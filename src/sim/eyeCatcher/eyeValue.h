@@ -53,14 +53,16 @@ public:
         eV_observer = nullptr;
     }
 
+    [[nodiscard]] bool isObserved() const{
+        return eV_observer != nullptr;
+    }
+
 
 private:
 
     void updateValueEye() {
-        if (eV_isToObserve) {
-            std::cout << "SEND VALUE" << (int) std::floor(eV_value) << std::endl;
+        if (eV_isToObserve)
             eV_observer->updateValue((int) std::floor(eV_value), eV_uuid);
-        }
     }
 
     bool eV_isToObserve = false;

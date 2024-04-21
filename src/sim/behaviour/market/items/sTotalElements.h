@@ -33,9 +33,9 @@ public:
             }
         }
 
-        static uint32_t desiredFunc(const double x){
+        static uint32_t desiredFunc(const double x) {
             //TODO Millorar corba
-            return x > 0? (uint32_t)x + 10 : 10;
+            return x > 0 ? (uint32_t) x + 10 : 10;
         }
     };
 
@@ -52,9 +52,21 @@ public:
         fCVS.close();
     }
 
+    std::vector<uint64_t> extractUuids() {
+        std::vector<uint64_t> uuids;
+        uuids.reserve(sME_listItems.size());
+
+        auto extractUuid = [](const sME_Element &element) {
+            return element.sMEE_uuid;
+        };
+
+        std::transform(sME_listItems.begin(), sME_listItems.end(), std::back_inserter(uuids), extractUuid);
+        return uuids;
+    }
+
     sME_Element getById(uint32_t idRec) { return sME_listItems[idRec]; }
 
-    std::string getNameById(uint32_t idRec) {return sME_gRecipeTotalName[idRec];}
+    std::string getNameById(uint32_t idRec) { return sME_gRecipeTotalName[idRec]; }
 
     uint32_t nElements() { return sME_listItems.size(); }
 
@@ -85,7 +97,7 @@ private:
         sME_gRecipeIdByName.insert({gTokens[0], idAct});
         sME_gRecipeTotalName.push_back(gTokens[4]);
 
-        return {idAct, rReqMaterials, rTypeBuilding[0] , static_cast<uint32_t>(std::stoul(gTokens[3]))};
+        return {idAct, rReqMaterials, rTypeBuilding[0], static_cast<uint32_t>(std::stoul(gTokens[3]))};
     }
 
     static std::vector<std::string> split(const std::string &s, char delimiter) {

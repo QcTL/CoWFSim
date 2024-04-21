@@ -131,6 +131,36 @@ public:
         return 0;
     }
 
+    void addPayment(double inQuantityPayment, const oPC_TypePayment inTypePayment, uint32_t inRTime, uint32_t inTDate) {
+        c_listPayments.push_back({inQuantityPayment, inTypePayment, inRTime, inTDate});
+        c_cActiveFunds += inQuantityPayment;
+    }
+
+    enum objC_TimeObligations {
+        objC_TO_WEEK, objC_TO_MONTH, objC_TO_YEAR
+    };
+
+    void complyTimeObligations(const objC_TimeObligations inTimeType, const uint32_t inTDate) {
+        switch (inTimeType) {
+            case objC_TO_WEEK:
+                c_listPayments.push_back({c_objWeek, oPC_TypePayment::oPC_TP_RECURRENT_WEEK, 0, inTDate});
+                c_cActiveFunds += c_objWeek;
+                break;
+            case objC_TO_MONTH:
+                c_listPayments.push_back({c_objMonth, oPC_TypePayment::oPC_TP_RECURRENT_MONTH, inTDate});
+                c_cActiveFunds += c_objMonth;
+                break;
+            case objC_TO_YEAR:
+                c_listPayments.push_back({c_objYear, oPC_TypePayment::oPC_TP_RECURRENT_YEAR, 0, inTDate});
+                c_cActiveFunds += c_objYear;
+                break;
+        }
+    }
+
+    [[nodiscard]] std::vector<objPaymentCompany> getVecAllTransactions() const{
+        return c_listPayments;
+    }
+
     std::map<uint32_t, int> c_pOwn;
     std::map<uint8_t, std::list<std::pair<int, int>>> c_cActiveLocations;
     std::map<uint8_t, int> c_cAvailableByType;
@@ -138,15 +168,16 @@ public:
     objComp_activeDates c_activeDates;
 
     eyeValue<uint32_t> c_nEmployee;
-    eyeValue<double> c_cActiveFunds;
     eyeValue<float> c_objWeek;
     eyeValue<float> c_objYear;
     eyeValue<float> c_objMonth;
 
     std::shared_ptr<sCodeObj> c_cCode;
-
+    std::vector<objPaymentCompany> c_listPayments;
     std::map<uint8_t, std::list<uint64_t>> c_activeContracts;
     bool c_attrCanEmployee = true;
+
+    eyeValue<double> c_cActiveFunds;
 private:
     static std::vector<std::string> vSyllablesP;
     static std::random_device oC_rd;

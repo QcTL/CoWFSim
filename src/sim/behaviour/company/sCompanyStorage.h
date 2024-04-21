@@ -45,22 +45,10 @@ public:
         return ret;
     }
 
-    void applyEcoWeek() {
+    void applyObligations(const objCompany::objC_TimeObligations inTypeObligation, const uint32_t &inTDate) {
         for (auto &i: iVS_tVecStorage)
             if (i.second != nullptr)
-                i.second->c_cActiveFunds += i.second->c_objWeek;
-    }
-
-    void applyEcoMonth() {
-        for (auto &i: iVS_tVecStorage)
-            if (i.second != nullptr)
-                i.second->c_cActiveFunds += i.second->c_objMonth;
-    }
-
-    void applyEcoYear() {
-        for (auto &i: iVS_tVecStorage)
-            if (i.second != nullptr)
-                i.second->c_cActiveFunds += i.second->c_objYear;
+                i.second->complyTimeObligations(inTypeObligation, inTDate);
     }
 
     std::vector<std::pair<uint32_t, int>> getDiffEmployeesByLocation(uint32_t inRTimer) {
@@ -81,7 +69,8 @@ public:
 
 class sCompanyStorage {
 public:
-    explicit sCompanyStorage(uint32_t inGridSize, uint32_t inMaxComp, const std::shared_ptr<sCodeStorage> &inSStorageCode)
+    explicit sCompanyStorage(uint32_t inGridSize, uint32_t inMaxComp,
+                             const std::shared_ptr<sCodeStorage> &inSStorageCode)
             : sCT_vTotalComp(inMaxComp), sCT_sCodeS(inSStorageCode) {
 
         sCT_gLayerOwnership = std::make_shared<gBasicGrid<std::list<uint32_t>>>
@@ -93,7 +82,9 @@ public:
             sCT_genRand.seed(static_cast<unsigned int>(time(nullptr)));
     }
 
-    uint32_t createCompany(const std::list<std::pair<int, int>> &inVecNPos, uint8_t inTypeSoilCompany) {
+    uint32_t
+    createCompany(const std::list<std::pair<int, int>> &inVecNPos, uint8_t inTypeSoilCompany, const uint32_t inRTime,
+                  const uint32_t inTDate) {
         std::uniform_int_distribution<> disDay(0, (int) sCT_vActiveDaysValid.size() - 1);
         std::discrete_distribution<> disHour(sCT_vActiveHoursWeight.begin(), sCT_vActiveHoursWeight.end());
         int randomIndexDay = disDay(sCT_genRand);
@@ -104,8 +95,7 @@ public:
                                                                                  sCT_vActiveHoursValid[randomIndexHour]}));
         uint32_t _idNewComp = sCT_vTotalComp.storeElement(newObjCompany);
         newObjCompany->c_uuid = _idNewComp;
-        newObjCompany->c_cActiveFunds.set(5000);
-
+        newObjCompany->addPayment(5000, oPC_TypePayment::oPC_TP_INVESTMENT_START,inRTime,inTDate);
         sCT_sCodeS->initNewCode(_idNewComp, inTypeSoilCompany);
         getCompanyByUUID(_idNewComp)->c_cCode = sCT_sCodeS->getPointerCodeByUuid(_idNewComp);
 
@@ -155,16 +145,8 @@ public:
         return sCT_vTotalComp.getTotalBankruptcy(inTDate);
     }
 
-    void applyEcoWeek() {
-        sCT_vTotalComp.applyEcoWeek();
-    }
-
-    void applyEcoMonth() {
-        sCT_vTotalComp.applyEcoMonth();
-    }
-
-    void applyEcoYear() {
-        sCT_vTotalComp.applyEcoYear();
+    void applyObligations(const objCompany::objC_TimeObligations inTypeObligation, const uint32_t &inTDate) {
+        sCT_vTotalComp.applyObligations(inTypeObligation, inTDate);
     }
 
     std::vector<sCompanyCompiler::sCCIntentions>
