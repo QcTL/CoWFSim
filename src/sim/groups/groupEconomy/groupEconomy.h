@@ -70,7 +70,7 @@ public:
     }
 
 
-    std::vector<std::pair<std::string, uint64_t>> getVecAllItemsPrices(){
+    [[nodiscard]] std::vector<std::pair<std::string, uint64_t>> getVecAllItemsPrices() const{
         return gE_sEvaluator->getVecAllItemsPrices();
     }
 

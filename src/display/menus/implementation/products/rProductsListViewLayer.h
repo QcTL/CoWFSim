@@ -52,6 +52,7 @@ public:
                         else if (_gButtonPressed == 1)
                             rPVL_cCurLayerObjects = std::min(rPVL_cCurLayerObjects + 1, (int)rPVL_totalProductsPrices.size() /
                                                              rPVL_nObjInLayer);
+                        rPVL_totalProductsPrices = rPVL_refGEco->getVecAllItemsPrices();
                         printItemsOnScreen();
                     }
                 }

@@ -92,7 +92,7 @@ private:
                         sUsedType = "C_Adq";
                         break;
                 }
-                setText(i + 3,"CATDOG"); //Type
+                setText(i + 3,sUsedType); //Type
 
             } else {
                 setText(i, "");

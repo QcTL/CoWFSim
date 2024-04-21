@@ -59,8 +59,6 @@ public:
 
     void
     computeBoughtElementCiv(uint64_t inUuidElement, uint32_t inQuantityElement, uint32_t inRTime, uint32_t inCDate) {
-
-
         for (int i = 0; i < inQuantityElement; i++) {
             sEM_vLastTransactions[inUuidElement].addLastBought();
             if (sEM_gAvailableItems.find(inUuidElement) != sEM_gAvailableItems.end() &&
@@ -87,7 +85,7 @@ public:
             std::cout << _pItem << " : Importat" << std::endl;
         }
         diffElementCompany(inUuidElement, 1, inObjCompany);
-        inObjCompany->addPayment(-_pItem,oPC_TypePayment::oPC_TP_SOLD, inRTime, inCDate);
+        inObjCompany->addPayment((double)_pItem*-1,oPC_TypePayment::oPC_TP_SOLD, inRTime, inCDate);
     }
 
     void _takeAndPayObjectLocalComp(uint64_t inUuidElement, uint32_t inRTime, uint32_t inCDate) {
@@ -95,7 +93,7 @@ public:
 
         uint32_t _pItem = getPriceItemActual(inUuidElement);
         diffElementCompany(inUuidElement, -1, sEM_companyHasItem[inUuidElement].front());
-        sEM_companyHasItem[inUuidElement].front()->addPayment(_pItem,oPC_TypePayment::oPC_TP_SOLD, inRTime, inCDate);
+        sEM_companyHasItem[inUuidElement].front()->addPayment((double)_pItem,oPC_TypePayment::oPC_TP_SOLD, inRTime, inCDate);
         sEM->callEventCompanySoldItemLocal(inRTime, inCDate, sEM_companyHasItem[inUuidElement].front()->c_uuid,
                                            inUuidElement, _pItem);
 
@@ -108,7 +106,7 @@ public:
         uint32_t _pItem = getPriceItemActual(inUuidElement);
 
         diffElementCompany(inUuidElement, -1, inObjCompany);
-        inObjCompany->addPayment(_pItem,oPC_TypePayment::oPC_TP_SOLD, inRTime, inCDate);
+        inObjCompany->addPayment((double)_pItem,oPC_TypePayment::oPC_TP_SOLD, inRTime, inCDate);
         sEventManager::getInstance()->callEventCompanySoldItemExport(inRTime, inCDate, inObjCompany->c_uuid,
                                                                      inUuidElement, _pItem);
     }
@@ -152,7 +150,8 @@ private:
     void updateStaticElements() {
         //They are update only for the information that the falled window of rolling proportions us.
         for (int i = 0; i < sEM_gBasicPrices.size(); i++)
-            sEM_gBasicPrices[i] = uint32_t(sEM_gBasicPrices[i] * sEM_vLastTransactions[i].dropLastWindow());
+            sEM_gBasicPrices[i] = getById(i).getPrice(sEM_vLastTransactions[i].dropLastWindow(), sEM_gBasicPrices);
+        std::cout<< "strt Of the day" << std::endl;
     }
 
     std::shared_ptr<sTotalElements> sEM_totalElements;

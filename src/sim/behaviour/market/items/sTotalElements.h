@@ -23,19 +23,18 @@ public:
 
         [[nodiscard]] uint32_t getPrice(const double desirability, const std::vector<uint32_t> &vDatePriceElems) const {
             if (sMEE_iCElem.empty())
-                return desiredFunc(vDatePriceElems[sMEE_uuid] * desirability);
+                return (uint32_t)(vDatePriceElems[sMEE_uuid] + (desiredFunc(desirability)) * 20);
             else {
                 uint32_t vRet = 0;
                 for (const uint64_t uuidCred: sMEE_iCElem) {
                     vRet += vDatePriceElems[uuidCred];
                 }
-                return (uint32_t) ((vRet + vDatePriceElems[sMEE_uuid]) * desirability);
+                return (uint32_t) (vRet + (vDatePriceElems[sMEE_uuid] + desiredFunc(desirability) * 2));
             }
         }
 
-        static uint32_t desiredFunc(const double x) {
-            //TODO Millorar corba
-            return x > 0 ? (uint32_t) x + 10 : 10;
+        static double desiredFunc(const double x) {
+            return  (1/ (1 + exp(-(x-1)))) - 0.5;
         }
     };
 

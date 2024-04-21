@@ -147,7 +147,7 @@ public:
                 c_cActiveFunds += c_objWeek;
                 break;
             case objC_TO_MONTH:
-                c_listPayments.push_back({c_objMonth, oPC_TypePayment::oPC_TP_RECURRENT_MONTH, inTDate});
+                c_listPayments.push_back({c_objMonth, oPC_TypePayment::oPC_TP_RECURRENT_MONTH, 0,inTDate});
                 c_cActiveFunds += c_objMonth;
                 break;
             case objC_TO_YEAR:
