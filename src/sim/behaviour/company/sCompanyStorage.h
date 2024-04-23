@@ -69,9 +69,8 @@ public:
 
 class sCompanyStorage {
 public:
-    explicit sCompanyStorage(uint32_t inGridSize, uint32_t inMaxComp,
-                             const std::shared_ptr<sCodeStorage> &inSStorageCode)
-            : sCT_vTotalComp(inMaxComp), sCT_sCodeS(inSStorageCode) {
+    explicit sCompanyStorage(uint32_t inGridSize, uint32_t inMaxComp)
+            : sCT_vTotalComp(inMaxComp), sCT_sCodeS(std::make_shared<sCodeStorage>()) {
 
         sCT_gLayerOwnership = std::make_shared<gBasicGrid<std::list<uint32_t>>>
                 (gBasicGrid<std::list<uint32_t>>(inGridSize, inGridSize, {}));
@@ -124,6 +123,9 @@ public:
         sCT_gLayerOwnership->set(inPCell, p);
     }
 
+    void updateScoreCode(const uint32_t  inUuidCompany,const int inVChange){
+        sCT_sCodeS->updateScoreCode(inUuidCompany, inVChange);
+    }
 
     std::shared_ptr<objCompany> getCompanyByUUID(uint32_t inIndex) {
         return sCT_vTotalComp.getElementByUuid(inIndex);

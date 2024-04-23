@@ -91,7 +91,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/structure/grids/transformation/gBaseToInertiaRoads.h
         src/sim/structure/grids/transformation/gBaseToIRF.h
         src/sim/structure/obj/sRoutesStorage.h
-        src/sim/behaviour/company/sCompanyTimer.h
+        src/sim/behaviour/market/items/sProductTimer.h
         src/sim/behaviour/company/sCompanyMain.h
         src/sim/behaviour/market/sMarketBazaar.h
         src/sim/behaviour/company/employee/sCivilMain.h

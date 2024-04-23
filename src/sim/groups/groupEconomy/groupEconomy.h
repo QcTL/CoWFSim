@@ -30,6 +30,7 @@ public:
         gE_sEvaluator->tickReduced(inRTime, inTDate);
     }
 
+    // FUNCTIONS BAZAAR;
     template<typename T>
     std::shared_ptr<typename T::sMOffering> getListOfOffering(typename T::sMFilter &sMFilter) {
         return gE_sMarketBazaar->getListOfOffering(sMFilter);
@@ -45,6 +46,7 @@ public:
         gE_sMarketBazaar->addListing(inSMOffer);
     }
 
+    // FUNCTIONS EVALUATOR
     void computeCreatedElement(uint64_t inUuidElement, const std::shared_ptr<objCompany> &inObjCompany) {
         gE_sEvaluator->computeCreatedElement(inUuidElement, inObjCompany);
     }
@@ -80,6 +82,8 @@ public:
 
     sTotalElements::sME_Element getById(uint64_t inUuidElement) { return gE_sEvaluator->getById(inUuidElement); }
 
+
+    //Parameters
     std::shared_ptr<sRollingListsRent> gE_sRLR = std::make_shared<sRollingListsRent>(10);
     std::shared_ptr<sEvaluatorMain> gE_sEvaluator = std::make_shared<sEvaluatorMain>();
     std::shared_ptr<sMarketBazaar> gE_sMarketBazaar = std::make_shared<sMarketBazaar>();

@@ -11,10 +11,9 @@
 #include <fstream>
 #include <iostream>
 #include <map>
-#include "../../../common/RelPath.h"
 #include "items/sRollingListsEvaluator.h"
 #include "items/sTotalElements.h"
-#include "../globalAttr/stGlobalTrackerAttr.h"
+#include "items/sProductTimer.h"
 
 class sEvaluatorMain {
 public:
@@ -25,12 +24,20 @@ public:
                                                                     sRollingListsEvaluator(5));
         sEM_companyHasItem = std::vector<std::list<std::shared_ptr<objCompany>>>(sEM_totalElements->nElements(),
                                                                                  std::list<std::shared_ptr<objCompany>>());
-
+        sEM_productTimer = std::make_shared<sProductTimer>();
         for (int i = 0; i < sEM_totalElements->nElements(); i++) {
-            sEM_eyeLastCheckedValue.push_back(eyeValue<uint32_t>("Prod_" + getStringByObjId(i) + "-mPrice",
-                                                            sEM_gBasicPrices[i]));
+            sEM_eyeLastCheckedValue.emplace_back("Prod_" + getStringByObjId(i) + "-mPrice",
+                                                 sEM_gBasicPrices[i]);
         }
     };
+
+    bool someCompletedProducts(const uint32_t inTDate){
+        return sEM_productTimer->hasToChange(inTDate);
+    }
+
+    std::vector<std::pair<uint32_t, uint32_t>> getCompletedProducts(const uint32_t inTDate){
+        return sEM_productTimer->checkForTime(inTDate);
+    }
 
     std::vector<std::pair<std::string, uint64_t>> getVecAllItemsPrices() {
         std::vector<std::pair<std::string, uint64_t>> _retVec;
@@ -61,12 +68,8 @@ public:
     computeBoughtElementCiv(uint64_t inUuidElement, uint32_t inQuantityElement, uint32_t inRTime, uint32_t inCDate) {
         for (int i = 0; i < inQuantityElement; i++) {
             sEM_vLastTransactions[inUuidElement].addLastBought();
-            if (sEM_gAvailableItems.find(inUuidElement) != sEM_gAvailableItems.end() &&
-                sEM_gAvailableItems[inUuidElement] > 0) {
+            if (sEM_gAvailableItems.count(inUuidElement) && sEM_gAvailableItems[inUuidElement] > 0)
                 _takeAndPayObjectLocalComp(inUuidElement, inRTime, inCDate);
-
-                sEM_companyHasItem[inUuidElement].pop_front();
-            }
         }
     }
 
@@ -74,30 +77,15 @@ public:
                               uint32_t inCDate) {
         uint32_t _pItem = getPriceItemActual(inUuidElement);
         sEM_vLastTransactions[inUuidElement].addLastBought();
-        std::shared_ptr<sEventManager> sEM = sEventManager::getInstance();
 
-        if (sEM_gAvailableItems.find(inUuidElement) != sEM_gAvailableItems.end() &&
-            sEM_gAvailableItems[inUuidElement] > 0) {
+        if (sEM_gAvailableItems.count(inUuidElement) && sEM_gAvailableItems[inUuidElement] > 0)
             _takeAndPayObjectLocalComp(inUuidElement, inRTime, inCDate);
-            sEM_companyHasItem[inUuidElement].pop_front();
-        } else {
-            sEM->callEventCompanyBoughtItemImport(inRTime, inCDate, inObjCompany->c_uuid, inUuidElement, _pItem);
-            std::cout << _pItem << " : Importat" << std::endl;
-        }
+        else
+            sEventManager::getInstance()->callEventCompanyBoughtItemImport(inRTime, inCDate, inObjCompany->c_uuid,
+                                                                           inUuidElement, _pItem);
+
         diffElementCompany(inUuidElement, 1, inObjCompany);
-        inObjCompany->addPayment((double)_pItem*-1,oPC_TypePayment::oPC_TP_SOLD, inRTime, inCDate);
-    }
-
-    void _takeAndPayObjectLocalComp(uint64_t inUuidElement, uint32_t inRTime, uint32_t inCDate) {
-        std::shared_ptr<sEventManager> sEM = sEventManager::getInstance();
-
-        uint32_t _pItem = getPriceItemActual(inUuidElement);
-        diffElementCompany(inUuidElement, -1, sEM_companyHasItem[inUuidElement].front());
-        sEM_companyHasItem[inUuidElement].front()->addPayment((double)_pItem,oPC_TypePayment::oPC_TP_SOLD, inRTime, inCDate);
-        sEM->callEventCompanySoldItemLocal(inRTime, inCDate, sEM_companyHasItem[inUuidElement].front()->c_uuid,
-                                           inUuidElement, _pItem);
-
-        sEM_gAvailableItems[inUuidElement] -= 1;
+        inObjCompany->addPayment((double) _pItem * -1, oPC_TypePayment::oPC_TP_SOLD, inRTime, inCDate);
     }
 
     void
@@ -106,7 +94,7 @@ public:
         uint32_t _pItem = getPriceItemActual(inUuidElement);
 
         diffElementCompany(inUuidElement, -1, inObjCompany);
-        inObjCompany->addPayment((double)_pItem,oPC_TypePayment::oPC_TP_SOLD, inRTime, inCDate);
+        inObjCompany->addPayment((double) _pItem, oPC_TypePayment::oPC_TP_SOLD, inRTime, inCDate);
         sEventManager::getInstance()->callEventCompanySoldItemExport(inRTime, inCDate, inObjCompany->c_uuid,
                                                                      inUuidElement, _pItem);
     }
@@ -124,7 +112,69 @@ public:
             sEM_eyeLastCheckedValue[uuidItem].setObserver(eyeCatcherActive::getInstance());
     }
 
+
+    [[nodiscard]] bool canCompanyProduceObject(const std::shared_ptr<objCompany> &inObjCompany, uint64_t inUuidProduct) {
+        if (!doesObjectExists(inUuidProduct))
+            return false;
+        if (!_hasTypeOwn(inObjCompany, getById(inUuidProduct)))
+            return false;
+        return true;
+    }
+
+    std::vector<uint32_t> getVecMissingProducts(const std::shared_ptr<objCompany> &inObjCompany, uint64_t inUuidProduct) {
+        std::map<uint32_t, uint8_t> gQuant; //TO IMPROVE;
+        for (const auto &nObj: getById(inUuidProduct).sMEE_iCElem)
+            gQuant[nObj]++;
+
+        std::vector<uint32_t> rOutput;
+        for (const auto &elem: getById(inUuidProduct).sMEE_iCElem)
+            if (inObjCompany->c_pOwn.count(elem) && inObjCompany->c_pOwn[elem] < gQuant[elem])
+                rOutput.insert(rOutput.end(), gQuant[elem] - inObjCompany->c_pOwn[elem], elem);
+
+        return rOutput;
+    }
+
+    void consumeMaterialsProduceObject(const std::shared_ptr<objCompany> &inObjCompany,const uint64_t inUuidProduct,const uint32_t inCDate ){
+        for (const auto &gElem: getById(inUuidProduct).sMEE_iCElem)
+            inObjCompany->c_pOwn[gElem] -= 1;
+        inObjCompany->c_cAvailableByType[getById(inUuidProduct).sMEE_iReqTypeBuild] -= 1;
+        sEM_productTimer->addTimer(inUuidProduct,
+                                         getById(inUuidProduct).sMEE_iTime + inCDate,
+                                         inObjCompany->c_uuid);
+    }
+
 private:
+
+    static bool
+    _hasTypeOwn(const std::shared_ptr<objCompany> &oC, const sTotalElements::sME_Element &inItemGen) {
+        if (oC->c_cAvailableByType.find(inItemGen.sMEE_iReqTypeBuild) == oC->c_cAvailableByType.end())
+            return false;
+        return oC->c_cAvailableByType[inItemGen.sMEE_iReqTypeBuild] > 0;
+    }
+
+    static bool _hasResources(const objCompany &oC, const sTotalElements::sME_Element &inItemGen) {
+        std::map<uint32_t, uint8_t> gQuant; //TO IMPROVE;
+        for (const auto &nObj: inItemGen.sMEE_iCElem)
+            gQuant[nObj]++;
+
+        return std::all_of(gQuant.begin(), gQuant.end(), [&](const auto &pair) {
+            return oC.c_pOwn.find(pair.first) != oC.c_pOwn.end() && oC.c_pOwn.at(pair.first) >= pair.second;
+        });
+    }
+
+    void _takeAndPayObjectLocalComp(uint64_t inUuidElement, uint32_t inRTime, uint32_t inCDate) {
+        std::shared_ptr<sEventManager> sEM = sEventManager::getInstance();
+
+        uint32_t _pItem = getPriceItemActual(inUuidElement);
+        diffElementCompany(inUuidElement, -1, sEM_companyHasItem[inUuidElement].front());
+        sEM_companyHasItem[inUuidElement].front()->addPayment((double) _pItem, oPC_TypePayment::oPC_TP_SOLD, inRTime,
+                                                              inCDate);
+        sEM->callEventCompanySoldItemLocal(inRTime, inCDate, sEM_companyHasItem[inUuidElement].front()->c_uuid,
+                                           inUuidElement, _pItem);
+
+        sEM_gAvailableItems[inUuidElement] -= 1;
+        sEM_companyHasItem[inUuidElement].pop_front();
+    }
 
     static void
     diffElementCompany(uint64_t inUuidElement, int inNElements, const std::shared_ptr<objCompany> &inPObjCompany) {
@@ -139,11 +189,12 @@ private:
     uint32_t getPriceItemActual(uint64_t inUuidElement) {
         uint32_t _objPrice = sEM_totalElements->getById(inUuidElement).getPrice(
                 sEM_vLastTransactions[inUuidElement].getDesirability(), sEM_gBasicPrices);
+
         if (sEM_eyeLastCheckedValue[inUuidElement].get() != _objPrice)
             sEM_eyeLastCheckedValue[inUuidElement].set(_objPrice);
 
         if (sEM_gAvailableItems[inUuidElement] <= 0)
-            return (uint32_t) (1.1 * _objPrice);
+            return (uint32_t)(1.1 * _objPrice);
         return _objPrice;
     }
 
@@ -151,17 +202,15 @@ private:
         //They are update only for the information that the falled window of rolling proportions us.
         for (int i = 0; i < sEM_gBasicPrices.size(); i++)
             sEM_gBasicPrices[i] = getById(i).getPrice(sEM_vLastTransactions[i].dropLastWindow(), sEM_gBasicPrices);
-        std::cout<< "strt Of the day" << std::endl;
     }
 
     std::shared_ptr<sTotalElements> sEM_totalElements;
+    std::shared_ptr<sProductTimer> sEM_productTimer;
 
     std::vector<uint32_t> sEM_gBasicPrices;
     std::vector<sRollingListsEvaluator> sEM_vLastTransactions;
 
     std::vector<eyeValue<uint32_t>> sEM_eyeLastCheckedValue;
-
-    std::map<std::string, uint32_t> sEM_gItemUuidByName;
     std::map<uint64_t, uint32_t> sEM_gAvailableItems;
 
     std::vector<std::list<std::shared_ptr<objCompany>>> sEM_companyHasItem;

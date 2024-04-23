@@ -7,12 +7,11 @@
 #ifndef CITYOFWEIRDFISHES_SCOMPANYMAIN_H
 #define CITYOFWEIRDFISHES_SCOMPANYMAIN_H
 
-#include "sCompanyTimer.h"
+
 #include "sCompanyStorage.h"
 #include "../../structure/grids/gIGrid.h"
 #include "../../structure/grids/gBasicGrid.h"
 #include "employee/sCivilMain.h"
-#include "code/sCodeStoratge.h"
 #include "../../groups/groupEconomy/groupEconomy.h"
 #include "contract/sContractorMain.h"
 #include "../globalAttr/stGlobalTrackerAttr.h"
@@ -27,19 +26,19 @@ public:
     explicit sCompanyMain(uint32_t inGridSize, const std::shared_ptr<sCivilMain> &inPCivilMain,
                           const std::shared_ptr<groupLand> &inGLand, const std::shared_ptr<groupEconomy> &inGEconomy)
             : sM_groupLand(inGLand), sM_sCompEmployee(inPCivilMain), sM_groupEconomy(inGEconomy) {
-        sTComp = std::make_shared<sCompanyStorage>(inGridSize, 5000, sSCode);
+        sTComp = std::make_shared<sCompanyStorage>(inGridSize, 5000);
         sM_sContractor = std::make_shared<sContractorMain>();
     }
 
     void tickReduced(const uint32_t inRTime, const uint32_t inTDate) {
-        if (sM_sCompanyTimer->hasToChange(inTDate))
-            for (std::pair<uint32_t, uint32_t> &t: sM_sCompanyTimer->checkForTime(inTDate))
+        if (sM_groupEconomy->gE_sEvaluator->someCompletedProducts(inTDate))
+            for (std::pair<uint32_t, uint32_t> &t: sM_groupEconomy->gE_sEvaluator->getCompletedProducts(inTDate))
                 FulfillIntentions::gCompletedProduct(sTComp->getCompanyByUUID(t.second), t.first, sM_groupEconomy);
 
         if (inRTime % (12 * 3) == 0) { //ONCE EVERY 3 HOURS
             for (const sCompanyCompiler::sCCIntentions &sCCI: sTComp->getTotalIntentions(inRTime)) {
                 FulfillIntentions::gTryIntention(sCCI, *this, inRTime, inTDate);
-                sSCode->updateScoreCode(sCCI.scc_objCompany->c_uuid, -1);
+                sTComp->updateScoreCode(sCCI.scc_objCompany->c_uuid, -1);
             }
 
             //Requisits civilians
@@ -107,13 +106,11 @@ public:
     }
 
     //STORAGE
-    std::shared_ptr<sCodeStorage> sSCode = std::make_shared<sCodeStorage>();
     std::shared_ptr<sCompanyStorage> sTComp;
 private:
     std::shared_ptr<groupLand> sM_groupLand;
     std::shared_ptr<groupEconomy> sM_groupEconomy;
 
-    std::shared_ptr<sCompanyTimer> sM_sCompanyTimer = std::make_shared<sCompanyTimer>();
     std::shared_ptr<sCivilMain> sM_sCompEmployee;
     std::shared_ptr<sContractorMain> sM_sContractor;
 
@@ -196,7 +193,6 @@ private:
 
                 FulfillIntentions::doRentContractsExistingResidents(sMOff->sMO_pos, inSCM, inCDate);
 
-
                 std::shared_ptr<sEventManager> sEM = sEventManager::getInstance();
                 sEM->callEventCompanyBoughtCell_PGiving(inRTime, inCDate,
                                                         sMOff->sMO_givingCompany->c_uuid, uuidContract);
@@ -276,47 +272,15 @@ private:
         static void
         gExecuteProduceObjOperation(const sCompanyCompiler::sCCIntentions &sCCI, sCompanyMain &inSCM,
                                     const uint32_t inRTime, const uint32_t inCDate) {
-            if (!_gProduceProduct(sCCI, inSCM, inRTime, inCDate))
-                inSCM.sSCode->updateScoreCode(sCCI.scc_objCompany->c_uuid, -50);
-        }
+            if(!inSCM.sM_groupEconomy->gE_sEvaluator->canCompanyProduceObject(sCCI.scc_objCompany, sCCI.scc_addIdInfo))
+                inSCM.sTComp->updateScoreCode(sCCI.scc_objCompany->c_uuid, -50);
 
-        static bool
-        _gProduceProduct(const sCompanyCompiler::sCCIntentions &sCCI, sCompanyMain &inSCM, const uint32_t inRTime,
-                         const uint32_t inCDate) {
-            if (!inSCM.sM_groupEconomy->doesObjectExists(sCCI.scc_addIdInfo))
-                return false;
-            if (!_hasTypeOwn(sCCI.scc_objCompany, inSCM.sM_groupEconomy->getById(sCCI.scc_addIdInfo)))
-                return false;
-            if (!_hasResources(*sCCI.scc_objCompany, inSCM.sM_groupEconomy->getById(sCCI.scc_addIdInfo)))
-                for (uint32_t mLack: inSCM.sM_groupEconomy->getById(sCCI.scc_addIdInfo).sMEE_iCElem)
-                    gTryIntention({sCompanyCompiler::sCCIntentions::OBJ_Buy, mLack, sCCI.scc_objCompany}, inSCM,
-                                  inRTime, inCDate);
+            for (uint32_t mLack: inSCM.sM_groupEconomy->gE_sEvaluator->getVecMissingProducts(sCCI.scc_objCompany, sCCI.scc_addIdInfo)){
+                gTryIntention({sCompanyCompiler::sCCIntentions::OBJ_Buy, mLack, sCCI.scc_objCompany}, inSCM,
+                              inRTime, inCDate);
+            }
 
-            for (const auto &gElem: inSCM.sM_groupEconomy->getById(sCCI.scc_addIdInfo).sMEE_iCElem)
-                sCCI.scc_objCompany->c_pOwn[gElem] -= 1;
-            sCCI.scc_objCompany->c_cAvailableByType
-            [inSCM.sM_groupEconomy->getById(sCCI.scc_addIdInfo).sMEE_iReqTypeBuild] -= 1;
-            inSCM.sM_sCompanyTimer->addTimer(sCCI.scc_addIdInfo,
-                                             inSCM.sM_groupEconomy->getById(sCCI.scc_addIdInfo).sMEE_iTime + inCDate,
-                                             sCCI.scc_objCompany->c_uuid);
-            return true;
-        }
-
-        static bool
-        _hasTypeOwn(const std::shared_ptr<objCompany> &oC, const sTotalElements::sME_Element &inItemGen) {
-            if (oC->c_cAvailableByType.find(inItemGen.sMEE_iReqTypeBuild) == oC->c_cAvailableByType.end())
-                return false;
-            return oC->c_cAvailableByType[inItemGen.sMEE_iReqTypeBuild] > 0;
-        }
-
-        static bool _hasResources(const objCompany &oC, const sTotalElements::sME_Element &inItemGen) {
-            std::map<uint32_t, uint8_t> gQuant; //TO IMPROVE;
-            for (const auto &nObj: inItemGen.sMEE_iCElem)
-                gQuant[nObj]++;
-
-            return std::all_of(gQuant.begin(), gQuant.end(), [&](const auto &pair) {
-                return oC.c_pOwn.find(pair.first) != oC.c_pOwn.end() && oC.c_pOwn.at(pair.first) >= pair.second;
-            });
+            inSCM.sM_groupEconomy->gE_sEvaluator->consumeMaterialsProduceObject(sCCI.scc_objCompany, sCCI.scc_addIdInfo, inCDate);
         }
 
         //BUY OBJ

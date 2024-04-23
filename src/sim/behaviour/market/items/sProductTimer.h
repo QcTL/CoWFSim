@@ -2,8 +2,8 @@
 // Created by Laminar on 05/03/2024.
 //
 
-#ifndef CITYOFWEIRDFISHES_SCOMPANYTIMER_H
-#define CITYOFWEIRDFISHES_SCOMPANYTIMER_H
+#ifndef CITYOFWEIRDFISHES_SPRODUCTTIMER_H
+#define CITYOFWEIRDFISHES_SPRODUCTTIMER_H
 
 #include <utility>
 #include <list>
@@ -11,10 +11,10 @@
 #include <algorithm>
 #include <vector>
 
-class sCompanyTimer {
+class sProductTimer {
 public:
 
-    sCompanyTimer() {
+    sProductTimer() {
         gListTimers = std::list<sObjTimer>();
     };
 
@@ -50,4 +50,4 @@ private:
     std::list<sObjTimer> gListTimers;
 };
 
-#endif //CITYOFWEIRDFISHES_SCOMPANYTIMER_H
+#endif //CITYOFWEIRDFISHES_SPRODUCTTIMER_H

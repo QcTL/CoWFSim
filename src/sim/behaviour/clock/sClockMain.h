@@ -33,13 +33,11 @@ public:
                 sCM_sEM->callEventCountHour(getReduced(), getDate());
                 if (sCM_clock.sCM_rVHour == 0) {
                     sCM_sEM->callEventEndDay(getDate());
-                    sCM_clock.sCM_rVDay = (sCM_clock.sCM_rVDay + 1) % 31;
+                    sCM_clock.sCM_rVDay = (sCM_clock.sCM_rVDay + 1) % 28;
                     sCM_sEM->callEventStartDay(getDate());
                     if (sCM_clock.sCM_rVDay == 0) {
-                        sCM_clock.sCM_rVDay++;
                         sCM_clock.sCM_rVMonth = (sCM_clock.sCM_rVMonth + 1) % 13;
                         if (sCM_clock.sCM_rVMonth == 0) {
-                            sCM_clock.sCM_rVMonth++;
                             sCM_clock.sCM_rVYear++;
                         }
                     }

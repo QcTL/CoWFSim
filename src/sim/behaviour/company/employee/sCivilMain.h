@@ -79,7 +79,7 @@ public:
         return sCM_civilStorage->getByUuid(_cRoute.sCS_cCRCivil);
     }
 
-    uint64_t getNCivil(){
+    [[nodiscard]]uint64_t getNCivil() const{
         return sCM_cTotalCivil;
     }
 
