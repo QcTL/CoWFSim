@@ -22,9 +22,9 @@ public:
         gLayerCurStruct = std::make_shared<gBasicGrid<uint32_t>>(gBasicGrid<uint32_t>(inGridSize, inGridSize, 0));
     };
 
-    void addNewBuildingRender(const std::pair<int, int> &inBPos, uint8_t inGenType) {
+    void addNewBuildingRender(const std::pair<int, int> &inBPos, uint8_t inSoilType) {
         const char *_gVal = "00000000"; // AIXO HO HA DE FER EL rgTERRAIN des de sgTERRAIN
-        switch (inGenType) {
+        switch (inSoilType) {
             case 1:
                 _gVal = "00010000";
                 break;
@@ -38,11 +38,14 @@ public:
             case 5:
                 _gVal = "00010101";
                 break;
+            case 6:
+                _gVal = "1000000";
+                break;
             default:
                 break;
         }
         gLayerCurStruct->set(inBPos, (((uint32_t) (uint8_t) strtol(_gVal, nullptr, 2)) << 24)
-                                     + rand() % (2 + 1));
+                                     + rand() % (2 + 1)); //TODO Change this
     }
 
     void loadRenderWithSimGrids(const std::shared_ptr<gIGrid<uint8_t>> &inGTypeGen,

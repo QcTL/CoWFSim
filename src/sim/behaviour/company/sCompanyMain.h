@@ -28,12 +28,25 @@ public:
             : sM_groupLand(inGLand), sM_sCompEmployee(inPCivilMain), sM_groupEconomy(inGEconomy) {
         sTComp = std::make_shared<sCompanyStorage>(inGridSize, 5000);
         sM_sContractor = std::make_shared<sContractorMain>();
+
+        if (snCommonAtr::getFlagAtr("snCA_Seed") != 0)
+            sCM_genRPos.seed(snCommonAtr::getFlagAtr("snCA_Seed"));
+        else
+            sCM_genRPos.seed(static_cast<unsigned int>(time(nullptr)));
     }
 
     void tickReduced(const uint32_t inRTime, const uint32_t inTDate) {
         if (sM_groupEconomy->gE_sEvaluator->someCompletedProducts(inTDate))
             for (std::pair<uint32_t, uint32_t> &t: sM_groupEconomy->gE_sEvaluator->getCompletedProducts(inTDate))
                 FulfillIntentions::gCompletedProduct(sTComp->getCompanyByUUID(t.second), t.first, sM_groupEconomy);
+
+        if (inRTime == 0) {
+            std::uniform_int_distribution<int> distribution(0,
+                                                            std::max(2, std::min(100, (int)(100000/sM_sCompEmployee->getNCivil()))));
+            int _resChoose = distribution(sCM_genRPos);
+            if (_resChoose <= 2)
+                addNewCompany(static_cast<sCM_strStyleCompany>(_resChoose), inRTime, inTDate);
+        }
 
         if (inRTime % (12 * 3) == 0) { //ONCE EVERY 3 HOURS
             for (const sCompanyCompiler::sCCIntentions &sCCI: sTComp->getTotalIntentions(inRTime)) {
@@ -108,6 +121,7 @@ public:
     //STORAGE
     std::shared_ptr<sCompanyStorage> sTComp;
 private:
+    std::mt19937 sCM_genRPos;
     std::shared_ptr<groupLand> sM_groupLand;
     std::shared_ptr<groupEconomy> sM_groupEconomy;
 
@@ -194,8 +208,9 @@ private:
                 FulfillIntentions::doRentContractsExistingResidents(sMOff->sMO_pos, inSCM, inCDate);
 
                 std::shared_ptr<sEventManager> sEM = sEventManager::getInstance();
-                sEM->callEventCompanyBoughtCell_PGiving(inRTime, inCDate,
-                                                        sMOff->sMO_givingCompany->c_uuid, uuidContract);
+                if (sMOff->sMO_givingCompany != nullptr)
+                    sEM->callEventCompanyBoughtCell_PGiving(inRTime, inCDate,
+                                                            sMOff->sMO_givingCompany->c_uuid, uuidContract);
                 sEM->callEventCompanyBoughtCell_PReceiving(inRTime, inCDate,
                                                            sCCI.scc_objCompany->c_uuid, uuidContract);
             }
@@ -272,15 +287,17 @@ private:
         static void
         gExecuteProduceObjOperation(const sCompanyCompiler::sCCIntentions &sCCI, sCompanyMain &inSCM,
                                     const uint32_t inRTime, const uint32_t inCDate) {
-            if(!inSCM.sM_groupEconomy->gE_sEvaluator->canCompanyProduceObject(sCCI.scc_objCompany, sCCI.scc_addIdInfo))
+            if (!inSCM.sM_groupEconomy->gE_sEvaluator->canCompanyProduceObject(sCCI.scc_objCompany, sCCI.scc_addIdInfo))
                 inSCM.sTComp->updateScoreCode(sCCI.scc_objCompany->c_uuid, -50);
 
-            for (uint32_t mLack: inSCM.sM_groupEconomy->gE_sEvaluator->getVecMissingProducts(sCCI.scc_objCompany, sCCI.scc_addIdInfo)){
+            for (uint32_t mLack: inSCM.sM_groupEconomy->gE_sEvaluator->getVecMissingProducts(sCCI.scc_objCompany,
+                                                                                             sCCI.scc_addIdInfo)) {
                 gTryIntention({sCompanyCompiler::sCCIntentions::OBJ_Buy, mLack, sCCI.scc_objCompany}, inSCM,
                               inRTime, inCDate);
             }
 
-            inSCM.sM_groupEconomy->gE_sEvaluator->consumeMaterialsProduceObject(sCCI.scc_objCompany, sCCI.scc_addIdInfo, inCDate);
+            inSCM.sM_groupEconomy->gE_sEvaluator->consumeMaterialsProduceObject(sCCI.scc_objCompany, sCCI.scc_addIdInfo,
+                                                                                inCDate);
         }
 
         //BUY OBJ
@@ -301,10 +318,10 @@ private:
         static void
         gExecuteCreateCompanyGenOperation(const sCompanyCompiler::sCCIntentions &sCCI, sCompanyMain &inSCM,
                                           const uint32_t inRTime, const uint32_t inCDate) {
-            std::vector<sgTerrain::sgT_TypeGen> gTypeGivenTC = {sgTerrain::sgT_TypeGen::sgT_TG_CivBuilding,
-                                                                sgTerrain::sgT_TypeGen::sgT_TG_IndBuilding,
-                                                                sgTerrain::sgT_TypeGen::sgT_TG_FieldBuilding};
-            sgTerrain::sgT_TypeGen gTypeCompany = gTypeGivenTC[sCCI.scc_addIdInfo % gTypeGivenTC.size()];
+            std::vector<sgTerrain::sgT_TypeSoil> gTypeGivenTC = {sgTerrain::sgT_TypeSoil::sgT_TS_T1Mixed,
+                                                                 sgTerrain::sgT_TypeSoil::sgT_TS_T1Industrial,
+                                                                 sgTerrain::sgT_TypeSoil::sgT_TS_T1Farm};
+            sgTerrain::sgT_TypeSoil gTypeCompany = gTypeGivenTC[sCCI.scc_addIdInfo % gTypeGivenTC.size()];
             uint32_t uuidNew = inSCM.sTComp->createCompany({}, gTypeCompany, inRTime, inCDate);
             gTryIntention({sCompanyCompiler::sCCIntentions::CELL_Buy, gTypeCompany,
                            inSCM.sTComp->getCompanyByUUID(uuidNew)}, inSCM, inRTime, inCDate);
