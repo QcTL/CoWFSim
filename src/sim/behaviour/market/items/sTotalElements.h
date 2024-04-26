@@ -21,8 +21,8 @@ public:
         std::uint8_t sMEE_iReqTypeBuild;
         std::uint32_t sMEE_iTime;
 
-        [[nodiscard]] uint32_t getPrice(const double desirability, const std::vector<uint32_t> &vDatePriceElems) const {
-            return (uint32_t)(vDatePriceElems[sMEE_uuid] + (desiredFunc(desirability)) * 5);
+        [[nodiscard]] uint32_t getPrice(const double desirability, const uint32_t inBasicPrice) const {
+            return (uint32_t)(inBasicPrice + (desiredFunc(desirability)) * 5);
         }
 
         static double desiredFunc(const double x) {
