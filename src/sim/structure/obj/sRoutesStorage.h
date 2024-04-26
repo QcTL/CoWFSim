@@ -23,10 +23,10 @@ public:
     [[nodiscard]]
     std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator>
     addRuteCivil(const std::shared_ptr<objCivil> &objCivil) {
-        mExitTimesCivil[objCivil->c_TBegin].push_back(*objCivil);
-        mExitTimesCivil[objCivil->c_TEnd].push_back(*objCivil);
+        mExitTimesCivil[objCivil->c_TBegin].push_front(*objCivil);
+        mExitTimesCivil[objCivil->c_TEnd].push_front(*objCivil);
 
-        return {mExitTimesCivil[objCivil->c_TBegin].rbegin().base(), mExitTimesCivil[objCivil->c_TEnd].rbegin().base()};
+        return {mExitTimesCivil[objCivil->c_TBegin].begin(), mExitTimesCivil[objCivil->c_TEnd].begin()};
     }
 
     void removeRuteCivil(const std::shared_ptr<objCivil> &inObjCivil,

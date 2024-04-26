@@ -10,6 +10,7 @@
 #include <iostream>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/Window/Event.hpp>
+#include <cmath>
 #include "../../common/RelPath.h"
 #include "../layers/tileset/gTileset.h"
 #include "../../IO/ReaderParameters.h"
@@ -378,7 +379,11 @@ protected:
     }
 
     void setText(const uint8_t tVal, std::string cText) {
+
         if (rIM_rPos == rIMenu::rRelativePos::pBottomRight || rIM_rPos == rIMenu::rRelativePos::pTopRight) {
+            if(rIM_comV[tVal].pLength > 6 && rIM_comV[tVal].pLength - cText.size() < 2)
+                cText = cText.substr(0, 5) + "...";
+
             std::reverse(cText.begin(), cText.end());
             cText.append(rIM_comV[tVal].pLength - cText.size(), ' ');
         }
@@ -413,10 +418,18 @@ protected:
 
     static std::string getFloatToString2Decimal(const float inValue) {
         std::stringstream ss;
-        if (inValue > 10000)
-            ss << std::fixed << static_cast<int>(inValue);
-        else
+        if (inValue >= 10000) {
+            int exp = static_cast<int>(std::log10(inValue));
+            if (exp % 3 == 0) {
+                ss << std::fixed << static_cast<int>(inValue / std::pow(10, exp)) << "";
+            } else if (exp % 3 == 1) {
+                ss << std::fixed << static_cast<int>(inValue / std::pow(10, exp - 1)) << "k";
+            } else {
+                ss << std::fixed << static_cast<int>(inValue / std::pow(10, exp - 2)) << "M";
+            }
+        } else {
             ss << std::fixed << std::setprecision(2) << inValue;
+        }
         return ss.str();
     }
 };

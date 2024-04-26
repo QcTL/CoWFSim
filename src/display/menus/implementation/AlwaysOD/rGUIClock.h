@@ -70,18 +70,20 @@ public:
                 }
                 break;
             case sf::Event::KeyPressed:
-                if (inEvent.key.code == sf::Keyboard::Num0) {
-                    rIM_parentMenu->setResponse(0, 16);
-                    setVelocity(0);
-                } else if (inEvent.key.code == sf::Keyboard::Num1) {
-                    rIM_parentMenu->setResponse(1, 16);
-                    setVelocity(1);
-                } else if (inEvent.key.code == sf::Keyboard::Num2) {
-                    rIM_parentMenu->setResponse(2, 16);
-                    setVelocity(2);
-                } else if (inEvent.key.code == sf::Keyboard::Num3) {
-                    rIM_parentMenu->setResponse(3, 16);
-                    setVelocity(3);
+                if (inEvent.key.code >= sf::Keyboard::Num0 && inEvent.key.code <= sf::Keyboard::Num3) {
+                    int velocity = inEvent.key.code - sf::Keyboard::Num0;
+                    rIM_parentMenu->setResponse(velocity, 16);
+                    setVelocity(velocity);
+
+                    rGUIC_isPaused = inEvent.key.code != sf::Keyboard::Num0;
+                    if (inEvent.key.code != sf::Keyboard::Num0)
+                        gLastVelocity = velocity;
+
+                } else if (inEvent.key.code == sf::Keyboard::Space) {
+                    int velocity = rGUIC_isPaused ? gLastVelocity : 0;
+                    rIM_parentMenu->setResponse(velocity, 16);
+                    setVelocity(velocity);
+                    rGUIC_isPaused = !rGUIC_isPaused;
                 }
             default:
                 break;
@@ -94,6 +96,8 @@ public:
     sClockMain::sCM_ClockValues rGUIC_lastClock;
 private:
     std::vector<std::pair<uint32_t, uint32_t>> rGUIC_comPSel;
+    uint8_t gLastVelocity = 1;
+    bool rGUIC_isPaused = true;
 
     void setText(const uint8_t tVal, const std::string &cText) {
         for (int i = 0; i < rIM_comV[tVal].pLength; i++) {

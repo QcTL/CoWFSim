@@ -15,10 +15,17 @@ public:
             : rIMenu(mParent, rIMenu::rRelativePos::pBottomLeft, "d_mProductListViewLayer"), rPVL_refGEco(inGEcon) {
 
         rPVL_totalProductsPrices = rPVL_refGEco->getVecAllItemsPrices();
-        for(int i=0; i < rPVL_totalProductsPrices.size(); i++)
-            rPVL_activatedEyesList.push_back(false);
+        for (int i = 0; i < rPVL_totalProductsPrices.size(); i++)
+            rPVL_activatedEyesList.push_back(rPVL_refGEco->getStateEyeProduct(i));
 
+        updateEyesCurrentState();
         printItemsOnScreen();
+    }
+
+    void updateEyesCurrentState(){
+        for (int i = 0; i < rPVL_totalProductsPrices.size(); i++) {
+            setEyeVisualValue(0, rPVL_activatedEyesList[i]);
+        }
     }
 
     void draw(sf::RenderWindow &rW) override {
@@ -50,7 +57,8 @@ public:
                         if (_gButtonPressed == 0)
                             rPVL_cCurLayerObjects = std::max(rPVL_cCurLayerObjects - 1, 0);
                         else if (_gButtonPressed == 1)
-                            rPVL_cCurLayerObjects = std::min(rPVL_cCurLayerObjects + 1, (int)rPVL_totalProductsPrices.size() /
+                            rPVL_cCurLayerObjects = std::min(rPVL_cCurLayerObjects + 1,
+                                                             (int) rPVL_totalProductsPrices.size() /
                                                              rPVL_nObjInLayer);
                         rPVL_totalProductsPrices = rPVL_refGEco->getVecAllItemsPrices();
                         printItemsOnScreen();
@@ -75,12 +83,12 @@ private:
                 setText(i, rPVL_totalProductsPrices[vObjAct].first);
                 setText(i + 1, std::to_string(rPVL_totalProductsPrices[vObjAct].second));
 
-                setEyeVisualValue(i/2, rPVL_activatedEyesList[vObjAct]);
+                setEyeVisualValue(i / 2, rPVL_activatedEyesList[vObjAct]);
             } else {
                 setText(i, "");
                 setText(i + 1, "");
 
-                setEyeVisualValue(i/2, false);
+                setEyeVisualValue(i / 2, false);
             }
         }
     }

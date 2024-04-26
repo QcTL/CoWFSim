@@ -67,19 +67,29 @@ public:
         sCM_groupEconomy->gE_sRLR->addElement(inTDate);
         sCM_groupLand->gL_gTerrain->addCivilHomeToPos(rPosCivHome);
 
-        sCM_cTotalCivil ++;
+        sCM_cTotalCivil++;
         return _oCivil;
     }
 
-    std::shared_ptr<objCivil> removeEmployeeToCompany(const uint32_t inUuidCompany) {
+    std::shared_ptr<objCivil> getCivGivenCompany(const uint32_t inUuidCompany) {
         sCivilStorage::sCS_cCivRoute _cRoute = sCM_civilStorage->routeCivilGivenCompany(inUuidCompany);
-        sCM_sRoadsMain->removeRuteCivil(sCM_civilStorage->getByUuid(_cRoute.sCS_cCRCivil), _cRoute.sCS_cCRUrBegin,
-                                        _cRoute.sCS_cCRUrEnd);
-        sCM_cTotalCivil --;
         return sCM_civilStorage->getByUuid(_cRoute.sCS_cCRCivil);
     }
 
-    [[nodiscard]]uint64_t getNCivil() const{
+    void removeRouteGivenCivil(const std::shared_ptr<objCivil> &inCivil, const uint32_t inUuidCompany) {
+        sCivilStorage::sCS_cCivRoute _cRoute = sCM_civilStorage->routeCivilGivenCompany(inUuidCompany);
+        sCM_cTotalCivil--;
+        sCM_sRoadsMain->removeRuteCivil(sCM_civilStorage->getByUuid(_cRoute.sCS_cCRCivil), _cRoute.sCS_cCRUrBegin,
+                                        _cRoute.sCS_cCRUrEnd);
+    }
+
+    void deleteCivil(const std::shared_ptr<objCivil> &inCivil, const uint32_t inUuidCompany){
+        sCM_civilStorage->removeCivilGivenCompany(inUuidCompany);
+        sCM_cTotalCivil--;
+    }
+
+
+    [[nodiscard]]uint64_t getNCivil() const {
         return sCM_cTotalCivil;
     }
 
@@ -103,7 +113,8 @@ private:
         return std::make_shared<objCivil>(
                 objCivil(objCivil::typeRouteSystem::OC_TRS_CAR, rPosCivHome,
                          {sCM_sRoadsMain->getClosestRoadToBuilding(rPosCivHome),
-                          sCM_sRoadsMain->getClosestRoadToBuilding(inObjCompany.c_cActiveLocations.begin()->second.front())},
+                          sCM_sRoadsMain->getClosestRoadToBuilding(
+                                  inObjCompany.c_cActiveLocations.begin()->second.front())},
                          inObjCompany.c_activeDates.c_StrEndTime.first + distrib(sCM_genRand),
                          inObjCompany.c_activeDates.c_StrEndTime.second + distrib(sCM_genRand),
                          inObjCompany.c_activeDates.cAD_jobWeek));

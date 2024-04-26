@@ -80,6 +80,10 @@ public:
         gE_sEvaluator->changeStateEye(inUuidProduct);
     }
 
+    bool getStateEyeProduct(const uint32_t inUuidProduct){
+        return gE_sEvaluator->getStateEye(inUuidProduct);
+    }
+
     sTotalElements::sME_Element getById(uint64_t inUuidElement) { return gE_sEvaluator->getById(inUuidElement); }
 
 

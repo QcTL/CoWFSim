@@ -2,4 +2,4 @@ type:mCompViewerMore
 src:mCompViewMoreLayer.txt
 inSelTex:65
 inLengthTex:8,8,7,7,7,7,7,7,7,7,7
-inPosEyes:5#10#1#1,5#12#1#1,5#14#1#1
+inPosEyes:5#10#1#1,5#12#1#1,5#14#1#1,14#17#1#1

@@ -41,6 +41,12 @@ public:
                 setText(5 + i * 2, inSGEconomy->gE_sEvaluator->getStringByObjId(it->first));
                 setText(6 + i * 2, oCommonMenus::getCompNumber(it->second));
             }
+
+        updateEyesCurrentState();
+    }
+
+    void updateEyesCurrentState(){
+        setEyeVisualValue(0, rCompRef.c_cActiveFunds.isObserved());
     }
 
     void draw(sf::RenderWindow &inRenderWin) override {
@@ -62,10 +68,10 @@ public:
                                                rCompRef,
                                                "d_mCompViewMoreLayer"));
                     mPiles->addMenuTop(rComp);
-                }else  if (inEvent.key.code == sf::Keyboard::H) {
+                } else if (inEvent.key.code == sf::Keyboard::H) {
                     std::shared_ptr<rCompPaymentsViewLayer> rComp = std::make_shared<rCompPaymentsViewLayer>(
                             rCompPaymentsViewLayer(mPiles->vTopActiveMenu,
-                                               rCompRef));
+                                                   rCompRef));
                     mPiles->addMenuTop(rComp);
                 }
                 break;
@@ -75,12 +81,11 @@ public:
                     int _gEyePressed = getEyePressed(rWindow, pMouse);
                     if (_gEyePressed != -1) {
                         if (_gEyePressed == 0) {
-                            if (!rIM_comVEyesState[0])
+                            if (!rCompRef.c_cActiveFunds.isObserved())
                                 rCompRef.c_cActiveFunds.setObserver(eyeCatcherActive::getInstance());
                             else
                                 rCompRef.c_cActiveFunds.removeObserver();
-                            setEyeVisualValue(0, !rIM_comVEyesState[0]);
-                            rIM_comVEyesState[0] = !rIM_comVEyesState[0];
+                            setEyeVisualValue(0, rCompRef.c_cActiveFunds.isObserved());
                         }
                         return true;
                     }

@@ -44,6 +44,18 @@ public:
 
         setText(8, std::to_string(rShow.c_nEmployee));
         setText(1, std::to_string(rShow.c_cCode->sCO_Score));
+
+        rIM_comVEyesState[0] = rCVML_rShow.c_objWeek.isObserved();
+        rIM_comVEyesState[1] = rCVML_rShow.c_objMonth.isObserved();
+        rIM_comVEyesState[2] = rCVML_rShow.c_objYear.isObserved();
+        rIM_comVEyesState[3] = rCVML_rShow.c_nEmployee.isObserved();
+
+        updateEyesCurrentState();
+    }
+
+    void updateEyesCurrentState() {
+        for (int i = 0; i < 4; i++)
+            setEyeVisualValue(i, rIM_comVEyesState[i]);
     }
 
     void draw(sf::RenderWindow &rW) override {
@@ -78,6 +90,11 @@ public:
                                 rCVML_rShow.c_objYear.setObserver(eyeCatcherActive::getInstance());
                             else
                                 rCVML_rShow.c_objYear.removeObserver();
+                        } else if (_gEyePressed == 3) {
+                            if (!rIM_comVEyesState[3])
+                                rCVML_rShow.c_nEmployee.setObserver(eyeCatcherActive::getInstance());
+                            else
+                                rCVML_rShow.c_nEmployee.removeObserver();
                         }
                         setEyeVisualValue(_gEyePressed, !rIM_comVEyesState[_gEyePressed]);
                         rIM_comVEyesState[_gEyePressed] = !rIM_comVEyesState[_gEyePressed];

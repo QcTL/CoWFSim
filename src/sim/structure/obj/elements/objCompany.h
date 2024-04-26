@@ -143,16 +143,16 @@ public:
     void complyTimeObligations(const objC_TimeObligations inTimeType, const uint32_t inTDate) {
         switch (inTimeType) {
             case objC_TO_WEEK:
-                c_listPayments.push_back({c_objWeek, oPC_TypePayment::oPC_TP_RECURRENT_WEEK, 0, inTDate});
-                c_cActiveFunds += c_objWeek;
+                c_listPayments.push_back({c_objWeek.get(), oPC_TypePayment::oPC_TP_RECURRENT_WEEK, 0, inTDate});
+                c_cActiveFunds += c_objWeek.get();
                 break;
             case objC_TO_MONTH:
-                c_listPayments.push_back({c_objMonth, oPC_TypePayment::oPC_TP_RECURRENT_MONTH, 0,inTDate});
-                c_cActiveFunds += c_objMonth;
+                c_listPayments.push_back({c_objMonth.get(), oPC_TypePayment::oPC_TP_RECURRENT_MONTH, 0,inTDate});
+                c_cActiveFunds += c_objMonth.get();
                 break;
             case objC_TO_YEAR:
-                c_listPayments.push_back({c_objYear, oPC_TypePayment::oPC_TP_RECURRENT_YEAR, 0, inTDate});
-                c_cActiveFunds += c_objYear;
+                c_listPayments.push_back({c_objYear.get(), oPC_TypePayment::oPC_TP_RECURRENT_YEAR, 0, inTDate});
+                c_cActiveFunds += c_objYear.get();
                 break;
         }
     }

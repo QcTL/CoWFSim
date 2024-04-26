@@ -19,7 +19,18 @@ class sEvaluatorMain {
 public:
     sEvaluatorMain() {
         sEM_totalElements = std::make_shared<sTotalElements>("FObjProduced.csv");
+
+
         sEM_gBasicPrices = std::vector<uint32_t>(sEM_totalElements->nElements(), 100);
+        for (int i = 0; i < sEM_totalElements->nElements(); i++) {
+            sTotalElements::sME_Element sElem = sEM_totalElements->getById(i);
+            for (unsigned long j: sElem.sMEE_iCElem)
+                sEM_gBasicPrices[i] += sEM_gBasicPrices[j];
+        }
+
+        sEM_gPastPrices = std::vector<uint32_t>(sEM_gBasicPrices.begin(), sEM_gBasicPrices.end());
+        sEM_buyFrequency = {50,200,400,150,500,150};
+
         sEM_vLastTransactions = std::vector<sRollingListsEvaluator>(sEM_totalElements->nElements(),
                                                                     sRollingListsEvaluator(5));
         sEM_companyHasItem = std::vector<std::list<std::shared_ptr<objCompany>>>(sEM_totalElements->nElements(),
@@ -31,11 +42,11 @@ public:
         }
     };
 
-    bool someCompletedProducts(const uint32_t inTDate){
+    bool someCompletedProducts(const uint32_t inTDate) {
         return sEM_productTimer->hasToChange(inTDate);
     }
 
-    std::vector<std::pair<uint32_t, uint32_t>> getCompletedProducts(const uint32_t inTDate){
+    std::vector<std::pair<uint32_t, uint32_t>> getCompletedProducts(const uint32_t inTDate) {
         return sEM_productTimer->checkForTime(inTDate);
     }
 
@@ -68,6 +79,7 @@ public:
     computeBoughtElementCiv(uint64_t inUuidElement, uint32_t inQuantityElement, uint32_t inRTime, uint32_t inCDate) {
         for (int i = 0; i < inQuantityElement; i++) {
             sEM_vLastTransactions[inUuidElement].addLastBought();
+
             if (sEM_gAvailableItems.count(inUuidElement) && sEM_gAvailableItems[inUuidElement] > 0)
                 _takeAndPayObjectLocalComp(inUuidElement, inRTime, inCDate);
         }
@@ -112,8 +124,12 @@ public:
             sEM_eyeLastCheckedValue[uuidItem].setObserver(eyeCatcherActive::getInstance());
     }
 
+    bool getStateEye(const uint32_t uuidItem) {
+        return sEM_eyeLastCheckedValue[uuidItem].isObserved();
+    }
 
-    [[nodiscard]] bool canCompanyProduceObject(const std::shared_ptr<objCompany> &inObjCompany, uint64_t inUuidProduct) {
+    [[nodiscard]] bool
+    canCompanyProduceObject(const std::shared_ptr<objCompany> &inObjCompany, uint64_t inUuidProduct) {
         if (!doesObjectExists(inUuidProduct))
             return false;
         if (!_hasTypeOwn(inObjCompany, getById(inUuidProduct)))
@@ -121,7 +137,8 @@ public:
         return true;
     }
 
-    std::vector<uint32_t> getVecMissingProducts(const std::shared_ptr<objCompany> &inObjCompany, uint64_t inUuidProduct) {
+    std::vector<uint32_t>
+    getVecMissingProducts(const std::shared_ptr<objCompany> &inObjCompany, uint64_t inUuidProduct) {
         std::map<uint32_t, uint8_t> gQuant; //TO IMPROVE;
         for (const auto &nObj: getById(inUuidProduct).sMEE_iCElem)
             gQuant[nObj]++;
@@ -134,13 +151,27 @@ public:
         return rOutput;
     }
 
-    void consumeMaterialsProduceObject(const std::shared_ptr<objCompany> &inObjCompany,const uint64_t inUuidProduct,const uint32_t inCDate ){
+    void consumeMaterialsProduceObject(const std::shared_ptr<objCompany> &inObjCompany, const uint64_t inUuidProduct,
+                                       const uint32_t inCDate) {
         for (const auto &gElem: getById(inUuidProduct).sMEE_iCElem)
             inObjCompany->c_pOwn[gElem] -= 1;
         inObjCompany->c_cAvailableByType[getById(inUuidProduct).sMEE_iReqTypeBuild] -= 1;
         sEM_productTimer->addTimer(inUuidProduct,
-                                         getById(inUuidProduct).sMEE_iTime + inCDate,
-                                         inObjCompany->c_uuid);
+                                   getById(inUuidProduct).sMEE_iTime + inCDate,
+                                   inObjCompany->c_uuid);
+    }
+
+    std::vector<uint32_t> getVecConsumeProductsByPopulation(const uint64_t inNPopulation){
+        std::vector<uint32_t> _ret  = std::vector<uint32_t>(sEM_gBasicPrices.size());
+        for(int i =0; i < sEM_gBasicPrices.size(); i++) {
+            //f(x)=((3)/(1+ℯ^(-((x)/(5)))))-0.5
+            _ret[i] = (uint32_t)(((double)inNPopulation / sEM_buyFrequency[i]) * std::max(1.0, (3.0 / (1.0 + std::exp(-getDifferencePrice(i) / 5.0))) - 0.5));
+        }
+        return _ret;
+    }
+
+    int getDifferencePrice(const uint32_t uuidProduct){
+        return (int)sEM_gPastPrices[uuidProduct] - (int)sEM_gBasicPrices[uuidProduct];
     }
 
 private:
@@ -194,20 +225,30 @@ private:
             sEM_eyeLastCheckedValue[inUuidElement].set(_objPrice);
 
         if (sEM_gAvailableItems[inUuidElement] <= 0)
-            return (uint32_t)(1.1 * _objPrice);
-        return _objPrice;
+            return (uint32_t) (1.1 * _objPrice);
+        return std::max((uint32_t)1,_objPrice);
     }
 
     void updateStaticElements() {
         //They are update only for the information that the falled window of rolling proportions us.
         for (int i = 0; i < sEM_gBasicPrices.size(); i++)
             sEM_gBasicPrices[i] = getById(i).getPrice(sEM_vLastTransactions[i].dropLastWindow(), sEM_gBasicPrices);
+
+        if (nDaysPassed >= 7) {
+            nDaysPassed = 0;
+            sEM_gPastPrices = std::vector<uint32_t>(sEM_gBasicPrices.begin(), sEM_gBasicPrices.end());
+        } else
+            nDaysPassed++;
     }
 
     std::shared_ptr<sTotalElements> sEM_totalElements;
     std::shared_ptr<sProductTimer> sEM_productTimer;
 
     std::vector<uint32_t> sEM_gBasicPrices;
+    std::vector<uint32_t> sEM_gPastPrices;
+    std::vector<uint32_t> sEM_buyFrequency;
+    uint8_t nDaysPassed;
+
     std::vector<sRollingListsEvaluator> sEM_vLastTransactions;
 
     std::vector<eyeValue<uint32_t>> sEM_eyeLastCheckedValue;
