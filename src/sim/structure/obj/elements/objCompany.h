@@ -83,6 +83,16 @@ public:
         c_cRentedLocations[typeCell].push_back(inPRented);
     }
 
+    void addProcessing(const uint32_t inCDate, const uint64_t  inUuidProduct){
+        if(!c_cActiveProcessing.count(inCDate))
+            c_cActiveProcessing[inCDate] = {};
+        c_cActiveProcessing[inCDate].push_back(inUuidProduct);
+    }
+
+    void removeProcessing(const uint32_t inCDate, const uint64_t  inUuidProduct){
+        c_cActiveProcessing[inCDate].remove(inUuidProduct);
+    }
+
     uint32_t c_uuid{};
     std::string nName;
 
@@ -166,6 +176,8 @@ public:
     std::map<uint8_t, int> c_cAvailableByType;
     std::map<uint8_t, std::list<std::pair<int, int>>> c_cRentedLocations;
     objComp_activeDates c_activeDates;
+
+    std::map<uint32_t, std::list<uint32_t>> c_cActiveProcessing;
 
     eyeValue<uint32_t> c_nEmployee;
     eyeValue<float> c_objWeek;

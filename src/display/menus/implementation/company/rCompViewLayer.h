@@ -10,13 +10,14 @@
 #include "../../oCommonMenus.h"
 #include "./rCompViewMoreLayer.h"
 #include "rCompPaymentsViewLayer.h"
+#include "rCompViewProcessing.h"
 
 class rCompViewLayer : public rIMenu {
 public:
     explicit rCompViewLayer(const std::shared_ptr<rIMenu> &inMParent, objCompany &inSelCompany,
                             const std::shared_ptr<groupEconomy> &inSGEconomy, const std::shared_ptr<rPileMenus> &mPiles)
             : rIMenu(inMParent, rIMenu::rRelativePos::pTopLeft, "d_mCompViewLayer"), mPiles(mPiles),
-              rCompRef(inSelCompany) {
+              rCompRef(inSelCompany), rCVL_SGEconomy(inSGEconomy) {
 
         setText(0, inSelCompany.nName);
         setText(1, oCommonMenus::getCompNumber((int) inSelCompany.getNumberActiveCells()));
@@ -45,7 +46,7 @@ public:
         updateEyesCurrentState();
     }
 
-    void updateEyesCurrentState(){
+    void updateEyesCurrentState() {
         setEyeVisualValue(0, rCompRef.c_cActiveFunds.isObserved());
     }
 
@@ -63,16 +64,20 @@ public:
                 if (inEvent.key.code == sf::Keyboard::Escape)
                     rIM_parentMenu->setResponse(-1, 1);
                 if (inEvent.key.code == sf::Keyboard::P) {
-                    std::shared_ptr<rCompViewMoreLayer> rComp = std::make_shared<rCompViewMoreLayer>(
+                    std::shared_ptr<rIMenu> rComp = std::make_shared<rCompViewMoreLayer>(
                             rCompViewMoreLayer(mPiles->vTopActiveMenu,
                                                rCompRef,
                                                "d_mCompViewMoreLayer"));
                     mPiles->addMenuTop(rComp);
                 } else if (inEvent.key.code == sf::Keyboard::H) {
-                    std::shared_ptr<rCompPaymentsViewLayer> rComp = std::make_shared<rCompPaymentsViewLayer>(
+                    std::shared_ptr<rIMenu> rComp = std::make_shared<rCompPaymentsViewLayer>(
                             rCompPaymentsViewLayer(mPiles->vTopActiveMenu,
                                                    rCompRef));
                     mPiles->addMenuTop(rComp);
+                } else if (inEvent.key.code == sf::Keyboard::C) {
+                    std::shared_ptr<rIMenu> rProcessing = std::make_shared<rCompViewProcessing>(
+                            rCompViewProcessing(mPiles->vTopActiveMenu, rCompRef, rCVL_SGEconomy));
+                    mPiles->addMenuTop(rProcessing);
                 }
                 break;
             case sf::Event::MouseButtonPressed:
@@ -102,6 +107,7 @@ public:
 private:
 
     std::shared_ptr<rPileMenus> mPiles;
+    std::shared_ptr<groupEconomy> rCVL_SGEconomy;
     objCompany &rCompRef;
 };
 

@@ -86,6 +86,7 @@ public:
 
     sTotalElements::sME_Element getById(uint64_t inUuidElement) { return gE_sEvaluator->getById(inUuidElement); }
 
+    std::string getNameById(uint64_t inUuidElement){return gE_sEvaluator->getStringByObjId(inUuidElement);}
 
     //Parameters
     std::shared_ptr<sRollingListsRent> gE_sRLR = std::make_shared<sRollingListsRent>(10);

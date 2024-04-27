@@ -128,6 +128,7 @@ public:
         sEM_productTimer->addTimer(inUuidProduct,
                                    getById(inUuidProduct).sMEE_iTime + inCDate,
                                    inObjCompany->c_uuid);
+        inObjCompany->addProcessing(getById(inUuidProduct).sMEE_iTime + inCDate, inUuidProduct);
     }
 
     std::vector<uint32_t> getVecConsumeProductsByPopulation(const uint64_t inNPopulation) {

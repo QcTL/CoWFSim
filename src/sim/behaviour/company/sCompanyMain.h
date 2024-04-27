@@ -38,7 +38,8 @@ public:
     void tickReduced(const uint32_t inRTime, const uint32_t inTDate) {
         if (sM_groupEconomy->gE_sEvaluator->someCompletedProducts(inTDate))
             for (std::pair<uint32_t, uint32_t> &t: sM_groupEconomy->gE_sEvaluator->getCompletedProducts(inTDate))
-                FulfillIntentions::gCompletedProduct(sTComp->getCompanyByUUID(t.second), t.first, sM_groupEconomy);
+                FulfillIntentions::gCompletedProduct(sTComp->getCompanyByUUID(t.second),
+                                                     t.first, sM_groupEconomy, inTDate);
 
         if (inRTime == 0) {
             std::uniform_int_distribution<int> distribution(0,
@@ -178,10 +179,12 @@ private:
         }
 
         static void gCompletedProduct(const std::shared_ptr<objCompany> &oC, uint32_t gItemGen,
-                                      std::shared_ptr<groupEconomy> &inGEconomy) {
+                                      std::shared_ptr<groupEconomy> &inGEconomy, uint32_t inCDate) {
             if (oC != nullptr) {
                 inGEconomy->computeCreatedElement(gItemGen, oC);
                 oC->c_cAvailableByType[inGEconomy->getById(gItemGen).sMEE_iReqTypeBuild] += 1;
+
+                oC->removeProcessing(inCDate, gItemGen);
             }
         }
 

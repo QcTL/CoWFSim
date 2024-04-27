@@ -381,7 +381,7 @@ protected:
     void setText(const uint8_t tVal, std::string cText) {
 
         if (rIM_rPos == rIMenu::rRelativePos::pBottomRight || rIM_rPos == rIMenu::rRelativePos::pTopRight) {
-            if(rIM_comV[tVal].pLength > 6 && rIM_comV[tVal].pLength - cText.size() < 2)
+            if(rIM_comV[tVal].pLength > 6 && (int)rIM_comV[tVal].pLength - (int)cText.size() < 2)
                 cText = cText.substr(0, 5) + "...";
 
             std::reverse(cText.begin(), cText.end());
