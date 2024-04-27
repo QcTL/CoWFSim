@@ -75,6 +75,10 @@ public:
         uint8_t totalDay = outWeekNumber * 7 + outWeekday;
         return {0, 0, totalDay, outMonth, outYear};
     }
+
+    static uint8_t unpackDayWeek(uint32_t packedDate){
+        return packedDate & 0b111;
+    }
 private:
 
     static uint32_t packDateInfo(uint8_t inWeekday, uint8_t inWeekNumber, uint8_t inMonth, uint16_t inYear) {

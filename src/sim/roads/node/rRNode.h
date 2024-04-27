@@ -72,6 +72,13 @@ public:
     uint16_t rBlock;
 
     uint8_t nLines = 1;
+
+    struct rPV_Car_Export{
+        uint64_t  rPV_uuidCar;
+        std::pair<uint32_t, uint32_t>  rPV_destination;
+    };
+
+    [[nodiscard]] virtual std::vector<rPV_Car_Export> exportCarsPresent() const{ return {};}
 protected:
 
     virtual void enterCar(const uint8_t &dDir, const uint8_t &nLine) = 0;
@@ -315,7 +322,13 @@ public:
                         it = dVecSecond[i].lOrderedCars.erase(it);
                         hasChanged = true;
                         rActiveVehicle::removeCar(c.first);
-                    } else if (!dVecSecond[i].hasRequestedNext) {
+                    } else if(dEndSecond > 3){
+                        //Fi de carrera:
+                        dVecSecond[i].pState[c.second] = false;
+                        it = dVecSecond[i].lOrderedCars.erase(it);
+                        hasChanged = true;
+                        rActiveVehicle::removeCar(c.first);
+                    }else if (!dVecSecond[i].hasRequestedNext) {
                         dVecSecond[i].hasRequestedNext = true;
                         notifyEnterNext(dEndSecond, c, i);
                         ++it;
@@ -402,6 +415,23 @@ public:
         return intList;
     }
 
+    [[nodiscard]] std::vector<rPV_Car_Export> exportCarsPresent() const  override{
+        std::vector<rPV_Car_Export> _ret;
+
+        for(const rRoad& r: dVecFirst){
+            for (const auto& c : r.lOrderedCars) {
+                _ret.push_back({c.first,{ rActiveVehicle::getDestByCar(c.first).second,rActiveVehicle::getDestByCar(c.first).first}});
+            }
+        }
+
+        for(const rRoad& r: dVecSecond){
+            for (const auto& c : r.lOrderedCars) {
+                _ret.push_back({c.first,{ rActiveVehicle::getDestByCar(c.first).second,rActiveVehicle::getDestByCar(c.first).first}});
+            }
+        }
+        return _ret;
+    }
+
 private:
 
 
@@ -482,7 +512,9 @@ private:
             sVec.push_back(0);
 
         auto [minIt, maxIt] = std::minmax_element(sVec.begin(), sVec.end());
-        return {maxIt != sVec.end() ? *maxIt : -1, minIt != sVec.end() ? *minIt : -1};
+        uint8_t sVecOne = maxIt != sVec.end() ? *maxIt : -1;
+        uint8_t sVecTwo = minIt != sVec.end() ? *minIt : -1;
+        return {sVecOne, sVecTwo == sVecOne ? 4 : sVecTwo };
     }
 
     std::pair<uint8_t, std::shared_ptr<rRNodeI>> otherDir(uint8_t dirFromPrev) {

@@ -28,7 +28,7 @@ public:
 
     void tickReduced(uint32_t inRTime, uint32_t inTDate) {
         routeCarsCommute(inRTime, inTDate);
-        routeCarsGhost(inRTime);
+        //routeCarsGhost(inRTime);
     }
 
     void tick() {

@@ -6,11 +6,12 @@
 #define CITYOFWEIRDFISHES_RROADLINEVIEW_H
 
 #include "rRoadViewMenu.h"
+#include "rRoadPresentView.h"
 
 class rRoadLineView : public rRoadViewMenu {
 public:
-    explicit rRoadLineView(const std::shared_ptr<rIMenu> &mParent, const std::shared_ptr<rRNodeI> &refView)
-            : rRoadViewMenu(mParent, refView, "d_mRoadsViewLayer"),
+    explicit rRoadLineView(const std::shared_ptr<rIMenu> &mParent, const std::shared_ptr<rRNodeI> &refView, const std::shared_ptr<rPileMenus> &mPiles)
+            : rRoadViewMenu(mParent, refView, "d_mRoadsViewLayer"), rRLV_rPileMenus(mPiles),
               pElemCrossNRoadsTop(2), pElemCrossNRoadsBottom(2) {
 
         pElemNumSize = {};
@@ -32,6 +33,22 @@ public:
         }
     }
 
+    bool interact(const sf::Event &inEvent, const sf::RenderWindow &inRenderWin) override {
+        if (inEvent.type == sf::Event::KeyPressed && inEvent.key.code == sf::Keyboard::Escape)
+            rIM_parentMenu->setResponse(-1, 2);
+        else if(inEvent.type == sf::Event::KeyPressed && inEvent.key.code == sf::Keyboard::P){
+            std::shared_ptr<rIMenu> rProcessing = std::make_shared<rRoadPresentView>(
+                    rRoadPresentView(rRLV_rPileMenus->vTopActiveMenu, rRVM_selRoad));
+            rRLV_rPileMenus->addMenuTop(rProcessing);
+        }
+
+        return false;
+    }
+
+    void setResponse(int inValResponse, uint16_t inLIDSender) override {
+        rRLV_rPileMenus->removeTop();
+    }
+
     void update() override {
         setSizeRoads(rRVM_selRoad->getSizeRoad());
         setRoadsCars(rRVM_selRoad->getPosRoad(0), rRVM_selRoad->getPosRoad(1));
@@ -49,6 +66,7 @@ private:
     std::vector<uint8_t> gHeightsTop;
     std::vector<uint8_t> gHeightsBottom;
 
+    std::shared_ptr<rPileMenus> rRLV_rPileMenus;
     void setNewOcc(const float fRate) {
         if (fRate < 0 || fRate > 1) return;
 

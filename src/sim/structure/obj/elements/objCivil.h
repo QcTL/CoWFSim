@@ -30,7 +30,7 @@ public:
               c_RActiveDays(cActiveDays) {}
 
     [[nodiscard]] bool isActiveDay(uint32_t cDate) const {
-        return c_RActiveDays & (1 << cDate & 0x7);
+        return c_RActiveDays & 1 << (cDate & 0b111);
     }
 
     uint64_t c_uuid = 0;

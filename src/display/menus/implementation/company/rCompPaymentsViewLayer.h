@@ -14,7 +14,6 @@ public:
     explicit rCompPaymentsViewLayer(const std::shared_ptr<rIMenu> &mParent,
                                     objCompany& inRefComp)
             : rIMenu(mParent, rIMenu::rRelativePos::pBottomLeft, "d_mCompPaymentsViewLayer"), rPVL_refCompany(inRefComp) {
-
         rPVL_totalTransactions = rPVL_refCompany.getVecAllTransactions();
 
         printItemsOnScreen();

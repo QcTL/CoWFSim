@@ -150,7 +150,7 @@ public:
                             } else {
                                 std::shared_ptr<rRoadViewMenu> rRoad = std::make_shared<rRoadLineView>(
                                         refPile->vTopActiveMenu,
-                                        rBM_refLRoads[cPressed.first][cPressed.second]->refCompressed);
+                                        rBM_refLRoads[cPressed.first][cPressed.second]->refCompressed,refPile);
                                 refPile->addMenuTop(rRoad);
                             }
                         }
