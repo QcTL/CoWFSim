@@ -26,14 +26,12 @@ void rSelOptMenu::draw(sf::RenderWindow &rW) {
 
 void rSelOptMenu::setNewSel(int v) {
     sf::Vertex *quad = &rIM_dInfo[(pElemSel[cCurrenSel].second + pElemSel[cCurrenSel].first * rIM_gWidth) * 4];
-    for (int k = 0; k < 4; k++) {
+    for (int k = 0; k < 4; k++)
         quad[k].texCoords = rIM_lRefTiles[305][k];
-    }
 
     quad = &rIM_dInfo[(pElemSel[v].second + pElemSel[v].first * rIM_gWidth) * 4];
-    for (int k = 0; k < 4; k++) {
+    for (int k = 0; k < 4; k++)
         quad[k].texCoords = rIM_lRefTiles[304][k];
-    }
 
     cCurrenSel = v;
 }

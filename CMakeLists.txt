@@ -148,6 +148,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/behaviour/market/items/sObjProduct.h
         src/display/menus/implementation/company/rCompViewProcessing.h
         src/display/menus/implementation/rRoadView/rRoadPresentView.h
+        src/display/menus/rIScrollableMenu.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)
