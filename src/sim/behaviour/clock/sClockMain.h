@@ -76,9 +76,21 @@ public:
         return {0, 0, totalDay, outMonth, outYear};
     }
 
-    static uint8_t unpackDayWeek(uint32_t packedDate){
-        return packedDate & 0b111;
+    static uint32_t addDaysToDate(uint32_t inPackedDate, uint8_t nDays) {
+        sCM_ClockValues sActDate = unpackDateInfo(inPackedDate);
+        if (sActDate.sCM_rVDay + nDays >= 28) {
+            int nMonths = (sActDate.sCM_rVDay + nDays) / 28;
+            if (sActDate.sCM_rVMonth + nMonths >= 12)
+                sActDate.sCM_rVYear += (sActDate.sCM_rVMonth + nMonths) / 12;
+            sActDate.sCM_rVMonth = sActDate.sCM_rVMonth + nMonths % 12;
+        }
+
+        sActDate.sCM_rVDay = sActDate.sCM_rVDay + nDays % 28;
+
+        return packDateInfo(sActDate.sCM_rVDay % 7, sActDate.sCM_rVDay / 7, sActDate.sCM_rVMonth,
+                            sActDate.sCM_rVYear);
     }
+
 private:
 
     static uint32_t packDateInfo(uint8_t inWeekday, uint8_t inWeekNumber, uint8_t inMonth, uint16_t inYear) {

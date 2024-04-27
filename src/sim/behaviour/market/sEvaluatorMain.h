@@ -28,9 +28,9 @@ public:
             for (unsigned long j: sElem.sMEE_iCElem)
                 _gBasicPrices[i] += _gBasicPrices[j];
         }
-        std::vector<uint32_t>_buyFrequency = {50, 200, 400, 150, 500, 150};
+        std::vector<uint32_t> _buyFrequency = {50, 200, 400, 150, 500, 150};
 
-        for(int i = 0; i < sEM_totalElements->nElements(); i++){
+        for (int i = 0; i < sEM_totalElements->nElements(); i++) {
             sEM_totalProducts.emplace_back(getStringByObjId(i), _gBasicPrices[i], _buyFrequency[i], getById(i));
         }
     };
@@ -125,16 +125,16 @@ public:
         for (const auto &gElem: getById(inUuidProduct).sMEE_iCElem)
             inObjCompany->c_pOwn[gElem] -= 1;
         inObjCompany->c_cAvailableByType[getById(inUuidProduct).sMEE_iReqTypeBuild] -= 1;
-        sEM_productTimer->addTimer(inUuidProduct,
-                                   getById(inUuidProduct).sMEE_iTime + inCDate,
-                                   inObjCompany->c_uuid);
-        inObjCompany->addProcessing(getById(inUuidProduct).sMEE_iTime + inCDate, inUuidProduct);
+
+        uint32_t newDateProduct = sClockMain::addDaysToDate(inCDate, getById(inUuidProduct).sMEE_iTime);
+        sEM_productTimer->addTimer(inUuidProduct, newDateProduct, inObjCompany->c_uuid);
+        inObjCompany->addProcessing(newDateProduct, inUuidProduct);
     }
 
     std::vector<uint32_t> getVecConsumeProductsByPopulation(const uint64_t inNPopulation) {
         std::vector<uint32_t> _ret;
         _ret.reserve(sEM_totalProducts.size());
-        for (const auto& product : sEM_totalProducts)
+        for (const auto &product: sEM_totalProducts)
             _ret.push_back(product.getNProductsDesirability(inNPopulation));
         return _ret;
     }
@@ -150,13 +150,13 @@ private:
 
     void updateStaticElements() {
         //They are update only for the information that the falled window of rolling proportions us.
-        for (auto & sEM_totalProduct : sEM_totalProducts) {
+        for (auto &sEM_totalProduct: sEM_totalProducts) {
             if (nDaysPassed >= 7)
                 sEM_totalProduct.newValuePast();
             sEM_totalProduct.newValueBase();
         }
 
-        nDaysPassed = (nDaysPassed+1) % 7;
+        nDaysPassed = (nDaysPassed + 1) % 7;
     }
 
     std::shared_ptr<sTotalElements> sEM_totalElements;
