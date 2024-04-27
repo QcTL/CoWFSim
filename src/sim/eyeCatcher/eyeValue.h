@@ -20,6 +20,8 @@ public:
     const T &get() const { return eV_value; }
 
     void set(const T &newValue) {
+        if(eV_value == newValue)
+            return;
         eV_value = newValue;
         updateValueEye();
     }

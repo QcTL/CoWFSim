@@ -10,9 +10,10 @@
 
 class rRoadLineView : public rRoadViewMenu {
 public:
-    explicit rRoadLineView(const std::shared_ptr<rIMenu> &mParent, const std::shared_ptr<rRNodeI> &refView, const std::shared_ptr<rPileMenus> &mPiles)
+    explicit rRoadLineView(const std::shared_ptr<rIMenu> &mParent, const std::shared_ptr<rRNodeI> &refView,
+                           const std::shared_ptr<rPileMenus> &mPiles)
             : rRoadViewMenu(mParent, refView, "d_mRoadsViewLayer"), rRLV_rPileMenus(mPiles),
-              pElemCrossNRoadsTop(2), pElemCrossNRoadsBottom(2) {
+              pElemNRoadsTop(2), pElemNRoadsBottom(2) {
 
         pElemNumSize = {};
 
@@ -26,7 +27,7 @@ public:
                 int value = rIM_dExtracted[i][j];
                 if (value == 105) pElemOcc.emplace_back(row, col);
                 else if (value == 277) {
-                    auto &container = (i < 8) ? pElemCrossNRoadsTop[j == 8] : pElemCrossNRoadsBottom[j == 8];
+                    auto &container = (i < 8) ? pElemNRoadsTop[j == 8] : pElemNRoadsBottom[j == 8];
                     container.emplace_back(row, col);
                 } else if (value == 48) pElemNumSize.emplace_back(row, col);
             }
@@ -36,10 +37,21 @@ public:
     bool interact(const sf::Event &inEvent, const sf::RenderWindow &inRenderWin) override {
         if (inEvent.type == sf::Event::KeyPressed && inEvent.key.code == sf::Keyboard::Escape)
             rIM_parentMenu->setResponse(-1, 2);
-        else if(inEvent.type == sf::Event::KeyPressed && inEvent.key.code == sf::Keyboard::P){
+        else if (inEvent.type == sf::Event::KeyPressed && inEvent.key.code == sf::Keyboard::P) {
             std::shared_ptr<rIMenu> rProcessing = std::make_shared<rRoadPresentView>(
                     rRoadPresentView(rRLV_rPileMenus->vTopActiveMenu, rRVM_selRoad));
             rRLV_rPileMenus->addMenuTop(rProcessing);
+        } else if (inEvent.type == sf::Event::MouseButtonPressed && inEvent.mouseButton.button == sf::Mouse::Left) {
+            const int _gEyePressed = getEyePressed(inRenderWin, sf::Mouse::getPosition(inRenderWin));
+            if (_gEyePressed != -1) {
+                if (!rRVM_selRoad->nCarsAct.isObserved())
+                    rRVM_selRoad->nCarsAct.setObserver(eyeCatcherActive::getInstance());
+                else
+                    rRVM_selRoad->nCarsAct.removeObserver();
+                setEyeVisualValue(0, rRVM_selRoad->nCarsAct.isObserved());
+
+                return true;
+            }
         }
 
         return false;
@@ -60,17 +72,18 @@ private:
     std::vector<std::pair<int, int>> pElemOcc;
     std::vector<std::pair<int, int>> pElemNumSize;
 
-    std::vector<std::vector<std::pair<int, int>>> pElemCrossNRoadsTop;
-    std::vector<std::vector<std::pair<int, int>>> pElemCrossNRoadsBottom;
+    std::vector<std::vector<std::pair<int, int>>> pElemNRoadsTop;
+    std::vector<std::vector<std::pair<int, int>>> pElemNRoadsBottom;
 
     std::vector<uint8_t> gHeightsTop;
     std::vector<uint8_t> gHeightsBottom;
 
     std::shared_ptr<rPileMenus> rRLV_rPileMenus;
+
     void setNewOcc(const float fRate) {
         if (fRate < 0 || fRate > 1) return;
 
-        int nTurnOn = (int)(5 * (1 - fRate));
+        int nTurnOn = (int) (5 * (1 - fRate));
         for (int i = 0; i < pElemOcc.size(); i++) {
             auto quad = &rIM_dInfo[(pElemOcc[i].second + pElemOcc[i].first * rIM_gWidth) * 4];
             for (int k = 0; k < 4; k++)
@@ -80,16 +93,16 @@ private:
 
     void setSizeRoads(const int capRoad) {
         int nToTake = 1 + 2 * (capRoad - 1);
-        for (int i = 0; i < pElemCrossNRoadsTop[0].size(); i++) {
+        for (int i = 0; i < pElemNRoadsTop[0].size(); i++) {
             std::vector<sf::Vertex *> sQuadPos = {
-                    &rIM_dInfo[(pElemCrossNRoadsTop[0][i].second + pElemCrossNRoadsTop[0][i].first * rIM_gWidth) * 4],
-                    &rIM_dInfo[(pElemCrossNRoadsTop[1][i].second + pElemCrossNRoadsTop[1][i].first * rIM_gWidth) * 4],
-                    &rIM_dInfo[(pElemCrossNRoadsBottom[0][i].second + pElemCrossNRoadsBottom[0][i].first * rIM_gWidth) * 4],
-                    &rIM_dInfo[(pElemCrossNRoadsBottom[1][i].second + pElemCrossNRoadsBottom[1][i].first * rIM_gWidth) * 4]
+                    &rIM_dInfo[(pElemNRoadsTop[0][i].second + pElemNRoadsTop[0][i].first * rIM_gWidth) * 4],
+                    &rIM_dInfo[(pElemNRoadsTop[1][i].second + pElemNRoadsTop[1][i].first * rIM_gWidth) * 4],
+                    &rIM_dInfo[(pElemNRoadsBottom[0][i].second + pElemNRoadsBottom[0][i].first * rIM_gWidth) * 4],
+                    &rIM_dInfo[(pElemNRoadsBottom[1][i].second + pElemNRoadsBottom[1][i].first * rIM_gWidth) * 4]
             };
 
             for (int k = 0; k < 4; k++)
-                for(auto & quad : sQuadPos)
+                for (auto &quad: sQuadPos)
                     quad[k].texCoords = rIM_lRefTiles[(i <= nToTake) ? 32 : 277][k];
 
             if (i <= nToTake) {

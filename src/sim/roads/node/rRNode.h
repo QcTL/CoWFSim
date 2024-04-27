@@ -15,6 +15,7 @@
 #include "rInfoDists.h"
 #include "../../../display/rRemoteUpdateGrid.h"
 #include "../../structure/grids/gIGrid.h"
+#include "../../eyeCatcher/eyeValue.h"
 
 
 class rRNodeI {
@@ -24,7 +25,8 @@ public:
               rLeft(nullptr),
               rRight(nullptr),
               rTop(nullptr),
-              rBottom(nullptr) {}
+              rBottom(nullptr),
+              nCarsAct("R_" + std::to_string(rBlock) + "." + std::to_string(globIdNode) + "-Number_Cars", 0) {}
 
     virtual void receive(const rRMail &r, const uint8_t &dir) = 0;
 
@@ -80,6 +82,7 @@ public:
 
     [[nodiscard]] virtual std::vector<rPV_Car_Export> exportCarsPresent() const { return {}; }
 
+    eyeValue<uint32_t> nCarsAct;
 protected:
 
     virtual void enterCar(const uint8_t &dDir, const uint8_t &nLine) = 0;
@@ -183,6 +186,7 @@ public:
             itsEmpty = false;
             updateRefGrid(true);
         }
+        nCarsAct.set(!itsEmpty);
     }
 
     std::pair<uint32_t, uint32_t> takeCarPrep(const uint8_t &dDir, const uint8_t &nLine) override {
@@ -387,6 +391,8 @@ public:
             hasChanged = false;
             updateRefGrid(getMaxTotalCarsRoad());
         }
+
+        nCarsAct.set(dVecFirst[0].lOrderedCars.size() + dVecSecond[0].lOrderedCars.size());
     }
 
     [[nodiscard]] uint8_t getSizeRoad() const override {
