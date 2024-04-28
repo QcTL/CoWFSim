@@ -75,7 +75,7 @@ public:
                     rIM_parentMenu->setResponse(velocity, 16);
                     setVelocity(velocity);
 
-                    rGUIC_isPaused = inEvent.key.code != sf::Keyboard::Num0;
+                    rGUIC_isPaused = inEvent.key.code == sf::Keyboard::Num0;
                     if (inEvent.key.code != sf::Keyboard::Num0)
                         gLastVelocity = velocity;
 
