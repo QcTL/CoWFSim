@@ -56,9 +56,10 @@ public:
         sgUndergroundMain::sgUM_lowestViableRoute lVRMetro = sCM_groupLand->gL_gUnderground->getLowestDistanceCommute(
                 rPosCivHome, inObjCompany.c_cActiveLocations.begin()->second.front());
 
-        if (lVRMetro.totalDistance < 30)
+        if (lVRMetro.totalDistance < 30) {
             _oCivil = _getCivilMetro(rPosCivHome, inObjCompany, lVRMetro);
-        else {
+            r = sCM_sRoadsMain->addRuteCivil(_oCivil);
+        } else {
             _oCivil = _getCivilRoad(rPosCivHome, inObjCompany);
             r = sCM_sRoadsMain->addRuteCivil(_oCivil);
         }
@@ -83,7 +84,7 @@ public:
                                         _cRoute.sCS_cCRUrEnd);
     }
 
-    void deleteCivil(const std::shared_ptr<objCivil> &inCivil, const uint32_t inUuidCompany){
+    void deleteCivil(const std::shared_ptr<objCivil> &inCivil, const uint32_t inUuidCompany) {
         sCM_civilStorage->removeCivilGivenCompany(inUuidCompany);
         sCM_cTotalCivil--;
     }
@@ -98,6 +99,7 @@ private:
                                              const sgUndergroundMain::sgUM_lowestViableRoute &rRouteTrain) {
         return std::make_shared<objCivil>(
                 objCivil(objCivil::typeRouteSystem::OC_TRS_TRAIN, rPosCivHome,
+                         inObjCompany.c_cActiveLocations.begin()->second.front(),
                          {sCM_groupLand->gL_gUnderground->getPosStationById(rRouteTrain.closestSt1),
                           sCM_groupLand->gL_gUnderground->getPosStationById(rRouteTrain.closestSt2)},
                          sCM_groupLand->gL_gUnderground->getClosestTimeForStation(rRouteTrain.closestSt1,
@@ -112,6 +114,7 @@ private:
         std::uniform_int_distribution<> distrib(-sOffsetTimeStart, sOffsetTimeStart);
         return std::make_shared<objCivil>(
                 objCivil(objCivil::typeRouteSystem::OC_TRS_CAR, rPosCivHome,
+                         inObjCompany.c_cActiveLocations.begin()->second.front(),
                          {sCM_sRoadsMain->getClosestRoadToBuilding(rPosCivHome),
                           sCM_sRoadsMain->getClosestRoadToBuilding(
                                   inObjCompany.c_cActiveLocations.begin()->second.front())},

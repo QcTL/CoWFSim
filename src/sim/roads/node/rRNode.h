@@ -168,10 +168,10 @@ public:
             std::pair<uint32_t, uint16_t> destCar = rActiveVehicle::getDestByCar(carActInside.first);
             uint8_t dDir = rInfoDist::returnDirToDist(destCar.first, destCar.second, rBlock, globIdNode);
 
-            if (destCar.second == rBlock && (destCar.first == locIdNode || getByDir(dDir)->rBlock != destCar.second)) {
+            if (dDir < 4 && destCar.second == rBlock && (destCar.first == locIdNode || getByDir(dDir)->rBlock != destCar.second)) {
                 rActiveVehicle::removeCar(carActInside.first);
                 updateRefGrid(false);
-            } else {
+            } else if(dDir < 4){
                 sVecCarPos[dDir].push_back(carActInside);
                 notifyEnterNext(dDir, carActInside, 0);
             }

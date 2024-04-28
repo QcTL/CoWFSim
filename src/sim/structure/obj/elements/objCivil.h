@@ -23,9 +23,9 @@ public:
                 : c_RStart(cRStart), c_REnd(cREnd) {}
     };
 
-    objCivil(typeRouteSystem cTrs, const std::pair<int, int> pHome, objRoadTravel cTravel,
-             uint32_t cTBegin, uint32_t cTEnd, uint8_t cActiveDays)
-            : c_TRS(cTrs), c_Travel(std::move(cTravel)), c_pHome(pHome),
+    objCivil(typeRouteSystem cTrs, const std::pair<int, int> pHome, const std::pair<int, int> pWork,
+             objRoadTravel cTravel, uint32_t cTBegin, uint32_t cTEnd, uint8_t cActiveDays)
+            : c_TRS(cTrs), c_Travel(std::move(cTravel)), c_pHome(pHome), c_pWork(pWork),
               c_TBegin(cTBegin), c_TEnd(cTEnd),
               c_RActiveDays(cActiveDays) {}
 
@@ -38,6 +38,7 @@ public:
     typeRouteSystem c_TRS;
     objRoadTravel c_Travel;
     std::pair<int, int> c_pHome;
+    std::pair<int, int> c_pWork;
     uint32_t c_TBegin;
     uint32_t c_TEnd;
 };

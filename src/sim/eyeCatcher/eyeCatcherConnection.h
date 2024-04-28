@@ -25,6 +25,13 @@ public:
             std::cerr << "Error opening socket" << std::endl;
             exit(1);
         }
+
+        int yes = 1;
+        if (setsockopt(eyC_serverSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
+            std::cerr << "Error setting socket option" << std::endl;
+            exit(1);
+        }
+
         // Bind the socket to the IP and port
         sockaddr_in serverAddress;
         serverAddress.sin_family = AF_INET;
