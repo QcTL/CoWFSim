@@ -1,0 +1,4 @@
+type:mCompViewProcessingLayer
+src:mCompViewProcessingLayer.txt
+inSelTex:65
+inLengthTex:9,7,9,7,9,7,9,7

@@ -66,7 +66,8 @@ public:
         rInfoDist::seeMatrix();
     }
 
-    std::vector<objActiveRute> getRoutesByType(const objCivil::typeRouteSystem inRouteType, uint32_t cTime, uint32_t cDate) {
+    std::vector<objActiveRute>
+    getRoutesByType(const objCivil::typeRouteSystem inRouteType, uint32_t cTime, uint32_t cDate) {
         return sgRM_sTRoutes->getRoutesByType(inRouteType, cTime, cDate);
     }
 
@@ -84,8 +85,7 @@ private:
             gLayerRoads[r.c_RStart.first][r.c_RStart.second]->refCompressed->addNewCar(locId, blocId);
         }
 
-        auto newMetroRoutes = sgRM_sTRoutes->getRoutesByType(objCivil::typeRouteSystem::OC_TRS_TRAIN, inRTime,
-                                                             inTDate);
+        auto newMetroRoutes = sgRM_sTRoutes->getRoutesByType(objCivil::typeRouteSystem::OC_TRS_TRAIN, inRTime, inTDate);
         for (auto &r: newMetroRoutes) {
             sEventManager::getInstance()->callEventStartRoute(inRTime, inTDate, r.c_uuid, r);
         }

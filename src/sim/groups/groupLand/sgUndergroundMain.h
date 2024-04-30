@@ -106,9 +106,11 @@ public:
     }
 
     uint32_t getPastClosestTimeForStation(const uint16_t inNStation, const uint32_t inCTime) {
-        for (const uint32_t tArr: sgUM_timeArriving[inNStation])
+        for (auto rit = sgUM_timeArriving[inNStation].rbegin(); rit != sgUM_timeArriving[inNStation].rend(); ++rit) {
+            const uint32_t tArr = *rit;
             if (tArr <= inCTime * 5)
                 return tArr / 5;
+        }
         return 0;
     }
 

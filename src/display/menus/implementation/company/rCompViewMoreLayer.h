@@ -21,61 +21,86 @@ public:
         setText(6, getFloatToString2Decimal(rShow.c_objYear));
 
 
-        setText(3, std::to_string(
-                rShow.c_cAvailableByType.find(1) != rShow.c_cAvailableByType.end() ? rShow.c_cAvailableByType.at(
-                        (uint8_t) 1) : 0));
+        int sTotalCiv =
+                (rShow.c_cAvailableByType.find(sgTerrain::sgT_TypeSoil::sgT_TS_T1Mixed) !=
+                 rShow.c_cAvailableByType.end() ? 1 : 0)
+                + (rShow.c_cAvailableByType.find(sgTerrain::sgT_TypeSoil::sgT_TS_T2Mixed) !=
+                   rShow.c_cAvailableByType.end() ? 1 : 0)
+                + (rShow.c_cAvailableByType.find(sgTerrain::sgT_TypeSoil::sgT_TS_T3Mixed) !=
+                   rShow.c_cAvailableByType.end() ? 1 : 0);
+        setText(3, std::to_string(sTotalCiv));
+
         setText(5, std::to_string(
-                rShow.c_cAvailableByType.find(2) != rShow.c_cAvailableByType.end() ? rShow.c_cAvailableByType.at(
-                        (uint8_t) 2) : 0));
+                rShow.c_cAvailableByType.find(sgTerrain::sgT_TypeSoil::sgT_TS_T1Industrial) !=
+                rShow.c_cAvailableByType.end() ? rShow.c_cAvailableByType.at(
+                        (uint8_t) sgTerrain::sgT_TypeSoil::sgT_TS_T1Industrial) : 0));
         setText(7, std::to_string(
-                rShow.c_cAvailableByType.find(3) != rShow.c_cAvailableByType.end() ? rShow.c_cAvailableByType.at(
-                        (uint8_t) 3) : 0));
+                rShow.c_cAvailableByType.find(sgTerrain::sgT_TypeSoil::sgT_TS_T2Industrial) !=
+                rShow.c_cAvailableByType.end() ? rShow.c_cAvailableByType.at(
+                        (uint8_t) sgTerrain::sgT_TypeSoil::sgT_TS_T2Industrial) : 0));
         setText(9, std::to_string(
-                rShow.c_cAvailableByType.find(4) != rShow.c_cAvailableByType.end() ? rShow.c_cAvailableByType.at(
-                        (uint8_t) 4) : 0));
+                rShow.c_cAvailableByType.find(sgTerrain::sgT_TypeSoil::sgT_TS_T1Farm) != rShow.c_cAvailableByType.end()
+                ? rShow.c_cAvailableByType.at((uint8_t) sgTerrain::sgT_TypeSoil::sgT_TS_T1Farm) : 0));
 
         setText(8, std::to_string(rShow.c_nEmployee));
         setText(1, std::to_string(rShow.c_cCode->sCO_Score));
+
+        rIM_comVEyesState[0] = rCVML_rShow.c_objWeek.isObserved();
+        rIM_comVEyesState[1] = rCVML_rShow.c_objMonth.isObserved();
+        rIM_comVEyesState[2] = rCVML_rShow.c_objYear.isObserved();
+        rIM_comVEyesState[3] = rCVML_rShow.c_nEmployee.isObserved();
+
+        updateEyesCurrentState();
+    }
+
+    void updateEyesCurrentState() {
+        for (int i = 0; i < 4; i++)
+            setEyeVisualValue(i, rIM_comVEyesState[i]);
     }
 
     void draw(sf::RenderWindow &rW) override {
-        rW.draw(dInfo, &tsTex.tsTex);
+        rW.draw(rIM_dInfo, &rIM_tsTex.tsTex);
     }
 
-    void setResponse(int v, uint16_t lID) override {}
 
-    bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override {
-        switch (event.type) {
+    bool interact(const sf::Event &inEvent, const sf::RenderWindow &rWindow) override {
+        switch (inEvent.type) {
             case sf::Event::KeyPressed:
-                if (event.key.code == sf::Keyboard::Escape)
-                    parentMenu->setResponse(-1, 1);
+                if (inEvent.key.code == sf::Keyboard::Escape)
+                    rIM_parentMenu->setResponse(-1, rIM_idMenu);
                 break;
             case sf::Event::MouseButtonPressed:
-                if (event.mouseButton.button == sf::Mouse::Left) {
+                if (inEvent.mouseButton.button == sf::Mouse::Left) {
                     sf::Vector2<int> pMouse = sf::Mouse::getPosition(rWindow);
                     int _gEyePressed = getEyePressed(rWindow, pMouse);
                     if (_gEyePressed != -1) {
                         if (_gEyePressed == 0) {
-                            if (!comVEyesState[0])
+                            if (!rIM_comVEyesState[0])
                                 rCVML_rShow.c_objWeek.setObserver(eyeCatcherActive::getInstance());
                             else
                                 rCVML_rShow.c_objWeek.removeObserver();
                         } else if (_gEyePressed == 1) {
-                            if (!comVEyesState[1])
+                            if (!rIM_comVEyesState[1])
                                 rCVML_rShow.c_objMonth.setObserver(eyeCatcherActive::getInstance());
                             else
                                 rCVML_rShow.c_objMonth.removeObserver();
                         } else if (_gEyePressed == 2) {
-                            if (!comVEyesState[2])
+                            if (!rIM_comVEyesState[2])
                                 rCVML_rShow.c_objYear.setObserver(eyeCatcherActive::getInstance());
                             else
                                 rCVML_rShow.c_objYear.removeObserver();
+                        } else if (_gEyePressed == 3) {
+                            if (!rIM_comVEyesState[3])
+                                rCVML_rShow.c_nEmployee.setObserver(eyeCatcherActive::getInstance());
+                            else
+                                rCVML_rShow.c_nEmployee.removeObserver();
                         }
-                        setEyeVisualValue(_gEyePressed, !comVEyesState[_gEyePressed]);
-                        comVEyesState[_gEyePressed] = !comVEyesState[_gEyePressed];
+                        setEyeVisualValue(_gEyePressed, !rIM_comVEyesState[_gEyePressed]);
+                        rIM_comVEyesState[_gEyePressed] = !rIM_comVEyesState[_gEyePressed];
                         return true;
                     }
-                }
+                }else if (inEvent.mouseButton.button == sf::Mouse::Right)
+                    rIM_parentMenu->setResponse(-1, rIM_idMenu);
                 break;
             default:
                 break;
@@ -83,7 +108,7 @@ public:
         return false;
     }
 
-    void pressedCell(std::pair<int, int> cPressed,uint32_t inPTime, uint32_t inUTime) override {}
+    void pressedCell(std::pair<int, int> cPressed, uint32_t inPTime, uint32_t inUTime) override {}
 
 private:
     objCompany &rCVML_rShow;

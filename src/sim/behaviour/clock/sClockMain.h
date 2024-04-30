@@ -33,13 +33,11 @@ public:
                 sCM_sEM->callEventCountHour(getReduced(), getDate());
                 if (sCM_clock.sCM_rVHour == 0) {
                     sCM_sEM->callEventEndDay(getDate());
-                    sCM_clock.sCM_rVDay = (sCM_clock.sCM_rVDay + 1) % 31;
+                    sCM_clock.sCM_rVDay = (sCM_clock.sCM_rVDay + 1) % 28;
                     sCM_sEM->callEventStartDay(getDate());
                     if (sCM_clock.sCM_rVDay == 0) {
-                        sCM_clock.sCM_rVDay++;
                         sCM_clock.sCM_rVMonth = (sCM_clock.sCM_rVMonth + 1) % 13;
                         if (sCM_clock.sCM_rVMonth == 0) {
-                            sCM_clock.sCM_rVMonth++;
                             sCM_clock.sCM_rVYear++;
                         }
                     }
@@ -69,6 +67,30 @@ public:
 
     sCM_ClockValues getClock() { return sCM_clock; }
 
+    static sCM_ClockValues unpackDateInfo(uint32_t packedDate) {
+        uint8_t outWeekday = packedDate & 0b111;
+        uint8_t outWeekNumber = (packedDate >> 3) & 0b11;
+        uint8_t outMonth = (packedDate >> 5) & 0b1111;
+        uint16_t outYear = (packedDate >> 9);
+        uint8_t totalDay = outWeekNumber * 7 + outWeekday;
+        return {0, 0, totalDay, outMonth, outYear};
+    }
+
+    static uint32_t addDaysToDate(uint32_t inPackedDate, uint8_t nDays) {
+        sCM_ClockValues sActDate = unpackDateInfo(inPackedDate);
+        if (sActDate.sCM_rVDay + nDays >= 28) {
+            int nMonths = (sActDate.sCM_rVDay + nDays) / 28;
+            if (sActDate.sCM_rVMonth + nMonths >= 12)
+                sActDate.sCM_rVYear += (sActDate.sCM_rVMonth + nMonths) / 12;
+            sActDate.sCM_rVMonth = sActDate.sCM_rVMonth + nMonths % 12;
+        }
+
+        sActDate.sCM_rVDay = sActDate.sCM_rVDay + nDays % 28;
+
+        return packDateInfo(sActDate.sCM_rVDay % 7, sActDate.sCM_rVDay / 7, sActDate.sCM_rVMonth,
+                            sActDate.sCM_rVYear);
+    }
+
 private:
 
     static uint32_t packDateInfo(uint8_t inWeekday, uint8_t inWeekNumber, uint8_t inMonth, uint16_t inYear) {
@@ -82,14 +104,6 @@ private:
         return _packedDate;
     }
 
-    static sCM_ClockValues unpackDateInfo(uint32_t packedDate) {
-        uint8_t outWeekday = packedDate & 0b111;
-        uint8_t outWeekNumber = (packedDate >> 3) & 0b11;
-        uint8_t outMonth = (packedDate >> 5) & 0b1111;
-        uint16_t outYear = (packedDate >> 9);
-        uint8_t totalDay = outWeekNumber * 7 + outWeekday;
-        return {0, 0, totalDay, outMonth, outYear};
-    }
 
     sCM_ClockValues sCM_clock{};
     uint8_t sCM_pTickMinute = 0;

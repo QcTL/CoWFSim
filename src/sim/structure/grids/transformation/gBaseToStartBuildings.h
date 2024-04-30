@@ -31,7 +31,7 @@ public:
         for (int i = gRange.first.first; i <= gRange.first.second; ++i) {
             for (int j = gRange.second.first; j <= gRange.second.second; ++j) {
                 if (sGroupSoil.find(tSoil->get(i, j)) != sGroupSoil.end() && tType->get(i, j) == 0 &&
-                    rand() % (tSoil->get(i, j)*levelPopulation) == 0) {
+                    rand() % (tSoil->get(i, j)*(levelPopulation + 1)) == 0) {
                     switch (tSoil->get(i, j)) {
                         case TypeSoil_T1Urban:
                             tType->set(i, j, 1);

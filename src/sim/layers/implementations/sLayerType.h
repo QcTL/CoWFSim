@@ -150,11 +150,6 @@ public:
                 }
             }
         }
-        BasicTransformations::copyWhere(gTypeGen, gLayerTypeSoil,
-                                        {
-                                                {7,               5},
-                                                {TypeSoil_T1Farm, 4}});
-
 
         gCenterCoreUrban.insert(gCenterCoreUrban.end(), gCenterCoreIndustrial.begin(), gCenterCoreIndustrial.end());
 

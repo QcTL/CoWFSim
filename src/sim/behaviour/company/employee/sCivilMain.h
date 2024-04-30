@@ -56,9 +56,10 @@ public:
         sgUndergroundMain::sgUM_lowestViableRoute lVRMetro = sCM_groupLand->gL_gUnderground->getLowestDistanceCommute(
                 rPosCivHome, inObjCompany.c_cActiveLocations.begin()->second.front());
 
-        if (lVRMetro.totalDistance < 30)
+        if (lVRMetro.totalDistance < 30) {
             _oCivil = _getCivilMetro(rPosCivHome, inObjCompany, lVRMetro);
-        else {
+            r = sCM_sRoadsMain->addRuteCivil(_oCivil);
+        } else {
             _oCivil = _getCivilRoad(rPosCivHome, inObjCompany);
             r = sCM_sRoadsMain->addRuteCivil(_oCivil);
         }
@@ -67,14 +68,30 @@ public:
         sCM_groupEconomy->gE_sRLR->addElement(inTDate);
         sCM_groupLand->gL_gTerrain->addCivilHomeToPos(rPosCivHome);
 
+        sCM_cTotalCivil++;
         return _oCivil;
     }
 
-    std::shared_ptr<objCivil> removeEmployeeToCompany(const uint32_t inUuidCompany) {
+    std::shared_ptr<objCivil> getCivGivenCompany(const uint32_t inUuidCompany) {
         sCivilStorage::sCS_cCivRoute _cRoute = sCM_civilStorage->routeCivilGivenCompany(inUuidCompany);
+        return sCM_civilStorage->getByUuid(_cRoute.sCS_cCRCivil);
+    }
+
+    void removeRouteGivenCivil(const std::shared_ptr<objCivil> &inCivil, const uint32_t inUuidCompany) {
+        sCivilStorage::sCS_cCivRoute _cRoute = sCM_civilStorage->routeCivilGivenCompany(inUuidCompany);
+        sCM_cTotalCivil--;
         sCM_sRoadsMain->removeRuteCivil(sCM_civilStorage->getByUuid(_cRoute.sCS_cCRCivil), _cRoute.sCS_cCRUrBegin,
                                         _cRoute.sCS_cCRUrEnd);
-        return sCM_civilStorage->getByUuid(_cRoute.sCS_cCRCivil);
+    }
+
+    void deleteCivil(const std::shared_ptr<objCivil> &inCivil, const uint32_t inUuidCompany) {
+        sCM_civilStorage->removeCivilGivenCompany(inUuidCompany);
+        sCM_cTotalCivil--;
+    }
+
+
+    [[nodiscard]]uint64_t getNCivil() const {
+        return sCM_cTotalCivil;
     }
 
 private:
@@ -82,6 +99,7 @@ private:
                                              const sgUndergroundMain::sgUM_lowestViableRoute &rRouteTrain) {
         return std::make_shared<objCivil>(
                 objCivil(objCivil::typeRouteSystem::OC_TRS_TRAIN, rPosCivHome,
+                         inObjCompany.c_cActiveLocations.begin()->second.front(),
                          {sCM_groupLand->gL_gUnderground->getPosStationById(rRouteTrain.closestSt1),
                           sCM_groupLand->gL_gUnderground->getPosStationById(rRouteTrain.closestSt2)},
                          sCM_groupLand->gL_gUnderground->getClosestTimeForStation(rRouteTrain.closestSt1,
@@ -96,14 +114,18 @@ private:
         std::uniform_int_distribution<> distrib(-sOffsetTimeStart, sOffsetTimeStart);
         return std::make_shared<objCivil>(
                 objCivil(objCivil::typeRouteSystem::OC_TRS_CAR, rPosCivHome,
+                         inObjCompany.c_cActiveLocations.begin()->second.front(),
                          {sCM_sRoadsMain->getClosestRoadToBuilding(rPosCivHome),
-                          sCM_sRoadsMain->getClosestRoadToBuilding(inObjCompany.c_cActiveLocations.begin()->second.front())},
+                          sCM_sRoadsMain->getClosestRoadToBuilding(
+                                  inObjCompany.c_cActiveLocations.begin()->second.front())},
                          inObjCompany.c_activeDates.c_StrEndTime.first + distrib(sCM_genRand),
                          inObjCompany.c_activeDates.c_StrEndTime.second + distrib(sCM_genRand),
                          inObjCompany.c_activeDates.cAD_jobWeek));
     }
 
     std::mt19937 sCM_genRand;
+
+    uint64_t sCM_cTotalCivil = 0;
 
     std::shared_ptr<sgRoadsMain> sCM_sRoadsMain;
     std::shared_ptr<groupLand> sCM_groupLand;

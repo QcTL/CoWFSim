@@ -21,16 +21,12 @@ public:
         std::uint8_t sMEE_iReqTypeBuild;
         std::uint32_t sMEE_iTime;
 
-        [[nodiscard]] uint32_t getPrice(const double desirability, const std::vector<uint32_t> &vDatePriceElems) const {
-            if (sMEE_iCElem.empty())
-                return (uint32_t) (vDatePriceElems[sMEE_uuid] * desirability);
-            else {
-                uint32_t vRet = 0;
-                for (const uint64_t uuidCred: sMEE_iCElem) {
-                    vRet += vDatePriceElems[uuidCred];
-                }
-                return (uint32_t) ((vRet + vDatePriceElems[sMEE_uuid]) * desirability);
-            }
+        [[nodiscard]] uint32_t getPrice(const double desirability, const uint32_t inBasicPrice) const {
+            return (uint32_t)(inBasicPrice + (desiredFunc(desirability)) * 5);
+        }
+
+        static double desiredFunc(const double x) {
+            return  (1/ (1 + exp(-(x-1)))) - 0.5;
         }
     };
 
@@ -47,9 +43,21 @@ public:
         fCVS.close();
     }
 
+    std::vector<uint64_t> extractUuids() {
+        std::vector<uint64_t> uuids;
+        uuids.reserve(sME_listItems.size());
+
+        auto extractUuid = [](const sME_Element &element) {
+            return element.sMEE_uuid;
+        };
+
+        std::transform(sME_listItems.begin(), sME_listItems.end(), std::back_inserter(uuids), extractUuid);
+        return uuids;
+    }
+
     sME_Element getById(uint32_t idRec) { return sME_listItems[idRec]; }
 
-    std::string getNameById(uint32_t idRec) {return sME_gRecipeTotalName[idRec];}
+    std::string getNameById(uint32_t idRec) { return sME_gRecipeTotalName[idRec]; }
 
     uint32_t nElements() { return sME_listItems.size(); }
 
@@ -80,7 +88,7 @@ private:
         sME_gRecipeIdByName.insert({gTokens[0], idAct});
         sME_gRecipeTotalName.push_back(gTokens[4]);
 
-        return {idAct, rReqMaterials, rTypeBuilding[0] , static_cast<uint32_t>(std::stoul(gTokens[3]))};
+        return {idAct, rReqMaterials, rTypeBuilding[0], static_cast<uint32_t>(std::stoul(gTokens[3]))};
     }
 
     static std::vector<std::string> split(const std::string &s, char delimiter) {

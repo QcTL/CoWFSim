@@ -6,90 +6,112 @@
 #define CITYOFWEIRDFISHES_RROADLINEVIEW_H
 
 #include "rRoadViewMenu.h"
+#include "rRoadPresentView.h"
 
 class rRoadLineView : public rRoadViewMenu {
 public:
     explicit rRoadLineView(const std::shared_ptr<rIMenu> &mParent, const std::shared_ptr<rRNodeI> &refView,
-                           rIMenu::rRelativePos rPos)
-            : rRoadViewMenu(mParent, refView, "d_mRoadsViewLayer", rPos) {
+                           const std::shared_ptr<rPileMenus> &mPiles)
+            : rRoadViewMenu(mParent, refView, "d_mRoadsViewLayer"), rRLV_rPileMenus(mPiles),
+              pElemNRoadsTop(2), pElemNRoadsBottom(2) {
 
-        pElemCrossesNRoadsTop = {{},
-                                 {}};
-        pElemCrossesNRoadsBottom = {{},
-                                    {}};
         pElemNumSize = {};
 
         gHeightsTop = {6, 4, 2};
         gHeightsBottom = {12, 10, 8};
 
-        for (int i = 0; i < dExtracted.size(); ++i) {
-            for (int j = 0; j < dExtracted[i].size(); ++j) {
-                auto row = (rPos == pBottomLeft || rPos == pBottomRight) ? dExtracted.size() - 1 - i : i;
-                auto col = (rPos == pTopRight || rPos == pBottomRight) ? dExtracted[i].size() - 1 - j : j;
-                int value = dExtracted[i][j];
+        for (int i = 0; i < rIM_dExtracted.size(); ++i) {
+            for (int j = 0; j < rIM_dExtracted[i].size(); ++j) {
+                auto row = (rIM_rPos == pBottomLeft || rIM_rPos == pBottomRight) ? rIM_dExtracted.size() - 1 - i : i;
+                auto col = (rIM_rPos == pTopRight || rIM_rPos == pBottomRight) ? rIM_dExtracted[i].size() - 1 - j : j;
+                int value = rIM_dExtracted[i][j];
                 if (value == 105) pElemOcc.emplace_back(row, col);
                 else if (value == 277) {
-                    auto &container = (i < 8) ? pElemCrossesNRoadsTop[j == 8] : pElemCrossesNRoadsBottom[j == 8];
+                    auto &container = (i < 8) ? pElemNRoadsTop[j == 8] : pElemNRoadsBottom[j == 8];
                     container.emplace_back(row, col);
                 } else if (value == 48) pElemNumSize.emplace_back(row, col);
             }
         }
     }
 
+    bool interact(const sf::Event &inEvent, const sf::RenderWindow &inRenderWin) override {
+        if (inEvent.type == sf::Event::KeyPressed && inEvent.key.code == sf::Keyboard::Escape)
+            rIM_parentMenu->setResponse(-1, rIM_idMenu);
+        else if (inEvent.type == sf::Event::KeyPressed && inEvent.key.code == sf::Keyboard::P) {
+            std::shared_ptr<rIMenu> rProcessing = std::make_shared<rRoadPresentView>(
+                    rRoadPresentView(rRLV_rPileMenus->vTopActiveMenu, rRVM_selRoad));
+            rRLV_rPileMenus->addMenuTop(rProcessing);
+        } else if (inEvent.type == sf::Event::MouseButtonPressed && inEvent.mouseButton.button == sf::Mouse::Left) {
+            const int _gEyePressed = getEyePressed(inRenderWin, sf::Mouse::getPosition(inRenderWin));
+            if (_gEyePressed != -1) {
+                if (!rRVM_selRoad->nCarsAct.isObserved())
+                    rRVM_selRoad->nCarsAct.setObserver(eyeCatcherActive::getInstance());
+                else
+                    rRVM_selRoad->nCarsAct.removeObserver();
+                setEyeVisualValue(0, rRVM_selRoad->nCarsAct.isObserved());
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    void setResponse(int inValResponse,const std::string& inLIDSender) override {
+        rRLV_rPileMenus->removeTop();
+    }
+
     void update() override {
-        setSizeRoads(rSelRoad->getSizeRoad());
-        setRoadsCars(rSelRoad->getPosRoad(0), rSelRoad->getPosRoad(1));
-        setNewOcc(rSelRoad->getOccupancy());
-        setNumberComp(rSelRoad->getCapacity());
+        setSizeRoads(rRVM_selRoad->getSizeRoad());
+        setRoadsCars(rRVM_selRoad->getPosRoad(0), rRVM_selRoad->getPosRoad(1));
+        setNewOcc(rRVM_selRoad->getOccupancy());
+        setNumberComp(rRVM_selRoad->getCapacity());
     }
 
 private:
     std::vector<std::pair<int, int>> pElemOcc;
     std::vector<std::pair<int, int>> pElemNumSize;
 
-    std::vector<std::vector<std::pair<int, int>>> pElemCrossesNRoadsTop;
-    std::vector<std::vector<std::pair<int, int>>> pElemCrossesNRoadsBottom;
+    std::vector<std::vector<std::pair<int, int>>> pElemNRoadsTop;
+    std::vector<std::vector<std::pair<int, int>>> pElemNRoadsBottom;
 
     std::vector<uint8_t> gHeightsTop;
     std::vector<uint8_t> gHeightsBottom;
 
+    std::shared_ptr<rPileMenus> rRLV_rPileMenus;
+
     void setNewOcc(const float fRate) {
         if (fRate < 0 || fRate > 1) return;
 
-        int nTurnOn = static_cast<int>(5 * (1 - fRate));
+        int nTurnOn = (int) (5 * (1 - fRate));
         for (int i = 0; i < pElemOcc.size(); i++) {
-            auto quad = &dInfo[(pElemOcc[i].second + pElemOcc[i].first * gWidth) * 4];
-            auto tileIndex = (i >= nTurnOn) ? 105 : 32;
+            auto quad = &rIM_dInfo[(pElemOcc[i].second + pElemOcc[i].first * rIM_gWidth) * 4];
             for (int k = 0; k < 4; k++)
-                quad[k].texCoords = lRefTiles[tileIndex][k];
+                quad[k].texCoords = rIM_lRefTiles[(i >= nTurnOn) ? 105 : 32][k];
         }
     }
 
     void setSizeRoads(const int capRoad) {
         int nToTake = 1 + 2 * (capRoad - 1);
-        for (int i = 0; i < pElemCrossesNRoadsTop[0].size(); i++) {
-            auto *quadTop0 = &dInfo[
-                    (pElemCrossesNRoadsTop[0][i].second + pElemCrossesNRoadsTop[0][i].first * gWidth) * 4];
-            auto *quadTop1 = &dInfo[
-                    (pElemCrossesNRoadsTop[1][i].second + pElemCrossesNRoadsTop[1][i].first * gWidth) * 4];
-            auto *quadBtm0 = &dInfo[
-                    (pElemCrossesNRoadsBottom[0][i].second + pElemCrossesNRoadsBottom[0][i].first * gWidth) * 4];
-            auto *quadBtm1 = &dInfo[
-                    (pElemCrossesNRoadsBottom[1][i].second + pElemCrossesNRoadsBottom[1][i].first * gWidth) * 4];
-            int texIndex = (i <= nToTake) ? 32 : 277;
-            for (int k = 0; k < 4; k++) {
-                quadTop0[k].texCoords = lRefTiles[texIndex][k];
-                quadTop1[k].texCoords = lRefTiles[texIndex][k];
-                quadBtm0[k].texCoords = lRefTiles[texIndex][k];
-                quadBtm1[k].texCoords = lRefTiles[texIndex][k];
-            }
+        for (int i = 0; i < pElemNRoadsTop[0].size(); i++) {
+            std::vector<sf::Vertex *> sQuadPos = {
+                    &rIM_dInfo[(pElemNRoadsTop[0][i].second + pElemNRoadsTop[0][i].first * rIM_gWidth) * 4],
+                    &rIM_dInfo[(pElemNRoadsTop[1][i].second + pElemNRoadsTop[1][i].first * rIM_gWidth) * 4],
+                    &rIM_dInfo[(pElemNRoadsBottom[0][i].second + pElemNRoadsBottom[0][i].first * rIM_gWidth) * 4],
+                    &rIM_dInfo[(pElemNRoadsBottom[1][i].second + pElemNRoadsBottom[1][i].first * rIM_gWidth) * 4]
+            };
+
+            for (int k = 0; k < 4; k++)
+                for (auto &quad: sQuadPos)
+                    quad[k].texCoords = rIM_lRefTiles[(i <= nToTake) ? 32 : 277][k];
+
             if (i <= nToTake) {
                 for (int j = 3; j < 32; j++) {
-                    sf::Vertex *quadTop = &dInfo[(gHeightsBottom[i] * gWidth + j) * 4];
-                    sf::Vertex *quadBottom = &dInfo[(gHeightsTop[i] * gWidth + j) * 4];
+                    sf::Vertex *quadTop = &rIM_dInfo[(gHeightsBottom[i] * rIM_gWidth + j) * 4];
+                    sf::Vertex *quadBottom = &rIM_dInfo[(gHeightsTop[i] * rIM_gWidth + j) * 4];
                     for (int k = 0; k < 4; k++) {
-                        quadTop[k].texCoords = lRefTiles[32][k];
-                        quadBottom[k].texCoords = lRefTiles[32][k];
+                        quadTop[k].texCoords = rIM_lRefTiles[32][k];
+                        quadBottom[k].texCoords = rIM_lRefTiles[32][k];
                     }
                 }
             }
@@ -100,8 +122,8 @@ private:
         std::string vToShow = uint16_to_padded_string(rComp);
         for (int i = 0; i < 4; i++)
             for (int k = 0; k < 4; k++)
-                dInfo[(pElemNumSize[i].second + pElemNumSize[i].first * gWidth) * 4 + k].texCoords
-                        = lRefTiles[vToShow[i] - '0' + 48][k];
+                rIM_dInfo[(pElemNumSize[i].second + pElemNumSize[i].first * rIM_gWidth) * 4 + k].texCoords
+                        = rIM_lRefTiles[vToShow[i] - '0' + 48][k];
     }
 
     void setRoadsCars(const std::vector<std::list<uint32_t>> &rListPosTop,
@@ -114,9 +136,10 @@ private:
             for (int i = 0; i < sPos[j].size(); i++)
                 for (const auto &p: sPos[j][i])
                     for (int k = 0; k < 4; k++)
-                        dInfo[(sRefPos[j][i] * gWidth + 3 +
-                               static_cast<int>((static_cast<float>(p) / static_cast<float>(rSelRoad->getCapacity())) *
-                                                (32 - 3))) * 4 + k].texCoords = lRefTiles[48][k];
+                        rIM_dInfo[(sRefPos[j][i] * rIM_gWidth + 3 +
+                                   static_cast<int>(
+                                           (static_cast<float>(p) / static_cast<float>(rRVM_selRoad->getCapacity())) *
+                                           (32 - 3))) * 4 + k].texCoords = rIM_lRefTiles[48][k];
     }
 };
 

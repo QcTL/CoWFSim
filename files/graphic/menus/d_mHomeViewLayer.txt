@@ -1,5 +1,5 @@
 type:mHomeViewer
 src:mHomeViewLayer.txt
 inSelTex:65
-inLengthTex:11,3,3,4,9
+inLengthTex:13,3,3,4,10
 inPosButtons:2#12#11#1

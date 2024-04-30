@@ -17,16 +17,13 @@
 class rSelOptMenu : public rIMenu {
 
 public:
-    explicit rSelOptMenu(const std::shared_ptr<rIMenu> &mParent, int strValue, const std::string &pthFileD,
-                         rIMenu::rRelativePos rPos);
+    explicit rSelOptMenu(const std::shared_ptr<rIMenu> &mParent, int strValue);
 
     void draw(sf::RenderWindow &rW) override;
 
-    void setResponse(int v, uint16_t lID) override;
+    bool interact(const sf::Event &inEvent, const sf::RenderWindow &inRenderWin) override;
 
-    bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override;
-
-    void pressedCell(std::pair<int, int> cPressed,uint32_t inPTime, uint32_t inUTime) {}
+    void pressedCell(std::pair<int, int> inCellPressed, uint32_t inPTime, uint32_t inUTime) {}
 
 private:
     void setNewSel(int v);

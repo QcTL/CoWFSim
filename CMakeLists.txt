@@ -91,7 +91,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/structure/grids/transformation/gBaseToInertiaRoads.h
         src/sim/structure/grids/transformation/gBaseToIRF.h
         src/sim/structure/obj/sRoutesStorage.h
-        src/sim/behaviour/company/sCompanyTimer.h
+        src/sim/behaviour/market/items/sProductTimer.h
         src/sim/behaviour/company/sCompanyMain.h
         src/sim/behaviour/market/sMarketBazaar.h
         src/sim/behaviour/company/employee/sCivilMain.h
@@ -143,6 +143,12 @@ add_executable(CityOfWeirdFishes main.cpp
         src/sim/behaviour/company/code/implementations/sCodeManual.h
         src/sim/behaviour/company/code/implementations/isCode.h
         src/sim/behaviour/company/code/implementations/sCodeGenetic.h
+        src/display/menus/implementation/products/rProductsListViewLayer.h
+        src/display/menus/implementation/company/rCompPaymentsViewLayer.h
+        src/sim/behaviour/market/items/sObjProduct.h
+        src/display/menus/implementation/company/rCompViewProcessing.h
+        src/display/menus/implementation/rRoadView/rRoadPresentView.h
+        src/display/menus/rIScrollableMenu.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

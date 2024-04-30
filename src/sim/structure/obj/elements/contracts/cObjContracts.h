@@ -196,13 +196,13 @@ public:
 
     void
     addAsReceiving(const std::shared_ptr<objCompany> &objCom) override {
-        objCom->c_cActiveFunds += ct_askedStart;
+        objCom->addPayment(-ct_askedStart, oPC_TypePayment::oPC_TP_CONTRACT_LOAN, 0, ct_strDate);
         addPropertyContract(objCom, ct_typePayment, ct_recurrentCostReturn, false);
     };
 
     void
     addAsGiving(const std::shared_ptr<objCompany> &objCom) override {
-        objCom->c_cActiveFunds -= ct_askedStart;
+        objCom->addPayment(-ct_askedStart, oPC_TypePayment::oPC_TP_CONTRACT_LOAN, 0, ct_strDate);
         addPropertyContract(objCom, ct_typePayment, ct_recurrentCostReturn, true);
     };
 

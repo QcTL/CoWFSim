@@ -1,0 +1,6 @@
+type:ProductListViewLayer
+src:mProductListViewLayer.txt
+inSelTex:65
+inLengthTex:10,5,10,5,10,5,10,5,10,5
+inPosButtons:14#1#3#3,14#15#3#3
+inPosEyes:4#4#1#1,4#7#1#1,4#10#1#1,4#13#1#1,4#16#1#1

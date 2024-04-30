@@ -19,7 +19,7 @@ public:
     }
 
     std::vector<sf::Vector2f> getTexPos(int x, int y) override {
-        //return lRefTiles[lGrid->get(x, y)];
+        //return rIM_lRefTiles[lGrid->get(x, y)];
 
         uint32_t v = lCityGrid->get(x, y);
         auto vType = static_cast<uint8_t>(v >> 24);

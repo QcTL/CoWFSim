@@ -61,10 +61,12 @@ public:
     void addAvailableLocation(const std::list<std::pair<int, int>> &ctLCells, uint8_t typeSoilCell) {
         c_cActiveLocations[typeSoilCell].insert(
                 c_cActiveLocations[typeSoilCell].end(), ctLCells.begin(), ctLCells.end());
-        if (c_cAvailableByType.find(typeSoilCell) != c_cAvailableByType.end())
-            c_cAvailableByType[typeSoilCell] += 1;
-        else
-            c_cAvailableByType[typeSoilCell] = 1;
+        for (int i = 0; i < ctLCells.size(); i++) {
+            if (c_cAvailableByType.find(typeSoilCell) != c_cAvailableByType.end())
+                c_cAvailableByType[typeSoilCell] += 1;
+            else
+                c_cAvailableByType[typeSoilCell] = 1;
+        }
     }
 
     void removeAvailableLocation(const std::list<std::pair<int, int>> &ctLCells, uint8_t typeCell) {
@@ -76,28 +78,38 @@ public:
         c_cAvailableByType[typeCell] -= 1;
     }
 
-    void addRentedLocationByPos(const std::pair<int,int> inPRented, uint8_t typeCell){
+    void addRentedLocationByPos(const std::pair<int, int> inPRented, uint8_t typeCell) {
         removeAvailableLocation({inPRented}, typeCell);
         c_cRentedLocations[typeCell].push_back(inPRented);
+    }
+
+    void addProcessing(const uint32_t inCDate, const uint64_t  inUuidProduct){
+        if(!c_cActiveProcessing.count(inCDate))
+            c_cActiveProcessing[inCDate] = {};
+        c_cActiveProcessing[inCDate].push_back(inUuidProduct);
+    }
+
+    void removeProcessing(const uint32_t inCDate, const uint64_t  inUuidProduct){
+        c_cActiveProcessing[inCDate].remove(inUuidProduct);
     }
 
     uint32_t c_uuid{};
     std::string nName;
 
-    [[nodiscard]] bool hasOwnedType(uint8_t inNType) const{
+    [[nodiscard]] bool hasOwnedType(uint8_t inNType) const {
         return !c_cActiveLocations.at(inNType).empty();
     }
 
-    [[nodiscard]] uint32_t getNumberRentedCells() const{
+    [[nodiscard]] uint32_t getNumberRentedCells() const {
         size_t totalLength = 0;
-        for (const auto& pair : c_cRentedLocations)
+        for (const auto &pair: c_cRentedLocations)
             totalLength += pair.second.size();
         return totalLength;
     }
 
-    [[nodiscard]] uint32_t getNumberActiveCells() const{
+    [[nodiscard]] uint32_t getNumberActiveCells() const {
         size_t totalLength = 0;
-        for (const auto& pair : c_cActiveLocations)
+        for (const auto &pair: c_cActiveLocations)
             totalLength += pair.second.size();
         return totalLength;
     }
@@ -113,10 +125,10 @@ public:
             c_activeContracts[inCType] = {inCUuid};
     }
 
-    uint8_t getTypeByIndex(uint32_t inIndexCell){
+    uint8_t getTypeByIndex(uint32_t inIndexCell) {
         size_t remainingIndex = inIndexCell;
-        for (const auto& pair : c_cActiveLocations) {
-            const auto& list = pair.second;
+        for (const auto &pair: c_cActiveLocations) {
+            const auto &list = pair.second;
             size_t listSize = list.size();
 
             if (remainingIndex < listSize) {
@@ -129,22 +141,55 @@ public:
         return 0;
     }
 
+    void addPayment(double inQuantityPayment, const oPC_TypePayment inTypePayment, uint32_t inRTime, uint32_t inTDate) {
+        c_listPayments.push_back({inQuantityPayment, inTypePayment, inRTime, inTDate});
+        c_cActiveFunds += inQuantityPayment;
+    }
+
+    enum objC_TimeObligations {
+        objC_TO_WEEK, objC_TO_MONTH, objC_TO_YEAR
+    };
+
+    void complyTimeObligations(const objC_TimeObligations inTimeType, const uint32_t inTDate) {
+        switch (inTimeType) {
+            case objC_TO_WEEK:
+                c_listPayments.push_back({c_objWeek.get(), oPC_TypePayment::oPC_TP_RECURRENT_WEEK, 0, inTDate});
+                c_cActiveFunds += c_objWeek.get();
+                break;
+            case objC_TO_MONTH:
+                c_listPayments.push_back({c_objMonth.get(), oPC_TypePayment::oPC_TP_RECURRENT_MONTH, 0,inTDate});
+                c_cActiveFunds += c_objMonth.get();
+                break;
+            case objC_TO_YEAR:
+                c_listPayments.push_back({c_objYear.get(), oPC_TypePayment::oPC_TP_RECURRENT_YEAR, 0, inTDate});
+                c_cActiveFunds += c_objYear.get();
+                break;
+        }
+    }
+
+    [[nodiscard]] std::vector<objPaymentCompany> getVecAllTransactions() const{
+        return c_listPayments;
+    }
+
     std::map<uint32_t, int> c_pOwn;
     std::map<uint8_t, std::list<std::pair<int, int>>> c_cActiveLocations;
     std::map<uint8_t, int> c_cAvailableByType;
     std::map<uint8_t, std::list<std::pair<int, int>>> c_cRentedLocations;
     objComp_activeDates c_activeDates;
 
+    std::map<uint32_t, std::list<uint32_t>> c_cActiveProcessing;
+
     eyeValue<uint32_t> c_nEmployee;
-    eyeValue<double> c_cActiveFunds;
     eyeValue<float> c_objWeek;
     eyeValue<float> c_objYear;
     eyeValue<float> c_objMonth;
 
     std::shared_ptr<sCodeObj> c_cCode;
-
+    std::vector<objPaymentCompany> c_listPayments;
     std::map<uint8_t, std::list<uint64_t>> c_activeContracts;
     bool c_attrCanEmployee = true;
+
+    eyeValue<double> c_cActiveFunds;
 private:
     static std::vector<std::string> vSyllablesP;
     static std::random_device oC_rd;

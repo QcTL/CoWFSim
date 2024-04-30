@@ -13,7 +13,7 @@
 class gBaseToNearestRoad {
 public:
     static void
-    givenMatRef(const std::shared_ptr<gIGrid<rNode *>> &rGrid, const std::vector<std::vector<rNode *>> &vectInf,
+    givenMatRef(const std::shared_ptr<gIGrid<rNode *>> &rGrid, const std::vector<std::vector<rNode *>> &vecInf,
                 const std::shared_ptr<sgTerrain> &inGTerrain,
                 const std::vector<uint8_t> &gTypesRoad,
                 const std::vector<uint8_t> &gTypesSoil) {
@@ -33,16 +33,16 @@ public:
                             int gValid = (dDist + 1) / 2;
                             if (inGTerrain->gTG_TypeGen->isInside(i + gValid, j) &&
                                 isInsideGroup(roadGroup, inGTerrain->gTG_TypeGen->get(i + gValid, j)))
-                                nearRoad = vectInf[i + gValid][j];
+                                nearRoad = vecInf[i + gValid][j];
                             else if (inGTerrain->gTG_TypeGen->isInside(i - gValid, j) &&
                                      isInsideGroup(roadGroup, inGTerrain->gTG_TypeGen->get(i - gValid, j)))
-                                nearRoad = vectInf[i - gValid][j];
+                                nearRoad = vecInf[i - gValid][j];
                             else if (inGTerrain->gTG_TypeGen->isInside(i, j + gValid) &&
                                      isInsideGroup(roadGroup, inGTerrain->gTG_TypeGen->get(i, j + gValid)))
-                                nearRoad = vectInf[i][j + gValid];
+                                nearRoad = vecInf[i][j + gValid];
                             else if (inGTerrain->gTG_TypeGen->isInside(i, j - gValid) &&
                                      isInsideGroup(roadGroup, inGTerrain->gTG_TypeGen->get(i, j - gValid)))
-                                nearRoad = vectInf[i][j - gValid];
+                                nearRoad = vecInf[i][j - gValid];
                         } else {
                             int gValid = dDist / 2;
                             std::vector<int> vec(gValid);
@@ -53,21 +53,20 @@ public:
                             for (int k = 0; k < vec.size(); k++) {
                                 if (inGTerrain->gTG_TypeGen->isInside(i + vec[k], j + vecRev[k]) &&
                                     isInsideGroup(roadGroup, inGTerrain->gTG_TypeGen->get(i + vec[k], j + vecRev[k])))
-                                    nearRoad = vectInf[i + vec[k]][j + vecRev[k]];
+                                    nearRoad = vecInf[i + vec[k]][j + vecRev[k]];
                                 if (inGTerrain->gTG_TypeGen->isInside(i - vec[k], j + vecRev[k]) &&
                                     isInsideGroup(roadGroup, inGTerrain->gTG_TypeGen->get(i - vec[k], j + vecRev[k])))
-                                    nearRoad = vectInf[i - vec[k]][j + vecRev[k]];
+                                    nearRoad = vecInf[i - vec[k]][j + vecRev[k]];
                                 if (inGTerrain->gTG_TypeGen->isInside(i + vec[k], j - vecRev[k]) &&
                                     isInsideGroup(roadGroup, inGTerrain->gTG_TypeGen->get(i + vec[k], j - vecRev[k])))
-                                    nearRoad = vectInf[i + vec[k]][j - vecRev[k]];
+                                    nearRoad = vecInf[i + vec[k]][j - vecRev[k]];
                                 if (inGTerrain->gTG_TypeGen->isInside(i - vec[k], j - vecRev[k]) &&
                                     isInsideGroup(roadGroup, inGTerrain->gTG_TypeGen->get(i - vec[k], j - vecRev[k])))
-                                    nearRoad = vectInf[i - vec[k]][j - vecRev[k]];
+                                    nearRoad = vecInf[i - vec[k]][j - vecRev[k]];
                             }
                         }
                         dDist++;
                     }
-                    uint8_t r = inGTerrain->gTG_TypeGen->get(i, j);
                     rGrid->set(i, j, nearRoad);
                 }
             }

@@ -5,15 +5,15 @@
 #include "rSelOptMenu.h"
 
 
-rSelOptMenu::rSelOptMenu(const std::shared_ptr<rIMenu> &mParent, int strValue, const std::string &pthFileD,
-                         rIMenu::rRelativePos rPos) : rIMenu(mParent, rPos, pthFileD) {
-    std::vector<std::vector<int>> data = dExtracted;
+rSelOptMenu::rSelOptMenu(const std::shared_ptr<rIMenu> &mParent, int strValue)
+        : rIMenu(mParent, rIMenu::rRelativePos::pBottomRight, "d_mSelectLayer") {
+    std::vector<std::vector<int>> data = rIM_dExtracted;
 
     for (int i = 0; i < data.size(); ++i)
         for (int j = 0; j < data[i].size(); ++j)
             if (data[i][j] == 304 || data[i][j] == 305) {
-                auto row = (rPos == pBottomLeft || rPos == pBottomRight) ? data.size() - 1 - i : i;
-                auto col = (rPos == pTopRight || rPos == pBottomRight) ? data[i].size() - 1 - j : j;
+                auto row = (rIM_rPos == pBottomLeft || rIM_rPos == pBottomRight) ? data.size() - 1 - i : i;
+                auto col = (rIM_rPos == pTopRight || rIM_rPos == pBottomRight) ? data[i].size() - 1 - j : j;
                 pElemSel.emplace_back(row, col);
                 pElemSelAbs.emplace_back(i, j);
             }
@@ -21,36 +21,33 @@ rSelOptMenu::rSelOptMenu(const std::shared_ptr<rIMenu> &mParent, int strValue, c
 }
 
 void rSelOptMenu::draw(sf::RenderWindow &rW) {
-    rW.draw(dInfo, &tsTex.tsTex);
+    rW.draw(rIM_dInfo, &rIM_tsTex.tsTex);
 }
 
 void rSelOptMenu::setNewSel(int v) {
-    sf::Vertex *quad = &dInfo[(pElemSel[cCurrenSel].second + pElemSel[cCurrenSel].first * gWidth) * 4];
-    for (int k = 0; k < 4; k++) {
-        quad[k].texCoords = lRefTiles[305][k];
-    }
+    sf::Vertex *quad = &rIM_dInfo[(pElemSel[cCurrenSel].second + pElemSel[cCurrenSel].first * rIM_gWidth) * 4];
+    for (int k = 0; k < 4; k++)
+        quad[k].texCoords = rIM_lRefTiles[305][k];
 
-    quad = &dInfo[(pElemSel[v].second + pElemSel[v].first * gWidth) * 4];
-    for (int k = 0; k < 4; k++) {
-        quad[k].texCoords = lRefTiles[304][k];
-    }
+    quad = &rIM_dInfo[(pElemSel[v].second + pElemSel[v].first * rIM_gWidth) * 4];
+    for (int k = 0; k < 4; k++)
+        quad[k].texCoords = rIM_lRefTiles[304][k];
 
     cCurrenSel = v;
 }
 
-void rSelOptMenu::setResponse(int v, uint16_t lID) {}
-
-bool rSelOptMenu::interact(const sf::Event &event, const sf::RenderWindow &rWindow) {
-    switch (event.type) {
+bool rSelOptMenu::interact(const sf::Event &inEvent, const sf::RenderWindow &inRenderWin) {
+    switch (inEvent.type) {
         case sf::Event::MouseButtonPressed:
-            if (event.mouseButton.button == sf::Mouse::Left) {
-                sf::Vector2<int> pMouse = sf::Mouse::getPosition(rWindow);
-                if (isInside(rWindow, gHeight * 16, gWidth * 16, pMouse)) {
+            if (inEvent.mouseButton.button == sf::Mouse::Left) {
+                sf::Vector2<int> pMouse = sf::Mouse::getPosition(inRenderWin);
+                if (isInside(inRenderWin, rIM_gHeight * 16, rIM_gWidth * 16, pMouse)) {
                     //Now check if its in the same line as some element select;
-                    sf::Vector2<unsigned int> absPos = getAbsPos(rWindow, gHeight * 16, gWidth * 16, pMouse);
+                    sf::Vector2<unsigned int> absPos = getAbsPos(inRenderWin, rIM_gHeight * 16, rIM_gWidth * 16,
+                                                                 pMouse);
                     for (int i = 0; i < pElemSelAbs.size(); i++) {
                         if (pElemSelAbs[i].first * 16 < absPos.y && pElemSelAbs[i].first * 16 + 16 >= absPos.y) {
-                            parentMenu->setResponse(i, 3);
+                            rIM_parentMenu->setResponse(i, rIM_idMenu);
                         }
                     }
                     return true;

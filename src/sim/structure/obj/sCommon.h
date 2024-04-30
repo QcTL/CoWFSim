@@ -33,4 +33,22 @@ struct sCodeObj {
     sCodeObj(const std::vector<uint64_t> &sCoCode, uint32_t sCoScore) : sCO_Code(sCoCode), sCO_Score(sCoScore) {}
 };
 
+enum oPC_TypePayment {
+    oPC_TP_RECURRENT_YEAR,
+    oPC_TP_RECURRENT_MONTH,
+    oPC_TP_RECURRENT_WEEK,
+    oPC_TP_SOLD,
+    oPC_TP_INVESTMENT_START,
+    oPC_TP_CONTRACT_LOAN,
+    oPC_TP_CONTRACT_ADQUIRE_CELL,
+};
+
+struct objPaymentCompany {
+    double opc_qPayment;
+    oPC_TypePayment opc_pType;
+    uint32_t opc_pHour;
+    uint32_t opc_pDate;
+};
+
+
 #endif //CITYOFWEIRDFISHES_SCOMMON_H

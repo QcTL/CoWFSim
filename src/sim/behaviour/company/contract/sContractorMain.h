@@ -97,7 +97,7 @@ public:
         uint32_t _uuidContract = sCM_ContractorSt->addCon(_hireE);
         _hireE->addAsGiving(inPObjComGiving);
 
-        inPObjComGiving->addContractToCompany(con_Type::con_Type_Rent, _uuidContract);
+        inPObjComGiving->addContractToCompany(con_Type::con_Type_Hire, _uuidContract);
     }
 
     void addContractToCompanyRentHouse(const std::shared_ptr<objCompany> &inPObjComGiving,

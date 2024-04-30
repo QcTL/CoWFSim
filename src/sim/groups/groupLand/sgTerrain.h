@@ -60,12 +60,12 @@ public:
             for (int j = _gRange.first.first; j < (_gRange.first.second + 1); j++) {
                 if (gTG_TypeGen->get(i, j) == sgT_TypeGen::sgT_TG_Nothing) {
                     switch (gTG_TypeSoil->get(i, j)) {
+                        case sgT_TypeSoil::sgT_TS_T1Farm:
                         case sgT_TypeSoil::sgT_TS_T1Mixed:
                         case sgT_TypeSoil::sgT_TS_T2Mixed:
                         case sgT_TypeSoil::sgT_TS_T3Mixed:
                         case sgT_TypeSoil::sgT_TS_T1Industrial:
                         case sgT_TypeSoil::sgT_TS_T2Industrial:
-                        case sgT_TypeSoil::sgT_TS_T1Farm:
                             gTG_emptyCell.push_back({gTG_TypeSoil->get(i, j), {{i, j}}});
                             break;
                         default:
@@ -142,18 +142,19 @@ public:
             case sgT_TypeSoil::sgT_TS_T3Mixed:
                 gTG_TypeGen->set(inGridPos, sgT_TypeGen::sgT_TG_CivBuilding);
                 addToCivilPresentBySoil(gTG_TypeSoil->get(inGridPos), inGridPos);
-                gTG_rLayer->addNewBuildingRender(inGridPos, sgT_TypeGen::sgT_TG_CivBuilding);
+
                 break;
             case sgT_TypeSoil::sgT_TS_T1Industrial:
             case sgT_TypeSoil::sgT_TS_T2Industrial:
-            case sgT_TypeSoil::sgT_TS_T1Farm:
                 gTG_TypeGen->set(inGridPos, sgT_TypeGen::sgT_TG_IndBuilding);
                 gTG_factoryFieldFullCell.push_back(inGridPos);
-                gTG_rLayer->addNewBuildingRender(inGridPos,
-                                                 gTG_TypeSoil->get(inGridPos) == sgT_TypeSoil::sgT_TS_T1Industrial
-                                                 ? sgT_TypeGen::sgT_TG_IndBuilding : sgT_TypeGen::sgT_TG_HIndBuilding);
                 break;
+
+            case sgT_TypeSoil::sgT_TS_T1Farm:
+                gTG_TypeGen->set(inGridPos, sgT_TypeGen::sgT_TG_FieldBuilding);
+                gTG_factoryFieldFullCell.push_back(inGridPos);
         }
+        gTG_rLayer->addNewBuildingRender(inGridPos, gTG_TypeSoil->get(inGridPos));
     }
 
     void removeBuilding(const std::pair<int, int> &inGridPos) {
