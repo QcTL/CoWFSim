@@ -174,8 +174,8 @@ public:
             } else if(dDir < 4){
                 sVecCarPos[dDir].push_back(carActInside);
                 notifyEnterNext(dDir, carActInside, 0);
-            }
-
+            }else
+                updateRefGrid(false);
             itsEmpty = true;
         } else if (!reqTakeCar.empty()) {
             uint8_t dToTake = reqTakeCar.front().first;

@@ -27,13 +27,11 @@ public:
         rW.draw(rIM_dInfo, &rIM_tsTex.tsTex);
     }
 
-    void setResponse(int v, uint16_t lID) override {}
-
     bool interact(const sf::Event &inEvent, const sf::RenderWindow &inRenderWin) override {
         switch (inEvent.type) {
             case sf::Event::KeyPressed:
                 if (inEvent.key.code == sf::Keyboard::Escape)
-                    rIM_parentMenu->setResponse(-1, 0);
+                    rIM_parentMenu->setResponse(-1, rIM_idMenu);
                 break;
             case sf::Event::MouseButtonPressed:
                 if (inEvent.mouseButton.button == sf::Mouse::Left) {
@@ -48,8 +46,6 @@ public:
                                 refPile->addMenuTop(rComp);
                             }
                         }
-                    } else {
-                        // rIM_parentMenu->setResponse(-1);
                     }
                     return true;
                 }

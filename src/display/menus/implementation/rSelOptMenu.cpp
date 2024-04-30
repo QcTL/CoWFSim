@@ -36,8 +36,6 @@ void rSelOptMenu::setNewSel(int v) {
     cCurrenSel = v;
 }
 
-void rSelOptMenu::setResponse(int v, uint16_t lID) {}
-
 bool rSelOptMenu::interact(const sf::Event &inEvent, const sf::RenderWindow &inRenderWin) {
     switch (inEvent.type) {
         case sf::Event::MouseButtonPressed:
@@ -49,7 +47,7 @@ bool rSelOptMenu::interact(const sf::Event &inEvent, const sf::RenderWindow &inR
                                                                  pMouse);
                     for (int i = 0; i < pElemSelAbs.size(); i++) {
                         if (pElemSelAbs[i].first * 16 < absPos.y && pElemSelAbs[i].first * 16 + 16 >= absPos.y) {
-                            rIM_parentMenu->setResponse(i, 3);
+                            rIM_parentMenu->setResponse(i, rIM_idMenu);
                         }
                     }
                     return true;

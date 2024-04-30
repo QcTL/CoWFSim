@@ -33,16 +33,14 @@ public:
         inRenderWin.draw(rIM_dInfo, &rIM_tsTex.tsTex);
     }
 
-    void setResponse(int v, uint16_t lID) override {}
-
     bool interact(const sf::Event &inEvent, const sf::RenderWindow &inRenderWin) override {
         if (inEvent.type == sf::Event::KeyPressed && inEvent.key.code == sf::Keyboard::Escape)
-            rIM_parentMenu->setResponse(-1, 2);
+            rIM_parentMenu->setResponse(-1, rIM_idMenu);
         return false;
     }
 
     void pressedCell(std::pair<int, int> cPressed, uint32_t inPTime, uint32_t inUTime) override {
-        rIM_parentMenu->setResponse(-1, 2);
+        rIM_parentMenu->setResponse(-1, rIM_idMenu);
     }
 
 protected:

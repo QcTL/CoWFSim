@@ -55,8 +55,6 @@ public:
 
     void update() override {}
 
-    void setResponse(int v, uint16_t lID) override {}
-
     bool interact(const sf::Event &inEvent, const sf::RenderWindow &inRenderWin) override {
         switch (inEvent.type) {
             case sf::Event::MouseButtonPressed:
@@ -65,14 +63,14 @@ public:
                     int _gPressed = getButtonPressed(inRenderWin, _pMouse);
                     if (_gPressed != -1 && _gPressed <= 3) {
                         setVelocity(_gPressed);
-                        rIM_parentMenu->setResponse(_gPressed, 16);
+                        rIM_parentMenu->setResponse(_gPressed, rIM_idMenu);
                     }
                 }
                 break;
             case sf::Event::KeyPressed:
                 if (inEvent.key.code >= sf::Keyboard::Num0 && inEvent.key.code <= sf::Keyboard::Num3) {
                     int velocity = inEvent.key.code - sf::Keyboard::Num0;
-                    rIM_parentMenu->setResponse(velocity, 16);
+                    rIM_parentMenu->setResponse(velocity, rIM_idMenu);
                     setVelocity(velocity);
 
                     rGUIC_isPaused = inEvent.key.code == sf::Keyboard::Num0;
@@ -81,7 +79,7 @@ public:
 
                 } else if (inEvent.key.code == sf::Keyboard::Space) {
                     int velocity = rGUIC_isPaused ? gLastVelocity : 0;
-                    rIM_parentMenu->setResponse(velocity, 16);
+                    rIM_parentMenu->setResponse(velocity, rIM_idMenu);
                     setVelocity(velocity);
                     rGUIC_isPaused = !rGUIC_isPaused;
                 }

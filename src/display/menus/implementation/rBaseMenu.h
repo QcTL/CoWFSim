@@ -35,8 +35,8 @@ public:
 
     void draw(sf::RenderWindow &inRenderWin) override {}
 
-    void setResponse(int inRetValue, uint16_t inLIDSender) override {
-        if (inLIDSender == 3) {
+    void setResponse(int inRetValue, const std::string &inLIDSender) override {
+        if (inLIDSender == "mSelectLayer") {
             switch (inRetValue) {
                 case 0:
                     refPile->inSim->switchActual(gSimLayersTypes::G_AIRPOLLUTION);
@@ -58,7 +58,7 @@ public:
                     break;
             }
             lstValueLayer = inRetValue;
-        } else if (inLIDSender == 16) {
+        } else if (inLIDSender == "guiClock") {
             switch (inRetValue) {
                 case 0:
                     refPile->rInteractionGameVel = 0.0;
@@ -76,8 +76,8 @@ public:
                     break;
             }
         }
-        if (inLIDSender < 16)
-            refPile->removeTop();
+
+        refPile->removeTop();
     }
 
     bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override {
@@ -91,7 +91,7 @@ public:
                     std::shared_ptr<rGlobalAttrViewLayer> _rGlob = std::make_shared<rGlobalAttrViewLayer>(
                             refPile->vTopActiveMenu);
                     refPile->addMenuTop(_rGlob);
-                }else if(event.key.code == sf::Keyboard::O){
+                } else if (event.key.code == sf::Keyboard::O) {
                     std::shared_ptr<rProductsListViewLayer> _rProds = std::make_shared<rProductsListViewLayer>(
                             refPile->vTopActiveMenu, rBM_refEconomy);
                     refPile->addMenuTop(_rProds);
@@ -150,7 +150,7 @@ public:
                             } else {
                                 std::shared_ptr<rRoadViewMenu> rRoad = std::make_shared<rRoadLineView>(
                                         refPile->vTopActiveMenu,
-                                        rBM_refLRoads[cPressed.first][cPressed.second]->refCompressed,refPile);
+                                        rBM_refLRoads[cPressed.first][cPressed.second]->refCompressed, refPile);
                                 refPile->addMenuTop(rRoad);
                             }
                         }

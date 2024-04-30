@@ -21,9 +21,9 @@ public:
         std::vector<std::pair<uint32_t, uint32_t>> _rTopProcessing;
         int _count = 0;
         for (const auto &pair: rShow.c_cActiveProcessing) {
-            for(const auto& elem: pair.second) {
+            for (const auto &elem: pair.second) {
                 if (_count <= 4)
-                    _rTopProcessing.emplace_back(pair.first,elem);
+                    _rTopProcessing.emplace_back(pair.first, elem);
                 else
                     break;
                 _count++;
@@ -35,11 +35,12 @@ public:
         for (int i = 0; i < 4 * 2; i += 2) {
             if (_rTopProcessing.size() > i / 2) {
                 sClockMain::sCM_ClockValues sDateVal = sClockMain::unpackDateInfo(_rTopProcessing[i / 2].first);
-                std::string tDate = ((sDateVal.sCM_rVDay + 1) < 10 ? "0" : "") + std::to_string(sDateVal.sCM_rVDay + 1)  + '/' +
-                                    ((sDateVal.sCM_rVMonth + 1) < 10 ? "0" : "") + std::to_string(sDateVal.sCM_rVMonth + 1);
+                std::string tDate =
+                        ((sDateVal.sCM_rVDay + 1) < 10 ? "0" : "") + std::to_string(sDateVal.sCM_rVDay + 1) + '/' +
+                        ((sDateVal.sCM_rVMonth + 1) < 10 ? "0" : "") + std::to_string(sDateVal.sCM_rVMonth + 1);
                 setText(i + 1, tDate);
                 setText(i, inGEcon->getNameById(_rTopProcessing[i / 2].second));
-            }else{
+            } else {
                 setText(i + 1, "");
                 setText(i, "");
             }
@@ -50,13 +51,15 @@ public:
         rW.draw(rIM_dInfo, &rIM_tsTex.tsTex);
     }
 
-    void setResponse(int v, uint16_t lID) override {}
-
-    bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override {
-        switch (event.type) {
+    bool interact(const sf::Event &inEvent, const sf::RenderWindow &rWindow) override {
+        switch (inEvent.type) {
             case sf::Event::KeyPressed:
-                if (event.key.code == sf::Keyboard::Escape)
-                    rIM_parentMenu->setResponse(-1, 1);
+                if (inEvent.key.code == sf::Keyboard::Escape)
+                    rIM_parentMenu->setResponse(-1, rIM_idMenu);
+                break;
+            case sf::Event::MouseButtonPressed:
+                if (inEvent.mouseButton.button == sf::Mouse::Right)
+                    rIM_parentMenu->setResponse(-1, rIM_idMenu);
                 break;
             default:
                 break;

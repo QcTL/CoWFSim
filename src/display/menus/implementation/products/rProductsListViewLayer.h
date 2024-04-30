@@ -24,6 +24,31 @@ public:
     }
 
 
+    bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override {
+        if (rIScrollableMenu<std::pair<std::string, uint64_t>>::interact(event, rWindow))
+            return true;
+
+        switch (event.type) {
+            case sf::Event::MouseButtonPressed:
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    sf::Vector2<int> pMouse = sf::Mouse::getPosition(rWindow);
+                    int _gEyePressed = getEyePressed(rWindow, pMouse);
+                    if (_gEyePressed != -1) {
+                        int _refProduct = _gEyePressed + rPVL_cCurLayerObjects * rPVL_nObjInLayer;
+                        rPVL_refGEco->changeStateEyeProduct(_refProduct);
+
+                        rPVL_activatedEyesList[_refProduct] = !rPVL_activatedEyesList[_refProduct];
+                        setEyeVisualValue(_gEyePressed, rPVL_activatedEyesList[_refProduct]);
+                        return true;
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+        return false;
+    }
+
 protected:
     void updateEyesCurrentState() {
         for (int i = 0; i < rPVL_totalElements.size(); i++) {
@@ -31,7 +56,7 @@ protected:
         }
     }
 
-    void printItemsOnScreen() override{
+    void printItemsOnScreen() override {
         for (int i = 0; i < rPVL_nObjInLayer * 2; i += 2) {
             uint32_t vObjAct = rPVL_cCurLayerObjects * rPVL_nObjInLayer + i / 2;
 

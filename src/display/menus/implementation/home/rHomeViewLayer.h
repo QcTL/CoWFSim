@@ -41,14 +41,14 @@ public:
         rW.draw(rIM_dInfo, &rIM_tsTex.tsTex);
     }
 
-    void setResponse(int v, uint16_t lID) override {
+    void setResponse(int v,const std::string& lID) override {
         mPiles->removeTop();
     }
 
-    bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override {
-        switch (event.type) {
+    bool interact(const sf::Event &inEvent, const sf::RenderWindow &rWindow) override {
+        switch (inEvent.type) {
             case sf::Event::MouseButtonPressed:
-                if (event.mouseButton.button == sf::Mouse::Left) {
+                if (inEvent.mouseButton.button == sf::Mouse::Left) {
                     sf::Vector2<int> pMouse = sf::Mouse::getPosition(rWindow);
                     int _gPressed = getButtonPressed(rWindow, pMouse);
                     if (_gPressed != -1) {
@@ -59,12 +59,13 @@ public:
                             mPiles->addMenuTop(rComp);
                         }
                     }
-                }
+                }else if (inEvent.mouseButton.button == sf::Mouse::Right)
+                    rIM_parentMenu->setResponse(-1, rIM_idMenu);
                 break;
             case sf::Event::KeyPressed:
-                if (event.key.code == sf::Keyboard::Escape)
-                    rIM_parentMenu->setResponse(-1, 1);
-                if (event.key.code == sf::Keyboard::C && rCompRef != nullptr) {
+                if (inEvent.key.code == sf::Keyboard::Escape)
+                    rIM_parentMenu->setResponse(-1, rIM_idMenu);
+                if (inEvent.key.code == sf::Keyboard::C && rCompRef != nullptr) {
                     std::shared_ptr<rCompViewLayer> rComp = std::make_shared<rCompViewLayer>(
                             rCompViewLayer(mPiles->vTopActiveMenu,
                                            *rCompRef,rHVL_groupEconomy, mPiles));

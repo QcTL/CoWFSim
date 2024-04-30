@@ -36,7 +36,7 @@ public:
 
     bool interact(const sf::Event &inEvent, const sf::RenderWindow &inRenderWin) override {
         if (inEvent.type == sf::Event::KeyPressed && inEvent.key.code == sf::Keyboard::Escape)
-            rIM_parentMenu->setResponse(-1, 2);
+            rIM_parentMenu->setResponse(-1, rIM_idMenu);
         else if (inEvent.type == sf::Event::KeyPressed && inEvent.key.code == sf::Keyboard::P) {
             std::shared_ptr<rIMenu> rProcessing = std::make_shared<rRoadPresentView>(
                     rRoadPresentView(rRLV_rPileMenus->vTopActiveMenu, rRVM_selRoad));
@@ -57,7 +57,7 @@ public:
         return false;
     }
 
-    void setResponse(int inValResponse, uint16_t inLIDSender) override {
+    void setResponse(int inValResponse,const std::string& inLIDSender) override {
         rRLV_rPileMenus->removeTop();
     }
 

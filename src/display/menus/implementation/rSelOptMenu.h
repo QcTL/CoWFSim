@@ -21,8 +21,6 @@ public:
 
     void draw(sf::RenderWindow &rW) override;
 
-    void setResponse(int v, uint16_t lID) override;
-
     bool interact(const sf::Event &inEvent, const sf::RenderWindow &inRenderWin) override;
 
     void pressedCell(std::pair<int, int> inCellPressed, uint32_t inPTime, uint32_t inUTime) {}

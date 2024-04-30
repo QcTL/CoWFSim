@@ -54,7 +54,7 @@ public:
         inRenderWin.draw(rIM_dInfo, &rIM_tsTex.tsTex);
     }
 
-    void setResponse(int inValResponse, uint16_t inLIDSender) override {
+    void setResponse(int inValResponse,const std::string& inLIDSender) override {
         mPiles->removeTop();
     }
 
@@ -62,8 +62,8 @@ public:
         switch (inEvent.type) {
             case sf::Event::KeyPressed:
                 if (inEvent.key.code == sf::Keyboard::Escape)
-                    rIM_parentMenu->setResponse(-1, 1);
-                if (inEvent.key.code == sf::Keyboard::P) {
+                    rIM_parentMenu->setResponse(-1, rIM_idMenu);
+                else if (inEvent.key.code == sf::Keyboard::P) {
                     std::shared_ptr<rIMenu> rComp = std::make_shared<rCompViewMoreLayer>(
                             rCompViewMoreLayer(mPiles->vTopActiveMenu,
                                                rCompRef,
@@ -94,7 +94,8 @@ public:
                         }
                         return true;
                     }
-                }
+                } else if (inEvent.mouseButton.button == sf::Mouse::Right)
+                    rIM_parentMenu->setResponse(-1, rIM_idMenu);
                 break;
             default:
                 break;

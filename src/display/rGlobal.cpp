@@ -95,7 +95,7 @@ void rGlobal::loop() {
                 visibleArea = sf::View(sf::FloatRect(0, 0, event.size.width, event.size.height));
                 rWindow.setView(visibleArea);
                 break;
-            case sf::Event::MouseButtonPressed:
+            case sf::Event::MouseButtonReleased:
                 if (event.mouseButton.button == sf::Mouse::Right) {
                     gSimL->pressedCell(rPosCursor);
                     rPMenu->pressedCell(rPosCursor);

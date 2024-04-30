@@ -33,6 +33,7 @@ public:
             rIM_comV = std::vector<defTxtCompany>(_dInfoFile.of_inLengthTex.size(), {{0, 0}});
             rIM_comVButtons = _dInfoFile.of_vecButton;
             rIM_comVEyes = _dInfoFile.of_vecEye;
+            rIM_idMenu = _dInfoFile.of_nameFile;
             rIM_comVEyesState = std::vector<bool>(_dInfoFile.of_vecEye.size(), false);
 
             std::vector<uint8_t> sLengths = _dInfoFile.of_inLengthTex;
@@ -87,7 +88,7 @@ public:
 
     virtual void draw(sf::RenderWindow &inRenderWin) = 0;
 
-    virtual void setResponse(int inValResponse, uint16_t inLIDSender) = 0;
+    virtual void setResponse(int inValResponse,const std::string& inLIDSender){};
 
     virtual bool interact(const sf::Event &inEvent, const sf::RenderWindow &inRenderWin) = 0;
 
@@ -277,6 +278,7 @@ protected:
     sf::VertexArray v;
     std::vector<std::vector<sf::Vector2f>> rIM_lRefTiles;
     rRelativePos rIM_rPos;
+    std::string rIM_idMenu;
 
     struct defTxtCompany {
         std::pair<uint32_t, uint32_t> pStartText;
@@ -301,6 +303,7 @@ protected:
 
     struct rIMenu_objFile {
         std::vector<std::vector<int>> of_data;
+        std::string of_nameFile;
         uint32_t of_inSelTex;
         std::vector<uint8_t> of_inLengthTex;
         std::vector<of_button> of_vecButton;
@@ -325,6 +328,8 @@ protected:
             _gContentF.push_back(row);
         }
         _file.close();
+
+        std::string _sNameMenu = _strValRes["type"];
 
         uint32_t _gSelTex = 0;
         if (_strValRes.find("inSelTex") != _strValRes.end())
@@ -369,7 +374,7 @@ protected:
                             {_gVecComponent[0], _gVecComponent[1], _gVecComponent[2], _gVecComponent[3]});
             }
         }
-        return {_gContentF, _gSelTex, _gVecLengthTex, _gVecPosButtons, _gVecPosEyes};
+        return {_gContentF,_sNameMenu,_gSelTex, _gVecLengthTex, _gVecPosButtons, _gVecPosEyes};
     }
 
     void setPositionValue(std::pair<int, int> cPos, uint32_t cValue) {

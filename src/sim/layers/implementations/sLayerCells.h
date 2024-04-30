@@ -41,17 +41,18 @@ public:
         std::vector<sPosStartMainRoad> sVecMainRoads = {
                 {{lSize / 2,             0},                     {0,  1}},
                 {{0,                     lSize / 2},             {1,  0}},
-                {{lSize / 2 + lSize / 3, lSize-1},                 {0,  -1}},
-                {{lSize-1,                 lSize / 2 + lSize / 3}, {-1, 0}},
+                {{lSize / 2 + lSize / 3, lSize - 1},             {0,  -1}},
+                {{lSize - 1,             lSize / 2 + lSize / 3}, {-1, 0}},
         };
-        std::vector<int> sDispersionByNRoads = {30,60,100, 150};
+        std::vector<int> sDispersionByNRoads = {30, 60, 100, 150};
 
         std::vector<gBaseToIRF::gPositionEscape> rNext;
         for (int i = 0; i < std::stoi(mValues.at("Quanitat_Carrers_Princiapls")); i++) {
             std::vector<gBaseToIRF::gPositionEscape> gNewVec = gBaseToIRF::gen<uint8_t>(sgTerrain->gTG_TypeGen,
                                                                                         sVecMainRoads[i].sPSM_StartPos,
                                                                                         sVecMainRoads[i].sPSM_StartDir,
-                                                                                        5, sDispersionByNRoads[i], false, inSeed);
+                                                                                        5, sDispersionByNRoads[i],
+                                                                                        false, inSeed);
             rNext.insert(rNext.end(), gNewVec.begin(), gNewVec.end());
         }
 
@@ -80,7 +81,8 @@ public:
 
         for (const gBaseToIRF::gPositionEscape rPerp: rNext) {
             gBaseToIRF::gen<uint8_t>(sgTerrain->gTG_TypeGen, rPerp.pPerpStart,
-                                     rPerp.pPerpOrigin, sgTerrain::sgT_TypeGen::sgT_TG_RoadS, 255, std::stoi(mValues.at("Quanitat_Carrers_Princiapls")) > 2, inSeed);
+                                     rPerp.pPerpOrigin, sgTerrain::sgT_TypeGen::sgT_TG_RoadS, 255,
+                                     std::stoi(mValues.at("Quanitat_Carrers_Princiapls")) > 2, inSeed);
         }
 
 
@@ -107,7 +109,7 @@ public:
         gBaseToStartBuildings::gen(sgTerrain->gTG_TypeSoil, sgTerrain->gTG_TypeGen,
                                    {TypeSoil_T1Urban, TypeSoil_T2Urban, TypeSoil_T3Urban,
                                     TypeSoil_T1Factory, TypeSoil_T2Factory},
-                                   {5, 6}, levelPopulation,inSeed);
+                                   {5, 6}, levelPopulation, inSeed);
 
         //FIELDS:
 
@@ -129,7 +131,10 @@ public:
                     gBaseToLineRoads::givenTwoPoints<uint8_t>(gUnderground,
                                                               cClusters[i], cClusters[(i + 1) % cClusters.size()],
                                                               1));
-            gUnderground->set(cClusters[i], 2);
+        }
+
+        for (const auto & cCluster : cClusters) {
+            gUnderground->set(cCluster, 2);
         }
 
         std::map<uint8_t, std::vector<std::pair<std::pair<int, int>, uint8_t>>> pUnderground =
