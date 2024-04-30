@@ -43,10 +43,6 @@ public:
                                                  inCDate).size()));
     }
 
-    void draw(sf::RenderWindow &rW) override {
-        rW.draw(rIM_dInfo, &rIM_tsTex.tsTex);
-    }
-
     void setResponse(int v,const std::string& lID) override {
         mPiles->removeTop();
     }
@@ -82,8 +78,6 @@ public:
         }
         return false;
     }
-
-    void pressedCell(std::pair<int, int> cPressed, uint32_t inPTime, uint32_t inUTime) override {}
 
 private:
 

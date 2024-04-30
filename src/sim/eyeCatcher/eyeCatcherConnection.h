@@ -15,8 +15,17 @@
 #include <netinet/in.h>
 #include <vector>
 
+/**
+ * @class eyeCatcherConnection
+ * @brief class to send the eyeValues changed outside of the application, in this case using sockets.
+ * Class to connect to the local website where the active eyeValues are displayed, using port 8888 and localhost
+ */
 class eyeCatcherConnection {
 public:
+    /**
+     * @brief constructor of class that also open the necessary sockets to send information
+     * Opens the socked 8888 as a server side to send information, also accepts the client side of the connection.
+     */
     explicit eyeCatcherConnection() {
         std::cout << "WAITING FOR WEB CONNECTION" << std::endl;
 
@@ -33,7 +42,7 @@ public:
         }
 
         // Bind the socket to the IP and port
-        sockaddr_in serverAddress;
+        sockaddr_in serverAddress{};
         serverAddress.sin_family = AF_INET;
         serverAddress.sin_addr.s_addr = INADDR_ANY;
         serverAddress.sin_port = htons(8888);
@@ -47,7 +56,7 @@ public:
 
         // Accept a client connection
         socklen_t clientAddressLength;
-        sockaddr_in clientAddress;
+        sockaddr_in clientAddress{};
         clientAddressLength = sizeof(clientAddress);
         eyC_clientAddress = accept(eyC_serverSocket, (struct sockaddr *) &clientAddress, &clientAddressLength);
         if (eyC_clientAddress < 0) {
@@ -56,12 +65,25 @@ public:
         }
     };
 
+    /**
+     * @struct eyC_DataPacket
+     * @brief collection of information that will be send in a package from server to client.
+     * It consist of 3 elements, the new number, the timestamp where it changed and the eyC uuid in a char[32] padding spaces left.
+     */
     struct eyC_DataPacket {
         int eyC_nValue;
         int eyeC_nTime;
         char eyC_uuidEyeValue[32];
     };
 
+
+    /**
+     * @fn void sendInformation
+     * @brief Send the package @ref eyC_DataPacket to the connected client extracted from the parameters
+     * @param inNewValue The new value the @ref eyeValue got
+     * @param inUuidEye The uuid name of the @ref eyeValue changed
+     * @param inTotalTick The timestamp where this change happened.
+     */
     void sendInformation(int inNewValue, const std::string &inUuidEye, int inTotalTick) const {
         eyC_DataPacket inEyC_DP = {inNewValue, inTotalTick, ""};
         strncpy(inEyC_DP.eyC_uuidEyeValue, inUuidEye.c_str(), sizeof(inEyC_DP.eyC_uuidEyeValue) - 1);
@@ -72,6 +94,9 @@ public:
         send(eyC_clientAddress, &inEyC_DP, sizeof(inEyC_DP), 0);
     }
 
+    /**
+     * @brief destructor where the connection is closed.
+     */
     ~eyeCatcherConnection() {
         close(eyC_clientAddress);
         close(eyC_serverSocket);

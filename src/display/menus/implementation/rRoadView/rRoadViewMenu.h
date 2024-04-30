@@ -29,10 +29,6 @@ public:
 
     void update() override {}
 
-    void draw(sf::RenderWindow &inRenderWin) override {
-        inRenderWin.draw(rIM_dInfo, &rIM_tsTex.tsTex);
-    }
-
     bool interact(const sf::Event &inEvent, const sf::RenderWindow &inRenderWin) override {
         if (inEvent.type == sf::Event::KeyPressed && inEvent.key.code == sf::Keyboard::Escape)
             rIM_parentMenu->setResponse(-1, rIM_idMenu);

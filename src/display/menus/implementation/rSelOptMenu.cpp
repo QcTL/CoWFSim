@@ -20,9 +20,6 @@ rSelOptMenu::rSelOptMenu(const std::shared_ptr<rIMenu> &mParent, int strValue)
     setNewSel(strValue);
 }
 
-void rSelOptMenu::draw(sf::RenderWindow &rW) {
-    rW.draw(rIM_dInfo, &rIM_tsTex.tsTex);
-}
 
 void rSelOptMenu::setNewSel(int v) {
     sf::Vertex *quad = &rIM_dInfo[(pElemSel[cCurrenSel].second + pElemSel[cCurrenSel].first * rIM_gWidth) * 4];

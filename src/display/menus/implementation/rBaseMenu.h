@@ -58,6 +58,7 @@ public:
                     break;
             }
             lstValueLayer = inRetValue;
+            refPile->removeTop();
         } else if (inLIDSender == "guiClock") {
             switch (inRetValue) {
                 case 0:
@@ -75,9 +76,8 @@ public:
                 default:
                     break;
             }
-        }
-
-        refPile->removeTop();
+        } else
+            refPile->removeTop();
     }
 
     bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override {
