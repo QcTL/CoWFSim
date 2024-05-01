@@ -12,6 +12,10 @@
 #include "sEventReceiver.h"
 #include "../structure/obj/elements/objCivil.h"
 
+/**
+ * @class sEventManager
+ * @brief Singleton Class that manages all the sEventReceiver and calls them when a event is emitted.
+ */
 class sEventManager {
 public:
 
@@ -38,6 +42,11 @@ public:
 
     sEventManager() = default;
 
+    /**
+     * @fn  std::shared_ptr<sEventManager> getInstance
+     * @brief Function to get the unique instance of the class
+     * @return A pointer to the unique class of sEventManager instanced.
+     */
     static std::shared_ptr<sEventManager> getInstance() {
         if (!sEM_instance)
             sEM_instance = std::make_shared<sEventManager>();
