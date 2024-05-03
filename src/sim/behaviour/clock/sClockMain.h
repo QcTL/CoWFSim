@@ -21,6 +21,11 @@ public:
         uint32_t sCM_CDate = 0;
     };
 
+
+    /**
+     * @fn void tick
+     * @brief Updates the elements in the class that need changing every tick of the simulation
+     */
     void tick() {
         sCM_pTickMinute++;
         if (sCM_pTickMinute > 5) {

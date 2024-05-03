@@ -55,6 +55,12 @@ public:
         return sEM_totalElements->getNameById(inIdProduct);
     }
 
+    /**
+ * @fn void tickReduced
+ * @brief Updates the elements in the class that need changing every 5 tick of the simulation
+ * @param inRTime uint representing the reduced time of the day
+ * @param inTDate uint representing the reduced date of the simulation
+ */
     void tickReduced(uint32_t inRTick, uint32_t inTDate) {
         if (inRTick == 0)
             updateStaticElements();

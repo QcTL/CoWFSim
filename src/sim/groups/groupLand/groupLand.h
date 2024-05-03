@@ -17,15 +17,27 @@ public:
         gL_gUnderground = std::make_shared<sgUndergroundMain>(inGridSize);
     }
 
+    /**
+     * @fn void completedSetupStage
+     * @brief This function should be called when the modification of the grid like sLayerType and sLayerCell has been performed
+     */
     void completedSetupStage() {
         gL_gTerrain->loadUpRender();
         gL_gTerrain->setupLists();
     }
 
+    /**
+     * @fn void tick
+     * @brief Updates the elements in the class that need changing every tick of the simulation
+     * @param inCTime The integer containing the compressed time
+     */
     void tick(uint32_t inCTime) {
         gL_gUnderground->tick(inCTime);
     }
-
+    /**
+     * @fn void tickReduced
+     * @brief Updates the elements in the class that need changing every 5 tick of the simulation
+     */
     void tickReduced() {
         gL_gAirPollution->tickReduced(gL_gTerrain->gTG_TypeGen);
     }

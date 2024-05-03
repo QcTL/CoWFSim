@@ -29,10 +29,22 @@ const uint8_t TypeSoil_T2Obstacle = 9;
 class sLayerType {
 public:
 
+    /**
+     * @fn  double distance
+     * @brief Function to get the distance between two points
+     * @param p1 Pair of integers representing coordinates
+     * @param p2 Pair of integers representing coordinates
+     * @return A double representing the distance between the two points
+     */
     static double distance(const std::pair<int, int> &p1, const std::pair<int, int> &p2) {
         return std::sqrt(std::pow(p2.first - p1.first, 2) + std::pow(p2.second - p1.second, 2));
     }
 
+    /**
+     * @brief Given a lists of points return them in order so the two adjacent ones has the nearest distance possible to
+     * @param points A vector of point
+     * @return A list of the same points of input ordered to have the adjacent one closer.
+     */
     static std::vector<std::pair<int, int>> nearestNeighbor(const std::vector<std::pair<int, int>> &points) {
         std::vector<std::pair<int, int>> result;
         std::vector<bool> visited(points.size(), false);
@@ -74,8 +86,16 @@ public:
         std::vector<std::pair<int, int>> centerClusters;
     };
 
-    static returnLayerType gen(uint32_t lSize, const std::shared_ptr<gIGrid<uint8_t>> &gTypeGen,
-                               const std::map<std::string, std::string> &mValues, const int inSeed = 0) {
+    /**
+     * @fn returnLayerType gen
+     * @brief Function to generate the typeSoil and centerCluster of the new generated city
+     * @param lSize The size of the board
+     * @param mValues A map defining the attributes of the city
+     * @param inSeed The value of the seed which random systems will be based
+     * @return A struct containing the genTypeSold and a vector of the center of active zones
+     */
+    static returnLayerType
+    gen(uint32_t lSize, const std::map<std::string, std::string> &mValues, const int inSeed = 0) {
         std::shared_ptr<gIGrid<uint8_t>> gLayerTypeSoil =
                 std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(lSize, lSize, TypeSoil_Nothing));
         std::pair<std::pair<int, int>, std::pair<int, int>> gRange = gLayerTypeSoil->rangeUse();
@@ -134,7 +154,7 @@ public:
             selSizeNucleusInd = 1;
         else if (mValues.at("Node_Industrial_Mida") == "Gran")
             selSizeNucleusInd = 2;
-         std::vector<std::pair<int, int>> gCenterCoreIndustrial(std::stoi(mValues.at("Quanitat_Node_Industrial")));
+        std::vector<std::pair<int, int>> gCenterCoreIndustrial(std::stoi(mValues.at("Quanitat_Node_Industrial")));
         for (auto &gCenter: gCenterCoreIndustrial) {
             gCenter = {distGCenter(sLT_genRVal), distGCenter(sLT_genRVal)};
             genClusterTypeIndustry(gCenter, tSizeNucleusCiv[selSizeNucleusInd].pRadiusC,
@@ -159,40 +179,53 @@ public:
     }
 
 private:
+
+    /**
+     * @fn void genClusterTypeSoil
+     * @brief Modifies the matrix given to set the type soil to match the radial specification of types civilian housing
+     * @param pCenter The position of the center of the circle
+     * @param pRadiusC The size of the radius of the first center layer
+     * @param pRadiusE The size of the radius of the second layer
+     * @param pRadiusQ The size of the radius of the third layer
+     * @param gLayerTypeSoil The matrix the changes will be applied.
+     */
     static void genClusterTypeSoil(const std::pair<int, int> &pCenter,
                                    const uint32_t pRadiusC, const uint32_t pRadiusE, const uint32_t pRadiusQ,
                                    const std::shared_ptr<gIGrid<uint8_t>> &gLayerTypeSoil) {
 
         gBaseClosestToPoint::gen<uint8_t>(gLayerTypeSoil, {
-                                                  {pCenter, pRadiusC},
-                                          }, TypeSoil_T1Urban,
+                                                  {pCenter, pRadiusC}}, TypeSoil_T1Urban,
                                           BasicTransformations::genMaskFromGrid(gLayerTypeSoil,
                                                                                 {TypeSoil_Nothing}));
 
         gBaseClosestToPoint::gen<uint8_t>(gLayerTypeSoil, {
-                                                  {pCenter, pRadiusE},
-                                          }, TypeSoil_T2Urban,
+                                                  {pCenter, pRadiusE}}, TypeSoil_T2Urban,
                                           BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing}));
 
         gBaseClosestToPoint::gen<uint8_t>(gLayerTypeSoil, {
-                                                  {pCenter, pRadiusQ},
-                                          }, TypeSoil_T3Urban,
+                                                  {pCenter, pRadiusQ}}, TypeSoil_T3Urban,
                                           BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing}));
     }
 
+    /**
+     * @fn void genClusterTypeIndustry
+     * @brief Modifies the matrix given to set the type soil to match the radial specification of types factory zoning
+     * @param pCenter The position of the center of the zone
+     * @param pRadiusC The radius of the first layer, the heavy factory
+     * @param pRadiusE The radius of the second layer, non heavy factory
+     * @param gLayerTypeSoil The matrix this changes in type soil will be applied
+     */
     static void
     genClusterTypeIndustry(const std::pair<int, int> &pCenter,
                            const uint32_t pRadiusC, const uint32_t pRadiusE,
                            const std::shared_ptr<gIGrid<uint8_t>> &gLayerTypeSoil) {
 
         gBaseClosestToPoint::gen<uint8_t>(gLayerTypeSoil, {
-                                                  {pCenter, pRadiusC},
-                                          }, TypeSoil_T1Factory,
+                                                  {pCenter, pRadiusC}}, TypeSoil_T1Factory,
                                           BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing}));
 
         gBaseClosestToPoint::gen<uint8_t>(gLayerTypeSoil, {
-                                                  {pCenter, pRadiusE},
-                                          }, TypeSoil_T2Factory,
+                                                  {pCenter, pRadiusE}}, TypeSoil_T2Factory,
                                           BasicTransformations::genMaskFromGrid(gLayerTypeSoil, {TypeSoil_Nothing}));
     }
 

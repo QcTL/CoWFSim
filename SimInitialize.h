@@ -38,7 +38,7 @@ public:
 
         std::shared_ptr<sSimulatorMain> sMS = std::make_shared<sSimulatorMain>(lSizeGrid);
 
-        sLayerType::returnLayerType tReturn = sLayerType::gen(lSizeGrid, sMS->sSM_groupLand->gL_gTerrain->gTG_TypeGen,
+        sLayerType::returnLayerType tReturn = sLayerType::gen(lSizeGrid,
                                                               mValues, snCommonAtr::getFlagAtr("snCA_Seed"));
         sMS->sSM_groupLand->gL_gTerrain->gTG_TypeSoil = tReturn.genTypeSoil;
 

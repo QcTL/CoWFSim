@@ -68,6 +68,11 @@ public:
     //TRACKERS:
     std::shared_ptr<stGlobalTrackerAttr> sSM_GlobalTracker;
 
+
+    /**
+     * @fn void tick
+     * @brief Updates the elements in the class that need changing every tick of the simulation
+     */
     void tick() {
         if (sMClock->isReducedTick()) {
             allTicksReduced(sMClock->getReduced(), sMClock->getDate());

@@ -26,6 +26,12 @@ public:
         }
     }
 
+    /**
+     * @fn void tickReduced
+     * @brief Updates the elements in the class that need changing every 5 tick of the simulation
+     * @param inRTime uint representing the reduced time of the day
+     * @param inTDate uint representing the reduced date of the simulation
+     */
     void tickReduced(const uint32_t inRTime, const uint32_t inTDate) {
         gE_sEvaluator->tickReduced(inRTime, inTDate);
     }
