@@ -41,10 +41,6 @@ public:
         }
     }
 
-    static int gTotalRoads() {
-        return gRefByAdjacent.size();
-    }
-
     static uint32_t getTypeRoadById(const uint8_t &gId) {
         return static_cast<uint32_t>(std::stoul(gVect[gId][0]));
     }

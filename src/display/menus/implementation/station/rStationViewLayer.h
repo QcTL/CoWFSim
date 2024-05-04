@@ -13,6 +13,10 @@
 #include "../../../../sim/groups/groupLand/sgUndergroundMain.h"
 #include "../../../../sim/roads/sgRoadsMain.h"
 
+/**
+ * @class rStationViewLayer
+ * @brief This class implements the menu for the information about a given metro station
+ */
 class rStationViewLayer : public rIMenu {
 public:
     explicit rStationViewLayer(const std::shared_ptr<rIMenu> &mParent,
@@ -22,7 +26,7 @@ public:
             : rIMenu(mParent, rIMenu::rRelativePos::pTopLeft, pthFileD), mPiles(mPiles), soUnderground(sgUnderground) {
 
         uint32_t nextTime = sgUnderground->getClosestTimeForStation(inUuidStation, inRTime);
-        uint32_t prevTime = sgUnderground->getPastClosestTimeForStation(inUuidStation, inRTime);
+        uint32_t prevTime = sgUnderground->getClosestTimeForStation(inUuidStation, nextTime + 1);
 
         std::string gPrevHour = std::to_string(((prevTime/12)) == 0 ? 12 : ((prevTime/12)));
         std::string gPrevMinutes = std::to_string((prevTime%12) * 5);

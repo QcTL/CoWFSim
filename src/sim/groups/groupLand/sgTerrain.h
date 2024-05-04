@@ -53,7 +53,11 @@ public:
             gTG_genRPos.seed(static_cast<unsigned int>(time(nullptr)));
     }
 
-
+    /**
+     * @fn setupLists
+     * @brief This function should be called after the layers of type an cell values has been filled, and will extract the
+     * information of the current active and empty cells.
+     */
     void setupLists() {
         std::pair<std::pair<int, int>, std::pair<int, int>> _gRange = gTG_TypeSoil->rangeUse();
         for (int i = _gRange.second.first; i < (_gRange.second.second + 1); i++) {
@@ -135,6 +139,12 @@ public:
         }
     }
 
+    /**
+     * @fn void addNewBuilding
+     * @brief Given a coordinate will create a building in that position modification the graphical part, and removing an
+     * empty cell position
+     * @param inGridPos Position were the building will be added
+     */
     void addNewBuilding(const std::pair<int, int> &inGridPos) {
         switch (gTG_TypeSoil->get(inGridPos)) {
             case sgT_TypeSoil::sgT_TS_T1Mixed:
@@ -157,6 +167,11 @@ public:
         gTG_rLayer->addNewBuildingRender(inGridPos, gTG_TypeSoil->get(inGridPos));
     }
 
+    /**
+     * @fn void removeBuilding
+     * @brief Given a coordinate will remove a building in that position, creating a empty cell element in that place
+     * @param inGridPos Position were the building will be removed, it has to host a building
+     */
     void removeBuilding(const std::pair<int, int> &inGridPos) {
         switch (gTG_TypeSoil->get(inGridPos)) {
             case sgT_TypeSoil::sgT_TS_T1Mixed:
@@ -175,10 +190,19 @@ public:
         gTG_rLayer->addNewBuildingRender(inGridPos, 0);
     }
 
+    /**
+     * @fn void loadUpRender
+     * @brief It will load the matrix with the typeGen and typeSoil in the render side to be displayed correctly
+     */
     void loadUpRender() {
         gTG_rLayer->loadRenderWithSimGrids(gTG_TypeGen, gTG_TypeSoil, gTG_fieldsBlobPositions);
     }
 
+    /**
+     * @fn std::pair<int, int> returnRandomFullCivil
+     * @brief returns the random position of a cell that is occupied by some civilian building.
+     * @return The position of a present cell
+     */
     std::pair<int, int> returnRandomFullCivil() {
         std::uniform_int_distribution<> dist(0, (int) gTG_civilPresentCellBySoil.size() - 1);
         auto it = std::next(gTG_civilPresentCellBySoil.begin(), dist(gTG_genRPos));
@@ -201,10 +225,21 @@ public:
         }
     }
 
+    /**
+     * @fn uint8_t getMaxOccByPos
+     * @param inPCell The position of the cell you are trying to get the max occupancy
+     * @return Returns the maximum number of civilians that can live in that type of cell.
+     */
     [[nodiscard]] uint8_t getMaxOccByPos(const std::pair<int, int> &inPCell) const {
         return getMaxOccBySoil(gTG_TypeSoil->get(inPCell));
     }
 
+
+    /**
+     * @fn uint8_t getMaxOccBySoil
+     * @param tSoil The type of soil you are trying to get the max occupancy
+     * @return Returns the maximum number of civilians that can live in that type of cell.
+     */
     static uint8_t getMaxOccBySoil(const uint8_t tSoil) {
         switch (tSoil) {
             case sgT_TypeSoil::sgT_TS_T1Mixed:
@@ -218,7 +253,11 @@ public:
         }
     }
 
-
+    /**
+     * @fn std::pair<int, int> getHomeSortLessQuality
+     * @param inTypeSoil The type of soil you want the new cell house to be
+     * @return A position of the that home
+     */
     [[nodiscard]] std::pair<int, int>
     getHomeSortLessQuality(const uint8_t inTypeSoil) {
         //return gTG_civilPresentCellBySoil[inTypeSoil].front();
@@ -228,11 +267,23 @@ public:
         return topValidHomes.front();
     }
 
+    /**
+     * @fn uint32_t getQualityGivenPosHome
+     * @brief Given a house get its quality based on its surrounding and type of soil
+     * @param inPHouse The position of the house you want to get its quality
+     * @return The quality value
+     */
     [[nodiscard]] uint32_t getQualityGivenPosHome(const std::pair<int, int> inPHouse) const {
         return gTG_baseQualityAttr->get(inPHouse) * 3;
     }
 
-    [[nodiscard]]  double getRemainHomes(const uint8_t inTypeSoil) const {
+    /**
+     * @fn double getRemainHomes
+     * @brief Return the relative quantity of houses with that soil that are available for purchase
+     * @param inTypeSoil The type of soil, uint8_t
+     * @return The relative value of how many houses are left
+     */
+    [[nodiscard]] double getRemainHomes(const uint8_t inTypeSoil) const {
         double gTotalBuild = (double) gTG_civilPresentCellBySoil.at(inTypeSoil).size() +
                              (gTG_civilFilledCellBySoil.find(inTypeSoil) != gTG_civilFilledCellBySoil.end()
                               ? (double) gTG_civilFilledCellBySoil.at(inTypeSoil).size() : 0);

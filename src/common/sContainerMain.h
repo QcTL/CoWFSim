@@ -10,6 +10,10 @@
 #include "../display/menus/implementation/rBaseMenu.h"
 #include "../sim/sSimulatorMain.h"
 
+/**
+ * @class sContainerMain
+ * @brief A class containing all the basic elements to make the simulation run
+ */
 class sContainerMain {
 public:
 

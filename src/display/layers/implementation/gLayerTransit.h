@@ -12,15 +12,12 @@ public:
     explicit gLayerTransit(const std::shared_ptr<gIGrid<uint8_t>> &gGrid,
                            const std::shared_ptr<gIGrid<uint32_t>> &gCityGrid) :
             gILayer(gTileset("ts_transit16.png", 16, 10, 40)), lGrid(gGrid), lCityGrid(gCityGrid) {
-        //setTransformation({0, 1, 2, 3, 4, 5,6,7,8,9,10,11,12,13,14});
 
         addToMapSprites(0, getByPosTopLeft(lTs.getPos(42)));
         addRoadToMapSprites();
     }
 
     std::vector<sf::Vector2f> getTexPos(int x, int y) override {
-        //return rIM_lRefTiles[lGrid->get(x, y)];
-
         uint32_t v = lCityGrid->get(x, y);
         auto vType = static_cast<uint8_t>(v >> 24);
         if (vType != 32 && vType != 33)
@@ -50,7 +47,7 @@ public:
         mTypeSprites[n].push_back(v);
     }
 
-    std::vector<sf::Vector2f> getByPosTopLeft(const std::pair<int, int> posTopLeft) {
+    std::vector<sf::Vector2f> getByPosTopLeft(const std::pair<int, int> posTopLeft)  override{
         int tSize = lTs.getTileSize();
         return std::vector<sf::Vector2f>{
                 sf::Vector2f(posTopLeft.first * tSize, posTopLeft.second * tSize),
