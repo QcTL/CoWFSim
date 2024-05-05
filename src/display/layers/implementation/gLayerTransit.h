@@ -7,6 +7,10 @@
 
 #include "../gILayer.h"
 
+/**
+ * @class gLayerTransit
+ * @brief Represents the class that displays the transit on the city in the graphical layer
+ */
 class gLayerTransit : public gILayer {
 public:
     explicit gLayerTransit(const std::shared_ptr<gIGrid<uint8_t>> &gGrid,
@@ -25,6 +29,11 @@ public:
         return mTypeSprites.at((vType == 32 ? 1 : 10) + (lGrid->get(x, y) - 1)) [v & 0xFF];
     }
 
+    /**
+     * @fn void addRoadToMapSprites
+     * @brief Adds into the common structure all the different types of combinations of roads and its possible rotation
+     * to be used in the display, in the correct and prestablished order
+     */
     void addRoadToMapSprites() {
         int rRotate[] = {11, 1, 0, 10};
         std::vector<int> rTopLeftPos = {66, 46, 26, 8, 28, 64, 60, 40, 20, 0, 6, 62, 48, 48, 04, 02, 22, 24, 44, 80};
@@ -40,6 +49,12 @@ public:
         }
     }
 
+    /**
+     * @fn void addToMapSprites
+     * @brief Add to the structure in the type n the element v, event if the n was never initialized
+     * @param n The type of element inserted
+     * @param v The element you want to be retained in the correct order
+     */
     void addToMapSprites(const uint8_t &n, const std::vector<sf::Vector2f> &v) {
         if (mTypeSprites.find(n) == mTypeSprites.end()) {
             mTypeSprites[n] = std::vector<std::vector<sf::Vector2f>>();

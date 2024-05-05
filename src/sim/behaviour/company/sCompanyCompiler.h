@@ -9,6 +9,10 @@
 #include <cstdint>
 #include "../../structure/obj/elements/objCompany.h"
 
+/**
+ * @class sCompanyCompiler
+ * @brief Given the code of execution of a company is set to return the actions that has to occur
+ */
 class sCompanyCompiler {
 public:
     struct sCCIntentions {
@@ -37,29 +41,13 @@ public:
         sCCIntentions() = default;
     };
 
-    static sCCIntentions
-    intentionsFromLong(const uint16_t inCIntention, const uint64_t &cVal, const std::shared_ptr<objCompany> &objC) {
-        uint32_t dAddInfo = static_cast<uint32_t>(cVal & 0xFFFFFFFF);
-        switch (inCIntention) {
-            case 0:
-                return {sCCIntentions::OBJ_Produce, dAddInfo, objC};
-            case 1:
-                return {sCCIntentions::OBJ_Buy, dAddInfo, objC};
-            case 2:
-                return {sCCIntentions::OBJ_SellInm, dAddInfo, objC};
-            case 3:
-                return {sCCIntentions::CELL_Buy, dAddInfo, objC};
-            case 4:
-                return {sCCIntentions::CELL_Sell, dAddInfo, objC};
-            case 5:
-                return {sCCIntentions::CELL_GiveRent, dAddInfo, objC};
-            case 6:
-                return {sCCIntentions::CELL_GainRent, dAddInfo, objC};
-            default:
-                return {};
-        }
-    }
-
+    /**
+     * @fn std::vector<sCCIntentions> givenCode
+     * @param cCode The code that you want to have executed
+     * @param objC The company that the execution is set from, it has to be a pointer to a valid company
+     * @param cMaxInstructions The maximum number of instructions that can happen before its cut of
+     * @return A vector containing the total intentions that the code called for
+     */
     static std::vector<sCCIntentions>
     givenCode(const std::vector<uint64_t> &cCode, const std::shared_ptr<objCompany> &objC,
               uint32_t cMaxInstructions = 256) {
@@ -135,6 +123,39 @@ public:
             cIndInst++;
         }
         return cRet;
+    }
+
+private:
+
+    /**
+     * @fn sCCIntentions intentionsFromLong
+     * @brief Given the type of intention and the company it constructs it and returns a valid intention
+     * @param inCIntention The code of the intention you want to create
+     * @param cVal The value of the rest of the "act" instruction
+     * @param objC A pointer to the company this intention is referring to, and has been called from
+     * @return
+     */
+    static sCCIntentions
+    intentionsFromLong(const uint16_t inCIntention, const uint64_t &cVal, const std::shared_ptr<objCompany> &objC) {
+        auto dAddInfo = static_cast<uint32_t>(cVal & 0xFFFFFFFF);
+        switch (inCIntention) {
+            case 0:
+                return {sCCIntentions::OBJ_Produce, dAddInfo, objC};
+            case 1:
+                return {sCCIntentions::OBJ_Buy, dAddInfo, objC};
+            case 2:
+                return {sCCIntentions::OBJ_SellInm, dAddInfo, objC};
+            case 3:
+                return {sCCIntentions::CELL_Buy, dAddInfo, objC};
+            case 4:
+                return {sCCIntentions::CELL_Sell, dAddInfo, objC};
+            case 5:
+                return {sCCIntentions::CELL_GiveRent, dAddInfo, objC};
+            case 6:
+                return {sCCIntentions::CELL_GainRent, dAddInfo, objC};
+            default:
+                return {};
+        }
     }
 };
 
