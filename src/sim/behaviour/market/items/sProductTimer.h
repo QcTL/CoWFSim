@@ -11,6 +11,10 @@
 #include <algorithm>
 #include <vector>
 
+/**
+ * @class sProductTimer
+ * @brief Class responsible to set timers and notify when creating products
+ */
 class sProductTimer {
 public:
 
@@ -18,6 +22,13 @@ public:
         gListTimers = std::list<sObjTimer>();
     };
 
+    /**
+     * @fn void addTimer
+     * @brief This function will create a timer for a product creation given the company that created and the date in which it will be created
+     * @param gItemGen The valid uuid of a product, has to be less than the maximum index of product
+     * @param gTimer A valid reduced date of the end time of the timer
+     * @param gIdCompany A valid uuid of a company that has been created and not yet set to bankruptcy
+     */
     void addTimer(uint32_t gItemGen, uint32_t gTimer, uint32_t gIdCompany) {
         sObjTimer element = {gTimer, gItemGen, gIdCompany};
         gListTimers.insert(std::find_if(gListTimers.begin(), gListTimers.end(), [&](const auto &item) {
@@ -25,15 +36,26 @@ public:
         }), element);
     }
 
-    bool hasToChange(uint32_t gTimer) {
+    /**
+     * @fn  bool hasToChange
+     * @param inTDate A valid reduced date of the actual time in the simulator
+     * @return  True if an amount greater than 0 timers are set to complete in that date, false otherwise
+     */
+    bool hasToChange(uint32_t inTDate) {
         if (gListTimers.empty())
             return false;
-        return gListTimers.front().sOT_Timer <= gTimer;
+        return gListTimers.front().sOT_Timer <= inTDate;
     };
 
-    std::vector<std::pair<uint32_t, uint32_t>> checkForTime(uint32_t gTimer) {
+    /**
+     * @fn std::vector<std::pair<uint32_t, uint32_t>> checkForTime
+     * @param inTDate  A valid reduced date of the actual time in the simulator
+     * @return A list of the companies and the product that have been completed for a given date, and removed from the list
+     * of remaining timers
+     */
+    std::vector<std::pair<uint32_t, uint32_t>> checkForTime(uint32_t inTDate) {
         std::vector<std::pair<uint32_t, uint32_t>> ret;
-        while (!gListTimers.empty() && gListTimers.front().sOT_Timer <= gTimer) {
+        while (!gListTimers.empty() && gListTimers.front().sOT_Timer <= inTDate) {
             ret.emplace_back(gListTimers.front().sOT_ItemGen, gListTimers.front().sOT_IdCompany);
             gListTimers.pop_front();
         }

@@ -101,6 +101,13 @@ public:
                            std::max(1.0, (3.0 / (1.0 + std::exp(-getDifferencePrice() / 5.0))) - 0.5));
     }
 
+    /**
+     * @fn void computeSellInm
+     * @brief This function is called when a company wants to sell this item immediately outside the city
+     * @param inObjCompany  A valid company that wants to immediately sell the product
+     * @param inRTime The reduced time of the actual simulation < 288
+     * @param inCDate The reduced date where this creation happens, it has to be a valid reduced date
+     */
     void computeSellInm(const std::shared_ptr<objCompany> &inObjCompany, uint32_t inRTime, uint32_t inCDate) {
         uint32_t _pItem = getPriceActual();
 
@@ -110,30 +117,33 @@ public:
                                                                      sP_refElem.sMEE_uuid, _pItem);
     }
 
-    void takeAndPayObjectLocalComp(const uint32_t inRTime, const uint32_t inCDate) {
-        std::shared_ptr<sEventManager> sEM = sEventManager::getInstance();
-
-        uint32_t _pItem = getPriceActual();
-        diffElementCompany(-1, sP_companyHasItem.front());
-        sP_companyHasItem.front()->addPayment((double) _pItem, oPC_TypePayment::oPC_TP_SOLD, inRTime,
-                                              inCDate);
-        sEM->callEventCompanySoldItemLocal(inRTime, inCDate, sP_companyHasItem.front()->c_uuid,
-                                           sP_refElem.sMEE_uuid, _pItem);
-
-        sP_companyHasItem.pop_front();
-    }
-
+    /**
+     * @fn bool getStateEye
+     * @return Get the state of the eye of the fluctuations of the product
+     */
     bool getStateEye() { return sP_fluctuationPrice.isObserved(); }
 
+    /**
+     * @fn void changeStateEye
+     * @brief change the state of the value of the eye, if it was observed change it to none, otherwise, add an observer
+     */
     void changeStateEye() {
         sP_fluctuationPrice.isObserved()
         ? sP_fluctuationPrice.removeObserver() : sP_fluctuationPrice.setObserver(eyeCatcherActive::getInstance());
     }
 
+    /**
+     * @fn void newValueBase
+     * @brief Change the base price for the one with one less window
+     */
     void newValueBase() {
         sP_basePrice = sP_refElem.getPrice(sP_lastNTransactions->dropLastWindow(), sP_basePrice);
     }
 
+    /**
+     * @fn void newValuePast
+     * @brief store the basePrice as the pastPrice
+     */
     void newValuePast() {
         sP_pastPrice = sP_basePrice;
     }
@@ -147,6 +157,12 @@ private:
     std::shared_ptr<sRollingListsEvaluator> sP_lastNTransactions;
     sTotalElements::sME_Element sP_refElem;
 
+    /**
+     * @fn void diffElementCompany
+     * @brief Add a quantity of elements in the storage of a given company
+     * @param inNElements The quantity of elements you want to add subtract from this company
+     * @param inPObjCompany A pointer to a valid company, that has been created and is not yet at bankruptcy
+     */
     void diffElementCompany(int inNElements, const std::shared_ptr<objCompany> &inPObjCompany) const {
         if (inPObjCompany != nullptr) {
             if (!inPObjCompany->c_pOwn.count(sP_refElem.sMEE_uuid))
@@ -156,6 +172,11 @@ private:
         }
     }
 
+    /**
+     * @fn void _takeAndPayObjectLocalComp
+     * @param inRTime
+     * @param inCDate
+     */
     void _takeAndPayObjectLocalComp(const uint32_t inRTime, const uint32_t inCDate) {
         std::shared_ptr<sEventManager> sEM = sEventManager::getInstance();
 

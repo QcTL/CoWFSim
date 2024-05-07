@@ -12,6 +12,10 @@
 #include <map>
 #include "../../../../common/RelPath.h"
 
+/**
+ * @class sTotalElements
+ * @brief This class is responsible to contain and manage the absolute extracted values of the csv for the products.
+ */
 class sTotalElements {
 public:
     struct sME_Element {
@@ -22,11 +26,11 @@ public:
         std::uint32_t sMEE_iTime;
 
         [[nodiscard]] uint32_t getPrice(const double desirability, const uint32_t inBasicPrice) const {
-            return (uint32_t)(inBasicPrice + (desiredFunc(desirability)) * 5);
+            return (uint32_t) (inBasicPrice + (desiredFunc(desirability)) * 5);
         }
 
         static double desiredFunc(const double x) {
-            return  (1/ (1 + exp(-(x-1)))) - 0.5;
+            return (1 / (1 + exp(-(x - 1)))) - 0.5;
         }
     };
 
@@ -43,6 +47,12 @@ public:
         fCVS.close();
     }
 
+
+    /**
+     * @fn  std::vector<uint64_t> extractUuids
+     * @brief Extracts all the uuid of the products described on the csv
+     * @param gPathCSV A vector of the uuid of all of the products extracted from the csv
+     */
     std::vector<uint64_t> extractUuids() {
         std::vector<uint64_t> uuids;
         uuids.reserve(sME_listItems.size());
@@ -55,8 +65,18 @@ public:
         return uuids;
     }
 
+    /**
+     * @fn sME_Element getById
+     * @param idRec The uuid of a valid product you want to collect, < sME_listItems.size
+     * @return A copy of the object and its attributes referenced by the uuid
+     */
     sME_Element getById(uint32_t idRec) { return sME_listItems[idRec]; }
 
+    /**
+     * @fn std::string getNameById
+     * @param idRec The uuid of a valid product you want to collect, < sME_listItems.size
+     * @return The name in form of string of that product
+     */
     std::string getNameById(uint32_t idRec) { return sME_gRecipeTotalName[idRec]; }
 
     uint32_t nElements() { return sME_listItems.size(); }
@@ -67,6 +87,13 @@ private:
     std::map<std::string, uint32_t> sME_gRecipeIdByName;
     std::vector<std::string> sME_gRecipeTotalName;
 
+    /**
+     * @fn sME_Element getRecipeFromTokens
+     * @brief Given a line of string, representing a line of the csv, give the corresponding element created
+     * @param idAct The uuid that the product will have, has to be unique and incrementing for each call of the function
+     * @param gTokens The vector of strings as the line of the csv file
+     * @return The struct representing the element that was extracted from that line in the csv
+     */
     sME_Element getRecipeFromTokens(const uint32_t &idAct, const std::vector<std::string> &gTokens) {
         std::vector<uint8_t> rTypeBuilding;
 
@@ -91,6 +118,13 @@ private:
         return {idAct, rReqMaterials, rTypeBuilding[0], static_cast<uint32_t>(std::stoul(gTokens[3]))};
     }
 
+    /**
+     * @fn std::vector<std::string> split
+     * @brief given a string and a delimiter cut the string into the corresponding values as interpreted in a CSV
+     * @param s The string containing a repetition of some delimiter
+     * @param delimiter The delimiter the csv uses
+     * @return A vector of the sliced string
+     */
     static std::vector<std::string> split(const std::string &s, char delimiter) {
         std::vector<std::string> splits;
         std::string split;
@@ -102,10 +136,18 @@ private:
         return splits;
     }
 
-    static std::vector<std::string> splitTokens(std::istream &strLine, const char gSep) {
+
+    /**
+     * @fn std::vector<std::string> splitTokens
+     * @brief given a string and a delimiter cut the string into the corresponding values as interpreted in a CSV
+     * @param strLine The std::istream containing a repetition of some delimiter
+     * @param delimiter The delimiter the csv uses
+     * @return A vector of the sliced string
+     */
+    static std::vector<std::string> splitTokens(std::istream &strLine, const char delimiter) {
         std::string line;
         std::getline(strLine, line);
-        return split(line, gSep);
+        return split(line, 44);
     }
 
 };
