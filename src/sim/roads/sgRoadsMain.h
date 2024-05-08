@@ -58,9 +58,9 @@ public:
         return sgRM_gNearRoad->get(inGridPos)->rPos;
     }
 
-    [[nodiscard]] std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator>
+    [[nodiscard]] uint32_t
     addRuteCivil(const std::shared_ptr<objCivil> &oC) const {
-        return sgRM_sTRoutes->addRuteCivil(oC);
+        return sgRM_sTRoutes->addElement(oC);
     }
 
     /**
@@ -71,10 +71,8 @@ public:
      * @param gPBegin The iterator of the position of the obj in the list Begin
      * @param gPEnd The iterator of the position of the obj in the list End
      */
-    void removeRuteCivil(const std::shared_ptr<objCivil> &inObjCivil,
-                         const std::list<objCivil>::iterator &gPBegin,
-                         const std::list<objCivil>::iterator &gPEnd) {
-        sgRM_sTRoutes->removeRuteCivil(inObjCivil, gPBegin, gPEnd);
+    void removeRuteCivil(uint32_t inUuidElem) {
+        sgRM_sTRoutes->removeElementByUuid(inUuidElem);
     }
 
     /**

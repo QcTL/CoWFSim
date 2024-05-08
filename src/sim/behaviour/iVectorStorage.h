@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 #include <memory>
+#include "interface/iStorage.h"
 
 /**
  * @class iVectorStorage
@@ -18,7 +19,7 @@
  * @tparam T The type of element you want to store in this class
  */
 template<typename T>
-class iVectorStorage {
+class iVectorStorage : public iStorage<T,std::shared_ptr<T>>{
 public:
     explicit iVectorStorage(uint32_t inMaxElements) {
         iVS_tVecStorage = std::vector<std::pair<uint32_t, std::shared_ptr<T>>>(inMaxElements, {-1, nullptr});
@@ -30,34 +31,35 @@ public:
 
     /**
      * @fn std::shared_ptr<T> getElementByUuid
-     * @param inUuid A valid index that has been returned with storeElement and not yet resolved with removeElement
+     * @param inUuid A valid index that has been returned with addElement and not yet resolved with removeElementByUuid
      * @return The object stored with that ticket
      */
-    std::shared_ptr<T> getElementByUuid(uint32_t inUuid) {
-        return iVS_tVecStorage[inUuid].second;
+    std::shared_ptr<T> getElementByUuid(uint32_t inUuidElem) override{
+        return iVS_tVecStorage[inUuidElem].second;
     }
 
     /**
-     * @fn uint32_t storeElement
-     * @param inTElement A shared pointer to the object you want to save
-     * @return A ticket that will reference the object given as parameter if you dont call removeElement with that ticket
+     * @fn uint32_t addElement
+     * @param inAddElem A shared pointer to the object you want to save
+     * @return A ticket that will reference the object given as parameter if you dont call removeElementByUuid with that ticket
      */
-    uint32_t storeElement(const std::shared_ptr<T> &inTElement) {
+    uint32_t addElement(const std::shared_ptr<T> &inAddElem) override{
         uint32_t prevFEmpty = fEmpty;
         fEmpty = iVS_tVecStorage[fEmpty].first;
-        iVS_tVecStorage[prevFEmpty] = {0, inTElement};
+        iVS_tVecStorage[prevFEmpty] = {0, inAddElem};
         return prevFEmpty;
     }
 
     /**
-     * @fn void removeElement
+     * @fn void removeElementByUuid
      * @brief removes that element of the storage given the ticket, and from this point, the link between that ticket
      * and the item that was stored to get that ticket will be lost
-     * @param inTPos A valid ticket of an active element in the storage
+     * @param inUuidElem A valid ticket of an active element in the storage
      */
-    void removeElement(uint32_t inTPos) {
-        iVS_tVecStorage[inTPos] = {fEmpty, {}};
-        fEmpty = inTPos;
+    bool removeElementByUuid(uint32_t inUuidElem) override {
+        iVS_tVecStorage[inUuidElem] = {fEmpty, {}};
+        fEmpty = inUuidElem;
+        return true;
     }
 
 protected:
