@@ -15,9 +15,6 @@ public:
             : rIMenu(mParent, rRelativePos, pthFileD),rPVL_nObjInLayer(objInPage) {
     }
 
-    void draw(sf::RenderWindow &rW) override {
-        rW.draw(rIM_dInfo, &rIM_tsTex.tsTex);
-    }
 
     bool interact(const sf::Event &inEvent, const sf::RenderWindow &rWindow) override {
         switch (inEvent.type) {
@@ -46,8 +43,6 @@ public:
         }
         return false;
     }
-
-    void pressedCell(std::pair<int, int> cPressed, uint32_t inPTime, uint32_t inUTime) override {}
 
 protected:
     virtual void printItemsOnScreen() = 0;

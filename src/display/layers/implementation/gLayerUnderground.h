@@ -9,6 +9,10 @@
 
 #include "../gILayer.h"
 
+/**
+ * @class gLayerUnderground
+ * @brief This class implement the graphical layer to see the representation of the simulated metro in their corresponding layer
+ */
 class gLayerUnderground : public gILayer {
 public:
     explicit gLayerUnderground(const std::shared_ptr<gIGrid<uint8_t>> &gGrid)

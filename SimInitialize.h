@@ -23,6 +23,10 @@
 #include "src/sim/eyeCatcher/eyeCatcherConnection.h"
 #include "src/sim/eyeCatcher/eyeCatcherActive.h"
 
+/**
+ * @class SimInitialize
+ * @brief This class is responsible to load the starting parameters of the simulation, and execute the main simulator
+ */
 class SimInitialize {
 public:
     static int givenMap(const std::map<std::string, std::string> &mValues) {
@@ -38,7 +42,7 @@ public:
 
         std::shared_ptr<sSimulatorMain> sMS = std::make_shared<sSimulatorMain>(lSizeGrid);
 
-        sLayerType::returnLayerType tReturn = sLayerType::gen(lSizeGrid, sMS->sSM_groupLand->gL_gTerrain->gTG_TypeGen,
+        sLayerType::returnLayerType tReturn = sLayerType::gen(lSizeGrid,
                                                               mValues, snCommonAtr::getFlagAtr("snCA_Seed"));
         sMS->sSM_groupLand->gL_gTerrain->gTG_TypeSoil = tReturn.genTypeSoil;
 

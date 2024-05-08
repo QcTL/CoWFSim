@@ -25,12 +25,21 @@ public:
         gLayerTransit = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(inGridSize, inGridSize, 0));
         sgRM_gNearRoad = std::make_shared<gBasicGrid<rNode *>>(gBasicGrid<rNode *>(inGridSize, inGridSize, nullptr));
     }
-
+    /**
+     * @fn void tickReduced
+     * @brief Updates the elements in the class that need changing every 5 tick of the simulation
+     * @param inRTime uint representing the reduced time of the day
+     * @param inTDate uint representing the reduced date of the simulation
+     */
     void tickReduced(uint32_t inRTime, uint32_t inTDate) {
         routeCarsCommute(inRTime, inTDate);
         routeCarsGhost(inRTime);
     }
 
+    /**
+     * @fn void tick
+     * @brief Updates the elements in the class that need changing every tick of the simulation
+     */
     void tick() {
         for (const std::shared_ptr<rRNodeI> &node: sgRM_listRRoads) {
             node->sendInformationStart();
@@ -39,6 +48,12 @@ public:
         }
     }
 
+    /**
+     * @fn std::pair<int, int> getClosestRoadToBuilding
+     * @brief Given a position on the matrix return the closes position that has a road in it.
+     * @param inGridPos The position you want the closes road to
+     * @return The coordinate of the closes road
+     */
     [[nodiscard]] std::pair<int, int> getClosestRoadToBuilding(const std::pair<int, int> &inGridPos) const {
         return sgRM_gNearRoad->get(inGridPos)->rPos;
     }
@@ -48,13 +63,25 @@ public:
         return sgRM_sTRoutes->addRuteCivil(oC);
     }
 
+    /**
+     * @fn void removeRuteCivil
+     * @brief Given the shared pointer of the civil you want the remove and its position given the iterators,
+     * remove the route from the active ones.
+     * @param inObjCivil Given the shared pointer of the civil you want to remove the route
+     * @param gPBegin The iterator of the position of the obj in the list Begin
+     * @param gPEnd The iterator of the position of the obj in the list End
+     */
     void removeRuteCivil(const std::shared_ptr<objCivil> &inObjCivil,
                          const std::list<objCivil>::iterator &gPBegin,
                          const std::list<objCivil>::iterator &gPEnd) {
         sgRM_sTRoutes->removeRuteCivil(inObjCivil, gPBegin, gPEnd);
     }
 
-
+    /**
+     * @fn void completedStartGrid
+     * @brief This functions makes all the nodes that are connected speak with each-other to learn the routes necessary
+     * to reach any other position.
+     */
     void completedStartGrid() {
         extractRoadsFromLayer();
         for (int i = 0; i < 2000; i++) {
@@ -66,6 +93,15 @@ public:
         rInfoDist::seeMatrix();
     }
 
+    /**
+     * @fn std::vector<objActiveRute> getRoutesByType
+     * @brief Given the necessary times and the type of route you want it returns the actives routes that should be
+     * starting in that moment
+     * @param inRouteType A value of the enum objCivil::typeRouteSystem  with the possible type of route
+     * @param cTime A uint of the reduced time of the day < 288
+     * @param cDate A uint of the reduced date of the simulation, has to comply with the stipulations of reduced date.
+     * @return The vector of routes that start in that moment
+     */
     std::vector<objActiveRute>
     getRoutesByType(const objCivil::typeRouteSystem inRouteType, uint32_t cTime, uint32_t cDate) {
         return sgRM_sTRoutes->getRoutesByType(inRouteType, cTime, cDate);
@@ -76,6 +112,12 @@ public:
     std::shared_ptr<groupLand> sgRM_gLand;
 private:
 
+    /**
+     * @fn void routeCarsCommute
+     * @brief Given the date and the time, start the routes of all the ones that start in that timeframe
+     * @param inRTime A uint of the reduced time of the day < 288
+     * @param inTDate  A uint of the reduced date of the simulation, has to comply with the stipulations of reduced date
+     */
     void routeCarsCommute(const uint32_t inRTime, const uint32_t inTDate) {
         auto newCarRoutes = sgRM_sTRoutes->getRoutesByType(objCivil::typeRouteSystem::OC_TRS_CAR, inRTime, inTDate);
         for (auto &r: newCarRoutes) {
@@ -90,7 +132,12 @@ private:
             sEventManager::getInstance()->callEventStartRoute(inRTime, inTDate, r.c_uuid, r);
         }
     }
-
+    /**
+     * @fn void routeCarsGhost
+     * @brief Given the date and the time, start the routes of ghost cars that start in that timeframe.
+     * Ghost cars are the approximation of number of routes that are done outside the daily work commute
+     * @param inRTime A uint of the reduced time of the day < 288
+     */
     void routeCarsGhost(const uint32_t inRTime) {
         if (inRTime % 24 != 0)
             return;
@@ -105,6 +152,11 @@ private:
         }
     }
 
+    /**
+     * @fn void extractRoadsFromLayer
+     * @brief Given the cell matrix where the roads are represented from values, extract them from the world map and make the necessary
+     * structures to function them abstractly of the common map.
+     */
     void extractRoadsFromLayer() {
         std::pair<std::vector<rNode *>, std::vector<std::vector<rNode *>>> r = rNodeFromGrid<uint8_t>::givenGrid(
                 sgRM_gLand->gL_gTerrain->gTG_TypeGen, {5, 6});

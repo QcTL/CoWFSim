@@ -9,11 +9,21 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 
+/**
+ * @class CameraControls
+ * @brief This class controls the camera that is active in the simulation to move around the board.
+ */
 class CameraControls{
-
 public:
     CameraControls()= default;
 
+    /**
+     * @fn void updateOnEvent
+     * @brief This function is called when an event of the graphical interface happens
+     * @param event The event that is called
+     * @param rWindow The RenderWindow in which happened
+     * @param v The actual view of the system.
+     */
     void updateOnEvent(const sf::Event& event, const sf::RenderWindow& rWindow, sf::View& v){
         switch (event.type) {
             case sf::Event::MouseButtonPressed:
@@ -51,6 +61,11 @@ public:
         }
     }
 
+    /**
+     * @fn void updateOnLoop
+     * @brief This function will be called every loop for the needs of the class
+     * @param v The actual view applied to view the system
+     */
     void updateOnLoop(sf::View& v){
         if (cFIsDragging) {
             sf::Vector2f zoomAdjustedDelta = sf::Vector2f(cDelta) * (v.getSize().x / 1000);

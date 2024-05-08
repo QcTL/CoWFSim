@@ -24,10 +24,6 @@ public:
         setText(4, std::to_string(sGA->stGA_ratioEmptyHouses));
     }
 
-    void draw(sf::RenderWindow &rW) override {
-        rW.draw(rIM_dInfo, &rIM_tsTex.tsTex);
-    }
-
     bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override {
         switch (event.type) {
             case sf::Event::KeyPressed:
@@ -80,7 +76,6 @@ public:
         return false;
     }
 
-    void pressedCell(std::pair<int, int> cPressed,uint32_t inPTime, uint32_t inUTime) override {}
 };
 
 #endif //CITYOFWEIRDFISHES_RGLOBALATTRVIEWLAYER_H

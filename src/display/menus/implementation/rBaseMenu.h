@@ -58,6 +58,7 @@ public:
                     break;
             }
             lstValueLayer = inRetValue;
+            refPile->removeTop();
         } else if (inLIDSender == "guiClock") {
             switch (inRetValue) {
                 case 0:
@@ -75,9 +76,8 @@ public:
                 default:
                     break;
             }
-        }
-
-        refPile->removeTop();
+        } else
+            refPile->removeTop();
     }
 
     bool interact(const sf::Event &event, const sf::RenderWindow &rWindow) override {
@@ -130,9 +130,13 @@ public:
                                                        refPile));
                                 refPile->addMenuTop(rComp);
                             } else {
+                                std::vector<objCompany> vecActCompanies;
+                                for (const uint32_t l: rBM_refLBuild->get(cPressed)) {
+                                    vecActCompanies.push_back(*rBM_refSComp->getCompanyByUUID(l));
+                                }
+
                                 std::shared_ptr<rCellViewMenu> rComp = std::make_shared<rCellViewMenu>(
-                                        rCellViewMenu(refPile->vTopActiveMenu,
-                                                      rBM_refSComp->getVecCompByUUID(rBM_refLBuild->get(cPressed)),
+                                        rCellViewMenu(refPile->vTopActiveMenu, vecActCompanies,
                                                       rBM_refEconomy, refPile));
                                 refPile->addMenuTop(rComp);
                             }

@@ -10,12 +10,20 @@
 #include "../../../structure/obj/elements/objCivil.h"
 #include "../../iVectorStorage.h"
 
+/**
+ * @class rVectorCivil
+ * @brief An implementation of iVectorStorage to store @ref objCivil
+ */
 class rVectorCivil : public iVectorStorage<objCivil> {
 public:
 
     explicit rVectorCivil(uint32_t nMaxCivil) : iVectorStorage(nMaxCivil) {};
 };
 
+/**
+ * @class sCivilStorage
+ * @brief This class is used to interact with the storage of the objCivils elements
+ */
 class sCivilStorage {
 public:
     sCivilStorage() : sCS_vecCivil(std::make_shared<rVectorCivil>(30000)) {}
@@ -30,6 +38,13 @@ public:
         sCS_mapCivilByCompany[inUuidCompany].push_back({_uuidCivil, inRoute.first, inRoute.second});
         return _uuidCivil;
     }
+
+    /**
+     * @fn std::shared_ptr<objCivil> getByUuid
+     * @brief Gives a pointer to a objCivil referenced by the their uuid
+     * @param uuidCivil A valid uuid that represents a objCivil at some point created
+     * @return A pointer to the represented objCivil
+     */
     [[nodiscard]] std::shared_ptr<objCivil> getByUuid(uint32_t uuidCivil) const{
         return sCS_vecCivil->getElementByUuid(uuidCivil);
     }
@@ -40,10 +55,21 @@ public:
         std::list<objCivil>::iterator sCS_cCRUrEnd;
     };
 
+    /**
+     * @fn sCS_cCivRoute routeCivilGivenCompany
+     * @param uuidCompany The uuid of the company you want to get some route from, it has to be valid and come from some
+     * company valid and created
+     * @return A route having that company as an end position
+     */
     sCS_cCivRoute routeCivilGivenCompany(uint32_t uuidCompany){
         return sCS_mapCivilByCompany[uuidCompany].front();
     }
 
+    /**
+     * @fn void removeCivilGivenCompany
+     * @brief Remove the civil that has the longest time working in the company
+     * @param uuidCompany The valid uuid of a company, that has at some point being created, that you want to remove a civilian
+     */
     void removeCivilGivenCompany(uint32_t uuidCompany){
         sCS_cCivRoute _cCR = sCS_mapCivilByCompany[uuidCompany].front();
         sCS_mapCivilByCompany[uuidCompany].pop_front();

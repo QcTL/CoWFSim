@@ -21,6 +21,10 @@ enum gSimLayersTypes {
     G_CITY, G_AIRPOLLUTION, G_UNDERGROUND, G_TRANSIT
 };
 
+/**
+ * @class gDispLayers
+ * @brief This class stores the information of the matrix of all the available display layers.
+ */
 class gDispLayers {
 public:
     explicit gDispLayers(const std::shared_ptr<gIGrid<uint8_t>> &gSimAP, const std::shared_ptr<gIGrid<uint32_t>> &gSimC,
@@ -33,6 +37,11 @@ public:
         gSLActual = gSL_C;
     }
 
+    /**
+     * @fn void switchActual
+     * @brief Changes the actual display layer to the one given as a parameter in a form of an enumerator
+     * @param toChange The enumerator with the new layer you want to display on the screen
+     */
     void switchActual(gSimLayersTypes toChange) {
         rRemoteUpdateGrid::setHasToChange(true);
         switch (toChange) {
@@ -51,6 +60,11 @@ public:
         }
     }
 
+    /**
+     * @fn  void pressedCell
+     * @brief The function called when a cell is pressed in the graphical interface
+     * @param cPressed The pressed cell position with positive pair of coordinates
+     */
     void pressedCell(std::pair<int, int> cPressed) {}
 
     std::pair<std::pair<int, int>, std::pair<int, int>> gRangeUse;

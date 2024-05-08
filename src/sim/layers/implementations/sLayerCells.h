@@ -24,6 +24,17 @@
 
 class sLayerCells {
 public:
+
+    /**
+     * @fn retObjSLayerCells gen
+     * @brief Modifies the terrain matrix to comply with the attributes given at the start of the simulation
+     * @param lSize The size of the total grid
+     * @param sgTerrain The matrix where the modification will apply
+     * @param cClusters A vector with the centers of the active zones, like civilian or factories
+     * @param mValues A map containing all the attributes that are defined by the user
+     * @param inSeed The value of the seed which random systems will be based
+     * @return A struct containing the matrix of the underground and the route of the metro
+     */
     static retObjSLayerCells gen(
             uint32_t lSize, const std::shared_ptr<sgTerrain> &sgTerrain,
             const std::vector<std::pair<int, int>> &cClusters,

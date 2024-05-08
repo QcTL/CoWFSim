@@ -49,10 +49,6 @@ public:
         }
     }
 
-    void draw(sf::RenderWindow &inRenderWin) override {
-        inRenderWin.draw(rIM_dInfo, &rIM_tsTex.tsTex);
-    }
-
     void update() override {}
 
     bool interact(const sf::Event &inEvent, const sf::RenderWindow &inRenderWin) override {
@@ -88,8 +84,6 @@ public:
         }
         return false;
     }
-
-    void pressedCell(std::pair<int, int> inCellPressed, uint32_t inPTime, uint32_t inUTime) override {}
 
     sClockMain::sCM_ClockValues rGUIC_lastClock;
 private:

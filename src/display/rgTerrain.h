@@ -15,15 +15,24 @@
 #include "../sim/snCommonAtr.h"
 #include "../sim/structure/grids/transformation/gBaseToField.h"
 
-
+/**
+ * @class rgTerrain
+ * @brief This class represents and transform the simulating grids to a form where they can be displayed on screen
+ */
 class rgTerrain {
 public:
     explicit rgTerrain(uint32_t inGridSize) {
         gLayerCurStruct = std::make_shared<gBasicGrid<uint32_t>>(gBasicGrid<uint32_t>(inGridSize, inGridSize, 0));
     };
 
+    /**
+     * @fn void addNewBuildingRender
+     * @brief Change the actual value of the grid representation of the city to add a specific building on a position
+     * @param inBPos A positive pair of coordinates
+     * @param inSoilType The type of building in form of the soil you want
+     */
     void addNewBuildingRender(const std::pair<int, int> &inBPos, uint8_t inSoilType) {
-        const char *_gVal = "00000000"; // AIXO HO HA DE FER EL rgTERRAIN des de sgTERRAIN
+        const char *_gVal = "00000000";
         switch (inSoilType) {
             case 1:
                 _gVal = "00010000";
@@ -48,6 +57,13 @@ public:
                                      + rand() % (2 + 1)); //TODO Change this
     }
 
+    /**
+     * @fn void loadRenderWithSimGrids
+     * @brief starting with the matrix representing the simulation create the grid that cas the necessary values to be displayed
+     * @param inGTypeGen The grid containing the current building on each position
+     * @param inGTypeSoil The grid containing the type of soil on each position
+     * @param inGBlobFields The Map containing the soils that are owned by the same company, and have to be connected.
+     */
     void loadRenderWithSimGrids(const std::shared_ptr<gIGrid<uint8_t>> &inGTypeGen,
                                 const std::shared_ptr<gIGrid<uint8_t>> &inGTypeSoil,
                                 const std::map<uint32_t, std::vector<std::pair<std::pair<int, int>, uint8_t>>> &inGBlobFields) {

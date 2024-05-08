@@ -10,22 +10,38 @@
 #include <vector>
 #include <numeric>
 
+/**
+ * @class sRollingListsRent
+ * @brief This class controls a rolling window structure to define the times between the buying of houses
+ */
 class sRollingListsRent {
 public:
 
     explicit sRollingListsRent(int wSize) : sRLR_wSize(wSize) {}
 
+    /**
+     * @fn void dropLastWindow
+     * @brief This function when called drops the last window if there is any left
+     */
     void dropLastWindow() {
         if (!sRLR_winList.empty())
             sRLR_winList.pop_front();
     }
 
+    /**
+     * @fn void addElement
+     * @param nValueTime The time since the last cell was resided by a civilian
+     */
     void addElement(const uint32_t nValueTime) {
         if (sRLR_winList.size() >= sRLR_wSize)
             dropLastWindow();
         sRLR_winList.push_back(nValueTime);
     }
 
+    /**
+     * @fn uint32_t getAverageBuyingTime
+     * @return Returns the average number of days since the last house was bought
+     */
     [[nodiscard]] uint32_t getAverageBuyingTime() const {
         auto itP1 = sRLR_winList.begin();
         auto itP2 = sRLR_winList.begin();
@@ -62,6 +78,10 @@ public:
     }
 
 private:
+    /**
+     * @fn uint32_t computeDateDifference
+     * @return computes and returns the date different between any two dates
+     */
     static uint32_t computeDateDifference(const uint16_t year1, const uint8_t month1, const uint8_t day1,
                                           const uint16_t year2, const uint8_t month2, const uint8_t day2) {
         int monthsDifference = (year2 - year1) * 12 + (month2 - month1);

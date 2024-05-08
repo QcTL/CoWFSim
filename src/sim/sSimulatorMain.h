@@ -30,8 +30,11 @@ std::mt19937 objCompany::oC_gen(objCompany::oC_rd());
 std::uniform_int_distribution<> objCompany::numStringsDist(2, 3);
     //TODO :(
 
+/**
+ * @class sSimulatorMain
+ * @brief This class is the main class of the simulation that host all the necessary components to run the simulation
+ */
 class sSimulatorMain {
-
 public:
     explicit sSimulatorMain(int lSize) {
         sSM_GlobalTracker = stGlobalTrackerAttr::getInstance();
@@ -48,11 +51,8 @@ public:
     }
 
     //TERRAIN BASIC;
-
     std::shared_ptr<groupLand> sSM_groupLand;
     std::shared_ptr<groupEconomy> sSM_groupEconomy;
-
-    //UNDERGROUND
 
     //ROADS
     std::shared_ptr<sgRoadsMain> sSM_gMainRoads;
@@ -68,6 +68,11 @@ public:
     //TRACKERS:
     std::shared_ptr<stGlobalTrackerAttr> sSM_GlobalTracker;
 
+
+    /**
+     * @fn void tick
+     * @brief Updates the elements in the class that need changing every tick of the simulation
+     */
     void tick() {
         if (sMClock->isReducedTick()) {
             allTicksReduced(sMClock->getReduced(), sMClock->getDate());
@@ -79,6 +84,10 @@ public:
         sSM_gMainRoads->tick();
     }
 
+    /**
+     * @fn void completedSetupStage
+     * @brief This function should be called when all the layers have the starting values for the simulation set correctly
+     */
     void completedSetupStage() {
         sSM_groupLand->completedSetupStage();
         sSM_gMainRoads->completedStartGrid();
@@ -90,6 +99,12 @@ public:
     }
 
 private:
+    /**
+     * @fn void allTicksReduced
+     * @brief Calls all the function of the assigned classes that has a function that has to called each 5 ticks
+     * @param inRTime The reduced time of the actual simulation < 288
+     * @param inTDate The reduced date where this creation happens, it has to be a valid reduced date
+     */
     void allTicksReduced(const uint32_t inRTime, const uint32_t inTDate) {
         sSM_gMainRoads->tickReduced(inRTime, inTDate);
         sSM_sCompany->tickReduced(inRTime, inTDate);

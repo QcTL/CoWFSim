@@ -12,6 +12,10 @@
 #include "../../events/sEventManager.h"
 #include "sEnergyAttr.h"
 
+/**
+ * @class stGlobalTrackerAttr
+ * @brief This class has the responsibility of containing and maintain all the different global values that can be extracted from the simulation
+ */
 class stGlobalTrackerAttr : sEventReceiver {
 public:
     stGlobalTrackerAttr() {

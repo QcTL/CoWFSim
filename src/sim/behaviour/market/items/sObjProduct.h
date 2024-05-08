@@ -6,22 +6,32 @@
 #define CITYOFWEIRDFISHES_SOBJPRODUCT_H
 
 #include <cstdint>
+#include <utility>
 #include "../../../eyeCatcher/eyeValue.h"
 #include "../../../structure/obj/elements/objCompany.h"
 #include "sRollingListsEvaluator.h"
 #include "sTotalElements.h"
 #include "../../../events/sEventManager.h"
 
+/**
+ * @class sObjProduct
+ * @brief This class represents a product that can be created by some company
+ */
 class sObjProduct {
 public:
     sObjProduct(const std::string &inNameProduct, const uint32_t startBasePrice, const uint32_t startBuyDesire,
-                const sTotalElements::sME_Element& inElem)
+                sTotalElements::sME_Element inElem)
             : sP_desirability(startBuyDesire), sP_basePrice(startBasePrice), sP_pastPrice(startBasePrice),
               sP_fluctuationPrice("Prod_" + inNameProduct + "-mPrice", startBasePrice),
-              sP_refElem(inElem) {
+              sP_refElem(std::move(inElem)) {
         sP_lastNTransactions = std::make_shared<sRollingListsEvaluator>(5);
     }
 
+    /**
+     * @fn uint32_t getPriceActual
+     * @brief Using supply and demand return what should be the price of that product
+     * @return The price of the product this clas represent in this instance
+     */
     uint32_t getPriceActual() {
         uint32_t _objPrice = sP_refElem.getPrice(sP_lastNTransactions->getDesirability(), sP_basePrice);
 
@@ -32,6 +42,11 @@ public:
         return std::max((uint32_t) 1, _objPrice);
     }
 
+    /**
+     * @fn void computeCreatedElementCOMPANY
+     * @brief This function should be called when this product is created by a company
+     * @param inObjCompany The pointer company that created the item, has to be a valid company
+     */
     void computeCreatedElementCOMPANY(const std::shared_ptr<objCompany> &inObjCompany) {
         sP_lastNTransactions->addLastCreate();
 
@@ -39,6 +54,13 @@ public:
         sP_companyHasItem.push_back(inObjCompany);
     }
 
+    /**
+     * @fn void computeBoughtElementCOMPANY
+     * @brief This function should be called everytime that product is purchased by a company
+     * @param inObjCompany The company that purchased the product
+     * @param inRTime The reduced time of the actual simulation < 288
+     * @param inTDate The reduced date where this creation happens, it has to be a valid reduced date
+     */
     void computeBoughtElementCOMPANY(const std::shared_ptr<objCompany> &inObjCompany,
                                      const uint32_t inRTime, const uint32_t inCDate) {
         uint32_t _pItem = getPriceActual();
@@ -54,6 +76,12 @@ public:
         inObjCompany->addPayment((double) _pItem * -1, oPC_TypePayment::oPC_TP_SOLD, inRTime, inCDate);
     }
 
+    /**
+     * @fn void computeBoughtElementCIVIL
+     * @brief This function should be called everytime that product is purchased by a civilian
+     * @param inRTime The reduced time of the actual simulation < 288
+     * @param inTDate The reduced date where this creation happens, it has to be a valid reduced date
+     */
     void computeBoughtElementCIVIL(const uint32_t inRTime, const uint32_t inCDate) {
         sP_lastNTransactions->addLastBought();
 
@@ -61,16 +89,26 @@ public:
             _takeAndPayObjectLocalComp(inRTime, inCDate);
     }
 
-
+    /**
+     * @fn uint32_t getNProductsDesirability
+     * @brief Get the product desirability given the quantity of active population on the simulation
+     * @param inNPopulation The quantity of people in the simulation in that moment
+     * @return A number representing the desirability of that item, 0 is none.
+     */
     [[nodiscard]] uint32_t getNProductsDesirability(const uint32_t inNPopulation) const {
         //f(x)=((3)/(1+ℯ^(-((x)/(5)))))-0.5
         return (uint32_t) (((double) inNPopulation / sP_desirability) *
                            std::max(1.0, (3.0 / (1.0 + std::exp(-getDifferencePrice() / 5.0))) - 0.5));
     }
 
-    void
-    computeSellInm(const std::shared_ptr<objCompany> &inObjCompany, uint32_t inRTime,
-                   uint32_t inCDate) {
+    /**
+     * @fn void computeSellInm
+     * @brief This function is called when a company wants to sell this item immediately outside the city
+     * @param inObjCompany  A valid company that wants to immediately sell the product
+     * @param inRTime The reduced time of the actual simulation < 288
+     * @param inCDate The reduced date where this creation happens, it has to be a valid reduced date
+     */
+    void computeSellInm(const std::shared_ptr<objCompany> &inObjCompany, uint32_t inRTime, uint32_t inCDate) {
         uint32_t _pItem = getPriceActual();
 
         diffElementCompany(-1, inObjCompany);
@@ -79,30 +117,33 @@ public:
                                                                      sP_refElem.sMEE_uuid, _pItem);
     }
 
-    void takeAndPayObjectLocalComp(const uint32_t inRTime, const uint32_t inCDate) {
-        std::shared_ptr<sEventManager> sEM = sEventManager::getInstance();
-
-        uint32_t _pItem = getPriceActual();
-        diffElementCompany(-1, sP_companyHasItem.front());
-        sP_companyHasItem.front()->addPayment((double) _pItem, oPC_TypePayment::oPC_TP_SOLD, inRTime,
-                                              inCDate);
-        sEM->callEventCompanySoldItemLocal(inRTime, inCDate, sP_companyHasItem.front()->c_uuid,
-                                           sP_refElem.sMEE_uuid, _pItem);
-
-        sP_companyHasItem.pop_front();
-    }
-
+    /**
+     * @fn bool getStateEye
+     * @return Get the state of the eye of the fluctuations of the product
+     */
     bool getStateEye() { return sP_fluctuationPrice.isObserved(); }
 
+    /**
+     * @fn void changeStateEye
+     * @brief change the state of the value of the eye, if it was observed change it to none, otherwise, add an observer
+     */
     void changeStateEye() {
         sP_fluctuationPrice.isObserved()
         ? sP_fluctuationPrice.removeObserver() : sP_fluctuationPrice.setObserver(eyeCatcherActive::getInstance());
     }
 
+    /**
+     * @fn void newValueBase
+     * @brief Change the base price for the one with one less window
+     */
     void newValueBase() {
         sP_basePrice = sP_refElem.getPrice(sP_lastNTransactions->dropLastWindow(), sP_basePrice);
     }
 
+    /**
+     * @fn void newValuePast
+     * @brief store the basePrice as the pastPrice
+     */
     void newValuePast() {
         sP_pastPrice = sP_basePrice;
     }
@@ -116,7 +157,13 @@ private:
     std::shared_ptr<sRollingListsEvaluator> sP_lastNTransactions;
     sTotalElements::sME_Element sP_refElem;
 
-    void diffElementCompany(int inNElements, const std::shared_ptr<objCompany> &inPObjCompany) {
+    /**
+     * @fn void diffElementCompany
+     * @brief Add a quantity of elements in the storage of a given company
+     * @param inNElements The quantity of elements you want to add subtract from this company
+     * @param inPObjCompany A pointer to a valid company, that has been created and is not yet at bankruptcy
+     */
+    void diffElementCompany(int inNElements, const std::shared_ptr<objCompany> &inPObjCompany) const {
         if (inPObjCompany != nullptr) {
             if (!inPObjCompany->c_pOwn.count(sP_refElem.sMEE_uuid))
                 inPObjCompany->c_pOwn[sP_refElem.sMEE_uuid] = inNElements;
@@ -125,6 +172,11 @@ private:
         }
     }
 
+    /**
+     * @fn void _takeAndPayObjectLocalComp
+     * @param inRTime
+     * @param inCDate
+     */
     void _takeAndPayObjectLocalComp(const uint32_t inRTime, const uint32_t inCDate) {
         std::shared_ptr<sEventManager> sEM = sEventManager::getInstance();
 

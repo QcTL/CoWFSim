@@ -23,10 +23,6 @@ public:
         }
     }
 
-    void draw(sf::RenderWindow &rW) override {
-        rW.draw(rIM_dInfo, &rIM_tsTex.tsTex);
-    }
-
     bool interact(const sf::Event &inEvent, const sf::RenderWindow &inRenderWin) override {
         switch (inEvent.type) {
             case sf::Event::KeyPressed:
@@ -37,8 +33,7 @@ public:
                 if (inEvent.mouseButton.button == sf::Mouse::Left) {
                     sf::Vector2<int> pMouse = sf::Mouse::getPosition(inRenderWin);
                     if (isInside(inRenderWin, rIM_gHeight * 16, rIM_gWidth * 16, pMouse)) {
-                        sf::Vector2<unsigned int> absPos = getAbsPos(inRenderWin, rIM_gHeight * 16, rIM_gWidth * 16,
-                                                                     pMouse);
+                        sf::Vector2<int> absPos = getRelPosMenu(inRenderWin,pMouse);
                         for (int i = 0; i < pElemSelAbs.size(); i++) {
                             if (pElemSelAbs[i].first * 16 < absPos.y && pElemSelAbs[i].first * 16 + 16 >= absPos.y) {
                                 auto rComp = std::make_shared<rCompViewLayer>(
@@ -55,8 +50,6 @@ public:
         }
         return false;
     }
-
-    void pressedCell(std::pair<int, int> cPressed, uint32_t inPTime, uint32_t inUTime) override {}
 
 private:
 

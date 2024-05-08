@@ -11,6 +11,10 @@
 #include "../gILayer.h"
 #include "../../../common/r2BitDirection.h"
 
+/**
+ * @class gLayerCity
+ * @brief This class implement the graphical layer to see a graphical representation of the simulated city
+ */
 class gLayerCity : public gILayer {
 public:
     explicit gLayerCity(const std::shared_ptr<gIGrid<uint32_t>> &gGrid)
@@ -30,6 +34,10 @@ public:
 private:
     std::shared_ptr<gIGrid<uint32_t>> lGrid;
 
+    /**
+     * @fn void getInfoBlocks
+     * @brief This function has to be called to load the elements necessary for the displacement on a map ordered by the type.
+     */
     void getInfoBlocks() {
         // Empty
         addToMapSprites(0, getByPosTopLeft(lTs.getPos(42)));
@@ -69,6 +77,10 @@ private:
 
     }
 
+    /**
+     * @fn   void addRoadToMapSprites
+     * @brief Add the different types of roads and its rotations to the valid sprites that can be selected
+     */
     void addRoadToMapSprites() {
         int rRotate[] = {11,1,0,10};
         std::vector<int> rTopLeftPos = {66, 46, 26, 8, 28, 64, 60, 40, 20, 0, 6, 62, 48, 48, 04, 02, 22, 24, 44,80};
@@ -76,13 +88,19 @@ private:
         for (uint32_t i = 0; i < rTopLeftPos.size(); i++) {
             uint32_t cTypeRoad = r2BitDirection::getTypeRoadById(i);
 
-            for (int j: rRotate) { // per cada rotacio clar
+            for (int j: rRotate) { // ONE FOR EACH ROTATION
                 addToMapSprites(cTypeRoad == 1 ? 32 : 33,
                                 getByPosTopLeft(lTs.getPos(rTopLeftPos[i] + j)));
             }
         }
     }
 
+    /**
+     * @fn void addToMapSprites
+     * @brief Add element to the structure
+     * @param n The type of element that you are trying to add an element to
+     * @param v The element added indexed by its position on creation
+     */
     void addToMapSprites(const uint8_t &n, const std::vector<sf::Vector2f> &v) {
         if (mTypeSprites.find(n) == mTypeSprites.end()) {
             mTypeSprites[n] = std::vector<std::vector<sf::Vector2f>>();

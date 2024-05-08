@@ -10,6 +10,10 @@
 #include "../display/menus/implementation/rBaseMenu.h"
 #include "../sim/sSimulatorMain.h"
 
+/**
+ * @class sContainerMain
+ * @brief A class containing all the basic elements to make the simulation run
+ */
 class sContainerMain {
 public:
 
@@ -31,6 +35,10 @@ public:
         rG->setUp();
     }
 
+    /**
+     * @fn void gameLoop
+     * @brief This function calls the game loop that keeps on display the current simulation
+     */
     void gameLoop() {
         const double targetLoopTimeMs = 1000.0 / 60.0; // Target loop time in milliseconds (60 fps)
 
@@ -62,6 +70,11 @@ public:
         }
     }
 
+    /**
+     * @fn double getCurrentTimeInMilliseconds
+     * @brief Get the current time in milliseconds
+     * @return Returns the current time in milliseconds of actual time in a double
+     */
     static double getCurrentTimeInMilliseconds() {
         auto currentTime = std::chrono::high_resolution_clock::now();
         auto duration = currentTime.time_since_epoch();

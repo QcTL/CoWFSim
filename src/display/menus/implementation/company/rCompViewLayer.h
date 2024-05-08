@@ -50,9 +50,6 @@ public:
         setEyeVisualValue(0, rCompRef.c_cActiveFunds.isObserved());
     }
 
-    void draw(sf::RenderWindow &inRenderWin) override {
-        inRenderWin.draw(rIM_dInfo, &rIM_tsTex.tsTex);
-    }
 
     void setResponse(int inValResponse,const std::string& inLIDSender) override {
         mPiles->removeTop();
@@ -102,8 +99,6 @@ public:
         }
         return false;
     }
-
-    void pressedCell(std::pair<int, int> cPressed, uint32_t inPTime, uint32_t inUTime) override {}
 
 private:
 

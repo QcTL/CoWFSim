@@ -16,6 +16,10 @@
 #include "contract/sContractorMain.h"
 #include "../globalAttr/stGlobalTrackerAttr.h"
 
+/**
+ * @class sCompanyMain
+ * @brief Class that contains all the interaction with the companies and applies their actions on the simulation
+ */
 class sCompanyMain {
 public:
 
@@ -35,6 +39,12 @@ public:
             sCM_genRPos.seed(static_cast<unsigned int>(time(nullptr)));
     }
 
+    /**
+     * @fn void tickReduced
+     * @brief Updates the elements in the class that need changing every 5 tick of the simulation
+     * @param inRTime uint representing the reduced time of the day
+     * @param inTDate uint representing the reduced date of the simulation
+     */
     void tickReduced(const uint32_t inRTime, const uint32_t inTDate) {
         if (sM_groupEconomy->gE_sEvaluator->someCompletedProducts(inTDate))
             for (std::pair<uint32_t, uint32_t> &t: sM_groupEconomy->gE_sEvaluator->getCompletedProducts(inTDate))
@@ -91,7 +101,7 @@ public:
         }
 
         //Start bankruptcy
-        std::vector<std::shared_ptr<objCompany>> vCompBankruptcy = sTComp->getVecCompBankruptcy(inRTime);
+        std::vector<std::shared_ptr<objCompany>> vCompBankruptcy = sTComp->getVecCompBankruptcy();
         for (const std::shared_ptr<objCompany> &oCompany: vCompBankruptcy) {
             for (int i = 0; i < oCompany->getNumberActiveCells(); i++)
                 FulfillIntentions::gTryIntention(
@@ -104,6 +114,11 @@ public:
         }
     }
 
+    /**
+     * @fn void completedStartCompanies
+     * @brief Create and instance in the simulation all the companies that have to be present since the beginning
+     * @param gPosCompanies A vector of elements that describe starting state for each company
+     */
     void completedStartCompanies(const std::list<sgTerrain::sgT_CellSlot> &gPosCompanies) {
         for (const auto &posNewComp: gPosCompanies) {
             uint32_t uuidNew = sTComp->createCompany(posNewComp.sgT_gPos, posNewComp.sgT_soilType, 0, 0);
@@ -123,6 +138,13 @@ public:
         }
     }
 
+    /**
+     * @fn void addNewCompany
+     * @brief creates a new company given the style, and the date and time of the actual simulation
+     * @param cCompanyCreation An enumerator descriving the type of company that will be created
+     * @param inRTime The reduced time of the actual simulation < 288
+     * @param inTDate The reduced date where this creation happens, it has to be a valid reduced date
+     */
     void addNewCompany(sCM_strStyleCompany cCompanyCreation, const uint32_t inRTime, const uint32_t inTDate) {
         FulfillIntentions::gTryIntention(
                 {sCompanyCompiler::sCCIntentions::GEN_CreateCompany, cCompanyCreation, nullptr}, *this, +
@@ -139,8 +161,21 @@ private:
     std::shared_ptr<sCivilMain> sM_sCompEmployee;
     std::shared_ptr<sContractorMain> sM_sContractor;
 
+    /**
+     * @class FulfillIntentions
+     * @brief This class is used to explicitly describe how the different intentions have to be executed in the simulation
+     */
     class FulfillIntentions {
     public:
+
+        /**
+         * @fn bool gTryIntention
+         * @param sCCI The type of intention that wil be executed
+         * @param inSCM The companyMain containing all the attributes to interact with the simulation
+         * @param inRTime The reduced time of the actual simulation < 288
+         * @param inTDate The reduced date where this creation happens, it has to be a valid reduced date
+         * @return A bool representing if the intention has been correctly executed
+         */
         static bool gTryIntention(const sCompanyCompiler::sCCIntentions &sCCI, sCompanyMain &inSCM,
                                   const uint32_t inRTime, const uint32_t inCDate) {
             switch (sCCI.scc_type) {
@@ -178,16 +213,32 @@ private:
             return true;
         }
 
+        /**
+         * @fn void gCompletedProduct
+         * @brief a function to obtain the product that you queued up days before
+         * @param oC A shared pointer to the company you want to obtain the completed products
+         * @param gItemGen The item that has produced, it has to be a valid index of the item list, smaller that the last item
+         * @param inGEconomy A shared pointer to economy where the changes will be applied
+         * @param inTDate The reduced date where this creation happens, it has to be a valid reduced date
+         */
         static void gCompletedProduct(const std::shared_ptr<objCompany> &oC, uint32_t gItemGen,
-                                      std::shared_ptr<groupEconomy> &inGEconomy, uint32_t inCDate) {
+                                      std::shared_ptr<groupEconomy> &inGEconomy, uint32_t inTDate) {
             if (oC != nullptr) {
                 inGEconomy->computeCreatedElement(gItemGen, oC);
                 oC->c_cAvailableByType[inGEconomy->getById(gItemGen).sMEE_iReqTypeBuild] += 1;
 
-                oC->removeProcessing(inCDate, gItemGen);
+                oC->removeProcessing(inTDate, gItemGen);
             }
         }
 
+        /**
+         * @fn void doRentContractsExistingResidents
+         * @brief For existing house with residents without a company, that in some point it gains it, this function
+         * applies the correct current rents to the finances of the company
+         * @param inPHouse A pair of positive coordinates marking the position of a valid house
+         * @param inSCM The companyMain containing all the attributes to interact with the simulation
+         * @param inTDate The reduced date where this creation happens, it has to be a valid reduced date
+         */
         static void
         doRentContractsExistingResidents(const std::pair<int, int> &inPHouse, sCompanyMain &inSCM, uint32_t inTDate) {
             uint8_t nResidents = inSCM.sM_groupLand->gL_gTerrain->gTG_civilOccupancy->get(inPHouse);
