@@ -74,7 +74,7 @@ public:
      */
     std::shared_ptr<objCivil>
     createCivil(std::pair<int, int> rPosCivHome, const objCompany &inObjCompany, uint32_t inTDate) {
-        std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator> r;
+        uint32_t _uuidRute;
         std::shared_ptr<objCivil> _oCivil;
 
         sgUndergroundMain::sgUM_lowestViableRoute lVRMetro = sCM_groupLand->gL_gUnderground->getLowestDistanceCommute(
@@ -82,12 +82,12 @@ public:
 
         if (lVRMetro.totalDistance < 30) {
             _oCivil = _getCivilMetro(rPosCivHome, inObjCompany, lVRMetro);
-            r = sCM_sRoadsMain->addRuteCivil(_oCivil);
+            _uuidRute = sCM_sRoadsMain->addRuteCivil(_oCivil);
         } else {
             _oCivil = _getCivilRoad(rPosCivHome, inObjCompany);
-            r = sCM_sRoadsMain->addRuteCivil(_oCivil);
+            _uuidRute = sCM_sRoadsMain->addRuteCivil(_oCivil);
         }
-        _oCivil->c_uuid = sCM_civilStorage->storeCivil(_oCivil, inObjCompany.c_uuid, r);
+        _oCivil->c_uuid = sCM_civilStorage->storeCivil(_oCivil, inObjCompany.c_uuid, _uuidRute);
 
         sCM_groupEconomy->gE_sRLR->addElement(inTDate);
         sCM_groupLand->gL_gTerrain->addCivilHomeToPos(rPosCivHome);
@@ -117,8 +117,7 @@ public:
     void removeRouteGivenCivil(const std::shared_ptr<objCivil> &inCivil, const uint32_t inUuidCompany) {
         sCivilStorage::sCS_cCivRoute _cRoute = sCM_civilStorage->routeCivilGivenCompany(inUuidCompany);
         sCM_cTotalCivil--;
-        sCM_sRoadsMain->removeRuteCivil(sCM_civilStorage->getByUuid(_cRoute.sCS_cCRCivil), _cRoute.sCS_cCRUrBegin,
-                                        _cRoute.sCS_cCRUrEnd);
+        sCM_sRoadsMain->removeRuteCivil(_cRoute.sCS_cCRRouteUuid);
     }
 
     /**

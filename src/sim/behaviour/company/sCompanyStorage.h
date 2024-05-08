@@ -37,7 +37,7 @@ public:
                 std::pair<uint32_t, uint32_t> pairTimeActive = i.second->c_activeDates.c_StrEndTime;
                 if (inRTimer >= pairTimeActive.first && inRTimer <= pairTimeActive.second) {
                     std::vector<sCompanyCompiler::sCCIntentions> rComp =
-                            sCompanyCompiler::givenCode(inSCode->getCodeByUuid(i.second->c_uuid).sCO_Code, i.second);
+                            sCompanyCompiler::givenCode(inSCode->getElementByUuid(i.second->c_uuid)->sCO_Code, i.second);
                     ret.insert(ret.end(), rComp.begin(), rComp.end());
                 }
             }
@@ -131,11 +131,11 @@ public:
         std::shared_ptr newObjCompany = std::make_shared<objCompany>(objCompany(inVecNPos, inTypeSoilCompany,
                                                                                 {sCT_vActiveDaysValid[randomIndexDay],
                                                                                  sCT_vActiveHoursValid[randomIndexHour]}));
-        uint32_t _idNewComp = sCT_vTotalComp.storeElement(newObjCompany);
+        uint32_t _idNewComp = sCT_vTotalComp.addElement(newObjCompany);
         newObjCompany->c_uuid = _idNewComp;
         newObjCompany->addPayment(5000, oPC_TypePayment::oPC_TP_INVESTMENT_START, inRTime, inTDate);
-        sCT_sCodeS->initNewCode(_idNewComp, inTypeSoilCompany);
-        getCompanyByUUID(_idNewComp)->c_cCode = sCT_sCodeS->getPointerCodeByUuid(_idNewComp);
+        sCT_sCodeS->addElement({_idNewComp, inTypeSoilCompany});
+        getCompanyByUUID(_idNewComp)->c_cCode = sCT_sCodeS->getElementByUuid(_idNewComp);
 
 
         for (const auto &nPos: inVecNPos)
@@ -149,7 +149,7 @@ public:
      * @param inObjCompany A valid company that hasn't been removed, that you want to have removed
      */
     void removeCompany(const std::shared_ptr<objCompany> &inObjCompany) {
-        sCT_vTotalComp.removeElement(inObjCompany->c_uuid);
+        sCT_vTotalComp.removeElementByUuid(inObjCompany->c_uuid);
     }
 
     /**

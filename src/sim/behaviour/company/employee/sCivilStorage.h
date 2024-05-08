@@ -29,13 +29,13 @@ public:
     sCivilStorage() : sCS_vecCivil(std::make_shared<rVectorCivil>(30000)) {}
 
     uint32_t storeCivil(const std::shared_ptr<objCivil> &inNewCivil, uint32_t inUuidCompany,
-                        std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator> inRoute) {
-        uint32_t _uuidCivil = sCS_vecCivil->storeElement(inNewCivil);
+                        uint32_t inRoute) {
+        uint32_t _uuidCivil = sCS_vecCivil->addElement(inNewCivil);
 
         if (sCS_mapCivilByCompany.find(inUuidCompany) == sCS_mapCivilByCompany.end())
             sCS_mapCivilByCompany[inUuidCompany] = {};
 
-        sCS_mapCivilByCompany[inUuidCompany].push_back({_uuidCivil, inRoute.first, inRoute.second});
+        sCS_mapCivilByCompany[inUuidCompany].push_back({_uuidCivil, inRoute});
         return _uuidCivil;
     }
 
@@ -51,8 +51,7 @@ public:
 
     struct sCS_cCivRoute {
         uint32_t sCS_cCRCivil;
-        std::list<objCivil>::iterator sCS_cCRUrBegin;
-        std::list<objCivil>::iterator sCS_cCRUrEnd;
+        uint32_t sCS_cCRRouteUuid;
     };
 
     /**
@@ -73,7 +72,7 @@ public:
     void removeCivilGivenCompany(uint32_t uuidCompany){
         sCS_cCivRoute _cCR = sCS_mapCivilByCompany[uuidCompany].front();
         sCS_mapCivilByCompany[uuidCompany].pop_front();
-        sCS_vecCivil->removeElement(_cCR.sCS_cCRCivil);
+        sCS_vecCivil->removeElementByUuid(_cCR.sCS_cCRCivil);
     }
 
 private:

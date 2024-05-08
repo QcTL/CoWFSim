@@ -26,6 +26,12 @@ struct objActiveRute {
     uint64_t c_uuid;
 };
 
+
+struct sCodeBase {
+    uint32_t uuidNewCompany;
+    uint8_t typeStartCompany;
+};
+
 /**
  * @struct sCodeObj
  * @brief This struct is used to save the code of a given company and its score

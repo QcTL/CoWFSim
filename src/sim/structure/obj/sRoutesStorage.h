@@ -16,7 +16,7 @@
  * @class sRoutesStorage
  * @brief This class is responsible to store the routes of the simulation
  */
-class sRoutesStorage {
+class sRoutesStorage : public iStorage<objActiveRute, std::shared_ptr<objCivil>> {
 public:
     sRoutesStorage() {
         mExitTimesCivil = std::vector<std::list<objCivil>>(289);
@@ -26,15 +26,15 @@ public:
      * @fn addRuteCivil
      * @brief Insert a route civil into the storage to be reference in the future
      * @param objCivil The objCivil you want to insert
-     * @return A pair of iterators to the position of the route in the list
+     * @return The uuid of the new route inserted
      */
-    [[nodiscard]]
-    std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator>
-    addRuteCivil(const std::shared_ptr<objCivil> &objCivil) {
+    uint32_t addElement(const std::shared_ptr<objCivil> &objCivil) override {
         mExitTimesCivil[objCivil->c_TBegin].push_front(*objCivil);
         mExitTimesCivil[objCivil->c_TEnd].push_front(*objCivil);
-
-        return {mExitTimesCivil[objCivil->c_TBegin].begin(), mExitTimesCivil[objCivil->c_TEnd].begin()};
+        sRS_uuidRoadIter.emplace_back(mExitTimesCivil[objCivil->c_TBegin].begin(),
+                                      mExitTimesCivil[objCivil->c_TEnd].begin());
+        sRS_uuidRoadTimes.emplace_back(objCivil->c_TBegin, objCivil->c_TBegin);
+        return sRS_uuidRoadIter.size() - 1;
     }
 
     /**
@@ -44,11 +44,19 @@ public:
      * @param gPBegin The first iterator given in the adding function
      * @param gPEnd The second iterator given in the adding function
      */
-    void removeRuteCivil(const std::shared_ptr<objCivil> &inObjCivil,
-                         const std::list<objCivil>::iterator &gPBegin,
-                         const std::list<objCivil>::iterator &gPEnd) {
-        mExitTimesCivil[inObjCivil->c_TBegin].erase(gPBegin);
-        mExitTimesCivil[inObjCivil->c_TEnd].erase(gPEnd);
+    bool removeElementByUuid(uint32_t inUuidElem) override {
+        if(sRS_uuidRoadTimes.size() <= inUuidElem)
+            return false;
+
+        std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator> _rItS = sRS_uuidRoadIter[inUuidElem];
+        std::pair<uint8_t, uint8_t> _rTiS = sRS_uuidRoadTimes[inUuidElem];
+        mExitTimesCivil[_rTiS.first].erase(_rItS.first);
+        mExitTimesCivil[_rTiS.second].erase(_rItS.second);
+        return true;
+    }
+
+    std::shared_ptr<objActiveRute> getElementByUuid(uint32_t inUuidElem) override{
+        return nullptr;
     }
 
     /**
@@ -58,7 +66,8 @@ public:
      * @param inTDate The reduced date where this creation happens, it has to be a valid reduced date
      * @return A list of all the routes with that specific type that start in the inRTime(hour) and in the inTDate(date)
      */
-    std::vector<objActiveRute> getRoutesByType(const objCivil::typeRouteSystem inRouteType, uint32_t inRTime, uint32_t inTDate) {
+    std::vector<objActiveRute>
+    getRoutesByType(const objCivil::typeRouteSystem inRouteType, uint32_t inRTime, uint32_t inTDate) {
         std::vector<objActiveRute> rRet;
         if (mExitTimesCivil[inRTime].empty())
             return {};
@@ -73,6 +82,8 @@ public:
     };
 
 private:
+    std::vector<std::pair<std::list<objCivil>::iterator, std::list<objCivil>::iterator>> sRS_uuidRoadIter;
+    std::vector<std::pair<uint8_t, uint8_t>> sRS_uuidRoadTimes;
     std::vector<std::list<objCivil>> mExitTimesCivil;
 };
 
