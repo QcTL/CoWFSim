@@ -8,6 +8,10 @@
 #include <utility>
 #include <cstdint>
 
+/**
+ * @class objCivil
+ * @brief This class represents a civilian in the simulation with a work commute
+ */
 class objCivil {
 public:
 
@@ -18,9 +22,6 @@ public:
     struct objRoadTravel {
         std::pair<int, int> c_RStart;
         std::pair<int, int> c_REnd;
-
-        objRoadTravel(const std::pair<int, int> &cRStart, const std::pair<int, int> &cREnd)
-                : c_RStart(cRStart), c_REnd(cREnd) {}
     };
 
     objCivil(typeRouteSystem cTrs, const std::pair<int, int> pHome, const std::pair<int, int> pWork,
@@ -29,8 +30,13 @@ public:
               c_TBegin(cTBegin), c_TEnd(cTEnd),
               c_RActiveDays(cActiveDays) {}
 
-    [[nodiscard]] bool isActiveDay(uint32_t cDate) const {
-        return c_RActiveDays & 1 << (cDate & 0b111);
+    /**
+     * @fn bool isActiveDay
+     * @param inCDate The reduced date where this creation happens, it has to be a valid reduced date
+     * @return Returs true if the civilian works in that day, false otherwise
+     */
+    [[nodiscard]] bool isActiveDay(uint32_t inCDate) const {
+        return c_RActiveDays & 1 << (inCDate & 0b111);
     }
 
     uint64_t c_uuid = 0;

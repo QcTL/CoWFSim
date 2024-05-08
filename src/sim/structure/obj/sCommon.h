@@ -6,19 +6,19 @@
 #define CITYOFWEIRDFISHES_SCOMMON_H
 
 
-struct objProdRecipe {
-    std::uint32_t pr_idObjEnd;
-    std::vector<std::uint16_t> pr_reqBuilding;
-    std::vector<std::uint32_t> pr_reqProdId;
-    std::uint32_t pr_reqTime;
-};
-
+/**
+ * @struct retObjSLayerCells
+ * @brief This struct is used as a return element for the function of setting the values of elements in each cell
+ */
 struct retObjSLayerCells {
     std::shared_ptr<gIGrid<uint8_t>> gUnderground;
     std::vector<std::vector<std::pair<int, int>>> routesMetro;
-
 };
 
+/**
+ * @struct objActiveRute
+ * @brief This struct defines a route that a car should be taking in its commute
+ */
 struct objActiveRute {
     std::pair<int, int> c_RStart;
     std::pair<int, int> c_REnd;
@@ -26,6 +26,10 @@ struct objActiveRute {
     uint64_t c_uuid;
 };
 
+/**
+ * @struct sCodeObj
+ * @brief This struct is used to save the code of a given company and its score
+ */
 struct sCodeObj {
     std::vector<uint64_t> sCO_Code;
     uint32_t sCO_Score = 0;
@@ -43,6 +47,10 @@ enum oPC_TypePayment {
     oPC_TP_CONTRACT_ADQUIRE_CELL,
 };
 
+/**
+ * @struct objPaymentCompany
+ * @brief Thi struct is used to define a repeated payment given the different possible types of payment
+ */
 struct objPaymentCompany {
     double opc_qPayment;
     oPC_TypePayment opc_pType;

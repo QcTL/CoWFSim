@@ -23,6 +23,10 @@
 #include "src/sim/eyeCatcher/eyeCatcherConnection.h"
 #include "src/sim/eyeCatcher/eyeCatcherActive.h"
 
+/**
+ * @class SimInitialize
+ * @brief This class is responsible to load the starting parameters of the simulation, and execute the main simulator
+ */
 class SimInitialize {
 public:
     static int givenMap(const std::map<std::string, std::string> &mValues) {
