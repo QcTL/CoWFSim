@@ -25,6 +25,7 @@ public:
         gLayerTransit = std::make_shared<gBasicGrid<uint8_t>>(gBasicGrid<uint8_t>(inGridSize, inGridSize, 0));
         sgRM_gNearRoad = std::make_shared<gBasicGrid<rNode *>>(gBasicGrid<rNode *>(inGridSize, inGridSize, nullptr));
     }
+
     /**
      * @fn void tickReduced
      * @brief Updates the elements in the class that need changing every 5 tick of the simulation
@@ -120,9 +121,10 @@ private:
         auto newCarRoutes = sgRM_sTRoutes->getRoutesByType(objCivil::typeRouteSystem::OC_TRS_CAR, inRTime, inTDate);
         for (auto &r: newCarRoutes) {
             sEventManager::getInstance()->callEventStartRoute(inRTime, inTDate, r.c_uuid, r);
-            uint32_t locId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->locIdNode;
-            uint16_t blocId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->rBlock;
-            gLayerRoads[r.c_RStart.first][r.c_RStart.second]->refCompressed->addNewCar(locId, blocId);
+            uint32_t _locId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->locIdNode;
+            uint16_t _blocId = gLayerRoads[r.c_REnd.first][r.c_REnd.second]->refCompressed->rBlock;
+            gLayerRoads[r.c_RStart.first][r.c_RStart.second]->refCompressed->
+                    addNewCar(rActiveVehicle::addCar(r.c_RStart, r.c_REnd, _locId, _blocId));
         }
 
         auto newMetroRoutes = sgRM_sTRoutes->getRoutesByType(objCivil::typeRouteSystem::OC_TRS_TRAIN, inRTime, inTDate);
@@ -130,6 +132,7 @@ private:
             sEventManager::getInstance()->callEventStartRoute(inRTime, inTDate, r.c_uuid, r);
         }
     }
+
     /**
      * @fn void routeCarsGhost
      * @brief Given the date and the time, start the routes of ghost cars that start in that timeframe.
@@ -146,7 +149,8 @@ private:
                     sgRM_gLand->gL_gTerrain->returnRandomFullCivil());
             uint32_t _locId = gLayerRoads[_gPointEnd.first][_gPointEnd.second]->refCompressed->locIdNode;
             uint16_t _blocId = gLayerRoads[_gPointEnd.first][_gPointEnd.second]->refCompressed->rBlock;
-            gLayerRoads[_gPointStart.first][_gPointStart.second]->refCompressed->addNewCar(_locId, _blocId);
+            gLayerRoads[_gPointStart.first][_gPointStart.second]->refCompressed->
+                    addNewCar(rActiveVehicle::addCar(_gPointStart, _gPointEnd, _locId, _blocId));
         }
     }
 
@@ -182,7 +186,7 @@ private:
         for (uint32_t i = 0; i < r.second.size(); ++i) {
             for (uint32_t j = 0; j < r.second[i].size(); ++j) {
                 if (r.second[i][j] != nullptr) {
-                    gLayerTransit->set(i, j, 1);
+                    gLayerTransit->set((int) i, (int) j, 1);
                     sgRM_vecRNodes.push_back(r.second[i][j]);
                 }
             }

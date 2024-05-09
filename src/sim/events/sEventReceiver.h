@@ -202,6 +202,16 @@ r    * @brief One of the events called when a Cell is rented, this carries the i
      * @param inTDate The simulated Reduced date where the event was fired
      */
     virtual void er_EventCountHour(uint32_t inRTime, uint32_t inTDate) {}
+
+
+    /**
+     * @fn void er_EventSoftLockCar
+     * @brief This event is called at the beginning of every hour
+     * @param inRTime The simulated Reduced time where the event was fired
+     * @param inTDate The simulated Reduced date where the event was fired
+     */
+    virtual void
+    er_EventSoftLockCar(const std::pair<uint32_t, uint32_t> inStrPos, const std::pair<uint32_t, uint32_t> inEndPos) {}
 };
 
 #endif //CITYOFWEIRDFISHES_SEVENTRECEIVER_H

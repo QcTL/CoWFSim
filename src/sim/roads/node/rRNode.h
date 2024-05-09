@@ -16,6 +16,7 @@
 #include "../../../display/rRemoteUpdateGrid.h"
 #include "../../structure/grids/gIGrid.h"
 #include "../../eyeCatcher/eyeValue.h"
+#include "../../events/sEventManager.h"
 
 
 class rRNodeI {
@@ -36,7 +37,7 @@ public:
 
     virtual std::pair<uint32_t, uint32_t> takeCarPrep(const uint8_t &dDir, const uint8_t &nLine) = 0;
 
-    virtual void addNewCar(uint32_t idDest, uint16_t blockDest) = 0;
+    virtual void addNewCar(uint32_t inUuidCar) = 0;
 
     void sendInformationStart() {
         rInfoDist::addSelfDist(locIdNode);
@@ -74,6 +75,7 @@ public:
     uint16_t rBlock;
 
     uint8_t nLines = 1;
+    uint8_t nCompressed;
 
     struct rPV_Car_Export {
         uint64_t rPV_uuidCar;
@@ -142,6 +144,7 @@ class rRNodeC : public rRNodeI {
     //CROSSING
 public:
     explicit rRNodeC(uint16_t rBlock) : rRNodeI(rBlock), itsEmpty(true) {
+        nCompressed = 1;
         sVecCarPos = std::vector<std::list<std::pair<uint32_t, uint32_t>>>
                 (4, std::list<std::pair<uint32_t, uint32_t>>());
     }
@@ -168,13 +171,14 @@ public:
             std::pair<uint32_t, uint16_t> destCar = rActiveVehicle::getDestByCar(carActInside.first);
             uint8_t dDir = rInfoDist::returnDirToDist(destCar.first, destCar.second, rBlock, globIdNode);
 
-            if (dDir < 4 && destCar.second == rBlock && (destCar.first == locIdNode || getByDir(dDir)->rBlock != destCar.second)) {
+            if (dDir < 4 && destCar.second == rBlock &&
+                (destCar.first == locIdNode || getByDir(dDir)->rBlock != destCar.second)) {
                 rActiveVehicle::removeCar(carActInside.first);
                 updateRefGrid(false);
-            } else if(dDir < 4){
+            } else if (dDir < 4) {
                 sVecCarPos[dDir].push_back(carActInside);
                 notifyEnterNext(dDir, carActInside, 0);
-            }else {
+            } else {
                 rActiveVehicle::removeCar(carActInside.first);
                 updateRefGrid(false);
             }
@@ -197,7 +201,9 @@ public:
         return retV;
     }
 
-    void addNewCar(uint32_t idDest, uint16_t blockDest) override {}
+    void addNewCar(uint32_t inUuidCar) override {
+        rActiveVehicle::removeCar(inUuidCar);
+    }
 
     [[nodiscard]] float getOccupancy() const override { return itsEmpty ? 0 : 1.0; }
 
@@ -240,8 +246,9 @@ private:
 class rRNodeL : public rRNodeI {
     //LINE
 public:
-    rRNodeL(uint16_t rBlock, uint8_t nCompressed, uint8_t nLinesIn) :
-            rRNodeI(rBlock), nCompressed(nCompressed) {
+    rRNodeL(uint16_t rBlock, uint8_t inNCompressed, uint8_t nLinesIn) :
+            rRNodeI(rBlock) {
+        nCompressed = inNCompressed;
         nLines = nLinesIn;
         dVecFirst = std::vector<rRoad>(nLines, rRoad(nCompressed));
         dVecSecond = std::vector<rRoad>(nLines, rRoad(nCompressed));
@@ -274,6 +281,10 @@ public:
                     std::pair<uint32_t, uint16_t> destCar = rActiveVehicle::getDestByCar(c.first);
                     if (destCar.second == rBlock &&
                         (destCar.first == locIdNode || getByDir(dEndFirst)->rBlock != destCar.second)) {
+                        if (destCar.second == rBlock && dEndFirst < 4 && getByDir(dEndFirst)->rBlock != destCar.second)
+                            sEventManager::getInstance()->callEventSoftLockCar(rActiveVehicle::getStartPos(c.first),
+                                                                               rActiveVehicle::getEndPos(c.first));
+
                         dVecFirst[i].pState[c.second] = false;
                         it = dVecFirst[i].lOrderedCars.erase(it);
                         hasChanged = true;
@@ -318,6 +329,11 @@ public:
                     if (dEndSecond > 3 ||
                         (destCar.second == rBlock &&
                          (destCar.first == locIdNode || getByDir(dEndSecond)->rBlock != destCar.second))) {
+                        if (destCar.second == rBlock && dEndSecond < 4 &&
+                            getByDir(dEndSecond)->rBlock != destCar.second)
+                            sEventManager::getInstance()->callEventSoftLockCar(rActiveVehicle::getStartPos(c.first),
+                                                                               rActiveVehicle::getEndPos(c.first));
+
                         dVecSecond[i].pState[c.second] = false;
                         it = dVecSecond[i].lOrderedCars.erase(it);
                         hasChanged = true;
@@ -366,8 +382,8 @@ public:
         return nLines;
     }
 
-    void addNewCar(uint32_t idDest, uint16_t blockDest) override {
-        std::pair<uint32_t, uint32_t> newCar = {rActiveVehicle::addCar(idDest, blockDest), 0};
+    void addNewCar(uint32_t inUuidCar) override {
+        std::pair<uint32_t, uint32_t> newCar = {inUuidCar, 0};
         //Afegir en la primera carretera:
         dVecFirst[0].pState[0] = true;
         dVecFirst[0].lOrderedCars.push_back(newCar);
@@ -472,8 +488,6 @@ private:
             updateRefGrid(getMaxTotalCarsRoad());
         }
     }
-
-    uint8_t nCompressed;
 
     struct rRoad {
         explicit rRoad(uint8_t nCompressed) : pState(nCompressed, false) {}

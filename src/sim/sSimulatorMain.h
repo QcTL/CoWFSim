@@ -19,6 +19,7 @@
 #include "behaviour/clock/sClockMain.h"
 #include "groups/groupLand/groupLand.h"
 #include "groups/groupEconomy/groupEconomy.h"
+#include "roads/sgAStarRoad.h"
 
 std::shared_ptr<sEventManager> sEventManager::sEM_instance = nullptr;
 std::shared_ptr<eyeCatcherActive> eyeCatcherActive::instance = nullptr;
@@ -44,6 +45,8 @@ public:
         sSM_groupLand = std::make_shared<groupLand>(lSize);
 
         sSM_gMainRoads = std::make_shared<sgRoadsMain>(lSize, sSM_groupLand);
+        sSM_gAStarRoads = std::make_shared<sgAStarRoad>(sSM_gMainRoads);
+
         sMCivil = std::make_shared<sCivilMain>(sSM_gMainRoads, sSM_groupLand, sSM_groupEconomy);
         sSM_sCompany = std::make_shared<sCompanyMain>(lSize, sMCivil,
                                                       sSM_groupLand, sSM_groupEconomy);
@@ -56,6 +59,7 @@ public:
 
     //ROADS
     std::shared_ptr<sgRoadsMain> sSM_gMainRoads;
+    std::shared_ptr<sgAStarRoad> sSM_gAStarRoads;
     std::shared_ptr<gIGrid<rNode *>> gLayerNextRoad;
 
     std::shared_ptr<rPileMenus> rInteraction;
@@ -82,6 +86,7 @@ public:
         sMClock->tick();
         sSM_groupLand->tick(sMClock->getComplete());
         sSM_gMainRoads->tick();
+        sSM_gAStarRoads->tick();
     }
 
     /**

@@ -150,6 +150,7 @@ add_executable(CityOfWeirdFishes main.cpp
         src/display/menus/implementation/rRoadView/rRoadPresentView.h
         src/display/menus/rIScrollableMenu.h
         src/sim/behaviour/interface/iStorage.h
+        src/sim/roads/sgAStarRoad.h
 )
 
 target_link_libraries(CityOfWeirdFishes sfml-graphics sfml-window sfml-system)

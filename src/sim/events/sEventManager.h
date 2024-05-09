@@ -38,6 +38,7 @@ public:
         sEM_EventEndDay = 16,
         sEM_EventStartDay = 17,
         sEM_EventCountHour = 18,
+        sEM_EventSoftLockCar = 19,
     };
 
     sEventManager() = default;
@@ -162,6 +163,11 @@ public:
     void callEventCountHour(uint32_t inRTime, uint32_t inTDate) {
         for (const auto eR: sEM_mapEventReceivers[sEM_EventStartDay])
             eR->er_EventCountHour(inRTime,inTDate);
+    }
+
+    void callEventSoftLockCar(const std::pair<uint32_t, uint32_t> inStrPos, const std::pair<uint32_t, uint32_t> inEndPos) {
+        for (const auto eR: sEM_mapEventReceivers[sEM_EventStartDay])
+            eR->er_EventSoftLockCar(inStrPos, inEndPos);
     }
 
 private:

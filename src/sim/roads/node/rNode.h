@@ -5,6 +5,8 @@
 #ifndef CITYOFWEIRDFISHES_RNODE_H
 #define CITYOFWEIRDFISHES_RNODE_H
 
+#include <utility>
+
 #include "rRNode.h"
 
 struct rNode{
@@ -17,7 +19,7 @@ struct rNode{
 
     std::shared_ptr<rRNodeI> refCompressed;
     // Constructor
-    rNode(std::pair<uint32_t , uint32_t> nPos) : rLeft(nullptr), rRight(nullptr), rTop(nullptr), rBottom(nullptr), refCompressed(nullptr), rPos(nPos) {}
+    rNode(std::pair<uint32_t , uint32_t> nPos) : rLeft(nullptr), rRight(nullptr), rTop(nullptr), rBottom(nullptr), refCompressed(nullptr), rPos(std::move(nPos)) {}
 };
 
 #endif //CITYOFWEIRDFISHES_RNODE_H
