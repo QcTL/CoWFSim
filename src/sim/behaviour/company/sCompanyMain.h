@@ -56,7 +56,7 @@ public:
                                                             std::max(2, std::min(100, (int) (100000 /
                                                                                              sM_sCompEmployee->getNCivil()))));
             int _resChoose = distribution(sCM_genRPos);
-            if (_resChoose <= 2) {
+            if (_resChoose <= 10) {
                 addNewCompany(static_cast<sCM_strStyleCompany>(_resChoose), inRTime, inTDate);
                 std::cout << "S'HA CREAT UNA EMPRESA" << std::endl;
             }
@@ -147,7 +147,7 @@ public:
      */
     void addNewCompany(sCM_strStyleCompany cCompanyCreation, const uint32_t inRTime, const uint32_t inTDate) {
         FulfillIntentions::gTryIntention(
-                {sCompanyCompiler::sCCIntentions::GEN_CreateCompany, cCompanyCreation, nullptr}, *this, +
+                {sCompanyCompiler::sCCIntentions::GEN_CreateCompany, static_cast<uint32_t>(cCompanyCreation), nullptr}, *this, +
                         inRTime, inTDate);
     }
 
@@ -390,7 +390,7 @@ private:
                                                                  sgTerrain::sgT_TypeSoil::sgT_TS_T1Farm};
             sgTerrain::sgT_TypeSoil gTypeCompany = gTypeGivenTC[sCCI.scc_addIdInfo % gTypeGivenTC.size()];
             uint32_t uuidNew = inSCM.sTComp->createCompany({}, gTypeCompany, inRTime, inCDate);
-            gTryIntention({sCompanyCompiler::sCCIntentions::CELL_Buy, gTypeCompany,
+            gTryIntention({sCompanyCompiler::sCCIntentions::CELL_Buy, static_cast<uint32_t>(gTypeCompany),
                            inSCM.sTComp->getCompanyByUUID(uuidNew)}, inSCM, inRTime, inCDate);
             for (int i = 0; i < 2; i++)
                 FulfillIntentions::gTryIntention({sCompanyCompiler::sCCIntentions::GEN_HireEmployee, 0,

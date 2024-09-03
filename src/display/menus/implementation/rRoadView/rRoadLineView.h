@@ -17,8 +17,8 @@ public:
 
         pElemNumSize = {};
 
-        gHeightsTop = {6, 4, 2};
-        gHeightsBottom = {12, 10, 8};
+        gHeightsTop = {6, 4, 2, 0};
+        gHeightsBottom = {12, 10, 8, 6};
 
         for (int i = 0; i < rIM_dExtracted.size(); ++i) {
             for (int j = 0; j < rIM_dExtracted[i].size(); ++j) {

@@ -8,11 +8,10 @@
  */
 class rActiveVehicle {
 public:
-
     static rActiveVehicle initializer;
 
     rActiveVehicle() {
-        initialize(30000);
+        initialize(100000);
         fEmpty = 0;
     }
 
@@ -21,7 +20,7 @@ public:
      * @param rCar The uuid of the car given when it was added
      * @return A pair with destination index and block index
      */
-    static std::pair<uint32_t, uint16_t> getDestByCar(uint32_t rCar){
+    static std::pair<uint32_t, uint16_t> getDestByCar(uint32_t rCar) {
         return tVecCars[rCar];
     }
 
@@ -34,6 +33,7 @@ public:
      */
     static uint32_t addCar(uint32_t destPos, uint16_t destBlock) {
         uint32_t prevFEmpty = fEmpty;
+        if (prevFEmpty > tVecCars.size() - 1) prevFEmpty = 0;
         fEmpty = tVecCars[fEmpty].first;
         tVecCars[prevFEmpty] = {destPos, destBlock};
         return prevFEmpty;
@@ -49,7 +49,7 @@ public:
     }
 
 private:
-    static std::vector<std::pair<uint32_t, uint16_t>> tVecCars;
+    static std::vector<std::pair<uint32_t, uint16_t> > tVecCars;
     static uint32_t fEmpty;
 
     /**
@@ -57,15 +57,15 @@ private:
      * @param nMaxCars Number of maximum amount of cars that he class will hold
      */
     static void initialize(const uint32_t nMaxCars) {
-        tVecCars = std::vector<std::pair<uint32_t, uint16_t>>(nMaxCars, {-1, -1});
+        tVecCars = std::vector<std::pair<uint32_t, uint16_t> >(nMaxCars, {-1, -1});
         for (int i = 0; i < nMaxCars - 1; i++) {
-            tVecCars[i] = {i+1, -1};
+            tVecCars[i] = {i + 1, -1};
             fEmpty = 0;
         }
-        tVecCars[tVecCars.size() -1] = {-1, -1};
+        tVecCars[tVecCars.size() - 1] = {-1, -1};
     }
 };
 
-std::vector<std::pair<uint32_t, uint16_t>> rActiveVehicle::tVecCars;
+std::vector<std::pair<uint32_t, uint16_t> > rActiveVehicle::tVecCars;
 uint32_t rActiveVehicle::fEmpty;
 rActiveVehicle rActiveVehicle::initializer;
